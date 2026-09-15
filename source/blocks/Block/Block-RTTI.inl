@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "../Block.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Check if type origin is the same as one of the provided types          
@@ -431,4 +431,4 @@ namespace Langulus::Anyness
       }
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

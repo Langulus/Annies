@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -38,7 +38,7 @@ namespace Langulus::CT
 
 } // namespace Langulus::CT
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -125,4 +125,4 @@ namespace Langulus::Anyness
    template<class K, class V>
    TPair(K&&, V&&) -> TPair<Deref<K>, Deref<V>>;
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

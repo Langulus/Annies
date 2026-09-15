@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -21,7 +21,7 @@
 #define TABLE()      Set<ORDERED>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Refer constructor                                                      
@@ -299,7 +299,7 @@ namespace Langulus::Anyness
       BlockSet::Reserve<Set>(count);
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TEMPLATE
 #undef TABLE

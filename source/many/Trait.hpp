@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -19,15 +19,15 @@ namespace Langulus
       /// An abstract Trait structure                                         
       /// It defines the size for CT::Trait and CT::TraitBased concepts       
       ///                                                                     
-      struct Trait : Anyness::Many {
+      struct Trait : Annies::Many {
          LANGULUS(ABSTRACT) true;
          LANGULUS(DEEP) false;
          LANGULUS(ACT_AS) A::Trait;
-         LANGULUS_BASES(Anyness::Many);
+         LANGULUS_BASES(Annies::Many);
 
       protected:
-         using Base  = Anyness::Many;
-         using TMeta = Anyness::TMeta;
+         using Base  = Annies::Many;
+         using TMeta = Annies::TMeta;
 
          // The trait tag                                               
          mutable TMeta mTraitType {};
@@ -54,7 +54,7 @@ namespace Langulus
 
 } // namespace Langulus
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -149,4 +149,4 @@ namespace Langulus::Anyness
       Count Serialize(CT::Serial auto&) const;
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

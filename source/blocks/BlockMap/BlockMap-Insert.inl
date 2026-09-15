@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,7 +11,7 @@
 #include "../../blocks/Block/Block-Construct.inl"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Wrap the argument into a handle with key's type                        
@@ -71,7 +71,7 @@ namespace Langulus::Anyness
    ///   @return the number of inserted elements after unfolding              
    template<CT::Map THIS>
    Count BlockMap::UnfoldInsert(auto&& item) {
-      using E = Conditional<CT::Typed<THIS>, typename THIS::Pair, Anyness::Pair>;
+      using E = Conditional<CT::Typed<THIS>, typename THIS::Pair, Annies::Pair>;
       using S = IntentOf<decltype(item)>;
       using T = TypeOf<S>;
 
@@ -808,4 +808,4 @@ namespace Langulus::Anyness
       return GetCount() - initialCount;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

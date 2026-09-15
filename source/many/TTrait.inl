@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,7 +13,7 @@
 #define TME()        TTrait<TRAIT>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Refer-constructor                                                      
@@ -165,7 +165,7 @@ namespace Langulus::Anyness
       return Trait::Serialize<TRAIT>(to);
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TME
 #undef TEMPLATE

@@ -1,7 +1,7 @@
-# Anyness
+# Annies
 Modern (C++20) cross-platform set of type-erased containers, for standalone or [Langulus](https://github.com/Langulus/Langulus) use
 
-[![Langulus::Anyness CI](https://github.com/Langulus/Anyness/actions/workflows/ci.yml/badge.svg)](https://github.com/Langulus/Anyness/actions/workflows/ci.yml)
+[![Langulus::Annies CI](https://github.com/Langulus/Annies/actions/workflows/ci.yml/badge.svg)](https://github.com/Langulus/Annies/actions/workflows/ci.yml)
 
 ## What is it?
 The main design goal behind the library, is to simplify containment of data as much as possible without sacrificing a lot of performance.
@@ -85,7 +85,7 @@ if (integers.Is<int>()) {
 Integrated with std::range, even when type-erased:
 ```c++
 Any integers {1, 2, 3};
-for (auto it : integers) {  // it is a type-erased iterator, that turns to Anyness::Block when dereferenced
+for (auto it : integers) {  // it is a type-erased iterator, that turns to Annies::Block when dereferenced
    if(it == 1)    { /*true for first element, false for the rest*/ }
    if(it == 1.0f) { /*always false*/ }
 }
@@ -127,15 +127,15 @@ The plan is to never support older C++ standards. When C++23 comes out, it will 
 ## Building the library
 1. Clone the main branch
    - navigate to a folder of your choice and:
-   - `git clone https://github.com/Langulus/Anyness.git`
+   - `git clone https://github.com/Langulus/Annies.git`
 2. Use CMake to configure the project...:
    - by directly opening the cloned folder in MSVC 2022 and running the integrated CMake (preferred)
-   - by using CMake (at least version 3.22) directly (see the [CI file](https://github.com/Langulus/Anyness/blob/main/.github/workflows/ci.yml) for hints on that)
+   - by using CMake (at least version 3.22) directly (see the [CI file](https://github.com/Langulus/Annies/blob/main/.github/workflows/ci.yml) for hints on that)
 3. If in-tree as part of another project, you are responsible for providing the dependencies. Otherwise, when configuring as a top-level project, wait for external libraries to be automatically and seamlessly downloaded at configure time (happens only once, unless you delete the `external` folder) and configured by CMake:
    - [Langulus::Core](https://github.com/Langulus/Core) is used for common definitions all across Langulus
    - [Langulus::Logger](https://github.com/Langulus/Logger) is used for logging on debug builds
       - [fmt](https://github.com/fmtlib/fmt) will be downloaded, too
-   - [Langulus::RTTI](https://github.com/Langulus/RTTI) is used for reflecting any contained types - it is highly recommended to readup on it, so that you can fully take advantage of many Anyness features, such as marking types explicitly as POD, for example
+   - [Langulus::RTTI](https://github.com/Langulus/RTTI) is used for reflecting any contained types - it is highly recommended to readup on it, so that you can fully take advantage of many Annies features, such as marking types explicitly as POD, for example
    - [Langulus::SIMD](https://github.com/Langulus/SIMD) is used for statically optimized containers of vectorizable types (WIP)
       - [SIMDe](https://github.com/simd-everywhere/simde) will be downloaded, too
 4. Setup CMake options for features (and reconfigure if you have to)
@@ -152,10 +152,10 @@ The plan is to never support older C++ standards. When C++23 comes out, it will 
    - enable `LANGULUS_FEATURE_ENCRYPTION` - WIP
    - you can set `LANGULUS_ALIGNMENT` to a power-of-two number - it will affect available SIMD optimizations, as well as minimal allocation sizes
 5. Build using your favourite C++20 compliant compiler version
-6. Use by linking with Langulus.Anyness CMake target (or library output), and including <LangulusAnyness.hpp>
+6. Use by linking with Langulus.Annies CMake target (or library output), and including <LangulusAnnies.hpp>
 
 ## Motivation
-**Anyness** started out as an educational project. 
+**Annies** started out as an educational project. 
 Few years later, as [Langulus](https://github.com/Langulus/Langulus) strayed away from standard containers, it became a simple drop-in replacement for `std::any`. With the years, it evolved to its own thing, with memory manager, RTTI, new semantics, and style.
 [Langulus](https://github.com/Langulus/Langulus) required a fast and flexible way to share data between independent modules, utilizing runtime polymorphism, and type-erasure to minimize interdependences.
 

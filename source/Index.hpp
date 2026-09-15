@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "Config.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -155,14 +155,13 @@ namespace Langulus::Anyness
    constexpr Index IndexRandom   {Index::Random};
    constexpr Index IndexFirst    {Index::First};
    constexpr Index IndexLast     {Index::Last};
-
-} // namespace Langulus::Anyness
+}
 
 namespace Langulus::CT
 {
 
    /// Generalized index concept                                              
    template<class T>
-   concept Index = Integer<T> or Same<T, Anyness::Index>;
+   concept Index = Integer<T> or Same<T, Annies::Index>;
 
 } // namespace Langulus::CT

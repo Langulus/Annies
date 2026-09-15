@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "../pairs/TPair.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -29,7 +29,7 @@ namespace Langulus::Anyness
       using Key = void;
       using Value = void;
       using Self = Map<ORDERED>;
-      using Pair = Anyness::Pair;
+      using Pair = Annies::Pair;
       using PairRef = Pair;
       using PairConstRef = Pair;
 
@@ -183,4 +183,4 @@ namespace Langulus::Anyness
       void Compact();
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -14,7 +14,7 @@
 #define TABLE()      TMap<K, V, ORDERED>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Default construction                                                   
@@ -891,7 +891,7 @@ namespace Langulus::Anyness
       return BlockMap::ForEachValueDeep<REVERSE, SKIP, TMap>(Forward<F>(calls)...);
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TEMPLATE
 #undef TABLE

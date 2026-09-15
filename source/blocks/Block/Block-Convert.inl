@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -14,7 +14,7 @@
 #include "../../many/Trait.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Convert block's contents to another kind of contents, by iterating     

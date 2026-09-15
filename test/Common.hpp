@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -8,10 +8,10 @@
 
 /// INTENTIONALLY NOT GUARDED                                                 
 /// Include this file once in each cpp file, after all other headers          
-#include <Langulus/Anyness/Many.hpp>
+#include <Langulus/Annies/Many.hpp>
 #include <Langulus/Testing.hpp>
 
-using namespace Anyness;
+using namespace Annies;
 
 
 template<class L, class R>
@@ -400,11 +400,11 @@ namespace Verbs
       template<CT::Data T>
       static bool ExecuteIn(T&, Verb&);
 
-      static bool ExecuteDefault(const Anyness::Block<>&, Verb&) {
+      static bool ExecuteDefault(const Annies::Block<>&, Verb&) {
          return true;
       }
 
-      static bool ExecuteDefault(Anyness::Block<>&, Verb&) {
+      static bool ExecuteDefault(Annies::Block<>&, Verb&) {
          return false;
       }
 

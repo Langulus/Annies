@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -12,7 +12,7 @@
 #define TME()        Edit<T>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Create an editor interface                                             
@@ -277,8 +277,7 @@ namespace Langulus::Anyness
          mStart = mEnd = mSource.GetCount() - 1;
       return *this;
    }
-
-} // namespace Langulus::Anyness
+}
 
 #undef TEMPLATE
 #undef TME

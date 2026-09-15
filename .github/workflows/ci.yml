@@ -1,4 +1,4 @@
-name: Langulus::Anyness CI
+name: Langulus::Annies CI
 on: push
 concurrency:
   group: ${{ github.ref }}
@@ -84,9 +84,9 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{matrix.cxx}}
           ${{matrix.cmake_args}}
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
-          -DLANGULUS_FEATURE_MANAGED_MEMORY=${{matrix.managed}}
-          -DLANGULUS_FEATURE_MANAGED_REFLECTION=${{matrix.managed}}
-          -DLANGULUS_TESTING=ON
+          -DLANGULUS_OPTION_MANAGED_MEMORY=${{matrix.managed}}
+          -DLANGULUS_OPTION_MANAGED_REFLECTION=${{matrix.managed}}
+          -DLANGULUS_OPTION_TESTING=ON
 
       - if: matrix.os == 'windows-latest'
         name: Configure (Windows)
@@ -94,9 +94,9 @@ jobs:
           mkdir build && cd build && cmake ..
           ${{matrix.cmake_args}} -T "${{matrix.cxx}}"
           -DCMAKE_BUILD_TYPE=${{matrix.build}}
-          -DLANGULUS_FEATURE_MANAGED_MEMORY=${{matrix.managed}}
-          -DLANGULUS_FEATURE_MANAGED_REFLECTION=${{matrix.managed}}
-          -DLANGULUS_TESTING=ON
+          -DLANGULUS_OPTION_MANAGED_MEMORY=${{matrix.managed}}
+          -DLANGULUS_OPTION_MANAGED_REFLECTION=${{matrix.managed}}
+          -DLANGULUS_OPTION_TESTING=ON
 
       - name: Build
         run: cmake --build build -j4 --config ${{matrix.build}}

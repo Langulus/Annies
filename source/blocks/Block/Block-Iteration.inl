@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "../../Index.inl"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Iterate each element block and execute F for it                        
@@ -872,5 +872,4 @@ namespace Langulus::Anyness
    constexpr TBlockIterator<T>::operator bool() const noexcept {
       return *this != A::IteratorEnd {};
    }
-
-} // namespace Langulus::Anyness
+}

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "Pair.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Construct pair from any other kind of pair                             
@@ -113,4 +113,4 @@ namespace Langulus::Anyness
       mValue.Reset();
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -31,7 +31,7 @@ namespace Langulus::CT
 
 } // namespace Langulus::CT
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -220,4 +220,4 @@ namespace Langulus::Anyness
       void Compact();
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

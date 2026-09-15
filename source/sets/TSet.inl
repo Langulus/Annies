@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,7 +13,7 @@
 #define TABLE()      TSet<T, ORDERED>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Default construction                                                   
@@ -511,7 +511,7 @@ namespace Langulus::Anyness
          Forward<Deref<decltype(f)>>(f)...);
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TEMPLATE
 #undef TABLE

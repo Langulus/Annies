@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "Text.inl"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Construct by copying a text container                                  
@@ -98,4 +98,4 @@ namespace Langulus::Anyness
       return *this;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

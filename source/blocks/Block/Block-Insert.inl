@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -12,7 +12,7 @@
 #include <Langulus/Core/Memory.hpp>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Allocate 'count' elements and fill the container with zeroes           
@@ -1760,4 +1760,4 @@ namespace Langulus::Anyness
       return *this;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -51,7 +51,7 @@ namespace Langulus
 
          // The block that contains the keys and info bytes             
          // Also keeps track of count and reserve                       
-         Anyness::Block<> mKeys;
+         Annies::Block<> mKeys;
 
          // The block that contains the values                          
          // Count and reserve in this block are redundant and shouldn't 
@@ -63,7 +63,7 @@ namespace Langulus
          // will definitely break binary compatibility, and would       
          // involve a lot of boilerplate code that duplicates Block     
          // functionality. I've decided to make the sacrifice...        
-         Anyness::Block<> mValues;
+         Annies::Block<> mValues;
 
       public:
          constexpr BlockMap() noexcept = default;
@@ -98,7 +98,7 @@ namespace Langulus
 
 } // namespace Langulus
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -119,7 +119,7 @@ namespace Langulus::Anyness
 
       using Key = void;
       using Value = void;
-      using Pair = Anyness::Pair;
+      using Pair = Annies::Pair;
 
       static constexpr bool Ownership = false;
       static constexpr bool Ordered = false;
@@ -621,5 +621,4 @@ namespace Langulus::Anyness
          return {mInfo, mSentinel, mKey, mValue};
       }
    };
-
-} // namespace Langulus::Anyness
+}

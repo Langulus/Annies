@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "Bytes.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Refer-constructor                                                      
@@ -349,4 +349,4 @@ namespace Langulus::Anyness
       return const_cast<Many&>(reinterpret_cast<const Many&>(*this));
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

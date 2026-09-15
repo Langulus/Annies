@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -86,9 +86,9 @@ namespace Langulus::A
    ///   @param priority - the priority to check                              
    ///   @return true if this verb's priority matches the provided one        
    LANGULUS(INLINED)
-   bool Verb::Validate(Anyness::Index priority) const noexcept {
+   bool Verb::Validate(Annies::Index priority) const noexcept {
       return int(mPriority) == priority.mIndex
-          or priority == Anyness::IndexAll;
+          or priority == Annies::IndexAll;
    }
    
    /// Check if verb has been satisfied at least once                         
@@ -228,7 +228,7 @@ namespace Langulus::A
    ///   @return verb charge                                                  
    LANGULUS(INLINED)
    auto Verb::GetCharge() const noexcept -> const Charge& {
-      return static_cast<const Anyness::Charge&>(*this);
+      return static_cast<const Annies::Charge&>(*this);
    }
 
    /// Get the verb mass (a.k.a. magnitude)                                   
@@ -355,8 +355,8 @@ namespace Langulus::A
 
    /// Serialize verb for logger                                              
    LANGULUS(INLINED)
-   Verb::operator Anyness::Text() const {
-      Anyness::Text result;
+   Verb::operator Annies::Text() const {
+      Annies::Text result;
       SerializeVerb(result);
       return result;
    }

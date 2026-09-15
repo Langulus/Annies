@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -141,7 +141,7 @@ TEMPLATE_TEST_CASE(
          Map_CheckState_Default<K, V>(map);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::map::default construction") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::map::default construction") (timer meter) {
                some<uninitialized<MapType>> storage(meter.runs());
                meter.measure([&](int i) {
                   return storage[i].construct();
@@ -179,7 +179,7 @@ TEMPLATE_TEST_CASE(
          }
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TUnorderedMap::operator = (single pair copy)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator = (single pair copy)") (timer meter) {
                some<Pair> source(meter.runs());
                for (auto& i : source)
                   i = CreatePair<Pair, K, V>("five hundred"_text, 555);
@@ -322,7 +322,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetReserved() >= 10);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TUnorderedMap::operator << (5 consecutive pair copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator << (5 consecutive pair copies)") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto& i : storage)
                   i << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -352,7 +352,7 @@ TEMPLATE_TEST_CASE(
             };
 
             // Last result: 1:1, slightly slower than STD, can be further improved
-            BENCHMARK_ADVANCED("Anyness::TUnorderedMap::operator [] (retrieval by key from a map with 10 pairs)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator [] (retrieval by key from a map with 10 pairs)") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto& i : storage) {
                   i << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -418,7 +418,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetReserved() >= 10);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TUnorderedMap::operator << (5 consecutive trivial moves)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator << (5 consecutive trivial moves)") (timer meter) {
                some<MapType> storage(meter.runs());
                meter.measure([&](int i) {
                   return storage[i] 
@@ -528,7 +528,7 @@ TEMPLATE_TEST_CASE(
 
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TUnorderedMap::RemoveValue") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TUnorderedMap::RemoveValue") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -593,7 +593,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.ContainsValue(darray1[4].GetValue()));
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TUnorderedMap::RemoveKey") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TUnorderedMap::RemoveKey") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];

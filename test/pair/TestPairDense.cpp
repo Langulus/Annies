@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -62,7 +62,7 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
          Pair_CheckState_Default<K, V>(pair);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::pair::default construction") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::pair::default construction") (timer meter) {
                some<uninitialized<T>> storage(meter.runs());
                meter.measure([&](int i) {
                   return storage[i].construct();
@@ -91,7 +91,7 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
          REQUIRE(pair.GetValue() == lp.GetValue());
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::pair::operator = (single pair copy)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::pair::operator = (single pair copy)") (timer meter) {
                some<T> source(meter.runs());
                for (auto& i : source)
                   i = CreatePair<Pair, K, V>("five hundred"_text, 555);

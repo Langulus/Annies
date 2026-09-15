@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -341,7 +341,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[i]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator << (5 consecutive trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator << (5 consecutive trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -374,7 +374,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[4-i]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >> (5 consecutive trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >> (5 consecutive trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -407,7 +407,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[i]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Insert<IndexBack> (5 trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Insert<IndexBack> (5 trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -435,7 +435,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[i]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Insert<IndexFront> (5 trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Insert<IndexFront> (5 trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -485,7 +485,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray3backup[i]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator << (5 consecutive trivial moves)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator << (5 consecutive trivial moves)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -545,7 +545,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray3backup[4 - i]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >> (5 consecutive trivial moves)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >> (5 consecutive trivial moves)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -587,7 +587,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(&pack[0] == &instance);
 
             #ifdef LANGULUS_STD_BENCHMARK
-               BENCHMARK_ADVANCED("Anyness::TMany::Emplace(single move at the front)") (timer meter) {
+               BENCHMARK_ADVANCED("Annies::TMany::Emplace(single move at the front)") (timer meter) {
                   some<T> storage(meter.runs());
                   for (auto&& o : storage)
                      o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -627,7 +627,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(&pack[0] == &instance);
 
             #ifdef LANGULUS_STD_BENCHMARK
-               BENCHMARK_ADVANCED("Anyness::TMany::Emplace(single move at the back)") (timer meter) {
+               BENCHMARK_ADVANCED("Annies::TMany::Emplace(single move at the back)") (timer meter) {
                   some<T> storage(meter.runs());
                   for (auto&& o : storage)
                      o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -782,7 +782,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[0] == darray2[3]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator <<= (merge copy to the back)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator <<= (merge copy to the back)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -811,7 +811,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[0] == darray2[3]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >> (merge copy to the front)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >> (merge copy to the front)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -841,7 +841,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[0] == darray2[3]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator <<= (merge move to the back)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator <<= (merge move to the back)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -871,7 +871,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[0] == darray2[3]);
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >>= (merge move to the front)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >>= (merge move to the front)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -1579,7 +1579,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator << (5 consecutive trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator << (5 consecutive trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -1620,7 +1620,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >> (5 consecutive trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >> (5 consecutive trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -1662,7 +1662,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Insert<IndexBack> (5 trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Insert<IndexBack> (5 trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -1699,7 +1699,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Insert<IndexFront> (5 trivial copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Insert<IndexFront> (5 trivial copies)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -1755,7 +1755,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator << (5 consecutive trivial moves)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator << (5 consecutive trivial moves)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -1821,7 +1821,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >> (5 consecutive trivial moves)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >> (5 consecutive trivial moves)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -1867,7 +1867,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[5] == darray1[4]);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::InsertAt(single copy in middle)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::InsertAt(single copy in middle)") (timer meter) {
                some<T> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -1910,7 +1910,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[9] == darray1[4]);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::InsertAt(5 copies in the middle)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::InsertAt(5 copies in the middle)") (timer meter) {
                some<T> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -1951,7 +1951,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[5] == darray1[4]);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Emplace(single move in middle)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Emplace(single move in middle)") (timer meter) {
                some<T> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -1999,7 +1999,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          }
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Emplace(single move in middle)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Emplace(single move in middle)") (timer meter) {
                some<T> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -2047,7 +2047,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          }
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Emplace(single move at the front)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Emplace(single move at the front)") (timer meter) {
                some<T> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -2095,7 +2095,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          }
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::Emplace(single move at the back)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Emplace(single move at the back)") (timer meter) {
                some<T> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -2132,7 +2132,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack.GetRaw() == memory);
 
          #ifdef LANGULUS_STD_BENCHMARK // Last result: 2:1 performance - needs more optimizations in Index handling
-            BENCHMARK_ADVANCED("Anyness::TMany::Remove(single element by value)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::Remove(single element by value)") (timer meter) {
                some<T> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -2142,7 +2142,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
                });
             };
 
-            BENCHMARK_ADVANCED("Anyness::vector::erase-remove(single element by value)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::vector::erase-remove(single element by value)") (timer meter) {
                some<StdT> storage(meter.runs());
                for (auto&& o : storage)
                   o = { darray1[0], darray1[1], darray1[2], darray1[3], darray1[4] };
@@ -2348,7 +2348,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator <<= (merge copy to the back)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator <<= (merge copy to the back)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -2384,7 +2384,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >> (merge copy to the front)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >> (merge copy to the front)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -2421,7 +2421,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator <<= (merge move to the back)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator <<= (merge move to the back)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {
@@ -2458,7 +2458,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          #endif
          
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Anyness::TMany::operator >>= (merge move to the front)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMany::operator >>= (merge move to the front)") (timer meter) {
                some<T> storage(meter.runs());
 
                meter.measure([&](int i) {

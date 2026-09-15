@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "../BlockMap.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Execute a call for each pair inside the map                            
@@ -613,4 +613,4 @@ namespace Langulus::Anyness
       return mInfo < mSentinel;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

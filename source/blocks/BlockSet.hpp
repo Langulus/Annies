@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -41,7 +41,7 @@ namespace Langulus
          InfoType* mInfo {};
 
          // The block that contains the keys and info bytes             
-         Anyness::Block<> mKeys;
+         Annies::Block<> mKeys;
 
       public:
          constexpr BlockSet() noexcept = default;
@@ -72,7 +72,7 @@ namespace Langulus
 
 } // namespace Langulus
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -439,5 +439,4 @@ namespace Langulus::Anyness
       constexpr explicit operator bool() const noexcept;
       constexpr operator Iterator<const SET>() const noexcept requires Mutable;
    };
-
-} // namespace Langulus::Anyness
+}

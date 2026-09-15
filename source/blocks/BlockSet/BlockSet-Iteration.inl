@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "../BlockSet.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Iterate and execute call for each flat element, counting each          
@@ -366,4 +366,4 @@ namespace Langulus::Anyness
       return {mInfo, mSentinel, mKey};
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

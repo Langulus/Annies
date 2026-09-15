@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,7 +13,7 @@
 #define TME()        Ref<T>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Get handle representation of the contained pointer                     
@@ -205,7 +205,7 @@ namespace Langulus::Anyness
       };
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TEMPLATE
 #undef TME

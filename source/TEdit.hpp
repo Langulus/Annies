@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "many/TMany.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    template<class...T>
@@ -80,5 +80,4 @@ namespace Langulus::Anyness
 
    template<DenseTypedBlock T>
    Edit(T*) -> Edit<T>;
-
-} // namespace Langulus::Anyness
+}

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -113,7 +113,7 @@ namespace Langulus::A
 } // namespace Langulus::A
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Blocks are always constructible from other blocks                      
@@ -616,4 +616,4 @@ namespace Langulus::Anyness
       }
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

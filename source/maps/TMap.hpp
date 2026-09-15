@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -15,24 +15,24 @@ namespace Langulus::CT
    /// Concept for recognizing arguments, with which a statically typed       
    /// map can be constructed                                                 
    template<class K, class V, class...A>
-   concept DeepMapMakable = UnfoldMakableFrom<Anyness::TPair<K, V>, A...>
+   concept DeepMapMakable = UnfoldMakableFrom<Annies::TPair<K, V>, A...>
         or (sizeof...(A) == 1
            and Map<Deint<FirstOf<A...>>> and (IntentOf<FirstOf<A...>>::Shallow
             or IntentMakableAlt<
-              typename IntentOf<FirstOf<A...>>::template As<Anyness::TPair<K, V>>>
+              typename IntentOf<FirstOf<A...>>::template As<Annies::TPair<K, V>>>
         ));
 
    /// Concept for recognizing argument, with which a statically typed        
    /// map can be assigned                                                    
    template<class K, class V, class A>
-   concept DeepMapAssignable = UnfoldMakableFrom<Anyness::TPair<K, V>, A>
+   concept DeepMapAssignable = UnfoldMakableFrom<Annies::TPair<K, V>, A>
         or (Map<Deint<A>> and (IntentOf<A>::Shallow
            or IntentAssignableAlt<
-             typename IntentOf<A>::template As<Anyness::TPair<K, V>>>));
+             typename IntentOf<A>::template As<Annies::TPair<K, V>>>));
 
 } // namespace Langulus::CT
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -307,4 +307,4 @@ namespace Langulus::Anyness
       static Size RequestValuesSize(Count) noexcept;
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

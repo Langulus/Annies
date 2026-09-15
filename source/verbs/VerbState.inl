@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "VerbState.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Manual construction                                                    
@@ -101,4 +101,4 @@ namespace Langulus::Anyness
       return (mState & VerbState::LongCircuited) == 0;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

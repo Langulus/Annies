@@ -1,15 +1,15 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include <Langulus/Anyness/Text.hpp>
-#include <Langulus/Anyness/Trait.hpp>
-#include <Langulus/Anyness/Own.hpp>
-#include <Langulus/Anyness/Ref.hpp>
-#include <Langulus/Anyness/TMap.hpp>
+#include <Langulus/Annies/Text.hpp>
+#include <Langulus/Annies/Trait.hpp>
+#include <Langulus/Annies/Own.hpp>
+#include <Langulus/Annies/Ref.hpp>
+#include <Langulus/Annies/TMap.hpp>
 #include "Common.hpp"
 
 

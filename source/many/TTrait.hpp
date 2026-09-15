@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "Trait.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -76,7 +76,7 @@ namespace Langulus::Anyness
       using Trait::SetTrait;
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 
 /// Define a static trait                                                     
@@ -85,7 +85,7 @@ namespace Langulus::Anyness
 #define LANGULUS_DEFINE_TRAIT(T, INFOSTRING) \
    namespace Langulus::Traits \
    { \
-      struct T : Anyness::TTrait<T> { \
+      struct T : Annies::TTrait<T> { \
          LANGULUS(INFO) INFOSTRING; \
          using TTrait<T>::TTrait; \
          using TTrait<T>::operator =; \
@@ -105,7 +105,7 @@ namespace Langulus::Anyness
 #define LANGULUS_DEFINE_TRAIT_WITH_PROPERTIES(T, INFOSTRING, PROPERTIES) \
    namespace Langulus::Traits \
    { \
-      struct T : Anyness::TTrait<T> { \
+      struct T : Annies::TTrait<T> { \
          LANGULUS(INFO) INFOSTRING; \
          using TTrait<T>::TTrait; \
          using TTrait<T>::operator =; \

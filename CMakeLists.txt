@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.30)
-project(LangulusAnyness
+project(LangulusAnnies
    VERSION         1.0.0
-   DESCRIPTION     "Langulus container library"
+   DESCRIPTION     "Langulus container library - compose your own containers"
    HOMEPAGE_URL    https://langulus.com
 )
 
@@ -20,38 +20,38 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
 endif()
 
 file(GLOB_RECURSE
-   LANGULUS_ANYNESS_SOURCES 
+   LANGULUS_ANNIES_SOURCES 
    LIST_DIRECTORIES FALSE CONFIGURE_DEPENDS
    source/*.cpp
 )
 
-# Build and install Anyness library												
-add_langulus_library(LangulusAnyness
+# Build and install Annies library												
+add_langulus_library(LangulusAnnies
    SOURCES  $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:$<TARGET_OBJECTS:LangulusLogger>>
             $<TARGET_OBJECTS:LangulusRTTI>
             $<$<BOOL:${LANGULUS_OPTION_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
-            $<$<BOOL:${LANGULUS_OPTION_PROFILING}>:$<TARGET_OBJECTS:LangulusProfiler>>
-            ${LANGULUS_ANYNESS_SOURCES}
+            $<$<BOOL:${LANGULUS_OPTION_PROFILING}>:$<TARGET_OBJECTS:LangulusPercist>>
+            ${LANGULUS_ANNIES_SOURCES}
 )
 
-target_include_directories(LangulusAnyness
+target_include_directories(LangulusAnnies
    PUBLIC   $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:$<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>>
             $<TARGET_PROPERTY:LangulusRTTI,INTERFACE_INCLUDE_DIRECTORIES>
             $<$<BOOL:${LANGULUS_OPTION_MANAGED_MEMORY}>:$<TARGET_PROPERTY:LangulusFractalloc,INTERFACE_INCLUDE_DIRECTORIES>>
-            $<$<BOOL:${LANGULUS_OPTION_PROFILING}>:$<TARGET_PROPERTY:LangulusProfiler,INTERFACE_INCLUDE_DIRECTORIES>>
+            $<$<BOOL:${LANGULUS_OPTION_PROFILING}>:$<TARGET_PROPERTY:LangulusPercist,INTERFACE_INCLUDE_DIRECTORIES>>
             include
 )
 
-target_link_libraries(LangulusAnyness
+target_link_libraries(LangulusAnnies
    PUBLIC   LangulusCore
             $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:fmt>
 )
 
-target_compile_definitions(LangulusAnyness
+target_compile_definitions(LangulusAnnies
    PRIVATE  LANGULUS_EXPORT_ALL
 )
 
-if(LANGULUS_TESTING)
+if(LANGULUS_OPTION_TESTING)
    enable_testing()
    add_subdirectory(test)
 endif()

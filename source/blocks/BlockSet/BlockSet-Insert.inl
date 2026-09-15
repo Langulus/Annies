@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "../../text/Text.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Wrap the argument into a handle with value's type                      
@@ -563,4 +563,4 @@ namespace Langulus::Anyness
       return insertedAt;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

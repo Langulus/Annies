@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -69,7 +69,7 @@ namespace Langulus
 
 } // namespace Langulus
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -160,7 +160,7 @@ namespace Langulus::Anyness
       constexpr operator T&() const noexcept;
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 namespace fmt
 {

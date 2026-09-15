@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "../BlockSet.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Reserves space for the specified number of elements                    
@@ -210,4 +210,4 @@ namespace Langulus::Anyness
       mKeys.mEntry = nullptr;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

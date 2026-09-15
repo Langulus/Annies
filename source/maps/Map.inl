@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -22,7 +22,7 @@
 #define TABLE()      Map<ORDERED>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Refer constructor                                                      
@@ -485,7 +485,7 @@ namespace Langulus::Anyness
       return BlockMap::Compact<Map>();
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TEMPLATE
 #undef TABLE

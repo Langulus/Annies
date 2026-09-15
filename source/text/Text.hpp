@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,7 +11,7 @@
 #include <Langulus/Logger.hpp> // Logger has some core fmt::formatters defined  
 
 
-namespace Langulus::Anyness::Serial
+namespace Langulus::Annies::Serial
 {
    enum RuleEnum {
       Skip = 0,
@@ -105,7 +105,7 @@ namespace Langulus::Anyness::Serial
       static constexpr Operator  sEnd = END;
    };
 
-} // namespace Langulus::Anyness::Serial
+} // namespace Langulus::Annies::Serial
 
 namespace Langulus::CT
 {
@@ -117,7 +117,7 @@ namespace Langulus::CT
    concept StdString = StdContiguousContainer<T...>
        and Character<TypeOf<T>...>;
 
-   /// Concept for differentiating managed text types, based on Anyness::Text 
+   /// Concept for differentiating managed text types, based on Annies::Text 
    /// Text containers are always binary compatible to Block                  
    template<class...T>
    concept TextBased = ((Decay<T>::CTTI_TextTrait and CT::Block<T>) and ...);
@@ -142,13 +142,13 @@ namespace Langulus::CT
       template<class...T>
       concept StringifiableByOperator = (std::is_object_v<T> and ...)
          and requires (const T&...a) {
-            ((a.operator ::Langulus::Anyness::Text()), ...);
+            ((a.operator ::Langulus::Annies::Text()), ...);
          };
 
       /// Does Text has an explicit/implicit constructor that accepts T       
       template<class...T>
       concept StringifiableByConstructor = requires (const T&...a) {
-         ((::Langulus::Anyness::Text {a}), ...); };
+         ((::Langulus::Annies::Text {a}), ...); };
 
       /// Used internally in Text, to sum up all types a variadic Text        
       /// constructor can accept                                              
@@ -159,7 +159,7 @@ namespace Langulus::CT
            or Meta<T>
            or Bytes<T>
            or HasNamedValues<T>
-           or Similar<T, Anyness::Serial::Operator>
+           or Similar<T, Annies::Serial::Operator>
            or Inner::StringifiableByOperator<T>
          ) and ...);
 
@@ -194,7 +194,7 @@ namespace Langulus::A
    /// Check if a type is compatible with CT::Character concept at runtime    
    struct Text {
       LANGULUS(ABSTRACT) true;
-      LANGULUS(CONCRETE) Anyness::Text;
+      LANGULUS(CONCRETE) Annies::Text;
 
       static constexpr bool CTTI_TextTrait = true;
 
@@ -204,7 +204,7 @@ namespace Langulus::A
    struct Code;
 }
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -418,12 +418,12 @@ namespace Langulus::Anyness
       static constexpr auto CheckPattern(const Token&, ::std::index_sequence<N...>);
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 namespace Langulus
 {
 
-   Anyness::Text operator ""_text(const char*, ::std::size_t);
+   Annies::Text operator ""_text(const char*, ::std::size_t);
 
    namespace A
    {
@@ -431,19 +431,19 @@ namespace Langulus
       ///                                                                     
       ///   Abstract code container                                           
       ///                                                                     
-      struct Code : Anyness::Text {
+      struct Code : Annies::Text {
          LANGULUS(NAME) "A::Code";
          LANGULUS(ACT_AS) A::Code;
          LANGULUS(FILES) "";
-         LANGULUS_BASES(Anyness::Text);
+         LANGULUS_BASES(Annies::Text);
 
-         using Anyness::Text::Text;
+         using Annies::Text::Text;
 
-         Code(const Anyness::Text& a)
-            : Anyness::Text {a} {}
+         Code(const Annies::Text& a)
+            : Annies::Text {a} {}
 
-         Code(Anyness::Text&& a)
-            : Anyness::Text {Forward<Anyness::Text>(a)} {}
+         Code(Annies::Text&& a)
+            : Annies::Text {Forward<Annies::Text>(a)} {}
       };
 
    } // namespace Langulus::A
@@ -455,7 +455,7 @@ namespace fmt
 
    ///                                                                        
    /// Extend FMT to be capable of logging anything that is convertible to    
-   /// Anyness::Text. Constness of T doesn't matter.                          
+   /// Annies::Text. Constness of T doesn't matter.                          
    ///                                                                        
    template<Langulus::CT::Inner::FmtStringifiable T>
    struct formatter<T> {
@@ -470,7 +470,7 @@ namespace fmt
          static_assert(CT::Complete<T>, "T isn't complete");
          auto& me = const_cast<T&>(element);
 
-         Anyness::Text asText {me};
+         Annies::Text asText {me};
          const auto token = asText.operator Token();
          return fmt::format_to(ctx.out(), "{}", token);
       }

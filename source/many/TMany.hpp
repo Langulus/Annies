@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "Many.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    ///                                                                        
@@ -23,7 +23,7 @@ namespace Langulus::Anyness
    /// (by checking result of doing something like pack.IsExact<my type>())   
    /// you can then directly reinterpret_cast that Many to an equivalent      
    /// TMany<of the type you checked for>, essentially converting your        
-   /// type-erased container to a statically-optimized equivalent. Anyness    
+   /// type-erased container to a statically-optimized equivalent. Annies    
    /// provides a strong guarantee that this operation is completely safe.    
    ///                                                                        
    template<CT::Data T>
@@ -152,4 +152,4 @@ namespace Langulus::Anyness
    template<CT::Data T>
    TMany(T&&) -> TMany<T>;
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

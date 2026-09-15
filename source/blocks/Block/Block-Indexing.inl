@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include "../../Index.inl"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Get the internal byte array with a given offset                        
@@ -818,5 +818,4 @@ namespace Langulus::Anyness
    decltype(auto) Block<TYPE>::Last() const {
       return (*this)[mCount - 1];
    }
-
-} // namespace Langulus::Anyness
+}

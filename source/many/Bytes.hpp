@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -26,7 +26,7 @@ namespace Langulus::CT
       template<class T>
       consteval bool BinableByOperator_AvoidMSVC_ICE() {
          return std::is_object_v<T> and requires (const T& a) {
-            a.operator ::Langulus::Anyness::Bytes();
+            a.operator ::Langulus::Annies::Bytes();
          };
       }
 
@@ -38,12 +38,12 @@ namespace Langulus::CT
       /// Does Bytes has an explicit/implicit constructor that accepts T      
       template<class...T>
       concept BinableByConstructor = requires (const T&...a) {
-         ((::Langulus::Anyness::Bytes {a}), ...); };
+         ((::Langulus::Annies::Bytes {a}), ...); };
 
       /// Used internally in Bytes, to sum up all types a variadic Bytes      
       /// constructor can accept                                              
       template<class...T>
-      concept Binable = ((DerivedFrom<T, Anyness::Bytes>
+      concept Binable = ((DerivedFrom<T, Annies::Bytes>
            or BinablePOD<T>
            or Meta<T>
            or Inner::BinableByOperator<T>) and ...);
@@ -57,13 +57,13 @@ namespace Langulus::CT
    concept Binable = ((Inner::BinableByOperator<T>
         or Inner::BinableByConstructor<T>) and ...);
    
-   /// Concept for differentiating managed Anyness::Bytes                     
+   /// Concept for differentiating managed Annies::Bytes                     
    template<class...T>
-   concept Bytes = (DerivedFrom<T, Anyness::Bytes> and ...);
+   concept Bytes = (DerivedFrom<T, Annies::Bytes> and ...);
 
 } // namespace Langulus::CT
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    ///                                                                        
@@ -174,4 +174,4 @@ namespace Langulus::Anyness
       operator Many& () const noexcept;
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,10 +9,10 @@
 #include <Langulus/MetaOf.hpp>
 
 
-#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ANYNESS)
-   #define LANGULUS_API_ANYNESS() LANGULUS_EXPORT()
+#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ANNIES)
+   #define LANGULUS_API_ANNIES() LANGULUS_EXPORT()
 #else
-   #define LANGULUS_API_ANYNESS() LANGULUS_IMPORT()
+   #define LANGULUS_API_ANNIES() LANGULUS_IMPORT()
 #endif
 
 /// Enable memory manager                                                     
@@ -22,8 +22,8 @@
    #include "memory/NoAllocator.hpp"
 #endif
 
-/// Make the rest of the code aware, that Langulus::Anyness has been included 
-#define LANGULUS_LIBRARY_ANYNESS() 1
+/// Make the rest of the code aware, that Langulus::Annies has been included  
+#define LANGULUS_LIBRARY_ANNIES() 1
 
 
 namespace Langulus
@@ -69,25 +69,25 @@ namespace Langulus
    namespace CT
    {
 
-      /// The ultimate Anyness container tag                                  
-      /// Checks if all T are marked as Anyness containers                    
+      /// The ultimate Annies container tag                                   
+      /// Checks if all T are marked as Annies containers                     
       template<class...T>
       concept Container = (requires { Decay<T>::CTTI_Container; } and ...);
 
-      /// Checks if none of the Ts are marked as Anyness containers           
+      /// Checks if none of the Ts are marked as Annies containers            
       template<class...T>
       concept NotContainer = ((not Container<T>) and ...);
 
    } // namespace Langulus::CT
 
-   namespace Anyness
+   namespace Annies
    {
       #if LANGULUS_FEATURE(MANAGED_MEMORY)
          using Allocator  = ::Langulus::Fractalloc::Allocator;
          using Allocation = ::Langulus::Fractalloc::Allocation;
       #else
-         using Allocator  = ::Langulus::Anyness::Allocator;
-         using Allocation = ::Langulus::Anyness::Allocation;
+         using Allocator  = ::Langulus::Annies::Allocator;
+         using Allocation = ::Langulus::Annies::Allocation;
       #endif
 
       using RTTI::DMeta;
@@ -145,9 +145,8 @@ namespace Langulus
       class Construct;
       class Neat;
 
-   } // namespace Langulus::Anyness
-
-} // namespace Langulus
+   }
+}
 
 #if 0
    #define VERBOSE_COMPARE(...)     Logger::Verbose(__VA_ARGS__)

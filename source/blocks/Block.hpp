@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -31,10 +31,10 @@ namespace Langulus
          static constexpr bool CTTI_Container = true;
 
       protected:
-         using DMeta = Anyness::DMeta;
-         using CMeta = Anyness::CMeta;
-         using Allocation = Anyness::Allocation;
-         using Allocator  = Anyness::Allocator;
+         using DMeta = Annies::DMeta;
+         using CMeta = Annies::CMeta;
+         using Allocation = Annies::Allocation;
+         using Allocator  = Annies::Allocator;
 
          union {
          #if LANGULUS(DEBUG)
@@ -136,7 +136,7 @@ namespace Langulus
 
       /// Check if origin of T(s) are Neat(s)                                 
       template<class...T>
-      concept Neat = ((Exact<Decay<T>, Anyness::Neat>) and ...);
+      concept Neat = ((Exact<Decay<T>, Annies::Neat>) and ...);
 
       /// Check if origin of T(s) aren't Neat(s)                              
       template<class...T>
@@ -144,7 +144,7 @@ namespace Langulus
 
       /// Check if origin of T(s) are Construct(s)                            
       template<class...T>
-      concept Construct = ((Exact<Decay<T>, Anyness::Construct>) and ...);
+      concept Construct = ((Exact<Decay<T>, Annies::Construct>) and ...);
 
       /// Check if origin of T(s) aren't Construct(s)                         
       template<class...T>
@@ -304,7 +304,7 @@ namespace Langulus
 } // namespace Langulus
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    template<class>
@@ -1130,7 +1130,7 @@ namespace Langulus::Anyness
          WrapEnd   end  () { return mContainer.end();   }
       };
 
-   } // namespace Langulus::Anyness::Inner
+   }
 
    LANGULUS(INLINED)
    constexpr auto Reverse(CT::IteratableInReverse auto&& what) noexcept {
@@ -1204,13 +1204,12 @@ namespace Langulus::Anyness
       constexpr operator TBlockIterator<const B>() const noexcept
       requires Mutable { return {mValue, mEnd}; }
    };
-
-} // namespace Langulus::Anyness
+}
 
 namespace Langulus::CT::TI
 {
    template<CT::Sparse T>
-   struct SparseTrait<::Langulus::Anyness::LocalRef<T>> {
+   struct SparseTrait<::Langulus::Annies::LocalRef<T>> {
       static constexpr bool Value = true;
    };
 }

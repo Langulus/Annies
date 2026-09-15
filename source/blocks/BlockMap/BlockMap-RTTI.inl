@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "../BlockMap.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Checks type compatibility and sets type of type-erased maps            
@@ -216,4 +216,4 @@ namespace Langulus::Anyness
       }
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

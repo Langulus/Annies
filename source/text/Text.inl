@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,7 +13,7 @@
 #include <cstring>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Default construction with nullptr_t                                    
@@ -1041,15 +1041,15 @@ namespace Langulus::Anyness
       return text;
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 namespace Langulus
 {
 
    /// Make a text literal                                                    
    LANGULUS(INLINED)
-   Anyness::Text operator ""_text(const char* text, ::std::size_t size) {
-      return Anyness::Text::From(Disown(text), size);
+   Annies::Text operator ""_text(const char* text, ::std::size_t size) {
+      return Annies::Text::From(Disown(text), size);
    }
 
 } // namespace Langulus

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,7 +13,7 @@
 #include <Langulus/Core/Vector.hpp>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Set a default trait, if such wasn't already set                        
@@ -247,5 +247,4 @@ namespace Langulus::Anyness
       // Finally, just push a Neat scope containing the trait           
       SmartPush(IndexBack, Neat {Forward<TRAIT>(trait)});
    }
-
-} // namespace Langulus::Anyness
+}

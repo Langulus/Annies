@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -10,7 +10,7 @@
 #include <Langulus/Core/Memory.hpp>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Get a size based on reflected allocation page and count                
@@ -780,5 +780,4 @@ namespace Langulus::Anyness
       mEntry = nullptr;
       mCount = mReserved = 0;
    }
-
-} // namespace Langulus::Anyness
+}

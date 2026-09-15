@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include <Langulus/Core/Assume.hpp>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Constructor from signed integer                                        
@@ -299,5 +299,4 @@ namespace Langulus::Anyness
    constexpr bool Index::operator >= (const Index& v) const noexcept {
       return *this == v or not (*this < v);
    }
-
-} // namespace Langulus::Anyness
+}

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -12,7 +12,7 @@
 #define PAIR()       TPair<K, V>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Constructor from any other pair (if K and V aren't references)         
@@ -181,7 +181,7 @@ namespace Langulus::Anyness
          mValue.Reset();
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TEMPLATE
 #undef PAIR

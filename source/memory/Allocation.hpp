@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include <Langulus/MetaOf.hpp>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    using RTTI::AllocationRequest;
@@ -85,6 +85,6 @@ namespace Langulus::Anyness
       constexpr void Free(Count) noexcept;
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #include "Allocation.inl"

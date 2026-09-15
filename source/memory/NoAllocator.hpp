@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "Allocation.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// MSVC will likely never support std::aligned_alloc, so we use           
@@ -101,4 +101,4 @@ namespace Langulus::Anyness
       #endif
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies

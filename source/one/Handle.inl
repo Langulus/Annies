@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -12,7 +12,7 @@
 #define HAND()       Handle<T, EMBED>
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    /// Create an embedded handle while searching for memory entry             
@@ -647,7 +647,7 @@ namespace Langulus::Anyness
       }
    }
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 #undef TEMPLATE
 #undef HAND

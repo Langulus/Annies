@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "Text.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
 
    ///                                                                        
@@ -42,11 +42,11 @@ namespace Langulus::Anyness
       using Text::SerializationRules;
    };
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
 
 namespace Langulus
 {
 
-   Anyness::Path operator ""_path(const char*, ::std::size_t);
+   Annies::Path operator ""_path(const char*, ::std::size_t);
 
 } // namespace Langulus

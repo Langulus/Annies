@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -8,10 +8,10 @@
 
 /// INTENTIONALLY NOT GUARDED                                                 
 /// Include this file once in each cpp file, after all other headers          
-#include <Langulus/Anyness/Text.hpp>
-#include <Langulus/Anyness/Trait.hpp>
-#include <Langulus/Anyness/Pair.hpp>
-#include <Langulus/Anyness/TPair.hpp>
+#include <Langulus/Annies/Text.hpp>
+#include <Langulus/Annies/Trait.hpp>
+#include <Langulus/Annies/Pair.hpp>
+#include <Langulus/Annies/TPair.hpp>
 #include <unordered_map>
 #include "../many/TestManyCommon.hpp"
 

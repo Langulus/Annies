@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -18,22 +18,22 @@ namespace Langulus::A
    ///                                                                        
    /// Abstract verb, dictating canonical verb size, used in various concepts 
    ///                                                                        
-   struct Verb : Anyness::Many, Anyness::Charge {
+   struct Verb : Annies::Many, Annies::Charge {
       LANGULUS(POD) false;
       LANGULUS(NULLIFIABLE) false;
       LANGULUS(DEEP) false;
       LANGULUS(ACT_AS) Verb;
-      LANGULUS_BASES(Anyness::Many, Anyness::Charge);
-      LANGULUS_CONVERTS_TO(Anyness::Text);
+      LANGULUS_BASES(Annies::Many, Annies::Charge);
+      LANGULUS_CONVERTS_TO(Annies::Text);
       static constexpr bool CTTI_Container = true;
 
    protected:
       using Real      = Langulus::Real;
-      using Charge    = Anyness::Charge;
-      using VMeta     = Anyness::VMeta;
-      using VerbState = Anyness::VerbState;
-      using Many      = Anyness::Many;
-      using Text      = Anyness::Text;
+      using Charge    = Annies::Charge;
+      using VMeta     = Annies::VMeta;
+      using VerbState = Annies::VerbState;
+      using Many      = Annies::Many;
+      using Text      = Annies::Text;
 
       // Verb meta, mass, rate, time and priority                       
       mutable VMeta mVerb {};
@@ -106,13 +106,13 @@ namespace Langulus::A
 
       bool IsMissing() const noexcept;
       bool IsMissingDeep() const noexcept;
-      bool Validate(Anyness::Index) const noexcept;
+      bool Validate(Annies::Index) const noexcept;
 
       void Done(Count) noexcept;
       void Done() noexcept;
       void Undo() noexcept;
 
-      explicit operator Anyness::Text() const;
+      explicit operator Annies::Text() const;
 
    protected:
       void SerializeVerb(CT::Serial auto&) const;

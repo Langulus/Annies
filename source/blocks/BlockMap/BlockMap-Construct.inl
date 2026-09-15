@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,7 +9,7 @@
 #include "../BlockMap.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Transfer the members of one map onto another, with or without intent   
@@ -653,5 +653,4 @@ namespace Langulus::Anyness
 
       return false;
    }
-
-} // namespace Langulus::Anyness
+}

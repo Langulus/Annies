@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Anyness                                                         
+/// Langulus::Annies                                                         
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -8,7 +8,7 @@
 //#include "../Many.hpp"
 
 
-namespace Langulus::Anyness
+namespace Langulus::Annies
 {
    
    /// Encrypt data                                                           
@@ -88,4 +88,4 @@ namespace Langulus::Anyness
       #endif
    }*/
 
-} // namespace Langulus::Anyness
+} // namespace Langulus::Annies
