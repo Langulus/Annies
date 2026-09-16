@@ -9,7 +9,7 @@
 #include "../Block.hpp"
 #include "../../text/Text.hpp"
 #include "Block-Indexing.inl"
-#include <Langulus/Core/Memory.hpp>
+//#include <Langulus/Core/Memory.hpp>
 
 
 namespace Langulus::Annies

@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus/Core/Assume.hpp>
+#include <Langulus/Assume.hpp>
 
 
 namespace Langulus::Annies

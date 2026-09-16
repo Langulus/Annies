@@ -10,7 +10,7 @@
 #include "../../many/Trait.hpp"
 #include "../../many/Construct.hpp"
 #include "../../many/Neat.hpp"
-#include <Langulus/Core/Vector.hpp>
+#include <Langulus/Vector.hpp>
 
 
 namespace Langulus::Annies

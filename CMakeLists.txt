@@ -44,6 +44,7 @@ target_include_directories(LangulusAnnies
 
 target_link_libraries(LangulusAnnies
    PUBLIC   LangulusCore
+            LangulusSIMD
             $<$<BOOL:${LANGULUS_OPTION_LOGGING}>:fmt>
 )
 

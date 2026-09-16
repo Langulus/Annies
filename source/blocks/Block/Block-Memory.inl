@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Block.hpp"
-#include <Langulus/Core/Memory.hpp>
+//#include <Langulus/Core/Memory.hpp>
 
 
 namespace Langulus::Annies

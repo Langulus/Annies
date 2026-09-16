@@ -12,7 +12,7 @@
 #include "../Iterator.hpp"
 #include "../one/Handle.hpp"
 #include "../one/Own.hpp"
-#include <Langulus/Core/Sequences.hpp>
+#include <Langulus/Sequences.hpp>
 
 
 namespace Langulus

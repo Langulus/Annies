@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../BlockSet.hpp"
-#include <Langulus/Core/Memory.hpp>
+#include <Langulus/Annies/Memory.hpp>
 
 
 namespace Langulus::Annies
