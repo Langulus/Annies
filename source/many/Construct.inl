@@ -115,7 +115,7 @@ namespace Langulus::Annies
    ///   @tparam T - type of the construct                                    
    ///   @param t1, tn  - the constructor arguments                           
    ///   @return the request                                                  
-   template<CT::Data T, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::NotVoid T, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    Construct Construct::From(T1&& t1, TN&&...tn) {
       static_assert(CT::Decayed<T>, "T must be fully decayed");
       return {
@@ -127,7 +127,7 @@ namespace Langulus::Annies
    /// Create content descriptor from a static type (without arguments)       
    ///   @tparam T - type of the construct                                    
    ///   @return the request                                                  
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    Construct Construct::From() {
       static_assert(CT::Decayed<T>, "T must be fully decayed");
       return Construct {MetaDataOf<T>()};
@@ -138,7 +138,7 @@ namespace Langulus::Annies
    ///   @param token - the type name for the construct                       
    ///   @param t1, tn  - the constructor arguments                           
    ///   @return the request                                                  
-   template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    Construct Construct::FromToken(const Token& token, T1&& t1, TN&&...tn) {
       return {
          RTTI::DisambiguateMeta(token),
@@ -220,7 +220,7 @@ namespace Langulus::Annies
    
    /// Check if construct type can be interpreted as a given static type      
    ///   @tparam T - type of the construct to compare against                 
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    bool Construct::CastsTo() const {
       return mType ? CastsTo(MetaDataOf<T>()) : false;
    }
@@ -235,7 +235,7 @@ namespace Langulus::Annies
    
    /// Check if construct type is similar to another type                     
    ///   @tparam T - the type to check for                                    
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    bool Construct::Is() const {
       return mType ? Is(MetaDataOf<T>()) : false;
    }
@@ -251,7 +251,7 @@ namespace Langulus::Annies
    /// Change the type of the construct                                       
    ///   @attention will cause a rehash if type differs                       
    ///   @tparam T - the new type of the construct                            
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    void Construct::SetType() {
       SetType(MetaDataOf<T>());
    }

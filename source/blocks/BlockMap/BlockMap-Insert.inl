@@ -282,7 +282,7 @@ namespace Langulus::Annies
             keymemory *= 2;
       }
       else {
-         LANGULUS_ASSUME(DevAssumes, mKeys.mType, "Key type was not set");
+         LglsAssumeDev(mKeys.mType, "Key type was not set");
          keymemory = request * mKeys.mType->mSize;
          if (mKeys.mType->mIsSparse)
             keymemory *= 2;
@@ -297,7 +297,7 @@ namespace Langulus::Annies
    ///   @return the requested byte size                                      
    LANGULUS(INLINED)
    Size BlockMap::RequestValuesSize(const Count count) const IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, mValues.mType, "Value type was not set");
+      LglsAssumeDev(mValues.mType, "Value type was not set");
       auto valueByteSize = count * mValues.mType->mSize;
       if (mValues.mType->mIsSparse)
          valueByteSize *= 2;
@@ -315,11 +315,11 @@ namespace Langulus::Annies
    ///   @return true if map requires another resize and rehash (very rare)   
    template<CT::Map THIS, class KEY_SOURCE, class VAL_SOURCE>
    bool BlockMap::Rehash(const InfoType* oldInfo, const Count oldCount, KEY_SOURCE& oldKeys, VAL_SOURCE& oldVals) {
-      LANGULUS_ASSUME(DevAssumes, mKeys.mReserved > oldCount,
+      LglsAssumeDev(mKeys.mReserved > oldCount,
          "New count is not larger than oldCount");
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(mKeys.mReserved),
+      LglsAssumeDev(IsPowerOfTwo(mKeys.mReserved),
          "New count is not a power-of-two");
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(oldCount),
+      LglsAssumeDev(IsPowerOfTwo(oldCount),
          "Old count is not a power-of-two");
 
       constexpr bool ReusingKeys = CT::Nullptr<KEY_SOURCE>;
@@ -334,13 +334,13 @@ namespace Langulus::Annies
 
          // We should discard the old keys or values before returning   
          if constexpr (not ReusingKeys) {
-            LANGULUS_ASSUME(DevAssumes, oldKeys.mKeys.mEntry->GetUses() == 1,
+            LglsAssumeDev(oldKeys.mKeys.mEntry->GetUses() == 1,
                "Deallocating old keys data that is still in use");
             Allocator::Deallocate(const_cast<Allocation*>(oldKeys.mKeys.mEntry));
          }
 
          if constexpr (not ReusingVals) {
-            LANGULUS_ASSUME(DevAssumes, oldVals.mValues.mEntry->GetUses() == 1,
+            LglsAssumeDev(oldVals.mValues.mEntry->GetUses() == 1,
                "Deallocating old values data that is still in use");
             Allocator::Deallocate(const_cast<Allocation*>(oldVals.mValues.mEntry));
          }
@@ -456,13 +456,13 @@ namespace Langulus::Annies
       // We can discard the old keys or values at this point, because   
       // the second stage works only with local stuff                   
       if constexpr (not ReusingKeys) {
-         LANGULUS_ASSUME(DevAssumes, oldKeys.mKeys.mEntry->GetUses() == 1,
+         LglsAssumeDev(oldKeys.mKeys.mEntry->GetUses() == 1,
             "Deallocating old keys data that is still in use");
          Allocator::Deallocate(const_cast<Allocation*>(oldKeys.mKeys.mEntry));
       }
 
       if constexpr (not ReusingVals) {
-         LANGULUS_ASSUME(DevAssumes, oldVals.mValues.mEntry->GetUses() == 1,
+         LglsAssumeDev(oldVals.mValues.mEntry->GetUses() == 1,
             "Deallocating old values data that is still in use");
          Allocator::Deallocate(const_cast<Allocation*>(oldVals.mValues.mEntry));
       }
@@ -515,7 +515,7 @@ namespace Langulus::Annies
                   while (mInfo[last] and last < GetReserved())
                      ++last;
 
-                  LANGULUS_ASSUME(DevAssumes, last < GetReserved(),
+                  LglsAssumeDev(last < GetReserved(),
                      "Shouldn't ever happen, but better safe than sorry");
 
                   GetKeyHandle<THIS>(last).CreateWithIntent(Abandon(key));
@@ -534,7 +534,7 @@ namespace Langulus::Annies
             }
 
             const Offset index = psl - GetInfo();
-            LANGULUS_ASSUME(DevAssumes, current != index,
+            LglsAssumeDev(current != index,
                "Shouldn't ever happen, but better safe than sorry");
 
             GetKeyHandle<THIS>(index).CreateWithIntent(Abandon(key));
@@ -742,7 +742,7 @@ namespace Langulus::Annies
                insertedAt = index;
          }
 
-         LANGULUS_ASSUME(DevAssumes, attempts < AllowedMisses,
+         LglsAssumeDev(attempts < AllowedMisses,
             "Attempt will go out of bounds");
 
          ++attempts;

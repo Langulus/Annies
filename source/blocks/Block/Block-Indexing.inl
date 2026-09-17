@@ -20,7 +20,7 @@ namespace Langulus::Annies
    ///   @return pointer to the selected raw data offset                      
    template<class TYPE> LANGULUS(ALWAYS_INLINED) IF_UNSAFE(constexpr)
    Byte* Block<TYPE>::At(const Offset byteOffset) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, mRaw, "Invalid memory");
+      LglsAssumeDev(mRaw, "Invalid memory");
       return mRaw + byteOffset;
    }
 
@@ -60,10 +60,10 @@ namespace Langulus::Annies
    ///   @param idx - simple index for accessing                              
    ///   @param baseOffset - byte offset from the element to apply            
    ///   @return either pointer or reference to the element (depends on T)    
-   template<class TYPE> template<CT::Data T> LANGULUS(INLINED) IF_UNSAFE(constexpr)
+   template<class TYPE> template<CT::NotVoid T> LANGULUS(INLINED) IF_UNSAFE(constexpr)
    decltype(auto) Block<TYPE>::Get(Offset idx) IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, mType, "Block is not typed");
+         LglsAssumeDev(mType, "Block is not typed");
          Byte* pointer;
          if (mType->mIsSparse)
             pointer = GetRaw<Byte*>()[idx];
@@ -91,10 +91,10 @@ namespace Langulus::Annies
       }
    }
 
-   template<class TYPE> template<CT::Data T> LANGULUS(INLINED) IF_UNSAFE(constexpr)
+   template<class TYPE> template<CT::NotVoid T> LANGULUS(INLINED) IF_UNSAFE(constexpr)
    decltype(auto) Block<TYPE>::Get(Offset idx) const IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, mType, "Block is not typed");
+         LglsAssumeDev(mType, "Block is not typed");
          const Byte* pointer;
          if (mType->mIsSparse)
             pointer = GetRaw<Byte*>()[idx];
@@ -127,7 +127,7 @@ namespace Langulus::Annies
    template<class TYPE> LANGULUS(INLINED) IF_UNSAFE(constexpr)
    decltype(auto) Block<TYPE>::GetDeep(Offset idx) IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, IsDeep(), "Block is not deep");
+         LglsAssumeDev(IsDeep(), "Block is not deep");
          return Get<Block<>>(idx);
       }
       else {
@@ -139,7 +139,7 @@ namespace Langulus::Annies
    template<class TYPE> LANGULUS(INLINED) IF_UNSAFE(constexpr)
    decltype(auto) Block<TYPE>::GetDeep(Offset idx) const IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, IsDeep(), "Block is not deep");
+         LglsAssumeDev(IsDeep(), "Block is not deep");
          return Get<Block<>>(idx);
       }
       else {
@@ -154,13 +154,13 @@ namespace Langulus::Annies
    ///   @tparam T - the type to interpret to                                 
    ///   @param index - the index                                             
    ///   @return either pointer or reference to the element (depends on T)    
-   template<class TYPE> template<CT::Data T>
+   template<class TYPE> template<CT::NotVoid T>
    decltype(auto) Block<TYPE>::As(CT::Index auto index) {
       if constexpr (TypeErased) {
          // Type-erased As                                              
          // First quick type stage for fast access - this will ignore   
          // sparsity if possible                                        
-         LANGULUS_ASSUME(DevAssumes, mType, "Block is not typed");
+         LglsAssumeDev(mType, "Block is not typed");
          if (mType->Is<T>())
             return Get<T>(SimplifyIndex(index));
       
@@ -276,7 +276,7 @@ namespace Langulus::Annies
       }
    }
 
-   template<class TYPE> template<CT::Data T> LANGULUS(ALWAYS_INLINED)
+   template<class TYPE> template<CT::NotVoid T> LANGULUS(ALWAYS_INLINED)
    decltype(auto) Block<TYPE>::As(CT::Index auto index) const {
       return const_cast<Block&>(*this).As<T>(index);
    }
@@ -288,7 +288,7 @@ namespace Langulus::Annies
    template<class TYPE> template<CT::Block THIS>
    LANGULUS(INLINED) IF_UNSAFE(constexpr)
    THIS Block<TYPE>::Select(Offset start, Count count) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, start + count <= mCount, "Out of limits");
+      LglsAssumeDev(start + count <= mCount, "Out of limits");
 
       if (count == 0) {
          THIS result {Disown(reinterpret_cast<const THIS&>(*this))};
@@ -354,7 +354,7 @@ namespace Langulus::Annies
    ///   @return the element's block                                          
    template<class TYPE> LANGULUS(INLINED)
    Block<> Block<TYPE>::GetElement(Offset index) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, index < mReserved, "Index out of range");
+      LglsAssumeDev(index < mReserved, "Index out of range");
       Block result = GetElementInner(index);
       result.mState -= DataState::Or;
       return result;
@@ -373,7 +373,7 @@ namespace Langulus::Annies
    ///   @return the element's block                                          
    template<class TYPE> LANGULUS(INLINED)
    Block<> Block<TYPE>::GetElementInner(Offset index) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, mRaw, "Invalid memory");
+      LglsAssumeDev(mRaw, "Invalid memory");
       Block result {*this};
       result.mCount = 1;
       result.mRaw += index * mType->mSize;
@@ -463,8 +463,8 @@ namespace Langulus::Annies
    ///   @return the mutable resolved first element                           
    template<class TYPE> LANGULUS(INLINED)
    Block<> Block<TYPE>::GetResolved() {
-      LANGULUS_ASSUME(DevAssumes, IsTyped(),  "Block is not typed");
-      LANGULUS_ASSUME(DevAssumes, mCount > 0, "Block is empty");
+      LglsAssumeDev(IsTyped(),  "Block is not typed");
+      LglsAssumeDev(mCount > 0, "Block is empty");
 
       if (mType->mResolver)
          return mType->mResolver(GetDense<CountMax>().mRaw);
@@ -487,8 +487,8 @@ namespace Langulus::Annies
    template<class TYPE> template<Count COUNT> LANGULUS(INLINED)
    Block<> Block<TYPE>::GetDense() {
       static_assert(COUNT > 0, "COUNT must be greater than 0");
-      LANGULUS_ASSUME(DevAssumes, IsTyped(),  "Block is not typed");
-      LANGULUS_ASSUME(DevAssumes, mCount > 0, "Block is empty");
+      LglsAssumeDev(IsTyped(),  "Block is not typed");
+      LglsAssumeDev(mCount > 0, "Block is empty");
 
       Block copy {*this};
       copy.mCount = 1;
@@ -575,12 +575,12 @@ namespace Langulus::Annies
    void Block<TYPE>::Swap(T1&& rhs) {
       using S = IntentOf<decltype(rhs)>;
       using ST = Conditional<TypeErased, TypeOf<S>, Block>;
-      LANGULUS_ASSUME(DevAssumes, mCount and DeintCast(rhs).mCount == mCount,
+      LglsAssumeDev(mCount and DeintCast(rhs).mCount == mCount,
          "Invalid count");
 
       // Type-erased pointers (void*) are always acceptable             
       //TODO add this check to IsSimilar(Block auto) directly?
-      LANGULUS_ASSUME(DevAssumes, (
+      LglsAssumeDev((
           DeintCast(rhs).IsSimilar(*this)
       or (DeintCast(rhs).template IsSimilar<void*>() and IsSparse())
       ), "Type mismatch on swap", ": ", DeintCast(rhs).GetType(), " != ", GetType());
@@ -715,7 +715,7 @@ namespace Langulus::Annies
       }
       else {
          // Type erased and dense                                       
-         LANGULUS_ASSUME(DevAssumes, IsSparse() == CT::Sparse<T>,
+         LglsAssumeDev(IsSparse() == CT::Sparse<T>,
             "Sparseness mismatch");
 
          if constexpr (CT::Sparse<T>)
@@ -741,9 +741,9 @@ namespace Langulus::Annies
    template<class TYPE> LANGULUS(INLINED)
    Block<TYPE> Block<TYPE>::CropInner(const Offset start, const Count count)
    const IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, mRaw,
+      LglsAssumeDev(mRaw,
          "Block is not allocated");
-      LANGULUS_ASSUME(DevAssumes, IsTyped(),
+      LglsAssumeDev(IsTyped(),
          "Block is not typed");
 
       Block result {*this};
@@ -791,13 +791,13 @@ namespace Langulus::Annies
          // Unsafe, works only on assumptions                           
          // Using an integer index explicitly makes a statement, that   
          // you know what you're doing                                  
-         LANGULUS_ASSUME(UserAssumes, 
+         LglsAssumeUser(
             not SAFE or index < static_cast<INDEX>(mCount),
             "Integer index out of range"
          );
 
          if constexpr (CT::Signed<INDEX>) {
-            LANGULUS_ASSUME(UserAssumes, index >= 0, 
+            LglsAssumeUser(index >= 0, 
                "Integer index is below zero, "
                "use Index for reverse indices instead"
             );

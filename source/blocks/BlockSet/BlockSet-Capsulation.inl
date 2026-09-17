@@ -199,7 +199,7 @@ namespace Langulus::Annies
    /// Check if a static type can be inserted                                 
    ///   @tparam T - the type to check                                        
    ///   @return true if able to insert an instance of the type to this block 
-   template<CT::Data T, CT::Set THIS> LANGULUS(INLINED)
+   template<CT::NotVoid T, CT::Set THIS> LANGULUS(INLINED)
    constexpr bool BlockSet::IsInsertable() const noexcept {
       return GetValues<THIS>().template IsInsertable<T>();
    }

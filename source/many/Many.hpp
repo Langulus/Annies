@@ -67,10 +67,10 @@ namespace Langulus::Annies
       static Many FromMeta(DMeta, DataState = {}) noexcept;
       static Many FromBlock(const CT::Block auto&, DataState = {}) noexcept;
       static Many FromState(const CT::Block auto&, DataState = {}) noexcept;
-      template<CT::Data T>
+      template<CT::NotVoid T>
       static Many From(DataState = {}) noexcept;
 
-      template<class AS = void, CT::Data...TN>
+      template<class AS = void, CT::NotVoid...TN>
       static Many Wrap(TN&&...);
 
       template<class...>

@@ -492,7 +492,7 @@ namespace Langulus::Annies
    ///   @attention assumes key and value types are clone-constructible       
    template<template<class> class S, CT::Map B> requires CT::Intent<S<B>>
    void BlockMap::CloneValuesReinsertInner(CT::Block auto& coalescedKeys, S<B>&& asFrom) {
-      LANGULUS_ASSUME(DevAssumes, IsKeySparse(), "Keys should be sparse");
+      LglsAssumeDev(IsKeySparse(), "Keys should be sparse");
       using SS = S<B>;
 
       if constexpr (CT::Typed<B>) {
@@ -631,7 +631,7 @@ namespace Langulus::Annies
          if (mKeys.GetUses() <= 1 or mValues.GetUses() <= 1)
             TODO();
 
-         LANGULUS_ASSUME(DevAssumes,
+         LglsAssumeDev(
             mKeys.GetUses() > 1 and mValues.GetUses() > 1,
             "Shouldn't be possible"
          );

@@ -84,7 +84,7 @@ namespace Langulus::Annies
    ///              For pointers, use Ptr or Ref instead. This doesn't really 
    ///              matter, if built without the MANAGED_MEMORY feature       
    ///                                                                        
-   template<CT::Data T>
+   template<CT::NotVoid T>
    class Own : public A::Owned {
    protected:
       T mValue;

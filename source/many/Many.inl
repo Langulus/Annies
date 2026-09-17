@@ -85,7 +85,7 @@ namespace Langulus::Annies
    ///   @tparam T - the contained type                                       
    ///   @param state - optional state of the container                       
    ///   @return the new container instance                                   
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    Many Many::From(DataState state) noexcept {
       return Base {state, MetaDataOf<T>()};
    }
@@ -94,7 +94,7 @@ namespace Langulus::Annies
    ///   @tparam AS - the type to wrap elements as, use void to auto-deduce   
    ///   @param items... - items to insert                                    
    ///   @returns the new container containing the data                       
-   template<class AS, CT::Data...TN> LANGULUS(INLINED)
+   template<class AS, CT::NotVoid...TN> LANGULUS(INLINED)
    Many Many::Wrap(TN&&...items) {
       if constexpr (CT::TypeErased<AS>)
          return WrapBlock<Many>(Forward<TN>(items)...);

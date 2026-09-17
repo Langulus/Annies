@@ -37,7 +37,7 @@ namespace Langulus::Annies
    ///                                                                        
    /// A hashset implementation, using the Robin Hood algorithm               
    ///                                                                        
-   template<CT::Data T, bool ORDERED = false>
+   template<CT::NotVoid T, bool ORDERED = false>
    struct TSet : Set<ORDERED> {
       using Value = T;
       using Base = Set<ORDERED>;
@@ -147,15 +147,15 @@ namespace Langulus::Annies
       ///                                                                     
       ///   RTTI                                                              
       ///                                                                     
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool Is() const noexcept;
       bool Is(DMeta) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsSimilar() const noexcept;
       bool IsSimilar(DMeta) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsExact() const noexcept;
       bool IsExact(DMeta) const noexcept;
 

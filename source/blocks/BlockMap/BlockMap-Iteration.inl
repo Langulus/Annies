@@ -153,9 +153,9 @@ namespace Langulus::Annies
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
 
-      LANGULUS_ASSUME(DevAssumes, not IsEmpty(),
+      LglsAssumeDev(not IsEmpty(),
          "Map is empty");
-      LANGULUS_ASSUME(DevAssumes, (part.template CastsTo<A, true>()),
+      LglsAssumeDev((part.template CastsTo<A, true>()),
          "Map is not typed properly");
        
       auto inf = REVERSE ? mInfo + GetReserved() - 1 : mInfo;
@@ -524,7 +524,7 @@ namespace Langulus::Annies
    ///   @return the modified iterator                                        
    template<class T> LANGULUS(INLINED)
    constexpr auto BlockMap::Iterator<T>::operator ++ () noexcept -> Iterator& {
-      LANGULUS_ASSUME(UserAssumes, mInfo < mSentinel,
+      LglsAssumeUser(mInfo < mSentinel,
          "Don't ++ an iterator if end was reached");
 
       // Seek next valid info, or hit sentinel at the end               
@@ -587,7 +587,7 @@ namespace Langulus::Annies
    ///   @return the pair at the current iterator position                    
    template<class T> LANGULUS(INLINED)
    constexpr auto BlockMap::Iterator<T>::operator * () const {
-      LANGULUS_ASSUME(UserAssumes, mInfo < mSentinel,
+      LglsAssumeUser(mInfo < mSentinel,
          "Accessing an end operator");
 
       const auto me = const_cast<Iterator<T>*>(this);

@@ -200,7 +200,7 @@ namespace Langulus::Annies
    /// ignoring density and cv-qualifiers                                     
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   TEMPLATE() template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool TABLE()::Is() const noexcept {
       return BlockSet::Is<Set, T1, TN...>();
    }
@@ -218,7 +218,7 @@ namespace Langulus::Annies
    /// ignoring cv-qualifiers only                                            
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   TEMPLATE() template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsSimilar() const noexcept {
       return BlockSet::IsSimilar<Set, T1, TN...>();
    }
@@ -236,7 +236,7 @@ namespace Langulus::Annies
    /// including by density and cv-qualifiers                                 
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type exactly matches at least one type         
-   TEMPLATE() template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsExact() const noexcept {
       return BlockSet::IsExact<Set, T1, TN...>();
    }

@@ -341,7 +341,7 @@ namespace Langulus::Annies
 
       LANGULUS(ALWAYS_INLINED)
       decltype(auto) operator * () const IF_UNSAFE(noexcept) {
-         LANGULUS_ASSUME(UserAssumes, *mPointer, "Dereferening null pointer");
+         LglsAssumeUser(*mPointer, "Dereferening null pointer");
          return **mPointer;
       }
 
@@ -530,18 +530,18 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Descriptor interface                                              
       ///                                                                     
-      template<class, CT::Data D>
+      template<class, CT::NotVoid D>
       void SetDefaultTrait(D&&);
 
       template<class...>
-      bool ExtractTrait(CT::Data auto&...) const;
-      auto ExtractData(CT::Data auto&) const -> Count;
+      bool ExtractTrait(CT::NotVoid auto&...) const;
+      auto ExtractData(CT::NotVoid auto&) const -> Count;
 
       // Intentionally undefined, because it requires Langulus::Flow    
       // and relies on Verbs::Interpret                                 
       // If you receive missing externals, include the following:       
       //    #include <Flow/Verbs/Interpret.hpp>                         
-      auto ExtractDataAs(CT::Data auto&) const -> Count;
+      auto ExtractDataAs(CT::NotVoid auto&) const -> Count;
 
       template<CT::Data>
       auto FindType()      const -> DMeta;
@@ -551,11 +551,11 @@ namespace Langulus::Annies
 
    protected:
       template<class>
-      bool ExtractTraitInner(CT::Data auto&...) const;
+      bool ExtractTraitInner(CT::NotVoid auto&...) const;
       template<class, Offset...IDX>
-      bool ExtractTraitInner(ExpandedSequence<IDX...>, CT::Data auto&...) const;
+      bool ExtractTraitInner(ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
       template<class, Offset>
-      bool ExtractTraitInnerInner(CT::Data auto&) const;
+      bool ExtractTraitInnerInner(CT::NotVoid auto&) const;
 
    public:
       ///                                                                     
@@ -569,12 +569,12 @@ namespace Langulus::Annies
       template<CT::Data>
       decltype(auto) As(CT::Index auto) const;
 
-      template<CT::Data T> LANGULUS(ALWAYS_INLINED)
+      template<CT::NotVoid T> LANGULUS(ALWAYS_INLINED)
       decltype(auto) As() {
          return As<T>(0);
       }
 
-      template<CT::Data T> LANGULUS(ALWAYS_INLINED)
+      template<CT::NotVoid T> LANGULUS(ALWAYS_INLINED)
       decltype(auto) As() const {
          return As<T>(0);
       }
@@ -586,10 +586,10 @@ namespace Langulus::Annies
       // and relies on Verbs::Interpret                                 
       // If you receive missing externals, include the following:       
       //    #include <Flow/Verbs/Interpret.hpp>                         
-      template<CT::Data T, bool FATAL_FAILURE = true>
+      template<CT::NotVoid T, bool FATAL_FAILURE = true>
       T AsCast(CT::Index auto) const;
 
-      template<CT::Data T, bool FATAL_FAILURE = true> LANGULUS(INLINED)
+      template<CT::NotVoid T, bool FATAL_FAILURE = true> LANGULUS(INLINED)
       T AsCast() const {
          return AsCast<T, FATAL_FAILURE>(0);
       }
@@ -640,9 +640,9 @@ namespace Langulus::Annies
       Index GetIndex() const IF_UNSAFE(noexcept);
       Index GetIndexMode(Count&) const IF_UNSAFE(noexcept);
 	  
-      template<CT::Data = TYPE> IF_UNSAFE(constexpr)
+      template<CT::NotVoid = TYPE> IF_UNSAFE(constexpr)
       decltype(auto) Get(Offset = 0)       IF_UNSAFE(noexcept);
-      template<CT::Data = TYPE> IF_UNSAFE(constexpr)
+      template<CT::NotVoid = TYPE> IF_UNSAFE(constexpr)
       decltype(auto) Get(Offset = 0) const IF_UNSAFE(noexcept);
    
       IF_UNSAFE(constexpr)
@@ -749,17 +749,17 @@ namespace Langulus::Annies
       ///                                                                     
       ///   RTTI                                                              
       ///                                                                     
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool Is() const noexcept;
       bool Is(DMeta) const noexcept;
       bool Is(const CT::Block auto&) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsSimilar() const noexcept;
       bool IsSimilar(DMeta) const noexcept;
       bool IsSimilar(const CT::Block auto&) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsExact() const noexcept;
       bool IsExact(DMeta) const noexcept;
       bool IsExact(const CT::Block auto&) const noexcept;
@@ -776,7 +776,7 @@ namespace Langulus::Annies
 
       template<CT::Block B>
       B ReinterpretAs(const B&) const;
-      template<CT::Data T>
+      template<CT::NotVoid T>
       TMany<T> ReinterpretAs() const;
 
       Block<> GetMember(const RTTI::Member&, CT::Index auto);
@@ -1031,7 +1031,7 @@ namespace Langulus::Annies
    template<class BLOCK = void>
    auto MakeBlock(auto&&, Count = 1);
 
-   template<class BLOCK = void, CT::Data...TN>
+   template<class BLOCK = void, CT::NotVoid...TN>
    auto WrapBlock(TN&&...);
 
    /// Cast between block types - does only reinterpret_cast, with some       

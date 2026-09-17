@@ -260,7 +260,7 @@ namespace Langulus::Annies
       using ST = TypeOf<S>;
 
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, type,
+         LglsAssumeDev(type,
             "Invalid type provided for type-erased handle");
 
          if (type->mIsSparse) {
@@ -519,18 +519,18 @@ namespace Langulus::Annies
    TEMPLATE() template<bool RESET, bool DEALLOCATE>
    void HAND()::FreeInner(DMeta meta) requires Mutable {
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, meta,
+         LglsAssumeDev(meta,
             "Invalid type provided for type-erased handle");
 
          if constexpr (Sparse) {
             // Handle is sparse, we should handle each indirection layer
-            LANGULUS_ASSUME(DevAssumes, meta->mIsSparse,
+            LglsAssumeDev(meta->mIsSparse,
                "Provided meta must match T sparseness");
 
             if (GetEntry()) {
                if (1 == GetEntry()->GetUses()) {
                   // This is the last occurence of that element         
-                  LANGULUS_ASSUME(DevAssumes, Get(), "Null pointer");
+                  LglsAssumeDev(Get(), "Null pointer");
 
                   if (meta->mDeptr->mIsSparse) {
                      // Pointer to pointer                              
@@ -582,7 +582,7 @@ namespace Langulus::Annies
             if (GetEntry()) {
                if (1 == GetEntry()->GetUses()) {
                   // This is the last occurence of that element         
-                  LANGULUS_ASSUME(DevAssumes, Get(), "Null pointer");
+                  LglsAssumeDev(Get(), "Null pointer");
 
                   if constexpr (CT::Sparse<Deptr<T>>) {
                      // Pointer to pointer                              

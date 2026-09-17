@@ -9,7 +9,7 @@
 #include "THive.hpp"
 #include "TMany.inl"
 
-#define TEMPLATE()   template<CT::Data T>
+#define TEMPLATE()   template<CT::NotVoid T>
 #define TME()        THive<T>
 
 
@@ -218,11 +218,11 @@ namespace Langulus::Annies
    ///   @param cell - cell to destroy                                        
    TEMPLATE()
    void THive<T>::Destroy(Cell* cell) {
-      LANGULUS_ASSUME(DevAssumes, cell,
+      LglsAssumeDev(cell,
          "Pointer is not valid");
-      LANGULUS_ASSUME(DevAssumes, Owns(cell),
+      LglsAssumeDev(Owns(cell),
          "Pointer is not valid");
-      LANGULUS_ASSUME(DevAssumes, not cell->mNextFreeCell,
+      LglsAssumeDev(not cell->mNextFreeCell,
          "Cell is not initialized");
 
       // Destroy the cell, if owned by this hive                        
@@ -250,7 +250,7 @@ namespace Langulus::Annies
                   // will continue to live as a reference somewhere,    
                   // until the handle's destructor is called, and the   
                   // last reference is released                         
-                  LANGULUS_ASSUME(DevAssumes, frame.GetUses() >= 1,
+                  LglsAssumeDev(frame.GetUses() >= 1,
                      "A populated frame must have references");
                   raw->~Cell();
                }
@@ -261,7 +261,7 @@ namespace Langulus::Annies
             ++raw;
          }
 
-         LANGULUS_ASSUME(DevAssumes, frame.mCount == 0,
+         LglsAssumeDev(frame.mCount == 0,
             "Frame should be empty at this point");
       }
    }

@@ -336,7 +336,7 @@ namespace Langulus::Annies
    /// Deserialize a byte container to a desired type                         
    ///   @tparam result - [out] data/container to deserialize into            
    ///   @return the number of parsed bytes                                   
-   Count Bytes::Deserialize(CT::Data auto& result) const {
+   Count Bytes::Deserialize(CT::NotVoid auto& result) const {
       Header header;
       return Base::DeserializeBinary<void>(result, header);
    }

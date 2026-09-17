@@ -25,7 +25,7 @@ namespace Langulus::Annies
    /// Set the contained data type                                            
    ///   @tparam T - the contained type                                       
    ///   @tparam CONSTRAIN - whether or not to enable type-constraints        
-   template<CT::Data T, bool CONSTRAIN, CT::Set THIS> LANGULUS(INLINED)
+   template<CT::NotVoid T, bool CONSTRAIN, CT::Set THIS> LANGULUS(INLINED)
    void BlockSet::SetType() {
       static_assert(not CT::Typed<THIS>,
          "Can't change type of a statically typed set");
@@ -37,7 +37,7 @@ namespace Langulus::Annies
    ///   @tparam FORCE - insert even if types mismatch, by making this set    
    ///                   deep with provided type - use void to disable        
    ///   @return true if block was deepened to incorporate the new type       
-   template<CT::Set THIS, CT::Data T, class FORCE> LANGULUS(INLINED)
+   template<CT::Set THIS, CT::NotVoid T, class FORCE> LANGULUS(INLINED)
    bool BlockSet::Mutate() {
       if constexpr (CT::Typed<THIS>) {
          if constexpr (CT::Similar<TypeOf<THIS>, T>) {
@@ -100,7 +100,7 @@ namespace Langulus::Annies
    /// ignoring density and cv-qualifiers                                     
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   template<CT::Set THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Set THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockSet::Is() const noexcept {
       return GetValues<THIS>().template Is<T1, TN...>();
    }
@@ -118,7 +118,7 @@ namespace Langulus::Annies
    /// ignoring cv-qualifiers only                                            
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   template<CT::Set THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Set THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockSet::IsSimilar() const noexcept {
       return GetValues<THIS>().template IsSimilar<T1, TN...>();
    }
@@ -136,7 +136,7 @@ namespace Langulus::Annies
    /// including by density and cv-qualifiers                                 
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type exactly matches at least one type         
-   template<CT::Set THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Set THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockSet::IsExact() const noexcept {
       return GetValues<THIS>().template IsExact<T1, TN...>();
    }

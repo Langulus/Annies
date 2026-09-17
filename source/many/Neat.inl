@@ -190,7 +190,7 @@ namespace Langulus::Annies
    ///              contents                                                  
    LANGULUS(INLINED)
    auto Neat::GetTraits(TMeta t) -> TraitList* {
-      LANGULUS_ASSUME(UserAssumes, t, "Can't get invalid trait");
+      LglsAssumeUser(t, "Can't get invalid trait");
       auto found = mTraits.Find(t);
       return found ? &mTraits.GetValue(found) : nullptr;
    }
@@ -208,7 +208,7 @@ namespace Langulus::Annies
    /// Get list of data, corresponding to a static type                       
    ///   @tparam T - type to search for                                       
    ///   @return the data list, or nullptr if no such list exists             
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    auto Neat::GetData() -> TailList* {
       return GetData(MetaDataOf<Decay<T>>());
    }
@@ -216,7 +216,7 @@ namespace Langulus::Annies
    /// Get list of data, corresponding to a static type (const)               
    ///   @tparam T - type to search for                                       
    ///   @return the data list, or nullptr if no such list exists             
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    auto Neat::GetData() const -> const TailList* {
       return GetData(MetaDataOf<Decay<T>>());
    }
@@ -241,7 +241,7 @@ namespace Langulus::Annies
    /// Get list of constructs, corresponding to a static type                 
    ///   @tparam T - type to search for                                       
    ///   @return the construct list, or nullptr if no such list exists        
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    auto Neat::GetConstructs() -> ConstructList* {
       return GetConstructs(MetaDataOf<Decay<T>>());
    }
@@ -249,7 +249,7 @@ namespace Langulus::Annies
    /// Get list of constructs, corresponding to a static type (const)         
    ///   @tparam T - type to search for                                       
    ///   @return the construct list, or nullptr if no such list exists        
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    auto Neat::GetConstructs() const -> const ConstructList* {
       return GetConstructs(MetaDataOf<Decay<T>>());
    }
@@ -274,7 +274,7 @@ namespace Langulus::Annies
    /// Find data in constructs or tail, that casts to T                       
    ///   @tparam T - type requirement                                         
    ///   @return the first type that matches                                  
-   template<CT::Data T> LANGULUS(INLINED)
+   template<CT::NotVoid T> LANGULUS(INLINED)
    DMeta Neat::FindType() const {
       return FindType(MetaDataOf<T>());
    }
@@ -321,7 +321,7 @@ namespace Langulus::Annies
    ///   @tparam T - trait to set                                             
    ///   @param value - the value to assign                                   
    template<CT::Trait T> LANGULUS(INLINED)
-   void Neat::SetDefaultTrait(CT::Data auto&& value) {
+   void Neat::SetDefaultTrait(CT::NotVoid auto&& value) {
       auto found = GetTraits<T>();
       if (found and *found)
          return;
@@ -334,7 +334,7 @@ namespace Langulus::Annies
    ///   @param values - [out] where to save the value, if found              
    ///   @return true if value changed                                        
    template<CT::Trait...T> LANGULUS(INLINED)
-   bool Neat::ExtractTrait(CT::Data auto&...values) const {
+   bool Neat::ExtractTrait(CT::NotVoid auto&...values) const {
       return (ExtractTraitInner<T>(values...) or ...);
    }
    
@@ -343,7 +343,7 @@ namespace Langulus::Annies
    ///   @param values - [out] where to save the value, if found              
    ///   @return true if value changed                                        
    template<CT::Trait T> LANGULUS(INLINED)
-   bool Neat::ExtractTraitInner(CT::Data auto&...values) const {
+   bool Neat::ExtractTraitInner(CT::NotVoid auto&...values) const {
       auto found = GetTraits<T>();
       if (found) {
          return ExtractTraitInner(
@@ -356,14 +356,14 @@ namespace Langulus::Annies
    ///                                                                        
    template<Offset...IDX>
    bool Neat::ExtractTraitInner(
-      const TraitList& found, ExpandedSequence<IDX...>, CT::Data auto&...values
+      const TraitList& found, ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
       return (ExtractTraitInnerInner<IDX>(found, values) or ...);
    }
    
    ///                                                                        
    template<Offset IDX>
-   bool Neat::ExtractTraitInnerInner(const TraitList& found, CT::Data auto& value) const {
+   bool Neat::ExtractTraitInnerInner(const TraitList& found, CT::NotVoid auto& value) const {
       if (IDX >= found.GetCount())
          return false;
 
@@ -384,7 +384,7 @@ namespace Langulus::Annies
    ///   @param value - [out] where to save the value(s), if found            
    ///   @return the number of extracted values (always 1 if not an array)    
    LANGULUS(INLINED)
-   Count Neat::ExtractData(CT::Data auto& value) const {
+   Count Neat::ExtractData(CT::NotVoid auto& value) const {
       using D = Deref<decltype(value)>;
       if constexpr (CT::Array<D>) {
          // Fill a bounded array                                        
@@ -421,7 +421,7 @@ namespace Langulus::Annies
    /// Extract any data that is convertible to D                              
    ///   @param value - [out] where to save the value, if found               
    ///   @return the number of extracted values (always 1 if not an array)    
-   inline Count Neat::ExtractDataAs(CT::Data auto& value) const {
+   inline Count Neat::ExtractDataAs(CT::NotVoid auto& value) const {
       using D = Deref<decltype(value)>;
 
       if constexpr (CT::Array<D>) {
@@ -1098,7 +1098,7 @@ namespace Langulus::Annies
    ///   @tparam EMPTY_TOO - use true, to remove all empty data entries, that 
    ///      are usually produced, by pushing DMeta (disabled by default)      
    ///   @return the number of removed data entries                           
-   template<CT::Data T, bool EMPTY_TOO>
+   template<CT::NotVoid T, bool EMPTY_TOO>
    Count Neat::RemoveData() {
       const auto filter = MetaDataOf<Decay<T>>();
       auto found = mAnythingElse.FindIt(filter);
@@ -1137,7 +1137,7 @@ namespace Langulus::Annies
    /// Remove constructs that match the given type                            
    ///   @tparam T - type of construct to remove                              
    ///   @return the number of removed constructs                             
-   template<CT::Data T>
+   template<CT::NotVoid T>
    Count Neat::RemoveConstructs() {
       const auto filter = MetaDataOf<Decay<T>>();
       auto found = mConstructs.FindIt(filter);

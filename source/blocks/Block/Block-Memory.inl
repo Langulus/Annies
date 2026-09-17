@@ -20,7 +20,7 @@ namespace Langulus::Annies
    auto Block<TYPE>::RequestSize(const Count count) const IF_UNSAFE(noexcept)
    -> AllocationRequest {
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Requesting allocation size for an untyped container");
          return mType->RequestSize(count);
       }
@@ -58,7 +58,7 @@ namespace Langulus::Annies
    ///   @param elements - number of elements to allocate                     
    template<class TYPE> template<bool CREATE, bool SETSIZE>
    void Block<TYPE>::AllocateMore(const Count elements) {
-      LANGULUS_ASSUME(DevAssumes, elements > mCount, "Bad element count");
+      LglsAssumeDev(elements > mCount, "Bad element count");
 
       if constexpr (not TypeErased) {
          // Allocate/reallocate                                         
@@ -80,7 +80,7 @@ namespace Langulus::Annies
             }
 
             // Reallocate                                               
-            LANGULUS_ASSUME(DevAssumes, mEntry->GetUses() == 1,
+            LglsAssumeDev(mEntry->GetUses() == 1,
                "Can't reuse memory of a block used from multiple places, "
                "BranchOut should've been called prior to AllocateMore"
             );
@@ -177,7 +177,7 @@ namespace Langulus::Annies
    ///   @param elements - number of elements to allocate                     
    template<class TYPE> LANGULUS(INLINED)
    void Block<TYPE>::AllocateLess(const Count elements) {
-      LANGULUS_ASSUME(DevAssumes, elements < mReserved, "Bad element count");
+      LglsAssumeDev(elements < mReserved, "Bad element count");
 
       if (mCount > elements) {
          // Destroy back entries on smaller allocation                  
@@ -195,7 +195,7 @@ namespace Langulus::Annies
          if (request.mElementCount == mReserved)
             return;
          
-         LANGULUS_ASSUME(DevAssumes, mEntry->GetUses() == 1,
+         LglsAssumeDev(mEntry->GetUses() == 1,
             "Can't reuse memory of a block used from multiple places, "
             "BranchOut should've been called prior to AllocateMore"
          );
@@ -215,7 +215,7 @@ namespace Langulus::Annies
             );
          }
          else {
-            LANGULUS_ASSUME(DevAssumes, mType, "Invalid type");
+            LglsAssumeDev(mType, "Invalid type");
 
             if (mType->mIsSparse) {
                // Move entry data to its new place                      
@@ -275,7 +275,7 @@ namespace Langulus::Annies
       // Allocate/reallocate                                            
       if (mEntry) {
          // Reallocate                                                  
-         LANGULUS_ASSUME(DevAssumes, mEntry->GetUses() == 1,
+         LglsAssumeDev(mEntry->GetUses() == 1,
             "Can't reuse memory of a block used from multiple places, "
             "BranchOut should've been called prior to AllocateMore"
          );
@@ -467,12 +467,12 @@ namespace Langulus::Annies
       if (not mEntry)
          return;
 
-      LANGULUS_ASSUME(DevAssumes, mEntry->GetUses() >= 1,
+      LglsAssumeDev(mEntry->GetUses() >= 1,
          "Bad memory dereferencing");
 
       if (mEntry->GetUses() == 1) {
          // Free memory                                                 
-         LANGULUS_ASSUME(DevAssumes, not IsStatic(),
+         LglsAssumeDev(not IsStatic(),
             "Last reference, but container was marked static"
             " - make sure initialization of this container was correct, "
             "did you forget to add a reference?",
@@ -503,11 +503,11 @@ namespace Langulus::Annies
    ///   @param mask - internally used for destroying tables (tag dispatch)   
    template<class TYPE> template<bool DESTROY, class MASK>
    void Block<TYPE>::FreeInner(MASK mask) {
-      LANGULUS_ASSUME(DevAssumes, not DESTROY or GetUses() == 1,
+      LglsAssumeDev(not DESTROY or GetUses() == 1,
          "Attempting to destroy elements used from multiple locations");
-      LANGULUS_ASSUME(DevAssumes, not IsEmpty(),
+      LglsAssumeDev(not IsEmpty(),
          "Attempting to destroy elements in an empty container");
-      LANGULUS_ASSUME(DevAssumes, not IsStatic(),
+      LglsAssumeDev(not IsStatic(),
          "Destroying elements in a static container is not allowed");
 
       constexpr bool MASKED = not CT::Nullptr<MASK>;
@@ -647,7 +647,7 @@ namespace Langulus::Annies
    ///   @param mask - internally used for destroying tables (tag dispatch)   
    template<class TYPE> template<class MASK>
    void Block<TYPE>::FreeInnerSparse(MASK mask) {
-      LANGULUS_ASSUME(DevAssumes, IsSparse(), "Container must be sparse");
+      LglsAssumeDev(IsSparse(), "Container must be sparse");
 
       // Destroy all indirection layers, if their references reach      
       // 1, and destroy the dense element, if it has destructor         
@@ -731,7 +731,7 @@ namespace Langulus::Annies
             for_each_match([&matches](const Handle<void*>&) {
                ++matches;
             });
-            LANGULUS_ASSUME(DevAssumes, handle.GetEntry()->GetUses() >= matches + 1,
+            LglsAssumeDev(handle.GetEntry()->GetUses() >= matches + 1,
                "Matches shouldn't exceed the expected count");
 
             if (matches) {

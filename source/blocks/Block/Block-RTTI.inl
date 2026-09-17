@@ -16,7 +16,7 @@ namespace Langulus::Annies
    ///   @attention ignores sparsity and cv-qualifiers                        
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if data type is similar to at least one of the types    
-   template<class TYPE> template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<class TYPE> template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool Block<TYPE>::Is() const noexcept {
       if constexpr (TypeErased)
          return mType and mType->template Is<T1, TN...>();
@@ -50,7 +50,7 @@ namespace Langulus::Annies
    ///   @attention ignores only cv-qualifiers                                
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if data type is similar to at least one of the types    
-   template<class TYPE> template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<class TYPE> template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool Block<TYPE>::IsSimilar() const noexcept {
       if constexpr (TypeErased)
          return mType and mType->template IsSimilar<T1, TN...>();
@@ -83,7 +83,7 @@ namespace Langulus::Annies
    /// Check if this type is exactly one of the provided types                
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if data type matches at least one type                  
-   template<class TYPE> template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<class TYPE> template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool Block<TYPE>::IsExact() const noexcept {
       if constexpr (TypeErased)
          return mType and mType->template IsExact<T1, TN...>();
@@ -156,7 +156,7 @@ namespace Langulus::Annies
    ///   @tparam BINARY_COMPATIBLE - do we require for the type to be         
    ///      binary compatible with this container's type                      
    ///   @return true if contained data is reinterpretable as T               
-   template<class TYPE> template<CT::Data T, bool BINARY_COMPATIBLE, bool ADVANCED>
+   template<class TYPE> template<CT::NotVoid T, bool BINARY_COMPATIBLE, bool ADVANCED>
    LANGULUS(INLINED) bool Block<TYPE>::CastsTo() const {
       //TODO can be further optimized
       return CastsToMeta<BINARY_COMPATIBLE, ADVANCED>(MetaDataOf<Decay<T>>());
@@ -169,7 +169,7 @@ namespace Langulus::Annies
    ///      binary compatible with this container's type                      
    ///   @param count - the number of elements of T                           
    ///   @return true if contained data is reinterpretable as T               
-   template<class TYPE> template<CT::Data T, bool BINARY_COMPATIBLE>
+   template<class TYPE> template<CT::NotVoid T, bool BINARY_COMPATIBLE>
    LANGULUS(INLINED) bool Block<TYPE>::CastsTo(const Count count) const {
       //TODO can be further optimized
       return CastsToMeta<BINARY_COMPATIBLE>(MetaDataOf<Decay<T>>(), count);
@@ -241,7 +241,7 @@ namespace Langulus::Annies
       }
    }
 
-   template<class TYPE> template<CT::Data T> LANGULUS(INLINED)
+   template<class TYPE> template<CT::NotVoid T> LANGULUS(INLINED)
    TMany<T> Block<TYPE>::ReinterpretAs() const {
       static_assert(CT::Dense<T>, "T must be dense");
       return ReinterpretAs(Block<T> {});
@@ -254,7 +254,7 @@ namespace Langulus::Annies
    ///   @return a static memory block                                        
    template<class TYPE> LANGULUS(INLINED)
    Block<> Block<TYPE>::GetMember(const RTTI::Member& member, CT::Index auto idx) {
-      LANGULUS_ASSUME(DevAssumes, not IsEmpty(),
+      LglsAssumeDev(not IsEmpty(),
          "Getting member from an empty block");
       const auto index = SimplifyIndex(idx);
       return { 
@@ -310,7 +310,7 @@ namespace Langulus::Annies
    ///   @tparam FORCE - insert even if types mismatch, by making this block  
    ///                   deep with provided type - use void to disable        
    ///   @return true if block was deepened to incorporate the new type       
-   template<class TYPE> template<CT::Data T, class FORCE> LANGULUS(INLINED)
+   template<class TYPE> template<CT::NotVoid T, class FORCE> LANGULUS(INLINED)
    bool Block<TYPE>::Mutate() {
       using TT = Conditional<CT::Handle<T>, TypeOf<T>, T>;
 
@@ -416,7 +416,7 @@ namespace Langulus::Annies
    /// Set the contained data type                                            
    ///   @tparam T - the contained type                                       
    ///   @tparam CONSTRAIN - whether or not to enable type-constraints        
-   template<class TYPE> template<CT::Data T, bool CONSTRAIN> LANGULUS(INLINED)
+   template<class TYPE> template<CT::NotVoid T, bool CONSTRAIN> LANGULUS(INLINED)
    void Block<TYPE>::SetType() requires TypeErased {
       SetType<CONSTRAIN>(MetaDataOf<T>());
    }

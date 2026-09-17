@@ -10,7 +10,7 @@
 #include "Many.inl"
 #include <cctype>
 
-#define TEMPLATE() template<CT::Data T>
+#define TEMPLATE() template<CT::NotVoid T>
 
 
 namespace Langulus::Annies
@@ -60,7 +60,7 @@ namespace Langulus::Annies
    /// Insert the provided elements, making sure to insert and never absorb   
    ///   @param items... - items to insert                                    
    ///   @returns the new container containing the data                       
-   TEMPLATE() template<CT::Data...TN> LANGULUS(ALWAYS_INLINED)
+   TEMPLATE() template<CT::NotVoid...TN> LANGULUS(ALWAYS_INLINED)
    auto TMany<T>::Wrap(TN&&...items) -> TMany {
       return WrapBlock<TMany>(Forward<TN>(items)...);
    }

@@ -29,7 +29,7 @@ namespace Langulus::Annies
    ///   @param count - the new number of elements                            
    template<CT::Set THIS> LANGULUS(INLINED)
    void BlockSet::AllocateFresh(const Count count) {
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(count),
+      LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
 
       Offset infoOffset;
@@ -51,9 +51,9 @@ namespace Langulus::Annies
    ///   @param count - the new number of pairs                               
    template<CT::Set THIS, bool REUSE>
    void BlockSet::AllocateData(const Count count) {
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(count),
+      LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
-      LANGULUS_ASSUME(DevAssumes, mKeys.mType,
+      LglsAssumeDev(mKeys.mType,
          "Key type haven't been set");
 
       auto& me = reinterpret_cast<const THIS&>(*this);
@@ -189,7 +189,7 @@ namespace Langulus::Annies
       if (not mKeys.mEntry)
          return;
 
-      LANGULUS_ASSUME(DevAssumes,
+      LglsAssumeDev(
          mKeys.mEntry->GetUses() >= 1, "Bad memory dereferencing");
 
       if (mKeys.mEntry->GetUses() == 1) {

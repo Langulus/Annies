@@ -43,7 +43,7 @@ namespace Langulus::Annies
    /// move, and are reused in-place. Extensively used by Flow::TFactory.     
    /// https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p0447r21.html 
    ///                                                                        
-   template<CT::Data T>
+   template<CT::NotVoid T>
    class THive : public A::Hive {
    public:
       LANGULUS(TYPED) T;
@@ -143,7 +143,7 @@ namespace Langulus::Annies
    /// Intended to be allocated only dynamically, and never instantiated on   
    /// the stack, because it may contain an instance of an uninitialized T.   
    ///                                                                        
-   template<CT::Data T>
+   template<CT::NotVoid T>
    class THive<T>::Cell {
    protected:
       friend class THive<T>;
@@ -174,7 +174,7 @@ namespace Langulus::Annies
    ///                                                                        
    ///   Hive iterator                                                        
    ///                                                                        
-   template<CT::Data T> template<bool MUTABLE>
+   template<CT::NotVoid T> template<bool MUTABLE>
    struct THive<T>::Iterator {
       static constexpr bool Mutable = MUTABLE;
 

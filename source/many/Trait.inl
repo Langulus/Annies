@@ -52,7 +52,7 @@ namespace Langulus::Annies
    ///   @tparam T - type of trait                                            
    ///   @tparam D - type of data                                             
    ///   @return a trait preconfigured with the provided types                
-   template<CT::Trait T, CT::Data D> LANGULUS(INLINED)
+   template<CT::Trait T, CT::NotVoid D> LANGULUS(INLINED)
    Trait Trait::From() {
       Trait temp {Block<D> {}};
       temp.SetTrait<T>();

@@ -52,7 +52,7 @@ namespace Langulus::Annies
          Offset idx = index;
          const auto ender = idx + count;
          const auto removed = ender - idx;
-         LANGULUS_ASSUME(DevAssumes, ender <= mCount, "Out of range");
+         LglsAssumeDev(ender <= mCount, "Out of range");
 
          if constexpr (TypeErased) {
             if (IsConstant() or IsStatic()) {

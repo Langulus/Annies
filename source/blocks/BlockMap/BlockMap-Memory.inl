@@ -39,7 +39,7 @@ namespace Langulus::Annies
    ///   @param count - the new number of pairs                               
    template<CT::Map THIS> LANGULUS(INLINED)
    void BlockMap::AllocateFresh(const Count count) {
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(count),
+      LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
 
       Offset infoOffset;
@@ -72,13 +72,13 @@ namespace Langulus::Annies
    ///   @return true if another resize is required after this one            
    template<CT::Map THIS, bool REUSE>
    bool BlockMap::AllocateData(const Count count) {
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(count),
+      LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
-      LANGULUS_ASSUME(DevAssumes, mKeys.mType and mValues.mType,
+      LglsAssumeDev(mKeys.mType and mValues.mType,
          "Key and value types haven't been set");
 
       if constexpr (REUSE) {
-         LANGULUS_ASSUME(DevAssumes,
+         LglsAssumeDev(
             mKeys.GetUses() == 1 and mValues.GetUses() == 1,
             "Can't reuse memory of a map used from multiple places, "
             "BranchOut should've been called prior to AllocateData"
@@ -196,13 +196,13 @@ namespace Langulus::Annies
          // When reusing, keys and values can potentially remain same   
          // Avoid deallocating them if that's the case                  
          if (old.mValues.mEntry != mValues.mEntry) {
-            LANGULUS_ASSUME(DevAssumes, old.mValues.mEntry->GetUses() == 1,
+            LglsAssumeDev(old.mValues.mEntry->GetUses() == 1,
                "Shouln't happen");
             Allocator::Deallocate(const_cast<Allocation*>(old.mValues.mEntry));
          }
 
          if (old.mKeys.mEntry != mKeys.mEntry) {
-            LANGULUS_ASSUME(DevAssumes, old.mKeys.mEntry->GetUses() == 1,
+            LglsAssumeDev(old.mKeys.mEntry->GetUses() == 1,
                "Shouln't happen");
             Allocator::Deallocate(const_cast<Allocation*>(old.mKeys.mEntry));
          }
@@ -230,7 +230,7 @@ namespace Langulus::Annies
    /// Doubles the reserved memory                                            
    template<CT::Map THIS> LANGULUS(INLINED)
    void BlockMap::AllocateMore() {
-      LANGULUS_ASSUME(DevAssumes, GetReserved(),
+      LglsAssumeDev(GetReserved(),
          "Can't AllocateMore, needs to AllocateFresh first");
 
       if (IsAllocated() and mKeys.GetUses() == 1 and mValues.GetUses() == 1)
@@ -264,7 +264,7 @@ namespace Langulus::Annies
    void BlockMap::Free() {
       // Always destroy values first, because keys also contain mInfo   
       if (mValues.mEntry) {
-         LANGULUS_ASSUME(DevAssumes, mValues.mEntry->GetUses() >= 1,
+         LglsAssumeDev(mValues.mEntry->GetUses() >= 1,
             "Bad value memory dereferencing");
 
          if (mValues.mEntry->GetUses() == 1) {
@@ -286,7 +286,7 @@ namespace Langulus::Annies
       }
 
       if (mKeys.mEntry) {
-         LANGULUS_ASSUME(DevAssumes, mKeys.mEntry->GetUses() >= 1,
+         LglsAssumeDev(mKeys.mEntry->GetUses() >= 1,
             "Bad key memory dereferencing");
 
          if (mKeys.mEntry->GetUses() == 1) {

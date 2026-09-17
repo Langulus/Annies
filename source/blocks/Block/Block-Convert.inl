@@ -773,7 +773,7 @@ namespace Langulus::Annies
          "THIS isn't a byte container");
       static_assert(OUT::TypeErased or CT::TypeErased<NEXT>
          or CT::Similar<TypeOf<OUT>, NEXT>, "Type mismatch");
-      LANGULUS_ASSUME(DevAssumes, IsSimilar<Byte>(),
+      LglsAssumeDev(IsSimilar<Byte>(),
          "THIS isn't a byte container");
 
       Count deserializedCount = 0;
@@ -807,13 +807,13 @@ namespace Langulus::Annies
          // We have predictable data                                    
          // In this case, 'to' should already be allocated and known    
          if constexpr (not CT::SameAsOneOf<T, RTTI::Base, RTTI::Member>) {
-            LANGULUS_ASSUME(DevAssumes, to.template IsSimilar<T>(),
+            LglsAssumeDev(to.template IsSimilar<T>(),
                "Bad binary deserializing block type: ",
                to.GetType(), " instead of ", MetaDataOf<T>()
             );
          }
 
-         LANGULUS_ASSUME(DevAssumes, not to.IsEmpty(),
+         LglsAssumeDev(not to.IsEmpty(),
             "Binary deserializing block isn't preinitialized");
 
          deserializedCount = to.GetCount();

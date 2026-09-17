@@ -114,9 +114,9 @@ namespace Langulus
 
       template<CT::Data, CT::Data, bool>
       struct TMap;
-      template<CT::Data K, CT::Data V>
+      template<CT::NotVoid K, CT::NotVoid V>
       using TOrderedMap = TMap<K, V, true>;
-      template<CT::Data K, CT::Data V>
+      template<CT::NotVoid K, CT::NotVoid V>
       using TUnorderedMap = TMap<K, V, false>;
 
       struct BlockSet;
@@ -128,9 +128,9 @@ namespace Langulus
 
       template<CT::Data, bool>
       struct TSet;
-      template<CT::Data T>
+      template<CT::NotVoid T>
       using TOrderedSet = TSet<T, true>;
-      template<CT::Data T>
+      template<CT::NotVoid T>
       using TUnorderedSet = TSet<T, false>;
 
       struct Bytes;

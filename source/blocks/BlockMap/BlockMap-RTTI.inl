@@ -76,7 +76,7 @@ namespace Langulus::Annies
    /// ignoring density and cv-qualifiers                                     
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if key type is similar to at least one of the types     
-   template<CT::Map THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsKey() const noexcept {
       return GetKeys<THIS>().template Is<T1, TN...>();
    }
@@ -94,7 +94,7 @@ namespace Langulus::Annies
    /// ignoring cv-qualifiers only                                            
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if key type is similar to at least one of the types     
-   template<CT::Map THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsKeySimilar() const noexcept {
       return GetKeys<THIS>().template IsSimilar<T1, TN...>();
    }
@@ -112,7 +112,7 @@ namespace Langulus::Annies
    /// including by density and cv-qualifiers                                 
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if key type exactly matches at least one type           
-   template<CT::Map THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsKeyExact() const noexcept {
       return GetKeys<THIS>().template IsExact<T1, TN...>();
    }
@@ -130,7 +130,7 @@ namespace Langulus::Annies
    /// ignoring density and cv-qualifiers                                     
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   template<CT::Map THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsValue() const noexcept {
       return GetVals<THIS>().template Is<T1, TN...>();
    }
@@ -148,7 +148,7 @@ namespace Langulus::Annies
    /// ignoring cv-qualifiers only                                            
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   template<CT::Map THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsValueSimilar() const noexcept {
       return GetVals<THIS>().template IsSimilar<T1, TN...>();
    }
@@ -166,7 +166,7 @@ namespace Langulus::Annies
    /// including by density and cv-qualifiers                                 
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type exactly matches at least one type         
-   template<CT::Map THIS, CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsValueExact() const noexcept {
       return GetVals<THIS>().template IsExact<T1, TN...>();
    }

@@ -197,7 +197,7 @@ namespace Langulus::Annies
    void BlockMap::RemoveInner(const Offset index) {
       BranchOut<THIS>();
       auto psl = GetInfo() + index;
-      LANGULUS_ASSUME(DevAssumes, *psl, "Removing an invalid pair");
+      LglsAssumeDev(*psl, "Removing an invalid pair");
 
       // Destroy the key, info and value at the start                   
       // Use statically typed optimizations where possible              

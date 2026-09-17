@@ -364,7 +364,7 @@ namespace Langulus::Annies
          return block;
       }
       else {
-         LANGULUS_ASSUME(UserAssumes, text, "Invalid string pointer");
+         LglsAssumeUser(text, "Invalid string pointer");
          // Raw pointer                                                 
          auto block = MakeBlock<Text>(Disown(text), count);
          // Make sure string is properly terminated                     

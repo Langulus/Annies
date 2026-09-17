@@ -166,7 +166,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Deserialization                                                   
       ///                                                                     
-      Count Deserialize(CT::Data auto&) const;
+      Count Deserialize(CT::NotVoid auto&) const;
 
       ///                                                                     
       ///   Conversion                                                        

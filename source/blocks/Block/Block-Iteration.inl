@@ -264,7 +264,7 @@ namespace Langulus::Annies
             else {
                // Iterate dense container where A is binary-compatible  
                // to the type, but may not match it exactly             
-               LANGULUS_ASSUME(DevAssumes, GetStride() % sizeof(DA) == 0, "Unaligned iterator");
+               LglsAssumeDev(GetStride() % sizeof(DA) == 0, "Unaligned iterator");
                loop = IterateInner<MUTABLE, REVERSE>(mCount * (GetStride() / sizeof(DA)),
                   [&index, &f](DA& element) noexcept(NOE) -> R {
                      ++index;
@@ -530,18 +530,18 @@ namespace Langulus::Annies
       static_assert(CT::Complete<Decay<A>> or CT::Sparse<A>,
          "Can't iterate with incomplete type, use pointer instead");
 
-      LANGULUS_ASSUME(DevAssumes, IsTyped(),
+      LglsAssumeDev(IsTyped(),
          "Block is not typed");
-      LANGULUS_ASSUME(DevAssumes, not IsEmpty(),
+      LglsAssumeDev(not IsEmpty(),
          "Block is empty", " (of type `", mType, "`)");
-      LANGULUS_ASSUME(DevAssumes, IsSparse() == CT::Sparse<A>,
+      LglsAssumeDev(IsSparse() == CT::Sparse<A>,
          "Sparseness mismatch", " (`", mType, 
          "` compared against `", MetaDataOf<A>(), "`)"
       );
 
       if constexpr (CT::Dense<A>) {
          using DA = Decay<A>;
-         LANGULUS_ASSUME(DevAssumes,
+         LglsAssumeDev(
             (CT::Deep<DA> and IsDeep()) or (not CT::Deep<DA> and CastsTo<A, true>()),
             "Incompatible iterator type", " `", MetaDataOf<A>(),
             "` (iterating block of type `", mType, "`)"
@@ -672,18 +672,18 @@ namespace Langulus::Annies
    /// Prefix increment - get next element by incrementing data pointer       
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
    auto Block<TYPE>::operator ++ () IF_UNSAFE(noexcept) -> Block& {
-      LANGULUS_ASSUME(DevAssumes, mRaw,
+      LglsAssumeDev(mRaw,
          "Block is not allocated");
 
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Block is not typed");
-         LANGULUS_ASSUME(DevAssumes, mRaw + mType->mSize <= mEntry->GetBlockEnd(),
+         LglsAssumeDev(mRaw + mType->mSize <= mEntry->GetBlockEnd(),
             "Block limit breached");
          mRaw += mType->mSize;
       }
       else {
-         LANGULUS_ASSUME(DevAssumes, mRaw + sizeof(TYPE) <= mEntry->GetBlockEnd(),
+         LglsAssumeDev(mRaw + sizeof(TYPE) <= mEntry->GetBlockEnd(),
             "Block limit breached");
          mRaw += sizeof(TYPE);
       }
@@ -699,18 +699,18 @@ namespace Langulus::Annies
    /// Prefix decrement - get previous element by decrementing data pointer   
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
    auto Block<TYPE>::operator -- () IF_UNSAFE(noexcept) -> Block& {
-      LANGULUS_ASSUME(DevAssumes, mRaw,
+      LglsAssumeDev(mRaw,
          "Block is not allocated");
 
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Block is not typed");
-         LANGULUS_ASSUME(DevAssumes, mRaw - mType->mSize >= mEntry->GetBlockStart(),
+         LglsAssumeDev(mRaw - mType->mSize >= mEntry->GetBlockStart(),
             "Block limit breached");
          mRaw -= mType->mSize;
       }
       else {
-         LANGULUS_ASSUME(DevAssumes, mRaw - sizeof(TYPE) >= mEntry->GetBlockStart(),
+         LglsAssumeDev(mRaw - sizeof(TYPE) >= mEntry->GetBlockStart(),
             "Block limit breached");
          mRaw -= sizeof(TYPE);
       }
@@ -759,18 +759,18 @@ namespace Langulus::Annies
    ///   @return the next handle                                              
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
    auto Block<TYPE>::operator += (Offset offset) IF_UNSAFE(noexcept) -> Block& {
-      LANGULUS_ASSUME(DevAssumes, mRaw,
+      LglsAssumeDev(mRaw,
          "Block is not allocated");
 
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Block is not typed");
-         LANGULUS_ASSUME(DevAssumes, mRaw + offset * mType->mSize <= mEntry->GetBlockEnd(),
+         LglsAssumeDev(mRaw + offset * mType->mSize <= mEntry->GetBlockEnd(),
             "Block limit breached");
          mRaw += offset * mType->mSize;
       }
       else {
-         LANGULUS_ASSUME(DevAssumes, mRaw + offset * sizeof(TYPE) <= mEntry->GetBlockEnd(),
+         LglsAssumeDev(mRaw + offset * sizeof(TYPE) <= mEntry->GetBlockEnd(),
             "Block limit breached");
          mRaw += offset * sizeof(TYPE);
       }
@@ -787,18 +787,18 @@ namespace Langulus::Annies
    ///   @return the next handle                                              
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
    auto Block<TYPE>::operator -= (Offset offset) IF_UNSAFE(noexcept) -> Block& {
-      LANGULUS_ASSUME(DevAssumes, mRaw,
+      LglsAssumeDev(mRaw,
          "Block is not allocated");
 
       if constexpr (TypeErased) {
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Block is not typed");
-         LANGULUS_ASSUME(DevAssumes, mRaw - offset * mType->mSize >= mEntry->GetBlockStart(),
+         LglsAssumeDev(mRaw - offset * mType->mSize >= mEntry->GetBlockStart(),
             "Block limit breached");
          mRaw -= offset * mType->mSize;
       }
       else {
-         LANGULUS_ASSUME(DevAssumes, mRaw - offset * sizeof(TYPE) >= mEntry->GetBlockStart(),
+         LglsAssumeDev(mRaw - offset * sizeof(TYPE) >= mEntry->GetBlockStart(),
             "Block limit breached");
          mRaw -= offset * sizeof(TYPE);
       }

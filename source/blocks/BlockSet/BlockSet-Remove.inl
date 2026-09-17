@@ -64,7 +64,7 @@ namespace Langulus::Annies
    template<CT::Set THIS> LANGULUS(INLINED)
    void BlockSet::RemoveInner(const Offset index) IF_UNSAFE(noexcept) {
       auto psl = GetInfo() + index;
-      LANGULUS_ASSUME(DevAssumes, *psl, "Removing an invalid key");
+      LglsAssumeDev(*psl, "Removing an invalid key");
       BranchOut<THIS>();
 
       // Destroy the key and info at the start                          

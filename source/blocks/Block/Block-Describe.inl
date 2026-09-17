@@ -19,7 +19,7 @@ namespace Langulus::Annies
    /// Set a default trait, if such wasn't already set                        
    ///   @tparam TRAIT - trait to set                                         
    ///   @param value - the value to assign                                   
-   template<class TYPE> template<class TRAIT, CT::Data D>
+   template<class TYPE> template<class TRAIT, CT::NotVoid D>
    void Block<TYPE>::SetDefaultTrait(D&& value) {
       static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
       bool satisfied = false;
@@ -52,7 +52,7 @@ namespace Langulus::Annies
    ///   @param values - [out] where to save the value, if found              
    ///   @return true if value changed                                        
    template<class TYPE> template<class...TRAIT>
-   bool Block<TYPE>::ExtractTrait(CT::Data auto&...values) const {
+   bool Block<TYPE>::ExtractTrait(CT::NotVoid auto&...values) const {
       static_assert(CT::Trait<TRAIT...>, "TRAIT is not a trait type");
       return (ExtractTraitInner<TRAIT>(values...) or ...);
    }
@@ -61,7 +61,7 @@ namespace Langulus::Annies
    ///   @param value - [out] where to save the value(s), if found            
    ///   @return the number of extracted values (always 1 if not an array)    
    template<class TYPE>
-   auto Block<TYPE>::ExtractData(CT::Data auto& value) const -> Count {
+   auto Block<TYPE>::ExtractData(CT::NotVoid auto& value) const -> Count {
       using D = Deref<decltype(value)>;
       Count progress = 0;
 
@@ -88,7 +88,7 @@ namespace Langulus::Annies
    ///   @param value - [out] where to save the value, if found               
    ///   @return the number of extracted values (always 1 if not an array)    
    template<class TYPE>
-   auto Block<TYPE>::ExtractDataAs(CT::Data auto& value) const -> Count {
+   auto Block<TYPE>::ExtractDataAs(CT::NotVoid auto& value) const -> Count {
       using D = Deref<decltype(value)>;
       Count progress = 0;
 
@@ -123,7 +123,7 @@ namespace Langulus::Annies
    /// Find data in constructs or tail, that casts to T                       
    ///   @tparam T - type requirement                                         
    ///   @return the first type that matches                                  
-   template<class TYPE> template<CT::Data T>
+   template<class TYPE> template<CT::NotVoid T>
    auto Block<TYPE>::FindType() const -> DMeta {
       return FindType(MetaDataOf<T>());
    }
@@ -164,7 +164,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class TYPE> template<class TRAIT>
-   bool Block<TYPE>::ExtractTraitInner(CT::Data auto&...values) const {
+   bool Block<TYPE>::ExtractTraitInner(CT::NotVoid auto&...values) const {
       static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
       return ExtractTraitInner<TRAIT>(
          Sequence<sizeof...(values)>::Expand, values...
@@ -174,7 +174,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<class TYPE> template<class TRAIT, Offset...IDX>
    bool Block<TYPE>::ExtractTraitInner(
-      ExpandedSequence<IDX...>, CT::Data auto&...values
+      ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
       static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
       return (ExtractTraitInnerInner<TRAIT, IDX>(values) or ...);
@@ -182,7 +182,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class TYPE> template<class TRAIT, Offset IDX>
-   bool Block<TYPE>::ExtractTraitInnerInner(CT::Data auto& value) const {
+   bool Block<TYPE>::ExtractTraitInnerInner(CT::NotVoid auto& value) const {
       static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
       using D = Deref<decltype(value)>;
       bool satisfied = false;

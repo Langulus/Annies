@@ -556,7 +556,7 @@ namespace Langulus::Annies
    /// Check if a static type can be inserted                                 
    ///   @tparam T - the type to check                                        
    ///   @return true if able to insert an instance of the type to this block 
-   template<class TYPE> template<CT::Data T> LANGULUS(INLINED)
+   template<class TYPE> template<CT::NotVoid T> LANGULUS(INLINED)
    constexpr bool Block<TYPE>::IsInsertable() const noexcept {
       if constexpr (TypeErased)
          return IsInsertable(MetaDataOf<T>());
@@ -572,7 +572,7 @@ namespace Langulus::Annies
    ///   @return a pointer to the first allocated element                     
    template<class TYPE> template<class T> LANGULUS(ALWAYS_INLINED)
    auto Block<TYPE>::GetRaw() IF_UNSAFE(noexcept) -> T* {
-      LANGULUS_ASSUME(DevAssumes, CT::Dense<T> or IsSparse(),
+      LglsAssumeDev(CT::Dense<T> or IsSparse(),
          "Representing dense data as sparse");
       return reinterpret_cast<T*>(mRaw);
    }
@@ -588,7 +588,7 @@ namespace Langulus::Annies
    ///   @return a pointer to the last+1 element (never initialized)          
    template<class TYPE> template<class T> LANGULUS(ALWAYS_INLINED)
    auto Block<TYPE>::GetRawEnd() const IF_UNSAFE(noexcept) -> const T* {
-      LANGULUS_ASSUME(DevAssumes, CT::Dense<T> or IsSparse(),
+      LglsAssumeDev(CT::Dense<T> or IsSparse(),
          "Representing dense data as sparse");
 
       if constexpr (TypeErased and CT::Dense<T>)
@@ -673,13 +673,13 @@ namespace Langulus::Annies
    ///   @return the array of entries                                         
    template<class TYPE> LANGULUS(INLINED)
    auto Block<TYPE>::GetEntries() IF_UNSAFE(noexcept) -> Allocation const** {
-      LANGULUS_ASSUME(DevAssumes, IsSparse(),
+      LglsAssumeDev(IsSparse(),
          "Entries do not exist for dense container");
-      LANGULUS_ASSUME(DevAssumes, mEntry,
+      LglsAssumeDev(mEntry,
          "Entries do not exist for sparse containers which are out of jurisdiction");
-      LANGULUS_ASSUME(DevAssumes, mRawSparse,
+      LglsAssumeDev(mRawSparse,
          "No memory available");
-      LANGULUS_ASSUME(DevAssumes, mReserved,
+      LglsAssumeDev(mReserved,
          "Invalid reserved count - don't use it from maps!");
       return const_cast<const Allocation**>(
          reinterpret_cast<Allocation**>(mRawSparse + mReserved));

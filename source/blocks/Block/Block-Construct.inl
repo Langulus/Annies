@@ -87,11 +87,11 @@ namespace Langulus::A
       , mType {meta}
       , mEntry {entry}
       , mState {state} {
-      LANGULUS_ASSUME(DevAssumes, not entry or raw,
+      LglsAssumeDev(not entry or raw,
          "Invalid data pointer");
-      LANGULUS_ASSUME(DevAssumes, meta,
+      LglsAssumeDev(meta,
          "Invalid data type");
-      LANGULUS_ASSUME(DevAssumes, not raw or not meta->mIsSparse or not mEntry,
+      LglsAssumeDev(not raw or not meta->mIsSparse or not mEntry,
          "Sparse raw data initialization is not allowed, "
          "unless mEntry is zero");
 
@@ -584,7 +584,7 @@ namespace Langulus::Annies
    ///      auto-deduce                                                       
    ///   @param items... - items to insert                                    
    ///   @returns the new container containing the data                       
-   template<class BLOCK, CT::Data...TN>
+   template<class BLOCK, CT::NotVoid...TN>
    auto WrapBlock(TN&&...items) {
       if constexpr (sizeof...(TN) == 0) {
          if constexpr (CT::TypeErased<BLOCK>)

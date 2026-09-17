@@ -41,12 +41,12 @@ namespace Langulus::Annies
          // Unsafe, works only on assumptions                           
          // Using an integer index explicitly makes a statement, that   
          // you know what you're doing                                  
-         LANGULUS_ASSUME(UserAssumes,
+         LglsAssumeUser(
             static_cast<Count>(index) < GetReserved(),
             "Integer index out of range");
 
          if constexpr (CT::Signed<INDEX>) {
-            LANGULUS_ASSUME(UserAssumes, index >= 0, 
+            LglsAssumeUser(index >= 0, 
                "Integer index is below zero, "
                "use Index for reverse indices instead"
             );
@@ -99,12 +99,12 @@ namespace Langulus::Annies
          // Unsafe, works only on assumptions                           
          // Using an integer index explicitly makes a statement, that   
          // you know what you're doing                                  
-         LANGULUS_ASSUME(UserAssumes,
+         LglsAssumeUser(
             static_cast<Count>(index) < GetCount(),
             "Integer index out of range");
 
          if constexpr (CT::Signed<INDEX>) {
-            LANGULUS_ASSUME(UserAssumes, index >= 0, 
+            LglsAssumeUser(index >= 0, 
                "Integer index is below zero, "
                "use Index for reverse indices instead"
             );
@@ -135,13 +135,13 @@ namespace Langulus::Annies
    ///   @return the element, wrapped in a Block                              
    template<CT::Set THIS> LANGULUS(INLINED)
    decltype(auto) BlockSet::GetRaw(const Offset i) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, i < GetReserved(),
+      LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing set",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");
 
       if constexpr (CT::Typed<THIS>) {
          IF_SAFE(using K = TypeOf<THIS>);
-         LANGULUS_ASSUME(DevAssumes, (IsSimilar<THIS, K>()),
+         LglsAssumeDev((IsSimilar<THIS, K>()),
             "Wrong type when accessing set",
             ", using type `", NameOf<K>(), "` instead of `", GetType(), '`');
          return GetValues<THIS>().GetRaw() + i;
@@ -195,13 +195,13 @@ namespace Langulus::Annies
    ///   @return the handle                                                   
    template<CT::Set THIS> LANGULUS(INLINED)
    auto BlockSet::GetHandle(const Offset i) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, i < GetReserved(),
+      LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing set",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");
 
       if constexpr (CT::Typed<THIS>) {
          IF_SAFE(using K = TypeOf<THIS>);
-         LANGULUS_ASSUME(DevAssumes, (IsSimilar<THIS, K>()),
+         LglsAssumeDev((IsSimilar<THIS, K>()),
             "Wrong type when accessing set",
             ", using type `", NameOf<K>(), "` instead of `", GetType(), '`');
          return GetValues<THIS>().GetHandle(i);

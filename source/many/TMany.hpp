@@ -26,7 +26,7 @@ namespace Langulus::Annies
    /// type-erased container to a statically-optimized equivalent. Annies    
    /// provides a strong guarantee that this operation is completely safe.    
    ///                                                                        
-   template<CT::Data T>
+   template<CT::NotVoid T>
    class TMany : public Block<T> {
       using Base = Block<T>;
 
@@ -76,7 +76,7 @@ namespace Langulus::Annies
 
       ~TMany();
 
-      template<CT::Data...TN>
+      template<CT::NotVoid...TN>
       static auto Wrap(TN&&...) -> TMany;
 
       ///                                                                     
@@ -149,7 +149,7 @@ namespace Langulus::Annies
 
 
    /// Deduction guides                                                       
-   template<CT::Data T>
+   template<CT::NotVoid T>
    TMany(T&&) -> TMany<T>;
 
 } // namespace Langulus::Annies

@@ -249,17 +249,17 @@ namespace Langulus::Annies
       ///                                                                     
       ///   RTTI                                                              
       ///                                                                     
-      template<CT::Set, CT::Data, CT::Data...>
+      template<CT::Set, CT::Data, CT::NotVoid...>
       constexpr bool Is() const noexcept;
       template<CT::Set>
       bool Is(DMeta) const noexcept;
 
-      template<CT::Set, CT::Data, CT::Data...>
+      template<CT::Set, CT::Data, CT::NotVoid...>
       constexpr bool IsSimilar() const noexcept;
       template<CT::Set>
       bool IsSimilar(DMeta) const noexcept;
 
-      template<CT::Set, CT::Data, CT::Data...>
+      template<CT::Set, CT::Data, CT::NotVoid...>
       constexpr bool IsExact() const noexcept;
       template<CT::Set>
       bool IsExact(DMeta) const noexcept;

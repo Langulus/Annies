@@ -58,13 +58,13 @@ namespace Langulus::Annies
    public:
       Hash GetHash() const;
 
-      template<CT::Data, CT::Data T1, CT::Data...TN>
+      template<CT::Data, CT::NotVoid T1, CT::NotVoid...TN>
       static Construct From(T1&&, TN&&...);
       template<CT::Data>
       static Construct From();
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         template<CT::Data T1, CT::Data...TN>
+         template<CT::NotVoid T1, CT::NotVoid...TN>
          static Construct FromToken(const Token&, T1&&, TN&&...);
          static Construct FromToken(const Token&);
       #endif

@@ -467,9 +467,9 @@ namespace Langulus::Annies
    ///   @return true if a common base has been found                         
    template<class TYPE>
    bool Block<TYPE>::CompareTypes(const CT::Block auto& right, RTTI::Base& common) const {
-      LANGULUS_ASSUME(DevAssumes, IsTyped(),
+      LglsAssumeDev(IsTyped(),
          "LHS block is not typed", " comparing with RHS: ", right.GetType());
-      LANGULUS_ASSUME(DevAssumes, right.IsTyped(),
+      LglsAssumeDev(right.IsTyped(),
          "RHS block is not typed", " comparing with LHS: ", GetType());
 
       if (not mType->Is(right.mType)) {

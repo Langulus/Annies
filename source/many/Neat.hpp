@@ -129,12 +129,12 @@ namespace Langulus::Annies
       auto GetConstructs(DMeta) const -> const ConstructList*;
 
       template<CT::Trait>
-      void SetDefaultTrait(CT::Data auto&&);
+      void SetDefaultTrait(CT::NotVoid auto&&);
 
       template<CT::Trait...>
-      bool ExtractTrait(CT::Data auto&...) const;
-      auto ExtractData(CT::Data auto&) const -> Count;
-      auto ExtractDataAs(CT::Data auto&) const -> Count;
+      bool ExtractTrait(CT::NotVoid auto&...) const;
+      auto ExtractData(CT::NotVoid auto&) const -> Count;
+      auto ExtractDataAs(CT::NotVoid auto&) const -> Count;
 
       template<CT::Trait>
       auto GetTrait(Offset = 0)        const -> const Trait*;
@@ -142,11 +142,11 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Trait>
-      bool ExtractTraitInner(CT::Data auto&...) const;
+      bool ExtractTraitInner(CT::NotVoid auto&...) const;
       template<Offset...IDX>
-      bool ExtractTraitInner(const TraitList&, ExpandedSequence<IDX...>, CT::Data auto&...) const;
+      bool ExtractTraitInner(const TraitList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
       template<Offset>
-      bool ExtractTraitInnerInner(const TraitList&, CT::Data auto&) const;
+      bool ExtractTraitInnerInner(const TraitList&, CT::NotVoid auto&) const;
 
    public:
       ///                                                                     

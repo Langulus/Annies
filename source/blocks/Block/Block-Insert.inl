@@ -71,7 +71,7 @@ namespace Langulus::Annies
    template<class TYPE> template<class...A> LANGULUS(INLINED)
    Count Block<TYPE>::New(const Count count, A&&...arguments)
    requires (TypeErased or ::std::constructible_from<TYPE, A...>) {
-      LANGULUS_ASSUME(UserAssumes, count, "Zero count not allowed");
+      LglsAssumeUser(count, "Zero count not allowed");
       BranchOut();
       AllocateMore(mCount + count);
       CropInner(mCount, count).Create(Forward<A>(arguments)...);
@@ -711,9 +711,9 @@ namespace Langulus::Annies
    ///      mCount set                                                        
    template<class TYPE>
    void Block<TYPE>::CreateDefault() {
-      LANGULUS_ASSUME(DevAssumes, mCount and mCount <= mReserved,
+      LglsAssumeDev(mCount and mCount <= mReserved,
          "Count outside limits", '(', mCount, " > ", mReserved);
-      LANGULUS_ASSUME(DevAssumes, GetUses() == 1,
+      LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 
       if constexpr (not TypeErased) {
@@ -775,9 +775,9 @@ namespace Langulus::Annies
    template<class TYPE> template<class...A>
    void Block<TYPE>::CreateDescribe(A&&...arguments) {
       static_assert(sizeof...(A) > 0, "Bad number of arguments");
-      LANGULUS_ASSUME(DevAssumes, mCount and mCount <= mReserved,
+      LglsAssumeDev(mCount and mCount <= mReserved,
          "Count outside limits", '(', mCount, " > ", mReserved);
-      LANGULUS_ASSUME(DevAssumes, GetUses() == 1,
+      LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 
       Many descriptor;
@@ -822,7 +822,7 @@ namespace Langulus::Annies
          }
       }
       else {
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Block is expected to be typed");
          LANGULUS_ASSERT(
             mType->mDescriptorConstructor, Construct,
@@ -889,9 +889,9 @@ namespace Langulus::Annies
    ///   @param arguments... - the arguments to forward to constructor        
    template<class TYPE> template<class...A>
    void Block<TYPE>::Create(A&&...arguments) {
-      LANGULUS_ASSUME(DevAssumes, mCount and mCount <= mReserved,
+      LglsAssumeDev(mCount and mCount <= mReserved,
          "Count outside limits", '(', mCount, " > ", mReserved);
-      LANGULUS_ASSUME(DevAssumes, GetUses() == 1,
+      LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 
       if constexpr (sizeof...(A) == 0) {
@@ -929,7 +929,7 @@ namespace Langulus::Annies
       else {
          // Constructing type-erased items                              
          // We expect that type has been previously set                 
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Block was expected to be typed");
 
          if constexpr (sizeof...(A) == 1) {
@@ -1041,11 +1041,11 @@ namespace Langulus::Annies
    void Block<TYPE>::CreateWithIntent(T1&& source) {
       using S = IntentOf<decltype(source)>;
       const auto count = DeintCast(source).mCount;
-      LANGULUS_ASSUME(DevAssumes, count and count <= mReserved,
+      LglsAssumeDev(count and count <= mReserved,
          "Count outside limits", '(', count, " > ", mReserved);
 
       // Type-erased pointers (void*) are acceptable                    
-      LANGULUS_ASSUME(DevAssumes, 
+      LglsAssumeDev(
             (DeintCast(source).IsSimilar(*this)
          or (DeintCast(source).template IsSimilar<void*>() and IsSparse())
          or (DeintCast(source).IsSparse() and IsSimilar<void*>())),
@@ -1307,18 +1307,18 @@ namespace Langulus::Annies
 
       //static_assert(CT::Sparse<T>,
       //   "Handle isn't sparse");
-      LANGULUS_ASSUME(DevAssumes, 1 <= mReserved,
+      LglsAssumeDev(1 <= mReserved,
          "Count outside limits (1 > ", mReserved);
-      //LANGULUS_ASSUME(DevAssumes, IsSparse(),
+      //LglsAssumeDev(IsSparse(),
       //   "Container is not sparse");
-      LANGULUS_ASSUME(DevAssumes, GetUses() == 1,
+      LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
-      //LANGULUS_ASSUME(DevAssumes, GetCount() == 0, // doesn't work for maps
+      //LglsAssumeDev(GetCount() == 0, // doesn't work for maps
       //   "Element is already initialized");
 
       // Type-erased pointers (void*) are acceptable, because they're   
       // required for some internal stuff, although not recommended     
-      LANGULUS_ASSUME(DevAssumes, (
+      LglsAssumeDev((
          (IsSparse() and CT::Similar<T, void*>) or IsSimilar<T>()),
          "Type mismatch on creation from handle", ": ", GetType(),
          " instead of ", MetaDataOf<T>());
@@ -1337,7 +1337,7 @@ namespace Langulus::Annies
       using S  = IntentOf<decltype(source)>;
       using ST = TypeOf<S>;
 
-      LANGULUS_ASSUME(DevAssumes, IsSimilar(DeintCast(source)),
+      LglsAssumeDev(IsSimilar(DeintCast(source)),
          "Type mismatch");
 
       static_assert(TypeErased or Sparse,
@@ -1358,9 +1358,9 @@ namespace Langulus::Annies
          ? DeintCast(source).GetEntries()
          : nullptr;
 
-      LANGULUS_ASSUME(DevAssumes, pointersDst != pointersSrc,
+      LglsAssumeDev(pointersDst != pointersSrc,
          "Memory source and destination are the same");
-      LANGULUS_ASSUME(DevAssumes, entriesDst != entriesSrc,
+      LglsAssumeDev(entriesDst != entriesSrc,
          "Entries source and destination are the same");
 
       if constexpr (S::Move) {
@@ -1385,7 +1385,7 @@ namespace Langulus::Annies
       else {
          // Copy/Refer/Disown                                           
          // Memory may NOT overlap!!!                                   
-         LANGULUS_ASSUME(DevAssumes, pointersDst >= pointersSrc + count
+         LglsAssumeDev(pointersDst >= pointersSrc + count
                                   or pointersDst <  pointersSrc - count,
                         "Can't copy/refer/disown memory onto itself");
          CopyMemory(pointersDst, pointersSrc, count);
@@ -1447,13 +1447,13 @@ namespace Langulus::Annies
    template<class TYPE> template<class T1>
    void Block<TYPE>::AssignWithIntent(T1&& source) requires CT::Block<Deint<T1>> {
       const auto count = source->mCount;
-      LANGULUS_ASSUME(DevAssumes, count and count <= mReserved,
+      LglsAssumeDev(count and count <= mReserved,
          "Count outside limits", '(', count, " > ", mReserved);
-      LANGULUS_ASSUME(DevAssumes, GetUses() == 1,
+      LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 
       // Type-erased pointers (void*) are acceptable                    
-      LANGULUS_ASSUME(DevAssumes, (source->IsSimilar(*this)
+      LglsAssumeDev((source->IsSimilar(*this)
          or (source->template IsSimilar<void*>() and IsSparse())
          or (source->IsSparse() and IsSimilar<void*>())),
          "Type mismatch on assignment", ": ", source->GetType(), " != ", GetType());
@@ -1707,7 +1707,7 @@ namespace Langulus::Annies
       else {
          // Assigning type-erased items                                 
          // We expect, that type has been previously set                
-         LANGULUS_ASSUME(DevAssumes, IsTyped(),
+         LglsAssumeDev(IsTyped(),
             "Block was expected to be typed");
          LANGULUS_ASSERT(IsSimilar<ST>(), Mutate,
             "Type mismatch");

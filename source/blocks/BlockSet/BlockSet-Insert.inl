@@ -322,7 +322,7 @@ namespace Langulus::Annies
             keymemory *= 2;
       }
       else {
-         LANGULUS_ASSUME(DevAssumes, mKeys.mType, "Key type was not set");
+         LglsAssumeDev(mKeys.mType, "Key type was not set");
          keymemory = request * mKeys.mType->mSize;
          if (mKeys.mType->mIsSparse)
             keymemory *= 2;
@@ -338,11 +338,11 @@ namespace Langulus::Annies
    ///   @param oldCount - the old number of pairs                            
    template<CT::Set THIS>
    void BlockSet::Rehash(const Count oldCount) {
-      LANGULUS_ASSUME(DevAssumes, mKeys.mReserved > oldCount,
+      LglsAssumeDev(mKeys.mReserved > oldCount,
          "New count is not larger than oldCount");
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(mKeys.mReserved),
+      LglsAssumeDev(IsPowerOfTwo(mKeys.mReserved),
          "New count is not a power-of-two");
-      LANGULUS_ASSUME(DevAssumes, IsPowerOfTwo(oldCount),
+      LglsAssumeDev(IsPowerOfTwo(oldCount),
          "Old count is not a power-of-two");
 
       [[maybe_unused]] auto& me = reinterpret_cast<const THIS&>(*this);

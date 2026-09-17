@@ -38,7 +38,7 @@ namespace Langulus::Annies
    ///                                                                        
    /// A hashmap implementation, using the Robin Hood algorithm               
    ///                                                                        
-   template<CT::Data K, CT::Data V, bool ORDERED>
+   template<CT::NotVoid K, CT::NotVoid V, bool ORDERED>
    struct TMap : Map<ORDERED> {
       using Key = K;
       using Value = V;
@@ -126,27 +126,27 @@ namespace Langulus::Annies
       ///                                                                     
       ///   RTTI                                                              
       ///                                                                     
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsKey() const noexcept;
       bool IsKey(DMeta) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsKeySimilar() const noexcept;
       bool IsKeySimilar(DMeta) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsKeyExact() const noexcept;
       bool IsKeyExact(DMeta) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsValue() const noexcept;
       bool IsValue(DMeta) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsValueSimilar() const noexcept;
       bool IsValueSimilar(DMeta) const noexcept;
 
-      template<CT::Data, CT::Data...>
+      template<CT::Data, CT::NotVoid...>
       constexpr bool IsValueExact() const noexcept;
       bool IsValueExact(DMeta) const noexcept;
 

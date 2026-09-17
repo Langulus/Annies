@@ -8,7 +8,7 @@
 #pragma once
 #include "Own.hpp"
 
-#define TEMPLATE()   template<CT::Data T>
+#define TEMPLATE()   template<CT::NotVoid T>
 #define TME()        Own<T>
 
 
@@ -167,7 +167,7 @@ namespace Langulus::Annies
    TEMPLATE() LANGULUS(INLINED)
    constexpr auto& TME()::operator * () const IF_UNSAFE(noexcept)
    requires (CT::Sparse<T> and not CT::Void<Decay<T>>) {
-      LANGULUS_ASSUME(UserAssumes, mValue, "Dereferening null pointer");
+      LglsAssumeUser(mValue, "Dereferening null pointer");
       return *mValue;
    }
 
@@ -177,7 +177,7 @@ namespace Langulus::Annies
    TEMPLATE() LANGULUS(INLINED)
    constexpr auto& TME()::operator * () IF_UNSAFE(noexcept)
    requires (CT::Sparse<T> and not CT::Void<Decay<T>>) {
-      LANGULUS_ASSUME(UserAssumes, mValue, "Dereferening null pointer");
+      LglsAssumeUser(mValue, "Dereferening null pointer");
       return *mValue;
    }
 

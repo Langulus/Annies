@@ -79,7 +79,7 @@ namespace Langulus::Annies
    /// Create a similar trait, that has a specific data type, but no contents 
    ///   @tparam T - the data type to set                                     
    ///   @return the empty trait of the given type                            
-   TEMPLATE() template<CT::Data T> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T> LANGULUS(INLINED)
    TRAIT TME()::OfType() {
       TRAIT instance;
       instance.template SetType<T>();

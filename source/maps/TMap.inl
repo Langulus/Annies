@@ -10,7 +10,7 @@
 #include "Map.inl"
 #include "../pairs/TPair.inl"
 
-#define TEMPLATE()   template<CT::Data K, CT::Data V, bool ORDERED>
+#define TEMPLATE()   template<CT::NotVoid K, CT::NotVoid V, bool ORDERED>
 #define TABLE()      TMap<K, V, ORDERED>
 
 
@@ -330,7 +330,7 @@ namespace Langulus::Annies
    /// Check if key origin type matches any of the list                       
    ///   @tparam K1, KN... - the list of types to compare against             
    ///   @return true if key type matches at least one of the others          
-   TEMPLATE() template<CT::Data K1, CT::Data...KN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid K1, CT::NotVoid...KN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsKey() const noexcept {
       return BlockMap::IsKey<TMap, K1, KN...>();
    }
@@ -346,7 +346,7 @@ namespace Langulus::Annies
    /// Check if cv-unqualified key type matches any of the list               
    ///   @tparam K1, KN... - the list of types to compare against             
    ///   @return true if key type matches at least one of the others          
-   TEMPLATE() template<CT::Data K1, CT::Data...KN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid K1, CT::NotVoid...KN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsKeySimilar() const noexcept {
       return BlockMap::IsKeySimilar<TMap, K1, KN...>();
    }
@@ -362,7 +362,7 @@ namespace Langulus::Annies
    /// Check if key type exactly matches any of the list                      
    ///   @tparam K1, KN... - the list of types to compare against             
    ///   @return true if key type matches at least one of the others          
-   TEMPLATE() template<CT::Data K1, CT::Data...KN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid K1, CT::NotVoid...KN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsKeyExact() const noexcept {
       return BlockMap::IsKeyExact<TMap, K1, KN...>();
    }
@@ -378,7 +378,7 @@ namespace Langulus::Annies
    /// Check if value origin type matches any of the list                     
    ///   @tparam V1, VN... - the list of types to compare against             
    ///   @return true if value type matches at least one of the others        
-   TEMPLATE() template<CT::Data V1, CT::Data...VN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid V1, CT::NotVoid...VN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsValue() const noexcept {
       return BlockMap::IsValue<TMap, V1, VN...>();
    }
@@ -394,7 +394,7 @@ namespace Langulus::Annies
    /// Check if cv-unqualified value type matches any of the list             
    ///   @tparam V1, VN... - the list of types to compare against             
    ///   @return true if value type matches at least one of the others        
-   TEMPLATE() template<CT::Data V1, CT::Data...VN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid V1, CT::NotVoid...VN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsValueSimilar() const noexcept {
       return BlockMap::IsValueSimilar<TMap, V1, VN...>();
    }
@@ -410,7 +410,7 @@ namespace Langulus::Annies
    /// Check if value type exactly matches any of the list                    
    ///   @tparam V1, VN... - the list of types to compare against             
    ///   @return true if value type matches at least one of the others        
-   TEMPLATE() template<CT::Data V1, CT::Data...VN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid V1, CT::NotVoid...VN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsValueExact() const noexcept {
       return BlockMap::IsValueExact<TMap, V1, VN...>();
    }

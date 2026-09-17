@@ -51,19 +51,19 @@ namespace Langulus::Annies
 
       LANGULUS(INLINED)
       static Allocation* Allocate(DMeta, Offset size) IF_UNSAFE(noexcept) {
-         LANGULUS_ASSUME(DevAssumes, size, "Zero allocation is not allowed");
+         LglsAssumeDev(size, "Zero allocation is not allowed");
          return AlignedAllocate<Allocation>(size);
       }
 
       LANGULUS(INLINED)
       static Allocation* Reallocate(Offset size, Allocation* previous) IF_UNSAFE(noexcept) {
-         LANGULUS_ASSUME(DevAssumes, previous,
+         LglsAssumeDev(previous,
             "Reallocating nullptr");
-         LANGULUS_ASSUME(DevAssumes, size != previous->GetAllocatedSize(),
+         LglsAssumeDev(size != previous->GetAllocatedSize(),
             "Reallocation suboptimal - size is same as previous");
-         LANGULUS_ASSUME(DevAssumes, size,
+         LglsAssumeDev(size,
             "Zero reallocation is not allowed");
-         LANGULUS_ASSUME(DevAssumes, previous->mReferences,
+         LglsAssumeDev(previous->mReferences,
             "Deallocating an unused allocation");
 
          (void) previous;
@@ -72,13 +72,13 @@ namespace Langulus::Annies
 
       LANGULUS(INLINED)
       static void Deallocate(Allocation* entry) IF_UNSAFE(noexcept) {
-         LANGULUS_ASSUME(DevAssumes, entry,
+         LglsAssumeDev(entry,
             "Deallocating nullptr");
-         LANGULUS_ASSUME(DevAssumes, entry->GetAllocatedSize(),
+         LglsAssumeDev(entry->GetAllocatedSize(),
             "Deallocating an empty allocation");
-         LANGULUS_ASSUME(DevAssumes, entry->mReferences,
+         LglsAssumeDev(entry->mReferences,
             "Deallocating an unused allocation");
-         LANGULUS_ASSUME(DevAssumes, entry->mReferences == 1,
+         LglsAssumeDev(entry->mReferences == 1,
             "Deallocating an allocation used from multiple places");
 
          ::std::free(entry->mPool);

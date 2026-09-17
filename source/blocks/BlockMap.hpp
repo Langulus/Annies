@@ -357,32 +357,32 @@ namespace Langulus::Annies
       ///                                                                     
       ///   RTTI                                                              
       ///                                                                     
-      template<CT::Map THIS, CT::Data, CT::Data...>
+      template<CT::Map THIS, CT::Data, CT::NotVoid...>
       constexpr bool IsKey() const noexcept;
       template<CT::Map THIS>
       bool IsKey(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::Data...>
+      template<CT::Map THIS, CT::Data, CT::NotVoid...>
       constexpr bool IsKeySimilar() const noexcept;
       template<CT::Map THIS>
       bool IsKeySimilar(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::Data...>
+      template<CT::Map THIS, CT::Data, CT::NotVoid...>
       constexpr bool IsKeyExact() const noexcept;
       template<CT::Map THIS>
       bool IsKeyExact(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::Data...>
+      template<CT::Map THIS, CT::Data, CT::NotVoid...>
       constexpr bool IsValue() const noexcept;
       template<CT::Map THIS>
       bool IsValue(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::Data...>
+      template<CT::Map THIS, CT::Data, CT::NotVoid...>
       constexpr bool IsValueSimilar() const noexcept;
       template<CT::Map THIS>
       bool IsValueSimilar(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::Data...>
+      template<CT::Map THIS, CT::Data, CT::NotVoid...>
       constexpr bool IsValueExact() const noexcept;
       template<CT::Map THIS>
       bool IsValueExact(DMeta) const noexcept;

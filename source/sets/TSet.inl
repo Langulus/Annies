@@ -9,7 +9,7 @@
 #include "TSet.hpp"
 #include "Set.inl"
 
-#define TEMPLATE()   template<CT::Data T, bool ORDERED>
+#define TEMPLATE()   template<CT::NotVoid T, bool ORDERED>
 #define TABLE()      TSet<T, ORDERED>
 
 
@@ -202,7 +202,7 @@ namespace Langulus::Annies
 
    /// Check if a static type can be inserted                                 
    ///   @return true if able to insert an instance of the type to this block 
-   TEMPLATE() template<CT::Data T1> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T1> LANGULUS(INLINED)
    constexpr bool TABLE()::IsInsertable() const noexcept {
       return BlockSet::IsInsertable<T1, TSet>();
    }
@@ -220,7 +220,7 @@ namespace Langulus::Annies
    /// ignoring density and cv-qualifiers                                     
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   TEMPLATE() template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool TABLE()::Is() const noexcept {
       return BlockSet::Is<TSet, T1, TN...>();
    }
@@ -238,7 +238,7 @@ namespace Langulus::Annies
    /// ignoring cv-qualifiers only                                            
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
-   TEMPLATE() template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsSimilar() const noexcept {
       return BlockSet::IsSimilar<TSet, T1, TN...>();
    }
@@ -256,7 +256,7 @@ namespace Langulus::Annies
    /// including by density and cv-qualifiers                                 
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type exactly matches at least one type         
-   TEMPLATE() template<CT::Data T1, CT::Data...TN> LANGULUS(INLINED)
+   TEMPLATE() template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool TABLE()::IsExact() const noexcept {
       return BlockSet::IsExact<TSet, T1, TN...>();
    }

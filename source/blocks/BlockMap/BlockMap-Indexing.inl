@@ -41,12 +41,12 @@ namespace Langulus::Annies
          // Unsafe, works only on assumptions                           
          // Using an integer index explicitly makes a statement, that   
          // you know what you're doing                                  
-         LANGULUS_ASSUME(UserAssumes,
+         LglsAssumeUser(
             static_cast<Count>(index) < GetReserved(),
             "Integer index out of range");
 
          if constexpr (CT::Signed<INDEX>) {
-            LANGULUS_ASSUME(UserAssumes, index >= 0, 
+            LglsAssumeUser(index >= 0, 
                "Integer index is below zero, "
                "use Index for reverse indices instead"
             );
@@ -138,7 +138,7 @@ namespace Langulus::Annies
          }
       }
       else {
-         LANGULUS_ASSUME(DevAssumes,
+         LglsAssumeDev(
             mKeys.IsSimilar<K_ALT>() or (CT::Sparse<K_ALT> and mKeys.IsSparse()),
             "Key type ", MetaDataOf<K_ALT>(), " differs from contained type ", mKeys.GetType(),
             ", hash integrity is compromised "
@@ -153,7 +153,7 @@ namespace Langulus::Annies
    ///   @return the bucket index                                             
    LANGULUS(INLINED)
    Offset BlockMap::GetBucketUnknown(Offset mask, const Block<>& key) const IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes,
+      LglsAssumeDev(
          mKeys.IsSimilar(key.GetType()) or (key.IsSparse() and mKeys.IsSparse()),
          "Key type ", key.GetType(), " differs from contained type ", mKeys.GetType(),
          ", hash integrity is compromised "
@@ -168,13 +168,13 @@ namespace Langulus::Annies
    ///   @return a reference to the key                                       
    template<CT::Map THIS> LANGULUS(INLINED)
    decltype(auto) BlockMap::GetRawKey(const Offset i) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, i < GetReserved(),
+      LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " key",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");
 
       if constexpr (CT::Typed<THIS>) {
          IF_SAFE(using K = typename THIS::Key);
-         LANGULUS_ASSUME(DevAssumes, (IsKeySimilar<THIS, K>()),
+         LglsAssumeDev((IsKeySimilar<THIS, K>()),
             "Wrong type when accessing ", NameOf<THIS>(), " key",
             ", using type `", NameOf<K>(), "` instead of `", GetKeyType(), '`');
          return GetKeys<THIS>().GetRaw() + i;
@@ -210,13 +210,13 @@ namespace Langulus::Annies
    ///   @return a reference to the value                                     
    template<CT::Map THIS> LANGULUS(INLINED)
    decltype(auto) BlockMap::GetRawVal(const Offset i) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, i < GetReserved(),
+      LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " value",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");
 
       if constexpr (CT::Typed<THIS>) {
          IF_SAFE(using V = typename THIS::Value);
-         LANGULUS_ASSUME(DevAssumes, (IsValueSimilar<THIS, V>()),
+         LglsAssumeDev((IsValueSimilar<THIS, V>()),
             "Wrong type when accessing ", NameOf<THIS>(), " value",
             ", using type `", NameOf<V>(), "` instead of `", GetValueType(), '`');
          return GetVals<THIS>().GetRaw() + i;
@@ -259,13 +259,13 @@ namespace Langulus::Annies
    ///   @return the handle                                                   
    template<CT::Map THIS> LANGULUS(INLINED)
    auto BlockMap::GetKeyHandle(const Offset i) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, i < GetReserved(),
+      LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " key, ",
          "index ", i, " is beyond the reserved ", GetReserved(), " elements");
 
       if constexpr (CT::Typed<THIS>) {
          IF_SAFE(using K = typename THIS::Key);
-         LANGULUS_ASSUME(DevAssumes, (IsKeySimilar<THIS, K>()),
+         LglsAssumeDev((IsKeySimilar<THIS, K>()),
             "Wrong type when accessing ", NameOf<THIS>(), " key, ",
             "using type `", NameOf<K>(), "` instead of `", GetKeyType(), '`');
          return GetKeys<THIS>().GetHandle(i);
@@ -298,13 +298,13 @@ namespace Langulus::Annies
    ///   @return the handle                                                   
    template<CT::Map THIS> LANGULUS(INLINED)
    auto BlockMap::GetValHandle(const Offset i) IF_UNSAFE(noexcept) {
-      LANGULUS_ASSUME(DevAssumes, i < GetReserved(),
+      LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " value, ",
          "index ", i, " is beyond the reserved ", GetReserved(), " elements");
 
       if constexpr (CT::Typed<THIS>) {
          using V = typename THIS::Value;
-         LANGULUS_ASSUME(DevAssumes, (IsValueSimilar<THIS, V>()),
+         LglsAssumeDev((IsValueSimilar<THIS, V>()),
             "Wrong type when accessing ", NameOf<THIS>(), " value, ",
             "using type `", NameOf<V>(), "` instead of `", GetValueType(), '`');
 

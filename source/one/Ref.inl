@@ -104,8 +104,8 @@ namespace Langulus::Annies
    ///   @attention assumes pointer is valid                                  
    TEMPLATE() LANGULUS(INLINED)
    void TME()::ResetInner() {
-      LANGULUS_ASSUME(DevAssumes, mValue, "Null value");
-      LANGULUS_ASSUME(DevAssumes, mEntry, "Null entry");
+      LglsAssumeDev(mValue, "Null value");
+      LglsAssumeDev(mEntry, "Null entry");
       GetHandle().FreeInner(MetaDataOf<T*>());
    }
 
