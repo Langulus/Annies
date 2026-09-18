@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include <Langulus/CT/POD.hpp>
-#include <Langulus/CT/Nullifiable.hpp>
+#include <Langulus/CT/Nullable.hpp>
 
 
 namespace Langulus

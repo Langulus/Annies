@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Config.hpp"
+#include <Langulus/Core.hpp>
 
 
 namespace Langulus::Annies
@@ -16,8 +16,8 @@ namespace Langulus::Annies
    ///   Data comparison results                                              
    ///                                                                        
    struct Compared {
-      LANGULUS(POD) true;
-      LANGULUS(NULLIFIABLE) true;
+      using CTTI_POD       = Yup;
+      using CTTI_Nullable  = Yup;
 
       enum Enum : ::std::uint8_t {
          // Elements were not compared                                  

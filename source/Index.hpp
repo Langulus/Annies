@@ -16,12 +16,12 @@ namespace Langulus::Annies
    ///   A multipurpose index, used to access common elements in containers   
    ///                                                                        
    struct Index {
-      LANGULUS(NAME) "Index";
-      LANGULUS(POD) true;
-      LANGULUS(NULLIFIABLE) true;
-      LANGULUS(SUFFIX) "i";
-      LANGULUS(INFO) "Used to safely access elements inside containers";
-      LANGULUS_BASES(A::Number);
+      using CTTI_Named     = Yes<"Index">;
+      using CTTI_Suffix    = Yes<"i">;
+      using CTTI_Info      = Yes<"Used to safely access elements inside containers">;
+      using CTTI_POD       = Yup;
+      using CTTI_Nullable  = Yup;
+      using CTTI_Number    = Yup;
 
    protected:
       using Type = ::std::ptrdiff_t;
@@ -60,7 +60,7 @@ namespace Langulus::Annies
          First = 0
       };
 
-      LANGULUS_NAMED_VALUES(
+      using CTTI_Values = Values<
          All,
          Many,
          Single,
@@ -78,7 +78,7 @@ namespace Langulus::Annies
 
          Last,
          First
-      );
+      >;
 
       #if LANGULUS_DEBUG()
          union {

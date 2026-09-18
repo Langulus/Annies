@@ -16,11 +16,7 @@
 #endif
 
 /// Enable memory manager                                                     
-#if LANGULUS_FEATURE(MANAGED_MEMORY)
-   #include <Langulus/Fractalloc.hpp>
-#else
-   #include "memory/NoAllocator.hpp"
-#endif
+#include <Langulus/Allocator.hpp>
 
 /// Make the rest of the code aware, that Langulus::Annies has been included  
 #define LANGULUS_LIBRARY_ANNIES() 1
@@ -94,15 +90,15 @@ namespace Langulus
       using RTTI::CMeta;
       using RTTI::TMeta;
       using RTTI::VMeta;
-      using RTTI::AMeta;
-      using RTTI::AllocationRequest;
+      //using RTTI::AMeta;
+      //using RTTI::AllocationRequest;
 
       template<class, bool EMBED = true>
       struct Handle;
 
       class Many;
       using Messy = Many;
-      template<CT::Data>
+      template<CT::NotVoid>
       class TMany;
 
       struct BlockMap;
@@ -112,7 +108,7 @@ namespace Langulus
       using UnorderedMap = Map<false>;
       using OrderedMap = Map<true>;
 
-      template<CT::Data, CT::Data, bool>
+      template<CT::NotVoid, CT::NotVoid, bool>
       struct TMap;
       template<CT::NotVoid K, CT::NotVoid V>
       using TOrderedMap = TMap<K, V, true>;
@@ -126,7 +122,7 @@ namespace Langulus
       using UnorderedSet = Set<false>;
       using OrderedSet = Set<true>;
 
-      template<CT::Data, bool>
+      template<CT::NotVoid, bool>
       struct TSet;
       template<CT::NotVoid T>
       using TOrderedSet = TSet<T, true>;
@@ -137,7 +133,7 @@ namespace Langulus
       struct Text;
       struct Path;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       class Own;
       template<class>
       class Ref;
