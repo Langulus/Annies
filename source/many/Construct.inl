@@ -381,7 +381,7 @@ namespace Langulus::Annies
    /// Serialize the construct to anything text-based                         
    ///   @param to - [in/out] container to serialize into                     
    ///   @return the number of elements that were written to 'to'             
-   Count Construct::Serialize(CT::Serial auto& to) const {
+   size_t Construct::Serialize(CT::Serial auto& to) const {
       const auto initial = to.GetCount();
       using OUT = Deref<decltype(to)>;
       to += GetType();

@@ -18,7 +18,7 @@ namespace Langulus
       /// An abstract owned value                                             
       ///                                                                     
       struct Owned {
-         LANGULUS(ABSTRACT) true;
+         using CTTI_Abstract = Yup;
          static constexpr bool CTTI_Container = true;
       };
 
@@ -41,7 +41,7 @@ namespace Langulus
 
       /// Anything usable to initialize a shared pointer                      
       template<class...T>
-      concept PointerRelated = ((Pointer<T> or Sparse<T> or Nullptr<T>) and ...);
+      concept PointerRelated = ((Pointer<T> or Sparse<T> or ::std::is_same_v<T, nullptr_t>) and ...);
 
    } // namespace Langulus::CT
    
@@ -90,10 +90,10 @@ namespace Langulus::Annies
       T mValue;
 
    public:
-      LANGULUS(NULLIFIABLE) CT::Nullifiable<T>;
-      LANGULUS(POD) not CT::Sparse<T> and CT::POD<T>;
-      LANGULUS(ABSTRACT) false;
-      LANGULUS(TYPED) T;
+      using CTTI_Nullable  = Maybe<CT::Nullable<T>>;
+      using CTTI_POD       = Maybe<not CT::Sparse<T> and CT::POD<T>>;
+      using CTTI_Abstract  = No;
+      using CTTI_Typed     = T;
 
       static constexpr bool Ownership = true;
 
@@ -101,10 +101,10 @@ namespace Langulus::Annies
       ///   Construction                                                      
       ///                                                                     
       constexpr Own() requires CT::Defaultable<T>;
-      constexpr Own(const Own&) requires (CT::Sparse<T> or CT::ReferMakable<T>);
-      constexpr Own(Own&&) requires (CT::Sparse<T> or CT::MoveMakable<T>);
+      constexpr Own(const Own&) requires (CT::Sparse<T> or CT::ReferConstructible<T>);
+      constexpr Own(Own&&) requires (CT::Sparse<T> or CT::MoveConstructible<T>);
 
-      template<template<class> class S> requires CT::IntentMakable<S, T>
+      template<template<class> class S> requires CT::IntentConstructible<S, T>
       constexpr Own(S<Own>&&);
 
       template<CT::NotOwned...A>

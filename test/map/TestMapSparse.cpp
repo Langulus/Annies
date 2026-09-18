@@ -926,7 +926,7 @@ TEMPLATE_TEST_CASE("Sparse templated map stress test", "[map]",
             map.Insert(CreateElement<K>(i), item);
 
             // Check integrity                                          
-            Count iterated = 0;
+            size_t iterated = 0;
             for (auto pair : map) {
                (void) pair;
                ++iterated;
@@ -940,7 +940,7 @@ TEMPLATE_TEST_CASE("Sparse templated map stress test", "[map]",
       }
 
       WHEN("Iterated") {
-         Count iterated = 0;
+         size_t iterated = 0;
          for (auto pair : map) {
             (void) pair;
             ++iterated;

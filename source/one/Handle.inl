@@ -184,20 +184,20 @@ namespace Langulus::Annies
       return --backup;
    }
 
-   /// Offset the handle                                                      
+   /// size_t the handle                                                      
    ///   @param offset - the offset to apply                                  
    ///   @return the offsetted handle                                         
    TEMPLATE() LANGULUS(INLINED)
-   auto HAND()::operator + (Offset offset) const noexcept -> Handle requires Embedded {
+   auto HAND()::operator + (size_t offset) const noexcept -> Handle requires Embedded {
       auto backup = *this;
       return backup += offset;
    }
 
-   /// Offset the handle                                                      
+   /// size_t the handle                                                      
    ///   @param offset - the offset to apply                                  
    ///   @return the offsetted handle                                         
    TEMPLATE() LANGULUS(INLINED)
-   auto HAND()::operator - (Offset offset) const noexcept -> Handle requires Embedded {
+   auto HAND()::operator - (size_t offset) const noexcept -> Handle requires Embedded {
       auto backup = *this;
       return backup -= offset;
    }
@@ -205,7 +205,7 @@ namespace Langulus::Annies
    /// Prefix increment operator                                              
    ///   @return the next handle                                              
    TEMPLATE() LANGULUS(INLINED)
-   auto HAND()::operator += (Offset offset) noexcept -> Handle& requires Embedded {
+   auto HAND()::operator += (size_t offset) noexcept -> Handle& requires Embedded {
       mValue += offset;
       if constexpr (CT::Sparse<T>)
          mEntry += offset;
@@ -215,7 +215,7 @@ namespace Langulus::Annies
    /// Prefix decrement operator                                              
    ///   @return the next handle                                              
    TEMPLATE() LANGULUS(INLINED)
-   auto HAND()::operator -= (Offset offset) noexcept -> Handle& requires Embedded {
+   auto HAND()::operator -= (size_t offset) noexcept -> Handle& requires Embedded {
       mValue -= offset;
       if constexpr (CT::Sparse<T>)
          mEntry -= offset;

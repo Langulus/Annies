@@ -17,7 +17,7 @@ namespace Langulus::Annies
    ///   @param count - the number of elements to request                     
    ///   @return both the provided byte size and reserved count               
    template<class TYPE> LANGULUS(INLINED)
-   auto Block<TYPE>::RequestSize(const Count count) const IF_UNSAFE(noexcept)
+   auto Block<TYPE>::RequestSize(const size_t count) const IF_UNSAFE(noexcept)
    -> AllocationRequest {
       if constexpr (TypeErased) {
          LglsAssumeDev(IsTyped(),
@@ -41,7 +41,7 @@ namespace Langulus::Annies
    ///      if you know what you're doing                                     
    ///   @param count - number of elements to reserve                         
    template<class TYPE> template<bool SETSIZE> LANGULUS(INLINED)
-   void Block<TYPE>::Reserve(const Count count) {
+   void Block<TYPE>::Reserve(const size_t count) {
       if (count < mCount)
          AllocateLess(count);
       else 
@@ -57,7 +57,7 @@ namespace Langulus::Annies
    ///   @tparam SETSIZE - true to set count, despite not constructing        
    ///   @param elements - number of elements to allocate                     
    template<class TYPE> template<bool CREATE, bool SETSIZE>
-   void Block<TYPE>::AllocateMore(const Count elements) {
+   void Block<TYPE>::AllocateMore(const size_t elements) {
       LglsAssumeDev(elements > mCount, "Bad element count");
 
       if constexpr (not TypeErased) {
@@ -176,7 +176,7 @@ namespace Langulus::Annies
    ///   @attention assumes 'elements' is smaller than the current reserve    
    ///   @param elements - number of elements to allocate                     
    template<class TYPE> LANGULUS(INLINED)
-   void Block<TYPE>::AllocateLess(const Count elements) {
+   void Block<TYPE>::AllocateLess(const size_t elements) {
       LglsAssumeDev(elements < mReserved, "Bad element count");
 
       if (mCount > elements) {
@@ -263,7 +263,7 @@ namespace Langulus::Annies
    ///   @tparam CREATE - true to call constructors and set count             
    ///   @param elements - number of elements to allocate                     
    template<class TYPE> template<bool CREATE>
-   void Block<TYPE>::AllocateInner(Count elements) {
+   void Block<TYPE>::AllocateInner(size_t elements) {
       LANGULUS_ASSERT(IsTyped(), Allocate,
          "Invalid type");
       LANGULUS_ASSERT(not GetType()->mIsAbstract or IsSparse(), Allocate,
@@ -349,7 +349,7 @@ namespace Langulus::Annies
    template<class TYPE> template<class MASK> LANGULUS(INLINED)
    void Block<TYPE>::KeepInner(MASK mask) const noexcept {
       constexpr bool MASKED = not CT::Nullptr<MASK>;
-      [[maybe_unused]] Count remaining;
+      [[maybe_unused]] size_t remaining;
       if constexpr (MASKED)
          remaining = GetCount();
       const auto count = MASKED ? mReserved : mCount;
@@ -531,7 +531,7 @@ namespace Langulus::Annies
             auto data = GetRaw();
             const auto begMarker = data;
             const auto endMarker = data + count;
-            [[maybe_unused]] Count remaining;
+            [[maybe_unused]] size_t remaining;
             if constexpr (MASKED)
                remaining = GetCount();
 
@@ -576,7 +576,7 @@ namespace Langulus::Annies
             const auto count = not MASKED ? mCount : mReserved;
             auto data = mRaw;
             [[maybe_unused]] int index;
-            [[maybe_unused]] Count remaining;
+            [[maybe_unused]] size_t remaining;
             if constexpr (MASKED) {
                index = 0;
                remaining = GetCount();
@@ -660,14 +660,14 @@ namespace Langulus::Annies
       auto handle = GetHandle<void*>(0);
       const auto begMarker = handle.mValue;
       const auto endMarker = handle.mValue + count;
-      [[maybe_unused]] Count remaining;
+      [[maybe_unused]] size_t remaining;
       if constexpr (MASKED)
          remaining = GetCount();
 
       // Execute a call for each handle that matches current entry      
       const auto for_each_match = [&](auto&& call) {
          auto handle2 = handle + 1;
-         [[maybe_unused]] Count remaining2;
+         [[maybe_unused]] size_t remaining2;
          if constexpr (MASKED)
             remaining2 = remaining;
 
@@ -726,8 +726,8 @@ namespace Langulus::Annies
             }
          }
          else {
-            // Count all handles that match the current entry           
-            Count matches = 0;
+            // size_t all handles that match the current entry           
+            size_t matches = 0;
             for_each_match([&matches](const Handle<void*>&) {
                ++matches;
             });
@@ -750,7 +750,7 @@ namespace Langulus::Annies
                   for_each_match([&](Handle<void*>& h) {
                      // We still have to make sure that per-instance    
                      // references are also affected                    
-                     [[maybe_unused]] Count remaining_refs = 0;
+                     [[maybe_unused]] size_t remaining_refs = 0;
                      if constexpr (TypeErased) {
                         if (mType->mReference)
                            remaining_refs = mType->mReference(h.Get(), -1);

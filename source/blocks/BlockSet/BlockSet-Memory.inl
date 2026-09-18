@@ -16,7 +16,7 @@ namespace Langulus::Annies
    ///   @attention does nothing if reserving less than current reserve       
    ///   @param count - number of elements to allocate                        
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::Reserve(const Count count) {
+   void BlockSet::Reserve(const size_t count) {
       AllocateInner<THIS>(
          Roof2(count < MinimalAllocation ? MinimalAllocation : count)
       );
@@ -28,11 +28,11 @@ namespace Langulus::Annies
    ///   @attention assumes count is a power-of-two                           
    ///   @param count - the new number of elements                            
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::AllocateFresh(const Count count) {
+   void BlockSet::AllocateFresh(const size_t count) {
       LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
 
-      Offset infoOffset;
+      size_t infoOffset;
       const auto keyAndInfoSize = RequestKeyAndInfoSize<THIS>(count, infoOffset);
       mKeys.mEntry = Allocator::Allocate(mKeys.mType, keyAndInfoSize);
       LANGULUS_ASSERT(mKeys.mEntry, Allocate, "Out of memory");
@@ -50,14 +50,14 @@ namespace Langulus::Annies
    ///   @tparam REUSE - true to reallocate, false to allocate fresh          
    ///   @param count - the new number of pairs                               
    template<CT::Set THIS, bool REUSE>
-   void BlockSet::AllocateData(const Count count) {
+   void BlockSet::AllocateData(const size_t count) {
       LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
       LglsAssumeDev(mKeys.mType,
          "Key type haven't been set");
 
       auto& me = reinterpret_cast<const THIS&>(*this);
-      Offset infoOffset;
+      size_t infoOffset;
 
       // Allocate new keys                                              
       BlockSet old = *this;
@@ -156,7 +156,7 @@ namespace Langulus::Annies
    ///   @attention assumes count is a power-of-two number                    
    ///   @param count - number of pairs to allocate                           
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::AllocateInner(const Count count) {
+   void BlockSet::AllocateInner(const size_t count) {
       // Shrinking is never allowed, you'll have to do it explicitly    
       // via Compact()                                                  
       if (count <= GetReserved())

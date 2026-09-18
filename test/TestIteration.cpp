@@ -23,7 +23,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEach<true>([&](int& i) {
@@ -31,7 +31,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEach([&](const int& i) {
@@ -39,7 +39,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
       }
 
       WHEN("Dense-iterating a sparse pack (shallow)") {
@@ -49,7 +49,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEach<true>([&](int& i) {
@@ -57,7 +57,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEach([&](const int& i) {
@@ -65,7 +65,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
       }
 
       /*WHEN("Sparse-iterating a dense pack (shallow)") {
@@ -75,7 +75,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEach<true>([&](int* i) {
@@ -83,7 +83,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEach([&](const int* i) {
@@ -91,7 +91,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
       }
 
       WHEN("Sparse-iterating a sparse pack (shallow)") {
@@ -101,7 +101,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEach<true>([&](int* i) {
@@ -109,7 +109,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEach([&](const int* i) {
@@ -117,7 +117,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
       }*/
    }
 
@@ -144,7 +144,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.GetValues().ForEachRev([&](int& i) {
@@ -152,7 +152,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.GetValues().ForEach([&](const int& i) {
@@ -161,7 +161,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEachPair([&](Text& key, int& value) {
@@ -177,7 +177,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEachPairRev([&](Text& key, int& value) {
@@ -193,7 +193,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
       }
 
       WHEN("Dense-iterating a sparse map (shallow)") {
@@ -203,7 +203,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.GetValues().ForEachRev([&](int& i) {
@@ -211,7 +211,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.GetValues().ForEach([&](const int& i) {
@@ -220,7 +220,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEachPair([&](Text& key, int& value) {
@@ -236,7 +236,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEachPairRev([&](Text& key, int& value) {
@@ -252,7 +252,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
       }
 
       WHEN("Sparse-iterating a dense map (shallow)") {
@@ -262,7 +262,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.GetValues().ForEachRev([&](int* i) {
@@ -270,7 +270,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.GetValues().ForEach([&](const int* i) {
@@ -278,7 +278,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEachPair([&](Text& key, int& value) {
@@ -294,7 +294,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
 
          it = 0;
          dense.ForEachPairRev([&](Text& key, int& value) {
@@ -310,7 +310,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == dense.GetCount());
+         REQUIRE(size_t(it) == dense.GetCount());
       }
 
       WHEN("Sparse-iterating a sparse map (shallow)") {
@@ -320,7 +320,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.GetValues().ForEachRev([&](int* i) {
@@ -328,7 +328,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.GetValues().ForEach([&](const int* i) {
@@ -336,7 +336,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEachPair([&](Text* key, int* value) {
@@ -352,7 +352,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
 
          it = 0;
          sparse.ForEachPairRev([&](Text* key, int* value) {
@@ -368,7 +368,7 @@ SCENARIO("Iterating containers", "[iteration]") {
             ++it;
             return true;
          });
-         REQUIRE(Count(it) == sparse.GetCount());
+         REQUIRE(size_t(it) == sparse.GetCount());
       }
    }*/
 
@@ -379,7 +379,7 @@ SCENARIO("Iterating containers", "[iteration]") {
       Many sparse_any = new float(sf);
 
       WHEN("Dense-iterating a dense any (shallow)") {
-         Count it {};
+         size_t it {};
          dense_any.ForEach([&](float& i) {
             REQUIRE(i == df + float(it));
             ++it;
@@ -405,7 +405,7 @@ SCENARIO("Iterating containers", "[iteration]") {
       }
 
       WHEN("Dense-iterating a sparse any (shallow)") {
-         Count it {};
+         size_t it {};
          sparse_any.ForEach([&](float& i) {
             REQUIRE(i == sf + float(it));
             ++it;
@@ -431,7 +431,7 @@ SCENARIO("Iterating containers", "[iteration]") {
       }
 
       /*WHEN("Sparse-iterating a dense pack (shallow)") {
-         Count it {};
+         size_t it {};
          dense_any.ForEach([&](float* i) {
             REQUIRE(*i == df + float(it));
             ++it;
@@ -457,7 +457,7 @@ SCENARIO("Iterating containers", "[iteration]") {
       }
 
       WHEN("Sparse-iterating a sparse pack (shallow)") {
-         Count it {};
+         size_t it {};
          sparse_any.ForEach([&](float* i) {
             REQUIRE(*i == sf + float(it));
             ++it;

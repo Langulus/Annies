@@ -320,7 +320,7 @@ namespace Langulus::Annies
 
                auto ptr = coalesced.mRaw;
                const auto ptrEnd = coalesced.mRaw + coalesced.GetBytesize();
-               const Size stride = coalesced.GetStride();
+               const size_t stride = coalesced.GetStride();
                while (ptr != ptrEnd) {
                   InsertInner<B, false>(
                      GetBucket(GetReserved() - 1, ptr),

@@ -48,7 +48,7 @@ namespace Langulus::Annies
    ///   If index is out of scope, return None                                
    ///   If index is special - return it as it is                             
    LANGULUS(INLINED)
-   constexpr Index Index::Constrained(const Count count) const noexcept {
+   constexpr Index Index::Constrained(const size_t count) const noexcept {
       switch (mIndex) {
       case Auto: case First: case Front:
          return {0};
@@ -80,23 +80,23 @@ namespace Langulus::Annies
    /// Throws Except::Access if not possible to extract index                 
    ///   @return a valid offset                                               
    LANGULUS(INLINED)
-   Offset Index::GetOffset() const {
+   size_t Index::GetOffset() const {
       LANGULUS_ASSERT(not IsSpecial(), Access,
          "Can't convert index to offset");
-      return static_cast<Offset>(mIndex);
+      return static_cast<size_t>(mIndex);
    }
    
    /// Return the internal value without any safety checks                    
    ///   @return the offset                                                   
    LANGULUS(INLINED)
-   Offset Index::GetOffsetUnsafe() const noexcept {
-      return static_cast<Offset>(mIndex);
+   size_t Index::GetOffsetUnsafe() const noexcept {
+      return static_cast<size_t>(mIndex);
    }
 
    /// Constrain the index to some count (destructive)                        
    ///   @param count - the count to constrain to                             
    LANGULUS(INLINED)
-   constexpr void Index::Constrain(const Count count) noexcept {
+   constexpr void Index::Constrain(const size_t count) noexcept {
       *this = Constrained(count); 
    }
 

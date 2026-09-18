@@ -75,39 +75,39 @@ namespace Langulus::Annies
       auto last() const noexcept -> ConstIterator;
 
       template<bool REVERSE = false>
-      Count ForEach(auto&&) const;
+      size_t ForEach(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEach(auto&&);
+      size_t ForEach(auto&&);
 
       template<bool REVERSE = false>
-      Count ForEachKeyElement(auto&&) const;
+      size_t ForEachKeyElement(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEachKeyElement(auto&&);
+      size_t ForEachKeyElement(auto&&);
 
       template<bool REVERSE = false>
-      Count ForEachValueElement(auto&&) const;
+      size_t ForEachValueElement(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEachValueElement(auto&&);
+      size_t ForEachValueElement(auto&&);
 
       template<bool REVERSE = false>
-      Count ForEachKey(auto&&...) const;
+      size_t ForEachKey(auto&&...) const;
       template<bool REVERSE = false>
-      Count ForEachKey(auto&&...);
+      size_t ForEachKey(auto&&...);
 
       template<bool REVERSE = false>
-      Count ForEachValue(auto&&...) const;
+      size_t ForEachValue(auto&&...) const;
       template<bool REVERSE = false>
-      Count ForEachValue(auto&&...);
-
-      template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachKeyDeep(auto&&...) const;
-      template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachKeyDeep(auto&&...);
+      size_t ForEachValue(auto&&...);
 
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachValueDeep(auto&&...) const;
+      size_t ForEachKeyDeep(auto&&...) const;
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachValueDeep(auto&&...);
+      size_t ForEachKeyDeep(auto&&...);
+
+      template<bool REVERSE = false, bool SKIP = true>
+      size_t ForEachValueDeep(auto&&...) const;
+      template<bool REVERSE = false, bool SKIP = true>
+      size_t ForEachValueDeep(auto&&...);
 
       ///                                                                     
       ///   RTTI                                                              
@@ -154,18 +154,18 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Memory management                                                 
       ///                                                                     
-      void Reserve(Count);
+      void Reserve(size_t);
 
       ///                                                                     
       ///   Insertion                                                         
       ///                                                                     
-      Count Insert(auto&&, auto&&);
+      size_t Insert(auto&&, auto&&);
 
       template<class T1, class T2> requires CT::Block<Deint<T1>, Deint<T2>>
-      Count InsertBlock(T1&&, T2&&);
+      size_t InsertBlock(T1&&, T2&&);
 
       template<class T1, class...TN>
-      Count InsertPair(T1&&, TN&&...);
+      size_t InsertPair(T1&&, TN&&...);
 
       auto operator << (CT::UnfoldInsertable auto&&) -> Map&;
       auto operator >> (CT::UnfoldInsertable auto&&) -> Map&;
@@ -173,9 +173,9 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Removal                                                           
       ///                                                                     
-      auto RemoveKey(const CT::NoIntent auto&) -> Count;
-      auto RemoveValue(const CT::NoIntent auto&) -> Count;
-      auto RemovePair(const CT::Pair auto&) -> Count;
+      auto RemoveKey(const CT::NoIntent auto&) -> size_t;
+      auto RemoveValue(const CT::NoIntent auto&) -> size_t;
+      auto RemovePair(const CT::Pair auto&) -> size_t;
       auto RemoveIt(const Iterator&) -> Iterator;
 
       void Clear();

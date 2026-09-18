@@ -92,11 +92,14 @@ namespace Langulus
       using RTTI::VMeta;
       //using RTTI::AMeta;
       //using RTTI::AllocationRequest;
+      
+      template<class TYPE = void>
+      struct Block;
 
       template<class, bool EMBED = true>
       struct Handle;
 
-      class Many;
+      struct Many;
       using Messy = Many;
       template<CT::NotVoid>
       class TMany;

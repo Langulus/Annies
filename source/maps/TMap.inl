@@ -246,42 +246,42 @@ namespace Langulus::Annies
    /// Get the size of a single key, in bytes                                 
    ///   @return the number of bytes a single key contains                    
    TEMPLATE() LANGULUS(INLINED)
-   constexpr Size TABLE()::GetKeyStride() const noexcept {
+   constexpr size_t TABLE()::GetKeyStride() const noexcept {
       return sizeof(K); 
    }
    
    /// Get the size of a single value, in bytes                               
    ///   @return the number of bytes a single value contains                  
    TEMPLATE() LANGULUS(INLINED)
-   constexpr Size TABLE()::GetValueStride() const noexcept {
+   constexpr size_t TABLE()::GetValueStride() const noexcept {
       return sizeof(V); 
    }
 
    /// Get the number of deep key containers                                  
    ///   @return the number of deep key containers                            
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::GetKeyCountDeep() const noexcept {
+   size_t TABLE()::GetKeyCountDeep() const noexcept {
       return BlockMap::GetKeyCountDeep<TMap>();
    }
 
    /// Get the number of deep key containers                                  
    ///   @return the number of deep key containers                            
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::GetKeyCountElementsDeep() const noexcept {
+   size_t TABLE()::GetKeyCountElementsDeep() const noexcept {
       return BlockMap::GetKeyCountElementsDeep<TMap>();
    }
 
    /// Get the number of deep value containers                                
    ///   @return the number of deep value containers                          
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::GetValueCountDeep() const noexcept {
+   size_t TABLE()::GetValueCountDeep() const noexcept {
       return BlockMap::GetValueCountDeep<TMap>();
    }
 
    /// Get the number of deep value containers                                
    ///   @return the number of deep value containers                          
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::GetValueCountElementsDeep() const noexcept {
+   size_t TABLE()::GetValueCountElementsDeep() const noexcept {
       return BlockMap::GetValueCountElementsDeep<TMap>();
    }
 
@@ -442,7 +442,7 @@ namespace Langulus::Annies
    /// Reserve a new table size                                               
    ///   @param count - the number of elements to reserve                     
    TEMPLATE() LANGULUS(INLINED)
-   void TABLE()::Reserve(Count count) {
+   void TABLE()::Reserve(size_t count) {
       return BlockMap::Reserve<TMap>(count);
    }
 
@@ -452,13 +452,13 @@ namespace Langulus::Annies
    ///   @return 1 if pair was inserted, zero otherwise                       
    TEMPLATE() template<class K1, class V1>
    requires (CT::MakableFrom<K, K1> and CT::MakableFrom<V, V1>) LANGULUS(INLINED)
-   Count TABLE()::Insert(K1&& key, V1&& val) {
+   size_t TABLE()::Insert(K1&& key, V1&& val) {
       return BlockMap::Insert<TMap>(Forward<K1>(key), Forward<V1>(val));
    }
    
    TEMPLATE() template<class K1>
    requires (CT::MakableFrom<K, K1> and CT::Defaultable<V>) LANGULUS(INLINED)
-   Count TABLE()::Insert(K1&& key) {
+   size_t TABLE()::Insert(K1&& key) {
       return BlockMap::Insert<TMap>(Forward<K1>(key), V {});
    }
    
@@ -468,7 +468,7 @@ namespace Langulus::Annies
    ///   @param val - the value block to insert                               
    ///   @return the number of inserted pairs                                 
    TEMPLATE() template<class K1, class V1> LANGULUS(INLINED)
-   Count TABLE()::InsertBlock(K1&& key, V1&& val) {
+   size_t TABLE()::InsertBlock(K1&& key, V1&& val) {
       return BlockMap::InsertBlock<TMap>(Forward<K1>(key), Forward<V1>(val));
    }
 
@@ -477,8 +477,8 @@ namespace Langulus::Annies
    ///   @return the number of inserted pairs                                 
    TEMPLATE() template<class T1, class...TN>
    requires CT::UnfoldMakableFrom<TPair<K, V>, T1, TN...> LANGULUS(INLINED)
-   Count TABLE()::InsertPair(T1&& t1, TN&&...tn) {
-      Count inserted = 0;
+   size_t TABLE()::InsertPair(T1&& t1, TN&&...tn) {
+      size_t inserted = 0;
         inserted += BlockMap::UnfoldInsert<TMap>(Forward<T1>(t1));
       ((inserted += BlockMap::UnfoldInsert<TMap>(Forward<TN>(tn))), ...);
       return inserted;
@@ -528,8 +528,8 @@ namespace Langulus::Annies
    ///   @param count - number of values to allocate                          
    ///   @return the requested byte size                                      
    TEMPLATE() LANGULUS(INLINED)
-   Size TABLE()::RequestValuesSize(const Count count) noexcept {
-      Offset valueByteSize = count * sizeof(V);
+   size_t TABLE()::RequestValuesSize(const size_t count) noexcept {
+      size_t valueByteSize = count * sizeof(V);
       if constexpr (CT::Sparse<V>)
          valueByteSize *= 2;
       return valueByteSize;
@@ -540,7 +540,7 @@ namespace Langulus::Annies
    ///   @return 1 if key was found and pair was removed                      
    TEMPLATE() template<CT::NoIntent K1>
    requires CT::Comparable<K, K1> LANGULUS(INLINED)
-   Count TABLE()::RemoveKey(const K1& key) {
+   size_t TABLE()::RemoveKey(const K1& key) {
       return BlockMap::RemoveKey<TMap>(key);
    }
 
@@ -549,7 +549,7 @@ namespace Langulus::Annies
    ///   @return the number of removed pairs                                  
    TEMPLATE() template<CT::NoIntent V1>
    requires CT::Comparable<V, V1> LANGULUS(INLINED)
-   Count TABLE()::RemoveValue(const V1& value) {
+   size_t TABLE()::RemoveValue(const V1& value) {
       return BlockMap::RemoveValue<TMap>(value);
    }
      
@@ -558,7 +558,7 @@ namespace Langulus::Annies
    ///   @return the number of removed pairs                                  
    TEMPLATE() template<CT::Pair P>
    requires CT::Comparable<TPair<K, V>, P> LANGULUS(INLINED)
-   Count TABLE()::RemovePair(const P& pair) {
+   size_t TABLE()::RemovePair(const P& pair) {
       return BlockMap::RemovePair<TMap>(pair);
    }
      
@@ -771,13 +771,13 @@ namespace Langulus::Annies
    ///   @param call - the function to call for each pair                     
    ///   @return the number of successful call() executions                   
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&& call) const {
+   size_t TABLE()::ForEach(auto&& call) const {
       using F = Deref<decltype(call)>;
       return BlockMap::ForEach<REVERSE, const TMap>(Forward<F>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&& call) {
+   size_t TABLE()::ForEach(auto&& call) {
       using F = Deref<decltype(call)>;
       return BlockMap::ForEach<REVERSE, TMap>(Forward<F>(call));
    }
@@ -789,13 +789,13 @@ namespace Langulus::Annies
    ///   @param call - the function to call for each key block                
    ///   @return the number of successful call() executions                   
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyElement(auto&& call) const {
+   size_t TABLE()::ForEachKeyElement(auto&& call) const {
       using F = Deref<decltype(call)>;
       return BlockMap::ForEachKeyElement<REVERSE, const TMap>(Forward<F>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyElement(auto&& call) {
+   size_t TABLE()::ForEachKeyElement(auto&& call) {
       using F = Deref<decltype(call)>;
       return BlockMap::ForEachKeyElement<REVERSE, TMap>(Forward<F>(call));
    }
@@ -806,13 +806,13 @@ namespace Langulus::Annies
    ///   @param call - the function to call for each value block              
    ///   @return the number of successful call() executions                   
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueElement(auto&& call) const {
+   size_t TABLE()::ForEachValueElement(auto&& call) const {
       using F = Deref<decltype(call)>;
       return BlockMap::ForEachValueElement<REVERSE, const TMap>(Forward<F>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueElement(auto&& call) {
+   size_t TABLE()::ForEachValueElement(auto&& call) {
       using F = Deref<decltype(call)>;
       return BlockMap::ForEachValueElement<REVERSE, TMap>(Forward<F>(call));
    }
@@ -824,13 +824,13 @@ namespace Langulus::Annies
    ///   @param calls - the functions to attempt                              
    ///   @return the number of successful call() executions                   
    TEMPLATE() template<bool REVERSE, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachKey(F&&...calls) const {
+   size_t TABLE()::ForEachKey(F&&...calls) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachKey");
       return BlockMap::ForEachKey<REVERSE, const TMap>(Forward<F>(calls)...);
    }
 
    TEMPLATE() template<bool REVERSE, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachKey(F&&...calls) {
+   size_t TABLE()::ForEachKey(F&&...calls) {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachKey");
       return BlockMap::ForEachKey<REVERSE, TMap>(Forward<F>(calls)...);
    }
@@ -842,13 +842,13 @@ namespace Langulus::Annies
    ///   @param calls - the functions to attempt                              
    ///   @return the number of successful call() executions                   
    TEMPLATE() template<bool REVERSE, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachValue(F&&...calls) const {
+   size_t TABLE()::ForEachValue(F&&...calls) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachValue");
       return BlockMap::ForEachValue<REVERSE, const TMap>(Forward<F>(calls)...);
    }
 
    TEMPLATE() template<bool REVERSE, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachValue(F&&...calls) {
+   size_t TABLE()::ForEachValue(F&&...calls) {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachValue");
       return BlockMap::ForEachValue<REVERSE, TMap>(Forward<F>(calls)...);
    }
@@ -861,13 +861,13 @@ namespace Langulus::Annies
    ///   @param calls - the functions to attempt                              
    ///   @return the number of successful call() executions                   
    TEMPLATE() template<bool REVERSE, bool SKIP, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyDeep(F&&...calls) const {
+   size_t TABLE()::ForEachKeyDeep(F&&...calls) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachKeyDeep");
       return BlockMap::ForEachKeyDeep<REVERSE, SKIP, const TMap>(Forward<F>(calls)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyDeep(F&&...calls) {
+   size_t TABLE()::ForEachKeyDeep(F&&...calls) {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachKeyDeep");
       return BlockMap::ForEachKeyDeep<REVERSE, SKIP, TMap>(Forward<F>(calls)...);
    }
@@ -880,13 +880,13 @@ namespace Langulus::Annies
    ///   @param calls - the functions to attempt                              
    ///   @return the number of successful call() executions                   
    TEMPLATE() template<bool REVERSE, bool SKIP, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueDeep(F&&...calls) const {
+   size_t TABLE()::ForEachValueDeep(F&&...calls) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachValueDeep");
       return BlockMap::ForEachValueDeep<REVERSE, SKIP, const TMap>(Forward<F>(calls)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP, class...F> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueDeep(F&&...calls) {
+   size_t TABLE()::ForEachValueDeep(F&&...calls) {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachValueDeep");
       return BlockMap::ForEachValueDeep<REVERSE, SKIP, TMap>(Forward<F>(calls)...);
    }

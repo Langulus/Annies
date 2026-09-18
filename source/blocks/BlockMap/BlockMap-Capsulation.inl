@@ -93,14 +93,14 @@ namespace Langulus::Annies
    /// Get the size of a single key, in bytes                                 
    ///   @return the number of bytes a single key contains                    
    template<CT::Map THIS> LANGULUS(INLINED)
-   constexpr Size BlockMap::GetKeyStride() const noexcept {
+   constexpr size_t BlockMap::GetKeyStride() const noexcept {
       return GetKeys<THIS>().GetStride();
    }
    
    /// Get the size of a single value, in bytes                               
    ///   @return the number of bytes a single value contains                  
    template<CT::Map THIS> LANGULUS(INLINED)
-   constexpr Size BlockMap::GetValueStride() const noexcept {
+   constexpr size_t BlockMap::GetValueStride() const noexcept {
       return GetVals<THIS>().GetStride();
    }
 
@@ -182,35 +182,35 @@ namespace Langulus::Annies
    /// Get the number of inserted pairs                                       
    ///   @return the number of inserted pairs                                 
    LANGULUS(INLINED)
-   constexpr Count BlockMap::GetCount() const noexcept {
+   constexpr size_t BlockMap::GetCount() const noexcept {
       return mKeys.mCount;
    }
 
    /// Get the number of deep key containers                                  
    ///   @return the number of deep key containers                            
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::GetKeyCountDeep() const noexcept {
+   size_t BlockMap::GetKeyCountDeep() const noexcept {
       return GetCountDeep(GetKeys<THIS>());
    }
 
    /// Get the number of deep key containers                                  
    ///   @return the number of deep key containers                            
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::GetKeyCountElementsDeep() const noexcept {
+   size_t BlockMap::GetKeyCountElementsDeep() const noexcept {
       return GetCountElementsDeep(GetKeys<THIS>());
    }
 
    /// Get the number of deep value containers                                
    ///   @return the number of deep value containers                          
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::GetValueCountDeep() const noexcept {
+   size_t BlockMap::GetValueCountDeep() const noexcept {
       return GetCountDeep(GetVals<THIS>());
    }
 
    /// Get the number of deep value containers                                
    ///   @return the number of deep value containers                          
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::GetValueCountElementsDeep() const noexcept {
+   size_t BlockMap::GetValueCountElementsDeep() const noexcept {
       return GetCountElementsDeep(GetVals<THIS>());
    }
 
@@ -273,11 +273,11 @@ namespace Langulus::Annies
    /// Inner function, for counting nested containers in key or value blocks  
    ///   @param what - the block to scan                                      
    ///   @return the number of found blocks                                   
-   Count BlockMap::GetCountDeep(const CT::Block auto& what) const noexcept {
+   size_t BlockMap::GetCountDeep(const CT::Block auto& what) const noexcept {
       if (IsEmpty() or not what.IsDeep())
          return 1;
 
-      Count counter = 1;
+      size_t counter = 1;
       auto data = what.template GetRawAs<Block>();
       auto info = GetInfo();
       const auto infoEnd = GetInfoEnd();
@@ -292,14 +292,14 @@ namespace Langulus::Annies
    /// Inner function, for counting nested elements in key or value blocks    
    ///   @param what - the block to scan                                      
    ///   @return the number of found blocks                                   
-   Count BlockMap::GetCountElementsDeep(const CT::Block auto& what) const noexcept {
+   size_t BlockMap::GetCountElementsDeep(const CT::Block auto& what) const noexcept {
       if (IsEmpty() or what.IsUntyped())
          return 0;
 
       if (not what.IsDeep())
          return GetCount();
 
-      Count counter = 0;
+      size_t counter = 0;
       auto data = what.template GetRawAs<Block>();
       auto info = GetInfo();
       const auto infoEnd = GetInfoEnd();
@@ -315,7 +315,7 @@ namespace Langulus::Annies
    /// Get the number of allocated pairs                                      
    ///   @return the number of allocated pairs                                
    LANGULUS(INLINED)
-   constexpr Count BlockMap::GetReserved() const noexcept {
+   constexpr size_t BlockMap::GetReserved() const noexcept {
       return mKeys.mReserved;
    }
 

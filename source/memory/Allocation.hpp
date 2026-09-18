@@ -37,9 +37,9 @@ namespace Langulus::Annies
    friend struct Allocator;
    protected:
       // Allocated bytes for this chunk                                 
-      Offset mAllocatedBytes;
+      size_t mAllocatedBytes;
       // The number of references to this memory                        
-      Count mReferences;
+      size_t mReferences;
       union {
          // This pointer has two uses, depending on mReferences         
          // If mReferences > 0, it refers to the pool that owns the     
@@ -53,7 +53,7 @@ namespace Langulus::Annies
 
       // Acts like a timestamp of when the allocation happened          
       #if LANGULUS_FEATURE(MEMORY_STATISTICS)
-         Count mStep;
+         size_t mStep;
       #endif
 
    public:
@@ -62,17 +62,17 @@ namespace Langulus::Annies
       Allocation(Allocation&&) = delete;
       ~Allocation() = delete;
 
-      constexpr Allocation(Offset, Pool*) noexcept;
+      constexpr Allocation(size_t, Pool*) noexcept;
 
-      static constexpr Offset GetSize() noexcept;
-      static constexpr Offset GetNewAllocationSize(Offset) noexcept;
-      static constexpr Offset GetMinAllocation() noexcept;
+      static constexpr size_t GetSize() noexcept;
+      static constexpr size_t GetNewAllocationSize(size_t) noexcept;
+      static constexpr size_t GetMinAllocation() noexcept;
 
-      auto GetUses() const noexcept -> Count;
+      auto GetUses() const noexcept -> size_t;
       auto GetBlockStart() const noexcept -> Byte*;
       auto GetBlockEnd() const noexcept -> Byte const*;
-      auto GetTotalSize() const noexcept -> Offset;
-      auto GetAllocatedSize() const noexcept -> Offset;
+      auto GetTotalSize() const noexcept -> size_t;
+      auto GetAllocatedSize() const noexcept -> size_t;
       bool Contains(const void*) const noexcept;
       bool CollisionFree(const Allocation&) const noexcept;
 
@@ -80,9 +80,9 @@ namespace Langulus::Annies
       T* As() const noexcept;
 
       constexpr void Keep() noexcept;
-      constexpr void Keep(Count) noexcept;
+      constexpr void Keep(size_t) noexcept;
       constexpr void Free() noexcept;
-      constexpr void Free(Count) noexcept;
+      constexpr void Free(size_t) noexcept;
    };
 
 } // namespace Langulus::Annies

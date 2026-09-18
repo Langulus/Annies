@@ -16,19 +16,19 @@ namespace Langulus::CT
 
    /// Concept for recognizing arguments, with which a statically typed       
    /// pair can be constructed                                                
-   template<class K, class V, class A>
+   /*template<class K, class V, class A>
    concept PairMakable = Pair<Deint<A>> and NotReference<K, V>
-       and (IntentOf<A>::Shallow or (
-            IntentMakableAlt<typename IntentOf<A>::template As<K>>
-        and IntentMakableAlt<typename IntentOf<A>::template As<V>>));
+       and (IntentOf(LglsFake(A))::Shallow or (
+            IntentConstructible<IntentOf(LglsFake(A)), K>
+        and IntentConstructible<IntentOf(LglsFake(A)), V>);
 
    /// Concept for recognizing argument, with which a statically typed        
    /// pair can be assigned                                                   
    template<class K, class V, class A>
    concept PairAssignable = Pair<Deint<A>> and NotReference<K, V>
-       and (IntentOf<A>::Shallow or (
-            IntentAssignableAlt<typename IntentOf<A>::template As<K>>
-        and IntentAssignableAlt<typename IntentOf<A>::template As<V>>));
+       and (IntentOf(LglsFake(A))::Shallow or (
+            IntentAssignable<typename IntentOf<A>::template As<K>>
+        and IntentAssignable<typename IntentOf<A>::template As<V>>));*/
 
    /// Concept for recognizing argument, against which a pair can be compared 
    template<class K, class V, class A>
@@ -55,13 +55,12 @@ namespace Langulus::Annies
    struct TPair : A::Pair {
       using Key = K;
       using Value = V;
-
-      LANGULUS_ABSTRACT() false;
-      LANGULUS(TYPED) TPair<K, V>;
+      using CTTI_Abstract = No;
+      using CTTI_Typed = TPair<K, V>;
 
    private:
-      Conditional<CT::Reference<K> or CT::Dense<K>, K, Ref<Deptr<K>>> mKey;
-      Conditional<CT::Reference<V> or CT::Dense<V>, V, Ref<Deptr<V>>> mValue;
+      std::conditional_t<CT::Reference<K> or CT::Dense<K>, K, Ref<Deptr<K>>> mKey;
+      std::conditional_t<CT::Reference<V> or CT::Dense<V>, V, Ref<Deptr<V>>> mValue;
 
    public:
       ///                                                                     
@@ -71,11 +70,11 @@ namespace Langulus::Annies
       TPair(TPair const&) = default;
       TPair(TPair&&) = default;
 
-      template<class P> requires CT::PairMakable<K, V, P>
+      template<CT::Pair P> //requires CT::PairMakable<K, V, P>
       TPair(P&&);
 
       template<class K1, class V1>
-      requires (CT::MakableFrom<K, K1> and CT::MakableFrom<V, V1>
+      requires (std::constructible_from<K, K1> and std::constructible_from<V, V1>
            and  CT::NotReference<K, V>)
       TPair(K1&&, V1&&);
 
@@ -83,7 +82,7 @@ namespace Langulus::Annies
 
       TPair& operator = (TPair const&) = default;
       TPair& operator = (TPair&&) = default;
-      template<class P> requires CT::PairAssignable<K, V, P>
+      template<CT::Pair P> //requires CT::PairAssignable<K, V, P>
       TPair& operator = (P&&);
 
       ///                                                                     
@@ -92,14 +91,14 @@ namespace Langulus::Annies
       Hash GetHash() const requires CT::Hashable<K, V>;
 
       auto GetKey()         const noexcept -> const K&;
-      auto GetKey()               noexcept -> Conditional<CT::Dense<K>, K&, K>;
+      auto GetKey()               noexcept -> std::conditional_t<CT::Dense<K>, K&, K>;
       auto GetKeyBlock()    const noexcept -> Block<K>;
       auto GetKeyBlock()          noexcept -> Block<K>;
       auto GetKeyHandle()         -> Handle<K>;
       auto GetKeyHandle()   const -> Handle<const K>;
 
       auto GetValue()       const noexcept -> const V&;
-      auto GetValue()             noexcept -> Conditional<CT::Dense<V>, V&, V>;
+      auto GetValue()             noexcept -> std::conditional_t<CT::Dense<V>, V&, V>;
       auto GetValueBlock()  const noexcept -> Block<V>;
       auto GetValueBlock()        noexcept -> Block<V>;
       auto GetValueHandle()       -> Handle<V>;

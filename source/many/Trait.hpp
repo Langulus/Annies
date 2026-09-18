@@ -20,10 +20,10 @@ namespace Langulus
       /// It defines the size for CT::Trait and CT::TraitBased concepts       
       ///                                                                     
       struct Trait : Annies::Many {
-         LANGULUS(ABSTRACT) true;
-         LANGULUS(DEEP) false;
-         LANGULUS(ACT_AS) A::Trait;
-         LANGULUS_BASES(Annies::Many);
+         using CTTI_Abstract = Yup;
+         using CTTI_Deep = No;
+         using CTTI_ReflectAs = A::Trait;
+         using CTTI_Bases = Annies::Many;
 
       protected:
          using Base  = Annies::Many;
@@ -47,7 +47,7 @@ namespace Langulus
       template<class...T>
       concept Trait = TraitBased<T...> and ((
             sizeof(T) == sizeof(A::Trait)
-            and requires { {Decay<T>::CTTI_Trait} -> Similar<Token>; }
+            and requires { {Decay<T>::CTTI_Trait} -> Same<Token>; }
          ) and ...);
 
    } // namespace Langulus::CT
@@ -62,15 +62,15 @@ namespace Langulus::Annies
    ///                                                                        
    ///   A named container, used to give containers a standard intent of use  
    ///   A count is a count, no matter how you call it. So when your type     
-   /// contains a count variable, you can tag it with a Traits::Count tag     
+   /// contains a count variable, you can tag it with a Traits::size_t tag     
    ///   Traits are used to access members of objects at runtime, or access   
    /// global objects, or supply paremeters                                   
    ///                                                                        
    struct Trait : A::Trait {
-      LANGULUS(NAME) "Trait";
-      LANGULUS(ABSTRACT) false;
-      LANGULUS(ACT_AS) Trait;
-      LANGULUS_BASES(A::Trait);
+      using CTTI_Named = Yes<"Trait">;
+      using CTTI_Abstract = No;
+      using CTTI_ReflectAs = Trait;
+      using CTTI_Bases = A::Trait;
 
       ///                                                                     
       ///   Construction & Assignment                                         
@@ -79,15 +79,14 @@ namespace Langulus::Annies
       Trait(const Trait&);
       Trait(Trait&&) noexcept;
 
-      template<class T1, class...TN>
-      requires CT::UnfoldInsertable<T1, TN...>
+      template<class T1, class...TN> //requires CT::UnfoldInsertable<T1, TN...>
       Trait(T1&&, TN&&...);
 
       Trait& operator = (const Trait&);
       Trait& operator = (Trait&&);
-      Trait& operator = (CT::UnfoldInsertable auto&&);
+      Trait& operator = (CT::Intent auto&&);
 
-      template<CT::Trait, CT::Data>
+      template<CT::Trait, CT::NotVoid>
       static Trait From();
       static Trait FromMeta(TMeta, DMeta);
 
@@ -105,8 +104,7 @@ namespace Langulus::Annies
       template<CT::Trait, CT::TraitBased = Trait>
       constexpr bool IsTrait() const;
 
-      template<CT::TraitBased = Trait, class...TN>
-      requires CT::Exact<TMeta, TMeta, TN...>
+      template<CT::TraitBased = Trait, class...TN> requires Exact<TMeta, TMeta, TN...>
       bool IsTrait(TMeta, TN...) const;
 
       template<CT::TraitBased = Trait>
@@ -124,8 +122,8 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Indexing                                                          
       ///                                                                     
-      Trait Select(Offset, Count)       IF_UNSAFE(noexcept);
-      Trait Select(Offset, Count) const IF_UNSAFE(noexcept);
+      Trait Select(size_t, size_t)       IF_UNSAFE(noexcept);
+      Trait Select(size_t, size_t) const IF_UNSAFE(noexcept);
 
       ///                                                                     
       ///   Compare                                                           
@@ -146,7 +144,7 @@ namespace Langulus::Annies
       ///   Conversion                                                        
       ///                                                                     
       template<CT::TraitBased = Trait>
-      Count Serialize(CT::Serial auto&) const;
+      size_t Serialize(CT::Serial auto&) const;
    };
 
 } // namespace Langulus::Annies

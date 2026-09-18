@@ -20,7 +20,7 @@ namespace Langulus::Annies
    ///   @param f - the function to execute for each element of type A        
    ///   @return the number of executions that occured                        
    template<CT::Set THIS, bool REVERSE> LANGULUS(INLINED)
-   LoopControl BlockSet::ForEachInner(auto&& f, Count& executions) const
+   LoopControl BlockSet::ForEachInner(auto&& f, size_t& executions) const
    noexcept(NoexceptIterator<decltype(f)>) {
       using F = Deref<decltype(f)>;
       using A = ArgumentOf<F>;
@@ -32,7 +32,7 @@ namespace Langulus::Annies
 
       if (   (CT::Deep<A> and keys.IsDeep())
       or (not CT::Deep<A> and keys.template CastsTo<A, true>())) {
-         Count index = 0;
+         size_t index = 0;
          if (mKeys.mType->mIsSparse) {
             // Iterate using pointers of A                              
             using DA = Conditional<CT::Mutable<THIS>, Deref<A>*, const Deref<A>*>;
@@ -80,7 +80,7 @@ namespace Langulus::Annies
    ///   @param f - the function to call for each key block                   
    ///   @return the number of successful f() executions                      
    template<bool REVERSE, CT::Set THIS>
-   Count BlockSet::ForEachElement(auto&& call) const {
+   size_t BlockSet::ForEachElement(auto&& call) const {
       using F = Deref<decltype(call)>;
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
@@ -90,7 +90,7 @@ namespace Langulus::Annies
       static_assert(CT::Constant<A> or CT::Mutable<THIS>,
          "Non constant iterator for constant memory block");
 
-      Count counter = 0;
+      size_t counter = 0;
       auto info = REVERSE ? mInfo + GetReserved() - 1 : mInfo;
       const auto infoEnd = REVERSE ? mInfo - 1 : mInfo + GetReserved();
       const auto next = [&info] {
@@ -152,7 +152,7 @@ namespace Langulus::Annies
    ///   @param call - the function to execute for each element of type A     
    ///   @return the number of executions that occured                        
    template<CT::Set THIS, bool REVERSE, bool SKIP>
-   LoopControl BlockSet::ForEachDeepInner(auto&& call, Count& counter) const {
+   LoopControl BlockSet::ForEachDeepInner(auto&& call, size_t& counter) const {
       using F = Deref<decltype(call)>;
       using A = ArgumentOf<F>;
       using SubBlock = Conditional<CT::Mutable<THIS>, Block<>&, const Block<>&>;
@@ -181,12 +181,12 @@ namespace Langulus::Annies
    ///   @param f - the functions to call for each key block                  
    ///   @return the number of successful f() executions                      
    template<bool REVERSE, CT::Set THIS, class...F> LANGULUS(INLINED)
-   Count BlockSet::ForEach(F&&...f) const {
+   size_t BlockSet::ForEach(F&&...f) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEach");
       if (IsEmpty())
          return 0;
 
-      Count result = 0;
+      size_t result = 0;
       (void) (... or (Loop::NextLoop != 
          ForEachInner<THIS, REVERSE>(Forward<F>(f), result)
       ));
@@ -198,9 +198,9 @@ namespace Langulus::Annies
    ///   @param calls - the functions to call for each key block              
    ///   @return the number of successful f() executions                      
    template<bool REVERSE, bool SKIP, CT::Set THIS, class...F>
-   LANGULUS(INLINED) Count BlockSet::ForEachDeep(F&&...calls) const {
+   LANGULUS(INLINED) size_t BlockSet::ForEachDeep(F&&...calls) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachDeep");
-      Count result = 0;
+      size_t result = 0;
       (void)(... or (Loop::Break != 
          ForEachDeepInner<THIS, REVERSE, SKIP>(Forward<F>(calls), result)
       ));

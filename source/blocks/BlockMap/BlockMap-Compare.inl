@@ -31,7 +31,7 @@ namespace Langulus::Annies
          if (*info) {
             // Compare each valid pair...                               
             const auto lidx = info - GetInfo();
-            Offset ridx;
+            size_t ridx;
             if constexpr (CT::Typed<RHS>)
                ridx = rhs.template FindInner<RHS>(GetKeyRef<RHS>(lidx));
             else
@@ -63,7 +63,7 @@ namespace Langulus::Annies
          , THIS
          , TMap<typename P::Key, typename P::Value, THIS::Ordered>>;
 
-      Offset idx;
+      size_t idx;
       if constexpr (CT::Typed<RHS>)
          idx = FindInner<RHS>(rhs.mKey);
       else
@@ -145,7 +145,7 @@ namespace Langulus::Annies
 
       using P = Deref<decltype(pair)>;
       auto& me = reinterpret_cast<THIS&>(*this);
-      Offset found;
+      size_t found;
 
       if constexpr (CT::Typed<P>) {
          // Search for a typed pair                                     
@@ -231,7 +231,7 @@ namespace Langulus::Annies
    ///   @param match - the key to search for                                 
    ///   @return the index, or InvalidOffset if not found                     
    template<CT::Map THIS>
-   Offset BlockMap::FindInner(const CT::NoIntent auto& match) const {
+   size_t BlockMap::FindInner(const CT::NoIntent auto& match) const {
       if (IsEmpty())
          return InvalidOffset;
 
@@ -319,7 +319,7 @@ namespace Langulus::Annies
    ///   @param match - the key to search for                                 
    ///   @return the index, or InvalidOffset if not found                     
    template<CT::Map THIS>
-   Offset BlockMap::FindBlockInner(const Block<>& match) const {
+   size_t BlockMap::FindBlockInner(const Block<>& match) const {
       if (IsEmpty() or not IsKeySimilar<THIS>(match.GetType()))
          return InvalidOffset;
 

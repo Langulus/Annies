@@ -136,7 +136,7 @@ namespace Langulus::A
    /// Get the number of successful execution of the verb                     
    ///   @return the number of successful executions                          
    LANGULUS(INLINED)
-   Count Verb::GetSuccesses() const noexcept {
+   size_t Verb::GetSuccesses() const noexcept {
       return mSuccesses;
    }
 
@@ -160,7 +160,7 @@ namespace Langulus::A
 
    /// Satisfy verb a number of times                                         
    LANGULUS(INLINED)
-   void Verb::Done(Count c) noexcept {
+   void Verb::Done(size_t c) noexcept {
       mSuccesses = c;
    }
 

@@ -188,7 +188,7 @@ namespace Langulus::Annies
    ///   @attention returns zero if pointer is not managed                    
    ///   @return number of uses for the pointer's memory                      
    TEMPLATE() LANGULUS(INLINED)
-   constexpr Count TME()::GetUses() const noexcept {
+   constexpr size_t TME()::GetUses() const noexcept {
       return mEntry ? mEntry->GetUses() : 0;
    }
                

@@ -18,7 +18,7 @@ namespace Langulus
       ///   An abstract pair                                                  
       ///                                                                     
       struct Pair {
-         LANGULUS_ABSTRACT() true;
+         using CTTI_Abstract = Yup;
          static constexpr bool CTTI_Container = true;
       };
 
@@ -50,7 +50,7 @@ namespace Langulus
       ///      counterpart TPair                                                 
       ///                                                                        
       struct Pair : A::Pair {
-         LANGULUS_ABSTRACT() false;
+         using CTTI_Abstract = No;
 
       private:
          Many mKey;

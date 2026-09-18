@@ -39,28 +39,28 @@ namespace Langulus::Annies
       // What are we editing?                                           
       T& mSource;
       // Start of the selection                                         
-      Offset mStart = 0;
+      size_t mStart = 0;
       // End of the selection                                           
-      Offset mEnd = 0;
+      size_t mEnd = 0;
 
    public:
       Edit() = delete;
       Edit(const Edit&) = delete;
       Edit(Edit&&) noexcept = default;
-      Edit(T*, Offset = 0, Offset = 0) noexcept;
-      Edit(T&, Offset = 0, Offset = 0) noexcept;
+      Edit(T*, size_t = 0, size_t = 0) noexcept;
+      Edit(T&, size_t = 0, size_t = 0) noexcept;
 
       Edit& Select(const T&);
-      Edit& Select(Offset, Offset);
-      Edit& Select(Offset);
+      Edit& Select(size_t, size_t);
+      Edit& Select(size_t);
 
       auto GetSource() const noexcept -> const T&;
-      auto GetStart()  const noexcept -> Offset;
-      auto GetEnd()    const noexcept -> Offset;
-      auto GetLength() const noexcept -> Count;
+      auto GetStart()  const noexcept -> size_t;
+      auto GetEnd()    const noexcept -> size_t;
+      auto GetLength() const noexcept -> size_t;
 
-      auto& operator[] (Offset) const noexcept;
-      auto& operator[] (Offset) noexcept;
+      auto& operator[] (size_t) const noexcept;
+      auto& operator[] (size_t) noexcept;
 
       Edit& operator << (const T&);
       Edit& operator >> (const T&);

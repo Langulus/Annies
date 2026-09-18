@@ -133,19 +133,19 @@ namespace Langulus::Annies
 
       template<CT::Trait...>
       bool ExtractTrait(CT::NotVoid auto&...) const;
-      auto ExtractData(CT::NotVoid auto&) const -> Count;
-      auto ExtractDataAs(CT::NotVoid auto&) const -> Count;
+      auto ExtractData(CT::NotVoid auto&) const -> size_t;
+      auto ExtractDataAs(CT::NotVoid auto&) const -> size_t;
 
       template<CT::Trait>
-      auto GetTrait(Offset = 0)        const -> const Trait*;
-      auto GetTrait(TMeta, Offset = 0) const -> const Trait*;
+      auto GetTrait(size_t = 0)        const -> const Trait*;
+      auto GetTrait(TMeta, size_t = 0) const -> const Trait*;
 
    protected:
       template<CT::Trait>
       bool ExtractTraitInner(CT::NotVoid auto&...) const;
-      template<Offset...IDX>
+      template<size_t...IDX>
       bool ExtractTraitInner(const TraitList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
-      template<Offset>
+      template<size_t>
       bool ExtractTraitInnerInner(const TraitList&, CT::NotVoid auto&) const;
 
    public:
@@ -153,44 +153,44 @@ namespace Langulus::Annies
       ///   Iteration                                                         
       ///                                                                     
       template<bool MUTABLE = true>
-      Count ForEach(auto&&...);
-      Count ForEach(auto&&...) const;
+      size_t ForEach(auto&&...);
+      size_t ForEach(auto&&...) const;
 
       template<bool MUTABLE = true>
-      Count ForEachDeep(auto&&...);
-      Count ForEachDeep(auto&&...) const;
+      size_t ForEachDeep(auto&&...);
+      size_t ForEachDeep(auto&&...) const;
 
       template<bool MUTABLE = true>
-      Count ForEachTrait(auto&&);
-      Count ForEachTrait(auto&&) const;
+      size_t ForEachTrait(auto&&);
+      size_t ForEachTrait(auto&&) const;
 
       template<bool MUTABLE = true>
-      Count ForEachConstruct(auto&&);
-      Count ForEachConstruct(auto&&) const;
+      size_t ForEachConstruct(auto&&);
+      size_t ForEachConstruct(auto&&) const;
 
       template<bool MUTABLE = true>
-      Count ForEachTail(auto&&);
-      Count ForEachTail(auto&&) const;
+      size_t ForEachTail(auto&&);
+      size_t ForEachTail(auto&&) const;
 
    protected:
       template<bool MUTABLE = true>
-      Count ForEachInner(auto&&);
-      Count ForEachInner(auto&&) const;
+      size_t ForEachInner(auto&&);
+      size_t ForEachInner(auto&&) const;
 
    public:
       ///                                                                     
       ///   Insertion                                                         
       ///                                                                     
       template<class T1, class...TN>
-      Count Insert(T1&&, TN&&...);
+      size_t Insert(T1&&, TN&&...);
       void  Merge(const Neat&);
-      Neat& SetTrait(CT::TraitBased auto&&, Offset = 0);
+      Neat& SetTrait(CT::TraitBased auto&&, size_t = 0);
 
       Neat& operator <<  (auto&&);
       Neat& operator <<= (auto&&);
 
    protected:
-      Count UnfoldInsert(auto&&);
+      size_t UnfoldInsert(auto&&);
       void InsertInner(auto&&);
 
       void AddTrait(CT::Intent auto&&);
@@ -202,16 +202,16 @@ namespace Langulus::Annies
       ///   Removal                                                           
       ///                                                                     
       template<CT::Data, bool EMPTY_TOO = false>
-      Count RemoveData();
+      size_t RemoveData();
       template<CT::Data>
-      Count RemoveConstructs();
+      size_t RemoveConstructs();
       template<CT::Trait, bool EMPTY_TOO = false>
-      Count RemoveTrait();
+      size_t RemoveTrait();
 
       ///                                                                     
       ///   Conversion                                                        
       ///                                                                     
-      Count Serialize(CT::Serial auto&) const;
+      size_t Serialize(CT::Serial auto&) const;
    };
 
 } // namespace Langulus::Annies

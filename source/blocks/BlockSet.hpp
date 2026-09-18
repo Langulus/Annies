@@ -23,12 +23,12 @@ namespace Langulus
          LANGULUS(POD) true;
 
          using InfoType = ::std::uint8_t;
-         using OrderType = Offset;
+         using OrderType = size_t;
 
          static constexpr bool CTTI_Container = true;
          static constexpr bool Sequential = false;
-         static constexpr Offset InvalidOffset = -1;
-         static constexpr Count MinimalAllocation = 8;
+         static constexpr size_t InvalidOffset = -1;
+         static constexpr size_t MinimalAllocation = 8;
 
       protected:
          // A precomputed pointer for the info (and ordering) bytes     
@@ -122,12 +122,12 @@ namespace Langulus::Annies
       template<CT::Set = UnorderedSet>
       constexpr bool IsDense() const noexcept;
       template<CT::Set = UnorderedSet>
-      constexpr Size GetStride() const noexcept;
+      constexpr size_t GetStride() const noexcept;
       constexpr auto GetState() const noexcept -> DataState;
-      constexpr auto GetCount() const noexcept -> Count;
-      Count GetCountDeep() const noexcept;
-      Count GetCountElementsDeep() const noexcept;
-      constexpr auto GetReserved() const noexcept -> Count;
+      constexpr auto GetCount() const noexcept -> size_t;
+      size_t GetCountDeep() const noexcept;
+      size_t GetCountElementsDeep() const noexcept;
+      constexpr auto GetReserved() const noexcept -> size_t;
       constexpr bool IsEmpty() const noexcept;
       constexpr bool IsValid() const noexcept;
       constexpr bool IsInvalid() const noexcept;
@@ -154,7 +154,7 @@ namespace Langulus::Annies
       bool IsOrdered() const noexcept;
 
       constexpr auto GetAllocation() const noexcept -> const Allocation*;
-      constexpr auto GetUses() const noexcept -> Count;
+      constexpr auto GetUses() const noexcept -> size_t;
 
       constexpr explicit operator bool() const noexcept;
 
@@ -172,8 +172,8 @@ namespace Langulus::Annies
       auto GetInfo()       noexcept -> InfoType*;
       auto GetInfoEnd() const noexcept -> InfoType const*;
 
-      Count GetCountDeep(const Block<>&) const noexcept;
-      Count GetCountElementsDeep(const Block<>&) const noexcept;
+      size_t GetCountDeep(const Block<>&) const noexcept;
+      size_t GetCountElementsDeep(const Block<>&) const noexcept;
 
    public:
       ///                                                                     
@@ -187,24 +187,24 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Set, CT::Index INDEX>
-      Offset SimplifyIndex(INDEX) const
+      size_t SimplifyIndex(INDEX) const
       noexcept(not LANGULUS_SAFE() and CT::BuiltinInteger<INDEX>);
 
-      static Offset GetBucket(Offset, const CT::NoIntent auto&) noexcept;
-      static Offset GetBucketUnknown(Offset, const Block<>&) noexcept;
+      static size_t GetBucket(size_t, const CT::NoIntent auto&) noexcept;
+      static size_t GetBucketUnknown(size_t, const Block<>&) noexcept;
 
       template<CT::Set = UnorderedSet>
-      decltype(auto) GetRaw(Offset)       IF_UNSAFE(noexcept);
+      decltype(auto) GetRaw(size_t)       IF_UNSAFE(noexcept);
       template<CT::Set = UnorderedSet>
-      decltype(auto) GetRaw(Offset) const IF_UNSAFE(noexcept);
+      decltype(auto) GetRaw(size_t) const IF_UNSAFE(noexcept);
 
       template<CT::Set = UnorderedSet>
-      decltype(auto) GetRef(Offset)       IF_UNSAFE(noexcept);
+      decltype(auto) GetRef(size_t)       IF_UNSAFE(noexcept);
       template<CT::Set = UnorderedSet>
-      decltype(auto) GetRef(Offset) const IF_UNSAFE(noexcept);
+      decltype(auto) GetRef(size_t) const IF_UNSAFE(noexcept);
 
       template<CT::Set = UnorderedSet>
-      auto GetHandle(Offset) IF_UNSAFE(noexcept);
+      auto GetHandle(size_t) IF_UNSAFE(noexcept);
 
    public:
       ///                                                                     
@@ -226,13 +226,13 @@ namespace Langulus::Annies
       constexpr A::IteratorEnd end() const noexcept { return {}; }
 
       template<bool REVERSE = false, CT::Set>
-      Count ForEach(auto&&...) const;
+      size_t ForEach(auto&&...) const;
 
       template<bool REVERSE = false, CT::Set>
-      Count ForEachElement(auto&&) const;
+      size_t ForEachElement(auto&&) const;
 
       template<bool REVERSE = false, bool SKIP = true, CT::Set>
-      Count ForEachDeep(auto&&...) const;
+      size_t ForEachDeep(auto&&...) const;
 
    protected:
       template<class F>
@@ -240,10 +240,10 @@ namespace Langulus::Annies
          and noexcept(Fake<F&&>().operator() (Fake<ArgumentOf<F>>()));
 
       template<CT::Set, bool REVERSE>
-      LoopControl ForEachInner(auto&& f, Count&) const noexcept(NoexceptIterator<decltype(f)>);
+      LoopControl ForEachInner(auto&& f, size_t&) const noexcept(NoexceptIterator<decltype(f)>);
 
       template<CT::Set, bool REVERSE, bool SKIP>
-      LoopControl ForEachDeepInner(auto&&, Count&) const;
+      LoopControl ForEachDeepInner(auto&&, size_t&) const;
 
    public:
       ///                                                                     
@@ -300,25 +300,25 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Set>
-      Offset FindInner(const CT::NoIntent auto&) const;
+      size_t FindInner(const CT::NoIntent auto&) const;
       template<CT::Set>
-      Offset FindBlockInner(const Block<>&) const;
+      size_t FindBlockInner(const Block<>&) const;
 
    public:
       ///                                                                     
       ///   Memory management                                                 
       ///                                                                     
       template<CT::Set = UnorderedSet>
-      void Reserve(Count);
+      void Reserve(size_t);
 
    protected:
       /// @cond show_protected                                                
       template<CT::Set>
-      void AllocateFresh(Count);
+      void AllocateFresh(size_t);
       template<CT::Set, bool REUSE>
-      void AllocateData(Count);
+      void AllocateData(size_t);
       template<CT::Set>
-      void AllocateInner(Count);
+      void AllocateInner(size_t);
 
       template<CT::Set, bool DEEP = false>
       void Keep() const noexcept;
@@ -331,42 +331,42 @@ namespace Langulus::Annies
       ///   Insertion                                                         
       ///                                                                     
       template<CT::Set = UnorderedSet, class T1, class...TAIL>
-      Count Insert(T1&&, TAIL&&...);
+      size_t Insert(T1&&, TAIL&&...);
 
       template<CT::Set = UnorderedSet, class T> requires CT::Set<Deint<T>>
-      Count InsertBlock(T&&);
+      size_t InsertBlock(T&&);
       
       template<CT::Set = UnorderedSet, class T> requires CT::Block<Deint<T>>
-      Count InsertBlock(T&&);
+      size_t InsertBlock(T&&);
 
    protected:
       template<CT::Set>
       auto CreateValHandle(auto&&);
 
       template<CT::Set>
-      Size RequestKeyAndInfoSize(Count, Offset&) const IF_UNSAFE(noexcept);
+      size_t RequestKeyAndInfoSize(size_t, size_t&) const IF_UNSAFE(noexcept);
 
       template<CT::Set>
-      void Rehash(Count);
+      void Rehash(size_t);
       template<CT::Set>
       void ShiftPairs();
 
       template<CT::Set, bool CHECK_FOR_MATCH>
-      Offset InsertInner(Offset, auto&&);
+      size_t InsertInner(size_t, auto&&);
 
       template<CT::Set, bool CHECK_FOR_MATCH, template<class> class S, CT::Block B>
       requires CT::Intent<S<B>>
-      Offset InsertBlockInner(Offset, S<B>&&);
+      size_t InsertBlockInner(size_t, S<B>&&);
 
       template<CT::Set>
-      Count UnfoldInsert(auto&&);
+      size_t UnfoldInsert(auto&&);
 
    public:
       ///                                                                     
       ///   Removal                                                           
       ///                                                                     
       template<CT::Set = UnorderedSet>
-      Count Remove(const CT::NoIntent auto&);
+      size_t Remove(const CT::NoIntent auto&);
 
       template<CT::Set = UnorderedSet>
       void Clear();
@@ -377,9 +377,9 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Set>
-      void RemoveInner(Offset) IF_UNSAFE(noexcept);
+      void RemoveInner(size_t) IF_UNSAFE(noexcept);
       template<CT::Set>
-      Count RemoveKeyInner(const CT::NoIntent auto&);
+      size_t RemoveKeyInner(const CT::NoIntent auto&);
 
    #if LANGULUS(TESTING)
       public: constexpr auto GetRawMemory() const noexcept -> const void*;

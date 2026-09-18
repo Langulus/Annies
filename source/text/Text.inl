@@ -57,7 +57,7 @@ namespace Langulus::Annies
    template<class T> requires CT::String<Deint<T>> LANGULUS(INLINED)
    Text::Text(T&& other) {
       using S = IntentOf<decltype(other)>;
-      Count count;
+      size_t count;
 
       if constexpr (CT::StringLiteral<Deint<T>>) {
          count = DeintCast(other)
@@ -105,7 +105,7 @@ namespace Langulus::Annies
       if (DeintCast(other).empty())
          return;
 
-      Count count;
+      size_t count;
       if constexpr (not ::std::is_convertible_v<Deint<T>, std::string_view>)
          count = strnlen(DeintCast(other).data(), DeintCast(other).size());
       else
@@ -244,7 +244,7 @@ namespace Langulus::Annies
    ///      bit or too small numbers.                                         
    ///   @param number - the number to stringify                              
    ///   @return the text                                                     
-   template<Count PRECISION, CT::BuiltinNumber T> LANGULUS(INLINED)
+   template<size_t PRECISION, CT::BuiltinNumber T> LANGULUS(INLINED)
    Text Text::FromNumber(const T& number) {
       Text result;
       result.mType = MetaDataOf<Letter>();
@@ -265,7 +265,7 @@ namespace Langulus::Annies
 
          if (dot == lastChar) {
             // There is no dot...                                       
-            const auto c = static_cast<Count>(lastChar - temp);
+            const auto c = static_cast<size_t>(lastChar - temp);
             result.AllocateFresh(result.RequestSize(c));
             memcpy(result.mRaw, temp, c);
             result.mCount = c;
@@ -309,7 +309,7 @@ namespace Langulus::Annies
          }
 
          ++lastChar;
-         const auto c = static_cast<Count>(lastChar - temp);
+         const auto c = static_cast<size_t>(lastChar - temp);
          if (approximate) {
             // We've truncated the number, so prepend a '~' symbol to   
             // signify it's an approximate representation               
@@ -332,7 +332,7 @@ namespace Langulus::Annies
          LANGULUS_ASSERT(errorCode == ::std::errc(), Convert,
             "std::to_chars failure");
 
-         const auto c = static_cast<Count>(lastChar - temp);
+         const auto c = static_cast<size_t>(lastChar - temp);
          result.AllocateFresh(result.RequestSize(c));
          memcpy(result.mRaw, temp, c);
          result.mCount = c;
@@ -351,7 +351,7 @@ namespace Langulus::Annies
    ///      or if 'text' is a bounded array of smaller size                   
    ///   @return the text wrapped inside a Text container                     
    template<class T> requires CT::String<Deint<T>> LANGULUS(INLINED)
-   Text Text::From(T&& text, Count count) {
+   Text Text::From(T&& text, size_t count) {
       if (count == 0)
          return {};
 
@@ -407,7 +407,7 @@ namespace Langulus::Annies
 
          TMany<char16_t> to;
          to.AllocateFresh(to.RequestSize(mCount));
-         Count newCount = 0;
+         size_t newCount = 0;
          try {
             newCount = utf8::utf8to16(begin(), end(), to.begin()) - to.begin();
          }
@@ -427,7 +427,7 @@ namespace Langulus::Annies
 
          TMany<char32_t> to;
          to.AllocateFresh(to.RequestSize(mCount));
-         Count newCount = 0;
+         size_t newCount = 0;
          try {
             newCount = utf8::utf8to32(begin(), end(), to.begin()) - to.begin();
          }
@@ -440,15 +440,15 @@ namespace Langulus::Annies
       }
    #endif
       
-   /// Count the number of newline characters                                 
+   /// size_t the number of newline characters                                 
    ///   @return the number of newline characters + 1, or zero if empty       
    LANGULUS(INLINED)
-   Count Text::GetLineCount() const noexcept {
+   size_t Text::GetLineCount() const noexcept {
       if (IsEmpty())
          return 0;
 
-      Count lines = 1;
-      for (Count i = 0; i < mCount; ++i) {
+      size_t lines = 1;
+      for (size_t i = 0; i < mCount; ++i) {
          if ((*this)[i] == '\n')
             ++lines;
       }
@@ -541,12 +541,12 @@ namespace Langulus::Annies
    ///   @param count - the number of characters after 'start'                
    ///   @return new text that references the original memory                 
    LANGULUS(INLINED)
-   Text Text::Select(CT::Index auto start, Count count) const IF_UNSAFE(noexcept) {
+   Text Text::Select(CT::Index auto start, size_t count) const IF_UNSAFE(noexcept) {
       return Block::Select<Text>(start, count);
    }
 
    LANGULUS(INLINED)
-   Text Text::Select(CT::Index auto start, Count count) IF_UNSAFE(noexcept) {
+   Text Text::Select(CT::Index auto start, size_t count) IF_UNSAFE(noexcept) {
       return Block::Select<Text>(start, count);
    }
 
@@ -576,8 +576,8 @@ namespace Langulus::Annies
       Text result;
       result.Reserve(mCount);
 
-      Count copyStart = 0, copyEnd = 0;
-      for (Count i = 0; i <= mCount - pattern.mCount; ++i) {
+      size_t copyStart = 0, copyEnd = 0;
+      for (size_t i = 0; i <= mCount - pattern.mCount; ++i) {
          const auto matches = CropInner(i, mCount - i).Matches(pattern);
          if (matches == pattern.mCount) {
             // Found a match, skip it                                   
@@ -625,8 +625,8 @@ namespace Langulus::Annies
       Text result;
       result.Reserve(mCount); // Not exact, but a good heuristic        
 
-      Count copyStart = 0, copyEnd = 0;
-      for (Count i = 0; i <= mCount - pattern.mCount; ++i) {
+      size_t copyStart = 0, copyEnd = 0;
+      for (size_t i = 0; i <= mCount - pattern.mCount; ++i) {
          const auto matches = CropInner(i, mCount - i).Matches(pattern);
 
          if (matches == pattern.mCount) {
@@ -674,7 +674,7 @@ namespace Langulus::Annies
    /// Extend the text container and return a referenced part of it           
    ///   @return a container that represents the extended part                
    LANGULUS(INLINED)
-   Text Text::Extend(const Count count) {
+   Text Text::Extend(const size_t count) {
       return Block::Extend<Text>(count);
    }
 
@@ -916,7 +916,7 @@ namespace Langulus::Annies
       result.AllocateFresh(result.RequestSize(sizeof(from) * 2));
       auto from_bytes = reinterpret_cast<const std::byte*>(&from);
       auto to_bytes = result.GetRaw();
-      for (Offset i = 0; i < sizeof(from); ++i)
+      for (size_t i = 0; i < sizeof(from); ++i)
          fmt::format_to_n(to_bytes + i * 2, 2, "{:02X}", from_bytes[i]);
       result.mCount = sizeof(from) * 2;
       return result;

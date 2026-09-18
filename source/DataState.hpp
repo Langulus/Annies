@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include <Langulus/Core.hpp>
+#include <type_traits>
 
 
 namespace Langulus
@@ -75,7 +76,7 @@ namespace Langulus
          MissingPast = Missing | Past
       };
 
-      using Type = TypeOf<Enum>;
+      using Type = ::std::underlying_type_t<Enum>;
 
       Type mState {Default};
 

@@ -265,7 +265,7 @@ void Any_CheckState_ContainsOne(const auto& pack, const auto& e, Allocation* ent
    }
 }
 
-void Any_CheckState_ContainsN(Count n, const auto& pack, const CT::Sparse auto& e, Allocation* entry = nullptr) {
+void Any_CheckState_ContainsN(size_t n, const auto& pack, const CT::Sparse auto& e, Allocation* entry = nullptr) {
    using T = Deref<decltype(pack)>;
    using E = Deref<decltype(e)>;
    (void)entry;
@@ -277,7 +277,7 @@ void Any_CheckState_ContainsN(Count n, const auto& pack, const CT::Sparse auto& 
    for (auto& it : pack)
       REQUIRE(it == e);
 
-   for (Count i = 0; i < n; ++i) {
+   for (size_t i = 0; i < n; ++i) {
       REQUIRE(&pack.template As<Deptr<E>>(i) == e);
       REQUIRE(pack.template As<Deptr<E>>(i) == *e);
       REQUIRE(*pack.template As<E>(i) == *e);
@@ -306,7 +306,7 @@ void Any_CheckState_ContainsArray(const auto& pack, const CT::Array auto& e, All
       REQUIRE(it == e[index++]);
    REQUIRE(index == n);
 
-   for (Count i = 0; i < n; ++i) {
+   for (size_t i = 0; i < n; ++i) {
       REQUIRE(&pack.template As<Deptr<E>>(i) == e[i]);
       REQUIRE(pack.template As<Deptr<E>>(i) == *e[i]);
       REQUIRE(*pack.template As<E>(i) == *e[i]);

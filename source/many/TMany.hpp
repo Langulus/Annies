@@ -29,17 +29,16 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    class TMany : public Block<T> {
       using Base = Block<T>;
-
-      LANGULUS(DEEP) true;
-      LANGULUS(POD) false;
-      LANGULUS_BASES(Base);
+      using CTTI_Deep = Yup;
+      using CTTI_POD = No;
+      using CTTI_Bases = Base;
 
    protected:
    	template<class>
 	   friend struct Block;
  	   friend struct BlockSet;
 	   friend struct BlockMap;
- 	   template<CT::Data>
+ 	   template<CT::NotVoid>
 	   friend class THive;
       
       #if LANGULUS_DEBUG()
@@ -91,8 +90,8 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Indexing                                                          
       ///                                                                     
-      auto Select(Offset, Count)       IF_UNSAFE(noexcept) -> TMany;
-      auto Select(Offset, Count) const IF_UNSAFE(noexcept) -> TMany;
+      auto Select(size_t, size_t)       IF_UNSAFE(noexcept) -> TMany;
+      auto Select(size_t, size_t) const IF_UNSAFE(noexcept) -> TMany;
 
       ///                                                                     
       ///   RTTI                                                              
@@ -113,7 +112,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Insertion                                                         
       ///                                                                     
-      auto Extend(Count) -> TMany;
+      auto Extend(size_t) -> TMany;
 
       template<class T1> requires CT::UnfoldMakableFrom<T, T1>
       auto operator << (T1&&) -> TMany&;

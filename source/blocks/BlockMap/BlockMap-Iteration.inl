@@ -17,7 +17,7 @@ namespace Langulus::Annies
    ///   @param call - the function to execute for each pair                  
    ///   @return the number of successfull executions                         
    template<bool REVERSE, CT::Map THIS>
-   Count BlockMap::ForEach(auto&& call) const {
+   size_t BlockMap::ForEach(auto&& call) const {
       if (IsEmpty())
          return 0;
 
@@ -57,7 +57,7 @@ namespace Langulus::Annies
          }
       };
 
-      Count executions = 0;
+      size_t executions = 0;
       while (inf != infEnd) {
          if (not *inf) {
             next();
@@ -146,7 +146,7 @@ namespace Langulus::Annies
    ///   @return the number of executions that occured                        
    template<CT::Map THIS, bool REVERSE>
    LoopControl BlockMap::ForEachInner(
-      const CT::Block auto& part, auto&& call, Count& counter
+      const CT::Block auto& part, auto&& call, size_t& counter
    ) const {
       auto& partLocal = DecvqCast(part);
       using F = Deref<decltype(call)>;
@@ -222,7 +222,7 @@ namespace Langulus::Annies
    ///   @return the number of successful executions                          
    template<CT::Map THIS, bool REVERSE>
    LoopControl BlockMap::ForEachElementInner(
-      const CT::Block auto& part, auto&& call, Count& counter
+      const CT::Block auto& part, auto&& call, size_t& counter
    ) const {
       using F = Deref<decltype(call)>;
       using A = ArgumentOf<F>;
@@ -296,7 +296,7 @@ namespace Langulus::Annies
    ///   @return the number of executions that occured                        
    template<CT::Map THIS, bool REVERSE, bool SKIP>
    LoopControl BlockMap::ForEachDeepInner(
-      const CT::Block auto& part, auto&& call, Count& counter
+      const CT::Block auto& part, auto&& call, size_t& counter
    ) const {
       constexpr bool MUTABLE = CT::Mutable<THIS>;
       using B = Deref<decltype(part)>;
@@ -348,7 +348,7 @@ namespace Langulus::Annies
    ///   @param call - the function to call for each key block                
    ///   @return the number of successful executions                          
    template<bool REVERSE, CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::ForEachKeyElement(auto&& call) const {
+   size_t BlockMap::ForEachKeyElement(auto&& call) const {
       using F = Deref<decltype(call)>;
       return ForEachElement<THIS, REVERSE>(
          GetKeys<THIS>(), Forward<F>(call));
@@ -360,7 +360,7 @@ namespace Langulus::Annies
    ///   @param call - the function to call for each key block                
    ///   @return the number of successful call() executions                   
    template<bool REVERSE, CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::ForEachValueElement(auto&& call) const {
+   size_t BlockMap::ForEachValueElement(auto&& call) const {
       using F = Deref<decltype(call)>;
       return ForEachElement<THIS, REVERSE>(
          GetVals<THIS>(), Forward<F>(call));
@@ -373,12 +373,12 @@ namespace Langulus::Annies
    ///   @param call - the functions to call for each key block               
    ///   @return the number of successful call() executions                   
    template<bool REVERSE, CT::Map THIS, class...F> LANGULUS(INLINED)
-   Count BlockMap::ForEachKey(F&&...call) const {
+   size_t BlockMap::ForEachKey(F&&...call) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachKey");
       if (IsEmpty())
          return 0;
 
-      Count result = 0;
+      size_t result = 0;
       (void) (... or (Loop::NextLoop !=  
          ForEachInner<THIS, REVERSE>(GetKeys<THIS>(), Forward<F>(call), result)
       ));
@@ -392,12 +392,12 @@ namespace Langulus::Annies
    ///   @param call - the functions to call for each value block             
    ///   @return the number of successful f() executions                      
    template<bool REVERSE, CT::Map THIS, class...F> LANGULUS(INLINED)
-   Count BlockMap::ForEachValue(F&&...call) const {
+   size_t BlockMap::ForEachValue(F&&...call) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachValue");
       if (IsEmpty())
          return 0;
 
-      Count result = 0;
+      size_t result = 0;
       (void) (... or (Loop::NextLoop != 
          ForEachInner<THIS, REVERSE>(GetVals<THIS>(), Forward<F>(call), result)
       ));
@@ -410,12 +410,12 @@ namespace Langulus::Annies
    ///   @param call - the functions to call for each key block               
    ///   @return the number of successful f() executions                      
    template<bool REVERSE, bool SKIP, CT::Map THIS, class...F> LANGULUS(INLINED)
-   Count BlockMap::ForEachKeyDeep(F&&...call) const {
+   size_t BlockMap::ForEachKeyDeep(F&&...call) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachKeyDeep");
       if (IsEmpty())
          return 0;
 
-      Count result = 0;
+      size_t result = 0;
       (void) (... or (Loop::Break != 
          ForEachDeepInner<THIS, REVERSE, SKIP>(
             GetKeys<THIS>(), Forward<F>(call), result)
@@ -430,12 +430,12 @@ namespace Langulus::Annies
    ///   @param call - the functions to call for each value block             
    ///   @return the number of successful f() executions                      
    template<bool REVERSE, bool SKIP, CT::Map THIS, class...F> LANGULUS(INLINED)
-   Count BlockMap::ForEachValueDeep(F&&...call) const {
+   size_t BlockMap::ForEachValueDeep(F&&...call) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachValueDeep");
       if (IsEmpty())
          return 0;
 
-      Count result = 0;
+      size_t result = 0;
       (void) (... or (Loop::Break != 
          ForEachDeepInner<THIS, REVERSE, SKIP>(
             GetVals<THIS>(), Forward<F>(call), result)

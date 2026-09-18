@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Config.hpp"
+#include <Langulus/Utils/Byte.hpp>
 
 
 namespace Langulus
@@ -16,7 +17,7 @@ namespace Langulus
 
       /// An abstract handle                                                  
       struct Handle {
-         LANGULUS(ACT_AS) void;
+         using CTTI_ReflectAs = void;
       };
 
    } // namespace Langulus::A
@@ -38,7 +39,9 @@ namespace Langulus
 
 namespace Langulus::Annies
 {
-   
+   template<class T>
+   struct Block;
+
    ///                                                                        
    ///   An element & allocation pair                                         
    ///                                                                        
@@ -48,14 +51,14 @@ namespace Langulus::Annies
    ///                                                                        
    template<class T, bool EMBED>
    struct Handle : A::Handle {
-      LANGULUS(TYPED) T;
-      LANGULUS(ABSTRACT) false;
-      LANGULUS_BASES(A::Handle);
+      using CTTI_Typed     = T;
+      using CTTI_Abstract  = No;
+      using CTTI_Bases     = A::Handle;
 
    public:
       static_assert(CT::NotHandle<T>, "Handles can't be nested");
       static constexpr bool Embedded   = EMBED;
-      static constexpr bool TypeErased = CT::TypeErased<Decay<T>>;
+      static constexpr bool TypeErased = CT::NotVoid<Decay<T>>;
       static constexpr bool Sparse     = CT::Sparse<T>;
       static constexpr bool Dense      = not Sparse;
       static constexpr bool Mutable    = CT::Mutable<T>;
@@ -64,11 +67,11 @@ namespace Langulus::Annies
       static_assert(Embedded or not TypeErased or Sparse,
          "Can't have a type-erased local handle, unless it is sparse");
 
-      using Type = Conditional<TypeErased and Dense, Byte, T>;
+      using Type = ::std::conditional_t<TypeErased and Dense, Byte, T>;
       using AllocType = const Allocation*;
-      using ValueType = Conditional<Embedded, Type*, Type>;
-      using EntryType = Conditional<Embedded and Sparse,
-            Conditional<Mutable, AllocType*, AllocType const*>,
+      using ValueType = ::std::conditional_t<Embedded, Type*, Type>;
+      using EntryType = ::std::conditional_t<Embedded and Sparse,
+            ::std::conditional_t<Mutable, AllocType*, AllocType const*>,
             AllocType>;
 
       friend struct Block<T>;
@@ -93,7 +96,7 @@ namespace Langulus::Annies
 
       // Construct from handle                                          
       template<template<class> class S, CT::Handle H>
-      requires CT::IntentMakable<S, T>
+      requires CT::IntentConstructible<S, T>
       constexpr Handle(S<H>&&);
 
       ~Handle();
@@ -131,11 +134,11 @@ namespace Langulus::Annies
       auto operator ++ (int) const noexcept -> Handle requires Embedded;
       auto operator -- (int) const noexcept -> Handle requires Embedded;
 
-      auto operator +  (Offset) const noexcept -> Handle requires Embedded;
-      auto operator -  (Offset) const noexcept -> Handle requires Embedded;
+      auto operator +  (size_t) const noexcept -> Handle requires Embedded;
+      auto operator -  (size_t) const noexcept -> Handle requires Embedded;
 
-      auto operator += (Offset) noexcept -> Handle& requires Embedded;
-      auto operator -= (Offset) noexcept -> Handle& requires Embedded;
+      auto operator += (size_t) noexcept -> Handle& requires Embedded;
+      auto operator -= (size_t) noexcept -> Handle& requires Embedded;
    };
    
    template<CT::NotHandle T>

@@ -161,7 +161,7 @@ namespace Langulus::Annies
 
    /// Serialize the trait to anything text-based                             
    TEMPLATE() LANGULUS(INLINED)
-   Count TME()::Serialize(CT::Serial auto& to) const {
+   size_t TME()::Serialize(CT::Serial auto& to) const {
       return Trait::Serialize<TRAIT>(to);
    }
 

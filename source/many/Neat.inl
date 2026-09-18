@@ -354,7 +354,7 @@ namespace Langulus::Annies
    }
 
    ///                                                                        
-   template<Offset...IDX>
+   template<size_t...IDX>
    bool Neat::ExtractTraitInner(
       const TraitList& found, ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
@@ -362,7 +362,7 @@ namespace Langulus::Annies
    }
    
    ///                                                                        
-   template<Offset IDX>
+   template<size_t IDX>
    bool Neat::ExtractTraitInnerInner(const TraitList& found, CT::NotVoid auto& value) const {
       if (IDX >= found.GetCount())
          return false;
@@ -384,16 +384,16 @@ namespace Langulus::Annies
    ///   @param value - [out] where to save the value(s), if found            
    ///   @return the number of extracted values (always 1 if not an array)    
    LANGULUS(INLINED)
-   Count Neat::ExtractData(CT::NotVoid auto& value) const {
+   size_t Neat::ExtractData(CT::NotVoid auto& value) const {
       using D = Deref<decltype(value)>;
       if constexpr (CT::Array<D>) {
          // Fill a bounded array                                        
          auto found = GetData<Decay<D>>();
          if (found) {
-            Count scanned = 0;
+            size_t scanned = 0;
             for (auto& group : *found) {
                const auto toscan = ::std::min(ExtentOf<D> - scanned, group.GetCount());
-               for (Offset i = 0; i < toscan; ++i) {
+               for (size_t i = 0; i < toscan; ++i) {
                   //TODO can be optimized-out for POD
                   value[scanned + i] = group.template Get<Deext<D>>(i);
                }
@@ -421,16 +421,16 @@ namespace Langulus::Annies
    /// Extract any data that is convertible to D                              
    ///   @param value - [out] where to save the value, if found               
    ///   @return the number of extracted values (always 1 if not an array)    
-   inline Count Neat::ExtractDataAs(CT::NotVoid auto& value) const {
+   inline size_t Neat::ExtractDataAs(CT::NotVoid auto& value) const {
       using D = Deref<decltype(value)>;
 
       if constexpr (CT::Array<D>) {
          // Fill a bounded array                                        
-         Count scanned = 0;
+         size_t scanned = 0;
          for (auto pair : mAnythingElse) {
             for (auto& group : pair.GetValue()) {
                const auto toscan = ::std::min(ExtentOf<D> - scanned, group.GetCount());
-               for (Offset i = 0; i < toscan; ++i) {
+               for (size_t i = 0; i < toscan; ++i) {
                   //TODO can be optimized-out for POD
                   try {
                      value[scanned] = group.template AsCast<Deext<D>>(i);
@@ -526,7 +526,7 @@ namespace Langulus::Annies
    ///   @param item - the argument to unfold and insert, can have intent     
    ///   @return the number of inserted elements after unfolding              
    LANGULUS(INLINED)
-   Count Neat::UnfoldInsert(auto&& item) {
+   size_t Neat::UnfoldInsert(auto&& item) {
       using S = IntentOf<decltype(item)>;
       using T = TypeOf<S>;
 
@@ -538,7 +538,7 @@ namespace Langulus::Annies
          }
          else {
             // Unfold-insert anything else                              
-            Count inserted = 0;
+            size_t inserted = 0;
             for (auto& key : item)
                inserted += UnfoldInsert(S::Nest(key));
             return inserted;
@@ -546,7 +546,7 @@ namespace Langulus::Annies
       }
       else if constexpr (CT::Neat<T>) {
          // Insert Neat, by inserting each element from it              
-         Count inserted = 0;
+         size_t inserted = 0;
 
          DeintCast(item).ForEach([&](const Many& subitem) {
             inserted += UnfoldInsert(
@@ -563,7 +563,7 @@ namespace Langulus::Annies
          }
          else if (DeintCast(item).IsDeep()) {
             // Item is deep, flatten it                                 
-            Count inserted = 0;
+            size_t inserted = 0;
             DeintCast(item).ForEach([&](const Many& subitem) {
                inserted += UnfoldInsert(
                   S::Nest(const_cast<Many&>(subitem)));
@@ -611,8 +611,8 @@ namespace Langulus::Annies
    ///   @param key - the key and intent to add                               
    ///   @return 1 if pair was inserted, zero otherwise                       
    template<class T1, class...TN> LANGULUS(INLINED)
-   Count Neat::Insert(T1&& t1, TN&&...tn) {
-      Count inserted = 0;
+   size_t Neat::Insert(T1&& t1, TN&&...tn) {
+      size_t inserted = 0;
         inserted += UnfoldInsert(Forward<T1>(t1));
       ((inserted += UnfoldInsert(Forward<TN>(tn))), ...);
       return inserted;
@@ -681,7 +681,7 @@ namespace Langulus::Annies
    ///   @param trait - trait to set                                          
    ///   @param index - the index we're interested with if repeated           
    ///   @return a reference to this construct for chaining                   
-   Neat& Neat::SetTrait(CT::TraitBased auto&& trait, Offset index) {
+   Neat& Neat::SetTrait(CT::TraitBased auto&& trait, size_t index) {
       const auto meta = trait.GetTrait();
       auto found = mTraits.BranchOut().FindIt(meta);
 
@@ -780,7 +780,7 @@ namespace Langulus::Annies
    ///   @param index - the index we're interested in, if repeated            
    ///   @return selected data or nullptr if none was found                   
    ///   @attention if not nullptr, returned Many might contain a Neat        
-   inline auto Neat::GetTrait(TMeta meta, Offset index) const -> const Trait* {
+   inline auto Neat::GetTrait(TMeta meta, size_t index) const -> const Trait* {
       const auto found = mTraits.FindIt(meta);
       if (found and found.GetValue().GetCount() > index)
          return &(found.GetValue()[index]);
@@ -792,7 +792,7 @@ namespace Langulus::Annies
    ///   @return selected data or nullptr if none was found                   
    ///   @attention if not nullptr, returned Many might contain a Neat        
    template<CT::Trait T> LANGULUS(INLINED)
-   auto Neat::GetTrait(Offset index) const -> const Trait* {
+   auto Neat::GetTrait(size_t index) const -> const Trait* {
       return Get(MetaTraitOf<T>(), index);
    }
 
@@ -803,12 +803,12 @@ namespace Langulus::Annies
    ///   @param call - the function(s) to execute for each element            
    ///   @return the number of executions of 'call'                           
    template<bool MUTABLE> LANGULUS(INLINED)
-   Count Neat::ForEach(auto&&...call) {
+   size_t Neat::ForEach(auto&&...call) {
       static_assert(sizeof...(call) > 0, "No iterators in ForEach");
       if (IsEmpty())
          return 0;
 
-      Count result = 0;
+      size_t result = 0;
       (void) (... or (0 != (result = 
          ForEachInner<MUTABLE>(Forward<Deref<decltype(call)>>(call))
       )));
@@ -817,7 +817,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    LANGULUS(INLINED)
-   Count Neat::ForEach(auto&&...call) const {
+   size_t Neat::ForEach(auto&&...call) const {
       static_assert(sizeof...(call) > 0, "No iterators in ForEach");
       return const_cast<Neat*>(this)->template
          ForEach<false>(Forward<Deref<decltype(call)>>(call)...);
@@ -828,9 +828,9 @@ namespace Langulus::Annies
    ///   @param call - the function(s) to execute for each element            
    ///   @return the number of executions of all calls                        
    template<bool MUTABLE> LANGULUS(INLINED)
-   Count Neat::ForEachDeep(auto&&...call) {
+   size_t Neat::ForEachDeep(auto&&...call) {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachDeep");
-      Count executions = 0;
+      size_t executions = 0;
       ((executions += ForEachInner<MUTABLE>(
          Forward<Deref<decltype(call)>>(call))), ...);
       return executions;
@@ -838,7 +838,7 @@ namespace Langulus::Annies
 
    /// Neat containers are always flat, so deep iteration is same as flat one 
    LANGULUS(INLINED)
-   Count Neat::ForEachDeep(auto&&...call) const {
+   size_t Neat::ForEachDeep(auto&&...call) const {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachDeep");
       return const_cast<Neat*>(this)->template
          ForEachDeep<false>(Forward<Deref<decltype(call)>>(call)...);
@@ -852,14 +852,14 @@ namespace Langulus::Annies
    ///   @param call - the function to execute for each element               
    ///   @return the number of executions of 'call'                           
    template<bool MUTABLE, class F> LANGULUS(INLINED)
-   Count Neat::ForEachInner(F&& call) {
+   size_t Neat::ForEachInner(F&& call) {
       using A = ArgumentOf<F>;
       static_assert(CT::Slab<A> or CT::Constant<Deptr<A>> or MUTABLE,
          "Non constant iterator for constant Neat block");
 
       if constexpr (CT::Deep<A>) {
          // Iterate everything                                          
-         Count counter = 0;
+         size_t counter = 0;
          counter += ForEachTrait<MUTABLE>(call);
          counter += ForEachConstruct<MUTABLE>(call);
          counter += ForEachTail<MUTABLE>(call);
@@ -881,7 +881,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class F> LANGULUS(INLINED)
-   Count Neat::ForEachInner(F&& call) const {
+   size_t Neat::ForEachInner(F&& call) const {
       return const_cast<Neat*>(this)->template 
          ForEach<false>(Forward<F>(call));
    }
@@ -896,7 +896,7 @@ namespace Langulus::Annies
    ///      simply returning Flow::Break (or just false)                      
    ///   @return the number of executions of 'call'                           
    template<bool MUTABLE, class F>
-   Count Neat::ForEachTrait(F&& call) {
+   size_t Neat::ForEachTrait(F&& call) {
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
 
@@ -905,7 +905,7 @@ namespace Langulus::Annies
       static_assert(CT::Slab<A> or CT::Constant<A> or MUTABLE,
          "Non constant iterator for constant Neat block");
 
-      Count index = 0;
+      size_t index = 0;
       if constexpr (CT::Trait<A>) {
          // Static trait provided, extract filter                       
          using TraitType = Decay<A>;
@@ -955,7 +955,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class F> LANGULUS(INLINED)
-   Count Neat::ForEachTrait(F&& call) const {
+   size_t Neat::ForEachTrait(F&& call) const {
       return const_cast<Neat*>(this)->template
          ForEachTrait<false>(Forward<F>(call));
    }
@@ -969,7 +969,7 @@ namespace Langulus::Annies
    ///      simply returning Flow::Break (or just false)                      
    ///   @return the number of executions of 'call'                           
    template<bool MUTABLE, class F>
-   Count Neat::ForEachConstruct(F&& call) {
+   size_t Neat::ForEachConstruct(F&& call) {
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
 
@@ -979,7 +979,7 @@ namespace Langulus::Annies
          "Non constant iterator for constant Neat block");
 
       // Iterate all constructs                                         
-      Count index = 0;
+      size_t index = 0;
       for (auto group : mConstructs) {
          for (auto& data : group.GetValue()) {
             if constexpr (CT::Deep<A>) {
@@ -1009,7 +1009,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class F> LANGULUS(INLINED)
-   Count Neat::ForEachConstruct(F&& call) const {
+   size_t Neat::ForEachConstruct(F&& call) const {
       return const_cast<Neat*>(this)->template
          ForEachConstruct<false>(Forward<F>(call));
    }
@@ -1022,13 +1022,13 @@ namespace Langulus::Annies
    ///      simply returning Flow::Break (or just false)                      
    ///   @return the number of executions of 'call'                           
    template<bool MUTABLE, class F>
-   Count Neat::ForEachTail(F&& call) {
+   size_t Neat::ForEachTail(F&& call) {
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
       static_assert(CT::Slab<A> or CT::Constant<Deptr<A>> or MUTABLE,
          "Non constant iterator for constant Neat block");
 
-      Count index = 0;
+      size_t index = 0;
       if constexpr (CT::Deep<A> and CT::Typed<A>) {
          // Statically typed container provided, extract filter         
          const auto filter = MetaDataOf<Decay<TypeOf<A>>>;
@@ -1088,7 +1088,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class F> LANGULUS(INLINED)
-   Count Neat::ForEachTail(F&& call) const {
+   size_t Neat::ForEachTail(F&& call) const {
       return const_cast<Neat*>(this)->template
          ForEachTail<false>(Forward<F>(call));
    }
@@ -1099,7 +1099,7 @@ namespace Langulus::Annies
    ///      are usually produced, by pushing DMeta (disabled by default)      
    ///   @return the number of removed data entries                           
    template<CT::NotVoid T, bool EMPTY_TOO>
-   Count Neat::RemoveData() {
+   size_t Neat::RemoveData() {
       const auto filter = MetaDataOf<Decay<T>>();
       auto found = mAnythingElse.FindIt(filter);
       if (not found)
@@ -1119,7 +1119,7 @@ namespace Langulus::Annies
          found = mAnythingElse.BranchOut().FindIt(filter);
       }
 
-      Count count = 0;
+      size_t count = 0;
       for (auto data : KeepIterator(found.mValue)) {
          if (not *data)
             continue;
@@ -1138,7 +1138,7 @@ namespace Langulus::Annies
    ///   @tparam T - type of construct to remove                              
    ///   @return the number of removed constructs                             
    template<CT::NotVoid T>
-   Count Neat::RemoveConstructs() {
+   size_t Neat::RemoveConstructs() {
       const auto filter = MetaDataOf<Decay<T>>();
       auto found = mConstructs.FindIt(filter);
       if (not found)
@@ -1151,7 +1151,7 @@ namespace Langulus::Annies
          found = mConstructs.BranchOut().FindIt(filter);
       }
 
-      Count count = 0;
+      size_t count = 0;
       for (auto data : KeepIterator(*found.mValue)) {
          if (not *data)
             continue;
@@ -1171,7 +1171,7 @@ namespace Langulus::Annies
    ///      that are usually made by pushing a TMeta (disabled by default)    
    ///   @return the number of removed trait entries                          
    template<CT::Trait T, bool EMPTY_TOO>
-   Count Neat::RemoveTrait() {
+   size_t Neat::RemoveTrait() {
       const auto filter = MetaTraitOf<T>();
       const auto found = mTraits.FindIt(filter);
       if (not found)
@@ -1191,7 +1191,7 @@ namespace Langulus::Annies
          found = mTraits.BranchOut().FindIt(filter);
       }
 
-      Count count = 0;
+      size_t count = 0;
       for (auto data : KeepIterator(*found.mValue)) {
          if (not *data)
             continue;
@@ -1210,7 +1210,7 @@ namespace Langulus::Annies
    ///   @param to - the serialized container                                 
    ///   @return the number of elements written to 'to'                       
    LANGULUS(INLINED)
-   Count Neat::Serialize(CT::Serial auto& to) const {
+   size_t Neat::Serialize(CT::Serial auto& to) const {
       const auto initial = to.GetCount();
       using OUT = Deref<decltype(to)>;
 

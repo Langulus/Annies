@@ -50,12 +50,12 @@ namespace Langulus::Annies
    ///   @param meta - the definition to serialize                            
    LANGULUS(INLINED)
    Bytes::Bytes(const CT::Meta auto& meta) {
-      constexpr auto atom = sizeof(Count);
+      constexpr auto atom = sizeof(size_t);
 
       if (meta) {
          const auto token = meta->mToken;
-         const Count tokensize = static_cast<Count>(token.size());
-         const Count count = atom + tokensize;
+         const size_t tokensize = static_cast<size_t>(token.size());
+         const size_t count = atom + tokensize;
          AllocateFresh(RequestSize(count));
          mCount = count;
          CopyMemory(GetRaw(),
@@ -64,7 +64,7 @@ namespace Langulus::Annies
             reinterpret_cast<const Byte*>(token.data()), tokensize);
       }
       else {
-         const Count tokensize = 0;
+         const size_t tokensize = 0;
          AllocateFresh(RequestSize(atom));
          mCount = atom;
          CopyMemory(GetRaw(),
@@ -94,7 +94,7 @@ namespace Langulus::Annies
    ///   @param count - number of characters inside text                      
    ///   @return the byte container                                           
    template<class T> requires (CT::Sparse<Deint<T>> and CT::Byte<Decay<Deint<T>>>)
-   LANGULUS(ALWAYS_INLINED) Bytes Bytes::From(T&& text, Count count) {
+   LANGULUS(ALWAYS_INLINED) Bytes Bytes::From(T&& text, size_t count) {
       return MakeBlock<Bytes>(Forward<T>(text), count);
    }
 
@@ -173,12 +173,12 @@ namespace Langulus::Annies
    ///   @param count - the number of bytes after 'start' to remain           
    ///   @return a new container that references the original memory          
    LANGULUS(ALWAYS_INLINED)
-   Bytes Bytes::Select(Offset start, Count count) IF_UNSAFE(noexcept) {
+   Bytes Bytes::Select(size_t start, size_t count) IF_UNSAFE(noexcept) {
       return Base::Select<Bytes>(start, count);
    }
 
    LANGULUS(ALWAYS_INLINED)
-   Bytes Bytes::Select(Offset start, Count count) const IF_UNSAFE(noexcept) {
+   Bytes Bytes::Select(size_t start, size_t count) const IF_UNSAFE(noexcept) {
       return Base::Select<Bytes>(start, count);
    }
 
@@ -277,7 +277,7 @@ namespace Langulus::Annies
    ///   @param count - the number of bytes to append                         
    ///   @return the extended part                                            
    LANGULUS(ALWAYS_INLINED)
-   Bytes Bytes::Extend(Count count) {
+   Bytes Bytes::Extend(size_t count) {
       return Base::Extend<Bytes>(count);
    }
    
@@ -336,7 +336,7 @@ namespace Langulus::Annies
    /// Deserialize a byte container to a desired type                         
    ///   @tparam result - [out] data/container to deserialize into            
    ///   @return the number of parsed bytes                                   
-   Count Bytes::Deserialize(CT::NotVoid auto& result) const {
+   size_t Bytes::Deserialize(CT::NotVoid auto& result) const {
       Header header;
       return Base::DeserializeBinary<void>(result, header);
    }

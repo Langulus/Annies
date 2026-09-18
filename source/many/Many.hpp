@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../blocks/Block.hpp"
+//#include <Langulus/CT/Text.hpp>
 
 
 namespace Langulus::Annies
@@ -23,18 +24,18 @@ namespace Langulus::Annies
    /// the cost of one runtime type check, because all Many variants are      
    /// binary-compatible.                                                     
    ///                                                                        
-   class Many : public Block<> {
-      using Base = Block<>;
-      LANGULUS(POD) false;
-      LANGULUS(ACT_AS) Many;
-      LANGULUS_BASES(Base);
+   struct Many : public Block<> {
+      using Base           = Block<>;
+      using CTTI_POD       = No;
+      using CTTI_ReflectAs = Many;
+      using CTTI_Bases     = Base;
 
    protected:
 	   template<class>
 	   friend struct Block;
 	   friend struct BlockSet;
 	   friend struct BlockMap;
-	   template<CT::Data>
+	   template<CT::NotVoid>
 	   friend class THive;
 	   
 	   #if LANGULUS_DEBUG()
@@ -79,10 +80,8 @@ namespace Langulus::Annies
       static Many Future() noexcept;
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         template<CT::String...T> requires (sizeof...(T) > 0)
-         static Many Past(T&&...);
-         template<CT::String...T> requires (sizeof...(T) > 0)
-         static Many Future(T&&...);
+         static Many Past(const char*);
+         static Many Future(const char*);
       #endif
 
       #if LANGULUS(DEBUG)
@@ -99,8 +98,8 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Indexing                                                          
       ///                                                                     
-      Many Select(Offset, Count) const IF_UNSAFE(noexcept);
-      Many Select(Offset, Count)       IF_UNSAFE(noexcept);
+      Many Select(size_t, size_t) const IF_UNSAFE(noexcept);
+      Many Select(size_t, size_t)       IF_UNSAFE(noexcept);
 
       ///                                                                     
       ///   Comparison                                                        

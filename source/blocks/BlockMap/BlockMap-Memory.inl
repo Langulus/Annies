@@ -16,7 +16,7 @@ namespace Langulus::Annies
    ///   @attention does nothing if reserving less than current reserve       
    ///   @param count - number of pairs to allocate                           
    template<CT::Map THIS> LANGULUS(INLINED)
-   void BlockMap::Reserve(const Count count) {
+   void BlockMap::Reserve(const size_t count) {
       if (GetReserved()) {
          while (count > GetReserved())
             AllocateMore<THIS>();
@@ -38,11 +38,11 @@ namespace Langulus::Annies
    ///   @attention assumes count is a power-of-two                           
    ///   @param count - the new number of pairs                               
    template<CT::Map THIS> LANGULUS(INLINED)
-   void BlockMap::AllocateFresh(const Count count) {
+   void BlockMap::AllocateFresh(const size_t count) {
       LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
 
-      Offset infoOffset;
+      size_t infoOffset;
       const auto keyAndInfoSize = RequestKeyAndInfoSize<THIS>(count, infoOffset);
       mKeys.mEntry = Allocator::Allocate(mKeys.mType, keyAndInfoSize);
       LANGULUS_ASSERT(mKeys.mEntry, Allocate, "Out of memory");
@@ -71,7 +71,7 @@ namespace Langulus::Annies
    ///   @param count - the new number of pairs                               
    ///   @return true if another resize is required after this one            
    template<CT::Map THIS, bool REUSE>
-   bool BlockMap::AllocateData(const Count count) {
+   bool BlockMap::AllocateData(const size_t count) {
       LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
       LglsAssumeDev(mKeys.mType and mValues.mType,
@@ -85,7 +85,7 @@ namespace Langulus::Annies
          );
       }
 
-      Offset infoOffset;
+      size_t infoOffset;
       BlockMap old = *this;
 
       // Allocate new keys                                              

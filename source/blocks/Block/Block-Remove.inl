@@ -18,7 +18,7 @@ namespace Langulus::Annies
    ///   @param item - the item type to search for and remove                 
    ///   @return 1 if the element was found and removed, 0 otherwise          
    template<class TYPE> template<bool REVERSE> LANGULUS(INLINED)
-   Count Block<TYPE>::Remove(const CT::NoIntent auto& item) {
+   size_t Block<TYPE>::Remove(const CT::NoIntent auto& item) {
       const auto found = Find<REVERSE>(item);
       return found ? RemoveIndex(found.GetOffsetUnsafe(), 1) : 0;
    }
@@ -28,7 +28,7 @@ namespace Langulus::Annies
    ///   @param count - number of contiguous items to remove                  
    ///   @return the number of removed elements                               
    template<class TYPE>
-   Count Block<TYPE>::RemoveIndex(CT::Index auto index, const Count count) {
+   size_t Block<TYPE>::RemoveIndex(CT::Index auto index, const size_t count) {
       using INDEX = Deref<decltype(index)>;
 
       if constexpr (CT::Similar<INDEX, Index>) {
@@ -49,7 +49,7 @@ namespace Langulus::Annies
       }
       else {
          // By simple index                                             
-         Offset idx = index;
+         size_t idx = index;
          const auto ender = idx + count;
          const auto removed = ender - idx;
          LglsAssumeDev(ender <= mCount, "Out of range");
@@ -130,14 +130,14 @@ namespace Langulus::Annies
    ///   @param index - index to remove                                       
    ///   @return 1 if block at that index was removed, 0 otherwise            
    template<class TYPE>
-   Count Block<TYPE>::RemoveIndexDeep(CT::Index auto index) {
+   size_t Block<TYPE>::RemoveIndexDeep(CT::Index auto index) {
       if constexpr (not CT::Same<decltype(index), Index>) {
          if (not IsDeep())
             return 0;
 
          --index;
 
-         for (Count i = 0; i != mCount; i += 1) {
+         for (size_t i = 0; i != mCount; i += 1) {
             if (index == 0)
                return RemoveIndex(i);
 
@@ -160,7 +160,7 @@ namespace Langulus::Annies
    ///   @return an iterator pointing to the element at index - 1, or at end  
    ///      if block became empty                                             
    template<class TYPE>
-   auto Block<TYPE>::RemoveIt(const Iterator& index, const Count count) -> Iterator {
+   auto Block<TYPE>::RemoveIt(const Iterator& index, const size_t count) -> Iterator {
       if (index.mValue >= GetRawEnd())
          return end();
 
@@ -178,7 +178,7 @@ namespace Langulus::Annies
    /// Remove elements at the back                                            
    ///   @param count - the new count                                         
    template<class TYPE>
-   void Block<TYPE>::Trim(const Count count) {
+   void Block<TYPE>::Trim(const size_t count) {
       if (count >= mCount)
          return;
 
@@ -226,7 +226,7 @@ namespace Langulus::Annies
       }
 
       if (GetCount() > 1 and IsDeep()) {
-         for (Count i = 0; i < mCount; ++i) {
+         for (size_t i = 0; i < mCount; ++i) {
             auto& subBlock = GetDeep(i);
             subBlock.Optimize();
             if (subBlock.IsEmpty()) {

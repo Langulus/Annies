@@ -42,7 +42,7 @@ namespace Langulus
    ///   @param count - number of elements to copy                            
    ///   @attention count becomes bytecount, when TO is void                  
    template<class TO, class FROM> LANGULUS(INLINED)
-   void CopyMemory(TO* to, const FROM* from, const Count& count) noexcept {
+   void CopyMemory(TO* to, const FROM* from, const size_t& count) noexcept {
       static_assert(CT::Void<TO> or CT::Sparse<TO> or CT::POD<TO>,
          "TO must be either pointer, reflected as POD, or trivial "
          "(you can suppress this error by casting pointer to void*)");
@@ -88,7 +88,7 @@ namespace Langulus
    ///   @param count - number of elements to fill                            
    ///   @attention count becomes bytecount, when TO is void                  
    template<int FILLER, class TO> LANGULUS(INLINED)
-   void FillMemory(TO* to, const Count& count) noexcept {
+   void FillMemory(TO* to, const size_t& count) noexcept {
       static_assert(FILLER or CT::Nullifiable<TO> or CT::Void<TO>,
          "Filling with zeroes requires the type to be reflected as nullifiable, "
          "or be a pointer/fundamental (you can suppress this error by casting to void*)");
@@ -111,7 +111,7 @@ namespace Langulus
    ///   @param count - number of elements to fill                            
    ///   @attention count becomes bytecount, when TO is void                  
    template<class TO> LANGULUS(INLINED)
-   void ZeroMemory(TO* to, const Count& count) noexcept {
+   void ZeroMemory(TO* to, const size_t& count) noexcept {
       return FillMemory<0>(to, count);
    }
       
@@ -121,7 +121,7 @@ namespace Langulus
    ///   @param count - number of elements to fill                            
    ///   @attention count becomes bytecount, when TO is void                  
    template<class TO> LANGULUS(INLINED)
-   void ZeroMemoryOverlapped(TO* from, const TO* to, const Count& count) noexcept {
+   void ZeroMemoryOverlapped(TO* from, const TO* to, const size_t& count) noexcept {
       if (from >= to + count or from + count <= to) {
          // No overlap                                                  
          // From: [][][][][][]                                          
@@ -180,7 +180,7 @@ namespace Langulus
    ///   @param count - number of elements to move                            
    ///   @attention count becomes bytecount, when TO is void                  
    template<class TO, class FROM> LANGULUS(INLINED)
-   void MoveMemory(TO* to, const FROM* from, const Count& count) noexcept {
+   void MoveMemory(TO* to, const FROM* from, const size_t& count) noexcept {
       static_assert(CT::Void<TO> or CT::Sparse<TO> or CT::POD<TO>,
          "TO must be either pointer, reflected as POD, or trivial "
          "(You can suppress this error by casting pointer to void*)");

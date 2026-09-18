@@ -59,12 +59,12 @@ SCENARIO("Test hives", "[hive]") {
          //REQUIRE(hive.GetReusable() == nullptr);
          REQUIRE(hive.GetType() == MetaOf<Producible>());
 
-         for (Count i = 0; i < hive.GetFrames()[0].GetReserved(); ++i) {
+         for (size_t i = 0; i < hive.GetFrames()[0].GetReserved(); ++i) {
             auto v = hive.GetFrames()[0].GetRaw()[i].mData;
             REQUIRE(v.v == i + 1);
          }
 
-         for (Count i = hive.GetFrames()[0].GetReserved(); i < hive.GetFrames()[0].GetReserved() + hive.GetFrames()[1].GetReserved() - 1; ++i) {
+         for (size_t i = hive.GetFrames()[0].GetReserved(); i < hive.GetFrames()[0].GetReserved() + hive.GetFrames()[1].GetReserved() - 1; ++i) {
             auto v = hive.GetFrames()[1].GetRaw()[i - hive.GetFrames()[0].GetReserved()].mData;
             REQUIRE(v.v == i + 1);
          }

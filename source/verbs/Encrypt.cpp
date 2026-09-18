@@ -12,7 +12,7 @@ namespace Langulus::Annies
 {
    
    /// Encrypt data                                                           
-   /*Size Block::Encrypt(Block& result, const ::std::size_t* keys, const Count& key_count) const {
+   /*size_t Block::Encrypt(Block& result, const ::std::size_t* keys, const size_t& key_count) const {
       constexpr auto HS = sizeof(Hash);
 
       // First compress the data, to avoid repeating bytes              
@@ -38,7 +38,7 @@ namespace Langulus::Annies
 
       // XOR the contents                                               
       //TODO mix with a PRNG
-      for (Count i = 0; i < compressed_size / HS; ++i)
+      for (size_t i = 0; i < compressed_size / HS; ++i)
          reinterpret_cast<::std::size_t*>(result.mRaw)[i] ^= keys[i % key_count];
 
       // Done                                                           
@@ -46,7 +46,7 @@ namespace Langulus::Annies
    }
 
    /// Decrypt data                                                           
-   Size Block::Decrypt(Block& result, const ::std::size_t* keys, const Count& key_count) const {
+   size_t Block::Decrypt(Block& result, const ::std::size_t* keys, const size_t& key_count) const {
       constexpr auto HS = sizeof(Hash);
 
       // Copy this encrypted data                                       
@@ -55,7 +55,7 @@ namespace Langulus::Annies
 
       // XOR the contents to decrypt them                               
       //TODO mix with a PRNG
-      for (Count i = 0; i < mCount / HS; ++i)
+      for (size_t i = 0; i < mCount / HS; ++i)
          reinterpret_cast<::std::size_t*>(decrypted.mRaw)[i] ^= keys[i % key_count];
 
       // Get the hash part                                              

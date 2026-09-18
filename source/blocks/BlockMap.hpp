@@ -20,19 +20,19 @@ namespace Langulus
       /// It defines the size for CT::Map concept                             
       ///                                                                     
       struct BlockMap {
-         LANGULUS(ABSTRACT) true;
-         LANGULUS(POD) true;
+         using CTTI_Abstract = Yup;
+         using CTTI_POD = Yup;
 
          using InfoType = ::std::uint8_t;
-         using OrderType = Offset;
+         using OrderType = size_t;
 
          static constexpr bool CTTI_Container = true;
          static constexpr bool Sequential = false;
-         static constexpr Offset InvalidOffset = -1;
+         static constexpr size_t InvalidOffset = -1;
 
          // Smallest possible table size                                
          // Has to be a power-of-two                                    
-         static constexpr Count MinimalAllocation = 8;
+         static constexpr size_t MinimalAllocation = 8;
 
          // How many consecutive cells can be dedicated to a single     
          // hash. The bigger the number, the more serial compares may   
@@ -54,7 +54,7 @@ namespace Langulus
          Annies::Block<> mKeys;
 
          // The block that contains the values                          
-         // Count and reserve in this block are redundant and shouldn't 
+         // size_t and reserve in this block are redundant and shouldn't 
          // be used for any purpose. The benefit is, that we can access 
          // the values block without any cost via pointer arithmetic,   
          // instead of generating Block instances at runtime            
@@ -115,8 +115,7 @@ namespace Langulus::Annies
    /// 'const' qualifier doesn't seem like a sound design decision in my book 
    ///                                                                        
    struct BlockMap : A::BlockMap {
-      LANGULUS(ABSTRACT) false;
-
+      using CTTI_Abstract = No;
       using Key = void;
       using Value = void;
       using Pair = Annies::Pair;
@@ -186,18 +185,18 @@ namespace Langulus::Annies
       constexpr bool IsValueDense() const noexcept;
 
       template<CT::Map = UnorderedMap>
-      constexpr Size GetKeyStride() const noexcept;
+      constexpr size_t GetKeyStride() const noexcept;
       template<CT::Map = UnorderedMap>
-      constexpr Size GetValueStride() const noexcept;
+      constexpr size_t GetValueStride() const noexcept;
 
       template<CT::Map = UnorderedMap>
-      Count GetKeyCountDeep() const noexcept;
+      size_t GetKeyCountDeep() const noexcept;
       template<CT::Map = UnorderedMap>
-      Count GetKeyCountElementsDeep() const noexcept;
+      size_t GetKeyCountElementsDeep() const noexcept;
       template<CT::Map = UnorderedMap>
-      Count GetValueCountDeep() const noexcept;
+      size_t GetValueCountDeep() const noexcept;
       template<CT::Map = UnorderedMap>
-      Count GetValueCountElementsDeep() const noexcept;
+      size_t GetValueCountElementsDeep() const noexcept;
 
       constexpr auto GetKeyState() const noexcept -> DataState;
       constexpr auto GetValueState() const noexcept -> DataState;
@@ -207,8 +206,8 @@ namespace Langulus::Annies
       constexpr bool IsValueEncrypted() const noexcept;
       constexpr bool IsKeyConstant() const noexcept;
       constexpr bool IsValueConstant() const noexcept;
-      constexpr auto GetCount() const noexcept -> Count;
-      constexpr auto GetReserved() const noexcept -> Count;
+      constexpr auto GetCount() const noexcept -> size_t;
+      constexpr auto GetReserved() const noexcept -> size_t;
       constexpr bool IsEmpty() const noexcept;
       constexpr bool IsValid() const noexcept;
       constexpr bool IsInvalid() const noexcept;
@@ -247,8 +246,8 @@ namespace Langulus::Annies
       auto GetInfoEnd() const noexcept -> const InfoType*;
 
    protected:
-      Count GetCountDeep(const CT::Block auto&) const noexcept;
-      Count GetCountElementsDeep(const CT::Block auto&) const noexcept;
+      size_t GetCountDeep(const CT::Block auto&) const noexcept;
+      size_t GetCountElementsDeep(const CT::Block auto&) const noexcept;
 
    public:
       ///                                                                     
@@ -269,39 +268,39 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Map, CT::Index INDEX>
-      Offset SimplifyIndex(INDEX) const
-      noexcept(not LANGULUS_SAFE() and CT::BuiltinInteger<INDEX>);
+      size_t SimplifyIndex(INDEX) const
+      noexcept(not LANGULUS_SAFE() and CT::Integer<INDEX>);
 
       template<CT::Map>
-      Offset GetBucket(Offset, const CT::NoIntent auto&) const IF_UNSAFE(noexcept);
-      Offset GetBucketUnknown(Offset, const Block<>&)    const IF_UNSAFE(noexcept);
+      size_t GetBucket(size_t, const CT::NoIntent auto&) const IF_UNSAFE(noexcept);
+      size_t GetBucketUnknown(size_t, const Block<>&)    const IF_UNSAFE(noexcept);
 
       template<CT::Map>
-      decltype(auto) GetRawKey(Offset) const IF_UNSAFE(noexcept);
+      decltype(auto) GetRawKey(size_t) const IF_UNSAFE(noexcept);
       template<CT::Map>
-      decltype(auto) GetRawKey(Offset)       IF_UNSAFE(noexcept);
+      decltype(auto) GetRawKey(size_t)       IF_UNSAFE(noexcept);
       template<CT::Map>
-      decltype(auto) GetKeyRef(Offset) const IF_UNSAFE(noexcept);
+      decltype(auto) GetKeyRef(size_t) const IF_UNSAFE(noexcept);
       template<CT::Map>
-      decltype(auto) GetKeyRef(Offset)       IF_UNSAFE(noexcept);
+      decltype(auto) GetKeyRef(size_t)       IF_UNSAFE(noexcept);
 
       template<CT::Map>
-      decltype(auto) GetRawVal(Offset) const IF_UNSAFE(noexcept);
+      decltype(auto) GetRawVal(size_t) const IF_UNSAFE(noexcept);
       template<CT::Map>
-      decltype(auto) GetRawVal(Offset)       IF_UNSAFE(noexcept);
+      decltype(auto) GetRawVal(size_t)       IF_UNSAFE(noexcept);
       template<CT::Map>
-      decltype(auto) GetValRef(Offset) const IF_UNSAFE(noexcept);
+      decltype(auto) GetValRef(size_t) const IF_UNSAFE(noexcept);
       template<CT::Map>
-      decltype(auto) GetValRef(Offset)       IF_UNSAFE(noexcept);
+      decltype(auto) GetValRef(size_t)       IF_UNSAFE(noexcept);
 
       template<CT::Map>
-      auto GetKeyHandle(Offset)       IF_UNSAFE(noexcept);
+      auto GetKeyHandle(size_t)       IF_UNSAFE(noexcept);
       template<CT::Map>
-      auto GetKeyHandle(Offset) const IF_UNSAFE(noexcept);
+      auto GetKeyHandle(size_t) const IF_UNSAFE(noexcept);
       template<CT::Map>
-      auto GetValHandle(Offset)       IF_UNSAFE(noexcept);
+      auto GetValHandle(size_t)       IF_UNSAFE(noexcept);
       template<CT::Map>
-      auto GetValHandle(Offset) const IF_UNSAFE(noexcept);
+      auto GetValHandle(size_t) const IF_UNSAFE(noexcept);
 
    public:
       ///                                                                     
@@ -323,66 +322,66 @@ namespace Langulus::Annies
       constexpr A::IteratorEnd end() const noexcept { return {}; }
 
       template<bool REVERSE = false, CT::Map>
-      Count ForEach(auto&&) const;
+      size_t ForEach(auto&&) const;
 
       template<bool REVERSE = false, CT::Map>
-      Count ForEachKeyElement(auto&&) const;
+      size_t ForEachKeyElement(auto&&) const;
 
       template<bool REVERSE = false, CT::Map>
-      Count ForEachValueElement(auto&&) const;
+      size_t ForEachValueElement(auto&&) const;
 
       template<bool REVERSE = false, CT::Map>
-      Count ForEachKey(auto&&...) const;
+      size_t ForEachKey(auto&&...) const;
 
       template<bool REVERSE = false, CT::Map>
-      Count ForEachValue(auto&&...) const;
+      size_t ForEachValue(auto&&...) const;
    
       template<bool REVERSE = false, bool SKIP = true, CT::Map>
-      Count ForEachKeyDeep(auto&&...) const;
+      size_t ForEachKeyDeep(auto&&...) const;
 
       template<bool REVERSE = false, bool SKIP = true, CT::Map>
-      Count ForEachValueDeep(auto&&...) const;
+      size_t ForEachValueDeep(auto&&...) const;
 
    protected:
       template<CT::Map, bool REVERSE>
-      LoopControl ForEachElementInner(const CT::Block auto&, auto&&, Count&) const;
+      LoopControl ForEachElementInner(const CT::Block auto&, auto&&, size_t&) const;
 
       template<CT::Map, bool REVERSE>
-      LoopControl ForEachInner(const CT::Block auto&, auto&&, Count&) const;
+      LoopControl ForEachInner(const CT::Block auto&, auto&&, size_t&) const;
 
       template<CT::Map, bool REVERSE, bool SKIP>
-      LoopControl ForEachDeepInner(const CT::Block auto&, auto&&, Count&) const;
+      LoopControl ForEachDeepInner(const CT::Block auto&, auto&&, size_t&) const;
 
    public:
       ///                                                                     
       ///   RTTI                                                              
       ///                                                                     
-      template<CT::Map THIS, CT::Data, CT::NotVoid...>
+      template<CT::Map THIS, CT::NotVoid, CT::NotVoid...>
       constexpr bool IsKey() const noexcept;
       template<CT::Map THIS>
       bool IsKey(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::NotVoid...>
+      template<CT::Map THIS, CT::NotVoid, CT::NotVoid...>
       constexpr bool IsKeySimilar() const noexcept;
       template<CT::Map THIS>
       bool IsKeySimilar(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::NotVoid...>
+      template<CT::Map THIS, CT::NotVoid, CT::NotVoid...>
       constexpr bool IsKeyExact() const noexcept;
       template<CT::Map THIS>
       bool IsKeyExact(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::NotVoid...>
+      template<CT::Map THIS, CT::NotVoid, CT::NotVoid...>
       constexpr bool IsValue() const noexcept;
       template<CT::Map THIS>
       bool IsValue(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::NotVoid...>
+      template<CT::Map THIS, CT::NotVoid, CT::NotVoid...>
       constexpr bool IsValueSimilar() const noexcept;
       template<CT::Map THIS>
       bool IsValueSimilar(DMeta) const noexcept;
 
-      template<CT::Map THIS, CT::Data, CT::NotVoid...>
+      template<CT::Map THIS, CT::NotVoid, CT::NotVoid...>
       constexpr bool IsValueExact() const noexcept;
       template<CT::Map THIS>
       bool IsValueExact(DMeta) const noexcept;
@@ -436,23 +435,23 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Map>
-      Offset FindInner(const CT::NoIntent auto&) const;
+      size_t FindInner(const CT::NoIntent auto&) const;
       template<CT::Map>
-      Offset FindBlockInner(const Block<>&) const;
+      size_t FindBlockInner(const Block<>&) const;
 
    public:
       ///                                                                     
       ///   Memory management                                                 
       ///                                                                     
       template<CT::Map>
-      void Reserve(Count);
+      void Reserve(size_t);
 
    protected:
       /// @cond show_protected                                                
       template<CT::Map>
-      void AllocateFresh(Count);
+      void AllocateFresh(size_t);
       template<CT::Map, bool REUSE>
-      bool AllocateData(Count);
+      bool AllocateData(size_t);
       template<CT::Map>
       void AllocateMore();
 
@@ -467,14 +466,14 @@ namespace Langulus::Annies
       ///   Insertion                                                         
       ///                                                                     
       template<CT::Map>
-      Count Insert(auto&&, auto&&);
+      size_t Insert(auto&&, auto&&);
 
       template<CT::Map, class T1, class T2>
       requires CT::Block<Deint<T1>, Deint<T2>>
-      Count InsertBlock(T1&&, T2&&);
+      size_t InsertBlock(T1&&, T2&&);
 
       template<CT::Map, class T1, class...TAIL>
-      Count InsertPair(T1&&, TAIL&&...);
+      size_t InsertPair(T1&&, TAIL&&...);
 
    protected:
       template<CT::Map>
@@ -483,39 +482,39 @@ namespace Langulus::Annies
       auto CreateValHandle(auto&&);
 
       template<CT::Map>
-      Size RequestKeyAndInfoSize(Count, Offset&) const IF_UNSAFE(noexcept);
-      Size RequestValuesSize(Count) const IF_UNSAFE(noexcept);
+      size_t RequestKeyAndInfoSize(size_t, size_t&) const IF_UNSAFE(noexcept);
+      size_t RequestValuesSize(size_t) const IF_UNSAFE(noexcept);
       
       template<CT::Map, class KEY_SOURCE, class VAL_SOURCE>
-      bool Rehash(const InfoType* oldInfo, Count oldCount, KEY_SOURCE&, VAL_SOURCE&);
+      bool Rehash(const InfoType* oldInfo, size_t oldCount, KEY_SOURCE&, VAL_SOURCE&);
 
       template<CT::Map>
       void ShiftPairs();
 
       template<CT::Map, bool CHECK_FOR_MATCH>
-      Offset InsertInner(Offset, auto&&, auto&&);
+      size_t InsertInner(size_t, auto&&, auto&&);
 
       template<CT::Map, bool CHECK_FOR_MATCH, template<class> class S1, template<class> class S2, CT::Block T>
       requires CT::Intent<S1<T>, S2<T>>
-      Offset InsertBlockInner(Offset, S1<T>&&, S2<T>&&);
+      size_t InsertBlockInner(size_t, S1<T>&&, S2<T>&&);
 
       template<CT::Map, bool CHECK_FOR_MATCH, template<class> class S, CT::Pair T>
       requires CT::Intent<S<T>>
-      Count InsertPairInner(Count, S<T>&&);
+      size_t InsertPairInner(size_t, S<T>&&);
 
       template<CT::Map>
-      Count UnfoldInsert(auto&&);
+      size_t UnfoldInsert(auto&&);
 
    public:
       ///                                                                     
       ///   Removal                                                           
       ///                                                                     
       template<CT::Map>
-      Count RemoveKey(const CT::NoIntent auto&);
+      size_t RemoveKey(const CT::NoIntent auto&);
       template<CT::Map>
-      Count RemoveValue(const CT::NoIntent auto&);
+      size_t RemoveValue(const CT::NoIntent auto&);
       template<CT::Map>
-      Count RemovePair(const CT::Pair auto&);
+      size_t RemovePair(const CT::Pair auto&);
       template<CT::Map THIS>
       auto RemoveIt(const Iterator<THIS>&) -> Iterator<THIS>;
 
@@ -528,14 +527,14 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Map>
-      Count RemoveKeyInner(const CT::NoIntent auto&);
+      size_t RemoveKeyInner(const CT::NoIntent auto&);
       template<CT::Map>
-      Count RemoveValInner(const CT::NoIntent auto&);
+      size_t RemoveValInner(const CT::NoIntent auto&);
       template<CT::Map>
-      Count RemovePairInner(const CT::Pair auto&);
+      size_t RemovePairInner(const CT::Pair auto&);
 
       template<CT::Map>
-      void RemoveInner(Offset);
+      void RemoveInner(size_t);
 
    #if LANGULUS(TESTING)
       public: constexpr const void* GetRawKeysMemory() const noexcept;
@@ -555,12 +554,12 @@ namespace Langulus::Annies
       // Key type is always constant, because changing it will mean     
       // rehashing the entire table, so we forbid it while iterating    
       using Key   = const typename MAP::Key;
-      using Value = Conditional<Mutable, typename MAP::Value,
+      using Value = std::conditional_t<Mutable, typename MAP::Value,
                                          const typename MAP::Value>;
-      using Pair  = Conditional<Mutable, typename MAP::PairRef,
+      using Pair  = std::conditional_t<Mutable, typename MAP::PairRef,
                                          typename MAP::PairConstRef>;
-      using KA = Conditional<CT::TypeErased<Key>,   Block<>, Key*>;
-      using VA = Conditional<CT::TypeErased<Value>, Block<>, Value*>;
+      using KA = std::conditional_t<CT::TypeErased<Key>,   Block<>, Key*>;
+      using VA = std::conditional_t<CT::TypeErased<Value>, Block<>, Value*>;
 
       LANGULUS(ABSTRACT) false;
       LANGULUS(TYPED)    Pair;

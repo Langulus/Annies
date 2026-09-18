@@ -19,13 +19,13 @@ namespace Langulus::Annies
    ///   @param byteOffset - number of bytes to add                           
    ///   @return pointer to the selected raw data offset                      
    template<class TYPE> LANGULUS(ALWAYS_INLINED) IF_UNSAFE(constexpr)
-   Byte* Block<TYPE>::At(const Offset byteOffset) IF_UNSAFE(noexcept) {
+   Byte* Block<TYPE>::At(const size_t byteOffset) IF_UNSAFE(noexcept) {
       LglsAssumeDev(mRaw, "Invalid memory");
       return mRaw + byteOffset;
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED) IF_UNSAFE(constexpr)
-   const Byte* Block<TYPE>::At(Offset byte_offset) const IF_UNSAFE(noexcept) {
+   const Byte* Block<TYPE>::At(size_t byte_offset) const IF_UNSAFE(noexcept) {
       return const_cast<Block*>(this)->At(byte_offset);
    }
 
@@ -61,7 +61,7 @@ namespace Langulus::Annies
    ///   @param baseOffset - byte offset from the element to apply            
    ///   @return either pointer or reference to the element (depends on T)    
    template<class TYPE> template<CT::NotVoid T> LANGULUS(INLINED) IF_UNSAFE(constexpr)
-   decltype(auto) Block<TYPE>::Get(Offset idx) IF_UNSAFE(noexcept) {
+   decltype(auto) Block<TYPE>::Get(size_t idx) IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
          LglsAssumeDev(mType, "Block is not typed");
          Byte* pointer;
@@ -92,7 +92,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> template<CT::NotVoid T> LANGULUS(INLINED) IF_UNSAFE(constexpr)
-   decltype(auto) Block<TYPE>::Get(Offset idx) const IF_UNSAFE(noexcept) {
+   decltype(auto) Block<TYPE>::Get(size_t idx) const IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
          LglsAssumeDev(mType, "Block is not typed");
          const Byte* pointer;
@@ -125,7 +125,7 @@ namespace Langulus::Annies
    /// A safe (only in safe-mode!) way to get Nth deep entry                  
    /// Will utilize any staticly typed deep containers, if available          
    template<class TYPE> LANGULUS(INLINED) IF_UNSAFE(constexpr)
-   decltype(auto) Block<TYPE>::GetDeep(Offset idx) IF_UNSAFE(noexcept) {
+   decltype(auto) Block<TYPE>::GetDeep(size_t idx) IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
          LglsAssumeDev(IsDeep(), "Block is not deep");
          return Get<Block<>>(idx);
@@ -137,7 +137,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> LANGULUS(INLINED) IF_UNSAFE(constexpr)
-   decltype(auto) Block<TYPE>::GetDeep(Offset idx) const IF_UNSAFE(noexcept) {
+   decltype(auto) Block<TYPE>::GetDeep(size_t idx) const IF_UNSAFE(noexcept) {
       if constexpr (TypeErased) {
          LglsAssumeDev(IsDeep(), "Block is not deep");
          return Get<Block<>>(idx);
@@ -287,7 +287,7 @@ namespace Langulus::Annies
    ///   @return the block representing the region                            
    template<class TYPE> template<CT::Block THIS>
    LANGULUS(INLINED) IF_UNSAFE(constexpr)
-   THIS Block<TYPE>::Select(Offset start, Count count) IF_UNSAFE(noexcept) {
+   THIS Block<TYPE>::Select(size_t start, size_t count) IF_UNSAFE(noexcept) {
       LglsAssumeDev(start + count <= mCount, "Out of limits");
 
       if (count == 0) {
@@ -309,7 +309,7 @@ namespace Langulus::Annies
    ///   @return the block representing the region                            
    template<class TYPE> template<CT::Block THIS>
    LANGULUS(ALWAYS_INLINED) IF_UNSAFE(constexpr)
-   THIS Block<TYPE>::Select(Offset start, Count count) const IF_UNSAFE(noexcept) {
+   THIS Block<TYPE>::Select(size_t start, size_t count) const IF_UNSAFE(noexcept) {
       auto result = const_cast<Block*>(this)->template Select<THIS>(start, count);
       result.MakeConst();
       return result;
@@ -320,13 +320,13 @@ namespace Langulus::Annies
    ///   @tparam COUNT - number of indirections to remove                     
    ///   @param index - index of the element inside the block                 
    ///   @return the dense mutable memory block for the element               
-   template<class TYPE> template<Count COUNT> LANGULUS(ALWAYS_INLINED)
-   Block<> Block<TYPE>::GetElementDense(Offset index) {
+   template<class TYPE> template<size_t COUNT> LANGULUS(ALWAYS_INLINED)
+   Block<> Block<TYPE>::GetElementDense(size_t index) {
       return GetElement(index).template GetDense<COUNT>();
    }
 
-   template<class TYPE> template<Count COUNT> LANGULUS(ALWAYS_INLINED)
-   Block<> Block<TYPE>::GetElementDense(Offset index) const {
+   template<class TYPE> template<size_t COUNT> LANGULUS(ALWAYS_INLINED)
+   Block<> Block<TYPE>::GetElementDense(size_t index) const {
       auto result = GetElement(index).template GetDense<COUNT>();
       result.MakeConst();
       return result;
@@ -337,12 +337,12 @@ namespace Langulus::Annies
    ///   @param index - index of the element inside the block                 
    ///   @return the dense resolved memory block for the element              
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   Block<> Block<TYPE>::GetElementResolved(Offset index) {
+   Block<> Block<TYPE>::GetElementResolved(size_t index) {
       return GetElement(index).GetResolved();
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   Block<> Block<TYPE>::GetElementResolved(Offset index) const {
+   Block<> Block<TYPE>::GetElementResolved(size_t index) const {
       auto result = GetElement(index).GetResolved();
       result.MakeConst();
       return result;
@@ -353,7 +353,7 @@ namespace Langulus::Annies
    ///   @param index - the element's index                                   
    ///   @return the element's block                                          
    template<class TYPE> LANGULUS(INLINED)
-   Block<> Block<TYPE>::GetElement(Offset index) IF_UNSAFE(noexcept) {
+   Block<> Block<TYPE>::GetElement(size_t index) IF_UNSAFE(noexcept) {
       LglsAssumeDev(index < mReserved, "Index out of range");
       Block result = GetElementInner(index);
       result.mState -= DataState::Or;
@@ -361,7 +361,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   Block<> Block<TYPE>::GetElement(Offset index) const IF_UNSAFE(noexcept) {
+   Block<> Block<TYPE>::GetElement(size_t index) const IF_UNSAFE(noexcept) {
       auto result = const_cast<Block*>(this)->GetElement(index);
       result.MakeConst();
       return result;
@@ -372,7 +372,7 @@ namespace Langulus::Annies
    ///   @param index - the element's index                                   
    ///   @return the element's block                                          
    template<class TYPE> LANGULUS(INLINED)
-   Block<> Block<TYPE>::GetElementInner(Offset index) IF_UNSAFE(noexcept) {
+   Block<> Block<TYPE>::GetElementInner(size_t index) IF_UNSAFE(noexcept) {
       LglsAssumeDev(mRaw, "Invalid memory");
       Block result {*this};
       result.mCount = 1;
@@ -381,7 +381,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   Block<> Block<TYPE>::GetElementInner(Offset index) const IF_UNSAFE(noexcept) {
+   Block<> Block<TYPE>::GetElementInner(size_t index) const IF_UNSAFE(noexcept) {
       return const_cast<Block*>(this)->GetElementInner(index);
    }
 
@@ -394,7 +394,7 @@ namespace Langulus::Annies
    ///      ... and so on ...                                                 
    ///   @return a pointer to the block or nullptr if index is invalid        
    template<class TYPE>
-   Block<>* Block<TYPE>::GetBlockDeep(Count index) noexcept {
+   Block<>* Block<TYPE>::GetBlockDeep(size_t index) noexcept {
       // Zero index always returns this                                 
       if (index == 0)
          return this;
@@ -425,7 +425,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   const Block<>* Block<TYPE>::GetBlockDeep(Count index) const noexcept {
+   const Block<>* Block<TYPE>::GetBlockDeep(size_t index) const noexcept {
       return const_cast<Block*>(this)->GetBlockDeep(index);
    }
 
@@ -433,7 +433,7 @@ namespace Langulus::Annies
    ///   @param index - the index to get                                      
    ///   @return the element block                                            
    template<class TYPE>
-   Block<> Block<TYPE>::GetElementDeep(Count index) noexcept {
+   Block<> Block<TYPE>::GetElementDeep(size_t index) noexcept {
       if (not IsDeep())
          return index < mCount ? GetElement(index) : Block<> {};
 
@@ -452,7 +452,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   Block<> Block<TYPE>::GetElementDeep(Count index) const noexcept {
+   Block<> Block<TYPE>::GetElementDeep(size_t index) const noexcept {
       auto result = const_cast<Block*>(this)->GetElementDeep(index);
       result.MakeConst();
       return result;
@@ -484,7 +484,7 @@ namespace Langulus::Annies
    ///   @attention assumes this block is valid and has exactly one element   
    ///   @tparam COUNT - how many levels of indirection to remove?            
    ///   @return the mutable denser first element                             
-   template<class TYPE> template<Count COUNT> LANGULUS(INLINED)
+   template<class TYPE> template<size_t COUNT> LANGULUS(INLINED)
    Block<> Block<TYPE>::GetDense() {
       static_assert(COUNT > 0, "COUNT must be greater than 0");
       LglsAssumeDev(IsTyped(),  "Block is not typed");
@@ -508,7 +508,7 @@ namespace Langulus::Annies
       }
       else if (copy.mType->mIsSparse) {
          // Dereference as much as needed at runtime                    
-         Count counter = COUNT;
+         size_t counter = COUNT;
          if (mEntry)
             copy.mEntry = *GetEntries();
 
@@ -527,7 +527,7 @@ namespace Langulus::Annies
       return copy;
    }
 
-   template<class TYPE> template<Count COUNT> LANGULUS(ALWAYS_INLINED)
+   template<class TYPE> template<size_t COUNT> LANGULUS(ALWAYS_INLINED)
    Block<> Block<TYPE>::GetDense() const {
       auto result = const_cast<Block*>(this)->template GetDense<COUNT>();
       result.MakeConst();
@@ -606,7 +606,7 @@ namespace Langulus::Annies
    ///   @param source - container to gather from, type acts as filter        
    ///   @return the number of gathered elements                              
    template<class TYPE> template<bool REVERSE> LANGULUS(INLINED)
-   Count Block<TYPE>::GatherFrom(const CT::Block auto& source) {
+   size_t Block<TYPE>::GatherFrom(const CT::Block auto& source) {
       return source.template GatherInner<REVERSE>(*this);
    }
 
@@ -616,7 +616,7 @@ namespace Langulus::Annies
    ///   @param state - state filter                                          
    ///   @return the number of gathered elements                              
    template<class TYPE> template<bool REVERSE> LANGULUS(INLINED)
-   Count Block<TYPE>::GatherFrom(const CT::Block auto& source, DataState state) {
+   size_t Block<TYPE>::GatherFrom(const CT::Block auto& source, DataState state) {
       return source.template GatherPolarInner<REVERSE>(GetType(), *this, state);
    }
 
@@ -655,7 +655,7 @@ namespace Langulus::Annies
    ///   @param count - [out] count the number of repeats for the mode        
    ///   @return the index of the first found mode                            
    template<class TYPE>
-   Index Block<TYPE>::GetIndexMode(Count& count) const IF_UNSAFE(noexcept) {
+   Index Block<TYPE>::GetIndexMode(size_t& count) const IF_UNSAFE(noexcept) {
       if constexpr (not TypeErased and CT::Comparable<TYPE, TYPE>) {
          if (IsEmpty()) {
             count = 0;
@@ -665,9 +665,9 @@ namespace Langulus::Annies
          auto data = GetRaw();
          const auto dataEnd = data + mCount;
          decltype(data) best = nullptr;
-         Count best_count = 0;
+         size_t best_count = 0;
          while (data != dataEnd) {
-            Count counter = 0;
+            size_t counter = 0;
             auto tail = data;
             while (tail != dataEnd) {
                if (*data == *tail)
@@ -699,7 +699,7 @@ namespace Langulus::Annies
    ///   @param index - the element index                                     
    ///   @return the handle                                                   
    template<class TYPE> template<class T1> LANGULUS(INLINED)
-   auto Block<TYPE>::GetHandle(const Offset index) IF_UNSAFE(noexcept) {
+   auto Block<TYPE>::GetHandle(const size_t index) IF_UNSAFE(noexcept) {
       using T = Decvq<Conditional<CT::Handle<T1>, TypeOf<T1>, T1>>;
 
       if constexpr (not TypeErased) {
@@ -728,7 +728,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> template<class T1> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::GetHandle(const Offset index) const IF_UNSAFE(noexcept) {
+   auto Block<TYPE>::GetHandle(const size_t index) const IF_UNSAFE(noexcept) {
       return const_cast<Block*>(this)->template GetHandle<T1>(index).MakeConst();
    }
 
@@ -739,7 +739,7 @@ namespace Langulus::Annies
    ///   @param count - number of elements                                    
    ///   @return the block representing the region                            
    template<class TYPE> LANGULUS(INLINED)
-   Block<TYPE> Block<TYPE>::CropInner(const Offset start, const Count count)
+   Block<TYPE> Block<TYPE>::CropInner(const size_t start, const size_t count)
    const IF_UNSAFE(noexcept) {
       LglsAssumeDev(mRaw,
          "Block is not allocated");
@@ -763,7 +763,7 @@ namespace Langulus::Annies
       else if (result == IndexSmallest)
          return GetIndex<IndexSmallest>();
       else if (result == IndexMode) {
-         [[maybe_unused]] Count unused;
+         [[maybe_unused]] size_t unused;
          return GetIndexMode(unused);
       }
 
@@ -778,7 +778,7 @@ namespace Langulus::Annies
    ///   @param index - the index to simplify                                 
    ///   @return the simplified index, as a simple offset                     
    template<class TYPE> template<bool SAFE, CT::Index INDEX> LANGULUS(INLINED)
-   Offset Block<TYPE>::SimplifyIndex(const INDEX index) const
+   size_t Block<TYPE>::SimplifyIndex(const INDEX index) const
    noexcept(not LANGULUS_SAFE() and CT::BuiltinInteger<INDEX>) {
       if constexpr (CT::Same<INDEX, Index>) {
          // This is the most safe path, throws on errors                

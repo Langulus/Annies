@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include <Langulus/Core.hpp>
+#include <type_traits>
 
 
 namespace Langulus::Annies
@@ -36,7 +37,7 @@ namespace Langulus::Annies
          Lower = 4
       };
 
-      using Type = TypeOf<Enum>;
+      using Type = ::std::underlying_type_t<Enum>;
 
       Type mResult {Unknown};
 

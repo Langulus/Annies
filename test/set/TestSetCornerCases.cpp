@@ -35,7 +35,7 @@ TEMPLATE_TEST_CASE("Set corner cases", "[set]",
       T set {keys};
 
       WHEN("Removing around-the-end elements by value (corner case)") {
-         Count removed = 0;
+         size_t removed = 0;
          removed += set.Remove("VulkanRenderer");
          removed += set.Remove("VulkanCamera");
          removed += set.Remove("Vulkan");

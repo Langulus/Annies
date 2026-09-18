@@ -22,7 +22,7 @@ namespace Langulus::Annies
    ///   @param out - what are we converting to?                              
    ///   @return the number of converted elements inserted in 'out'           
    template<class TYPE>
-   Count Block<TYPE>::Convert(CT::Block auto& out) const {
+   size_t Block<TYPE>::Convert(CT::Block auto& out) const {
       if (IsEmpty())
          return 0;
 
@@ -86,7 +86,7 @@ namespace Langulus::Annies
                auto temp = coalesced.GetRaw();
                auto to = out.GetHandle(0);
 
-               for (Count i = 0; i < mCount; ++i) {
+               for (size_t i = 0; i < mCount; ++i) {
                   auto from = GetElementDense<CountMax>(i);
                   converter(from.mRaw, temp);
                   to.Assign(temp, coalesced.mEntry);
@@ -100,7 +100,7 @@ namespace Langulus::Annies
             else {
                // We're converting to dense container                   
                auto to = out.mRaw;
-               for (Count i = 0; i < mCount; ++i) {
+               for (size_t i = 0; i < mCount; ++i) {
                   // Construct each element                             
                   auto from = GetElementDense<CountMax>(i);
                   converter(from.mRaw, to);
@@ -120,7 +120,7 @@ namespace Langulus::Annies
                auto temp = coalesced.GetElementInner();
                auto to = out.template GetHandle<void*>(0);
 
-               for (Count i = 0; i < mCount; ++i) {
+               for (size_t i = 0; i < mCount; ++i) {
                   auto from = GetElementDense<CountMax>(i);
                   converter(from.mRaw, temp.mRaw);
                   to.Assign(temp.mRaw, coalesced.mEntry);
@@ -134,7 +134,7 @@ namespace Langulus::Annies
             else {
                // We're converting to dense container                   
                auto to = out.mRaw;
-               for (Count i = 0; i < mCount; ++i) {
+               for (size_t i = 0; i < mCount; ++i) {
                   // Construct each element                             
                   auto from = GetElementDense<CountMax>(i);
                   converter(from.mRaw, to);
@@ -152,7 +152,7 @@ namespace Langulus::Annies
    ///   @param out - the resulting serialized data                           
    ///   @return the number of bytes/chars written to 'out'                   
    template<class TYPE>
-   Count Block<TYPE>::Serialize(CT::Serial auto& out) const {
+   size_t Block<TYPE>::Serialize(CT::Serial auto& out) const {
       using OUT = Deref<decltype(out)>;
       if constexpr (CT::Bytes<OUT>)
          return SerializeToBinary<void>(out);
@@ -166,7 +166,7 @@ namespace Langulus::Annies
    ///   @param to - [out] the serialized data goes here                      
    ///   @return the number of written characters                             
    template<class TYPE> template<class NEXT>
-   Count Block<TYPE>::SerializeToText(CT::Serial auto& to) const {
+   size_t Block<TYPE>::SerializeToText(CT::Serial auto& to) const {
       using OUT = Deref<decltype(to)>;
       const auto initial = to.GetCount();
 
@@ -181,7 +181,7 @@ namespace Langulus::Annies
       if constexpr (TypeErased) {
          if (IsDeep()) {
             // Nested serialization, wrap it in content scope           
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                auto& subblock = GetDeep(i);
                OUT::SerializationRules::BeginScope(subblock, to);
                subblock.template SerializeToText<void>(to);
@@ -193,7 +193,7 @@ namespace Langulus::Annies
          }
          else if (CastsTo<Trait>()) {
             // Nest inside traits                                       
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                As<Trait>(i).Serialize(to);
 
                if (i < GetCount() - 1)
@@ -202,21 +202,21 @@ namespace Langulus::Annies
          }
          else if (CastsTo<BlockMap>()) {
             // Nest inside maps                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                //auto& map = As<BlockMap>(i);
                TODO();
             }
          }
          else if (CastsTo<BlockSet>()) {
             // Nest inside sets                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                //auto& set = As<BlockSet>(i);
                TODO();
             }
          }
          else if (CastsTo<Construct>()) {
             // Nest inside sets                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                As<Construct>(i).Serialize(to);
 
                if (i < GetCount() - 1)
@@ -225,7 +225,7 @@ namespace Langulus::Annies
          }
          else if (CastsTo<Neat>()) {
             // Nest inside sets                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                As<Neat>(i).Serialize(to);
 
                if (i < GetCount() - 1)
@@ -247,7 +247,7 @@ namespace Langulus::Annies
 
             if (mType->mNamedValues.size()) {
                // Serialize as a named value                            
-               for (Offset i = 0; i < GetCount(); ++i) {
+               for (size_t i = 0; i < GetCount(); ++i) {
                   for (auto& named : mType->mNamedValues) {
                      const Block<> constant {{}, named};
                      if (GetElementDense(i) == constant) {
@@ -294,7 +294,7 @@ namespace Langulus::Annies
             }
 
             // Write all converted elements to the serialized container 
-            for (Offset i = 0; i < converted.GetCount(); ++i) {
+            for (size_t i = 0; i < converted.GetCount(); ++i) {
                if constexpr (LANGULUS(SAFE)) {
                   if (not converted[i]) {
                      // This is reached only if non-critical failure    
@@ -315,7 +315,7 @@ namespace Langulus::Annies
       else {
          if constexpr (CT::Deep<Decay<TYPE>>) {
             // Nested serialization, wrap it in content scope           
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                auto& subblock = GetDeep(i);
                OUT::SerializationRules::BeginScope(subblock, to);
                subblock.template SerializeToText<void>(to);
@@ -327,7 +327,7 @@ namespace Langulus::Annies
          }
          else if constexpr (CT::DerivedFrom<TYPE, Trait>) {
             // Nest inside traits                                       
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                As<Trait>(i).Serialize(to);
 
                if (i < GetCount() - 1)
@@ -336,21 +336,21 @@ namespace Langulus::Annies
          }
          else if constexpr (CT::DerivedFrom<TYPE, BlockMap>) {
             // Nest inside maps                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                //auto& map = As<BlockMap>(i);
                TODO();
             }
          }
          else if constexpr (CT::DerivedFrom<TYPE, BlockSet>) {
             // Nest inside sets                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                //auto& set = As<BlockSet>(i);
                TODO();
             }
          }
          else if constexpr (CT::DerivedFrom<TYPE, Construct>) {
             // Nest inside sets                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                As<Construct>(i).Serialize(to);
 
                if (i < GetCount() - 1)
@@ -359,7 +359,7 @@ namespace Langulus::Annies
          }
          else if constexpr (CT::DerivedFrom<TYPE, Neat>) {
             // Nest inside sets                                         
-            for (Offset i = 0; i < GetCount(); ++i) {
+            for (size_t i = 0; i < GetCount(); ++i) {
                As<Neat>(i).Serialize(to);
 
                if (i < GetCount() - 1)
@@ -382,7 +382,7 @@ namespace Langulus::Annies
             //TODO optimize this further
             if (mType->mNamedValues.size()) {
                // Serialize as a named value                            
-               for (Offset i = 0; i < GetCount(); ++i) {
+               for (size_t i = 0; i < GetCount(); ++i) {
                   for (auto& named : mType->mNamedValues) {
                      const Block<> constant {{}, named};
                      if (GetElementDense(i) == constant) {
@@ -429,7 +429,7 @@ namespace Langulus::Annies
             }
 
             // Write all converted elements to the serialized container 
-            for (Offset i = 0; i < converted.GetCount(); ++i) {
+            for (size_t i = 0; i < converted.GetCount(); ++i) {
                if constexpr (LANGULUS(SAFE)) {
                   if (not converted[i]) {
                      // This is reached only if non-critical failure    
@@ -461,15 +461,15 @@ namespace Langulus::Annies
 
    /// Apply serialization rules                                              
    template<class TYPE> template<class T, class...RULES>
-   Count Block<TYPE>::SerializeByRules(CT::Serial auto& to, Types<RULES...>) const {
-      Count result = 0;
+   size_t Block<TYPE>::SerializeByRules(CT::Serial auto& to, Types<RULES...>) const {
+      size_t result = 0;
       (void)(... or (result = SerializeApplyRule<T, RULES>(to)));
       return result;
    }
 
    /// Apply a single serialization rule                                      
    template<class TYPE> template<class T, class RULE>
-   Count Block<TYPE>::SerializeApplyRule(CT::Serial auto& to) const {
+   size_t Block<TYPE>::SerializeApplyRule(CT::Serial auto& to) const {
       using OUT = Deref<decltype(to)>;
       const auto initial = to.GetCount();
       using Type = typename RULE::Type;
@@ -489,7 +489,7 @@ namespace Langulus::Annies
             return 0;
          else if constexpr (RULE::sRule == Serial::Wrap) {
             // If reached, then the rule is compatible with the type    
-            for (Offset i = 0; i < mCount; ++i) {
+            for (size_t i = 0; i < mCount; ++i) {
                if constexpr (RULE::sStart < Serial::Operator::OpCounter)
                   to += RULE::sStart;
 
@@ -518,7 +518,7 @@ namespace Langulus::Annies
                return 0;
             else if constexpr (RULE::sRule == Serial::Wrap) {
                // If reached, then the rule is compatible with the type 
-               for (Offset i = 0; i < mCount; ++i) {
+               for (size_t i = 0; i < mCount; ++i) {
                   if constexpr (RULE::sStart < Serial::Operator::OpCounter)
                      to += RULE::sStart;
 
@@ -546,7 +546,7 @@ namespace Langulus::Annies
    ///   @param to - [out] the serialized data goes here                      
    ///   @return the number of written bytes                                  
    template<class TYPE> template<class NEXT>
-   Count Block<TYPE>::SerializeToBinary(CT::Serial auto& to1) const {
+   size_t Block<TYPE>::SerializeToBinary(CT::Serial auto& to1) const {
       auto& to = to1; //Workaround: needed due to really weird clang error  
       //using OUT = Deref<decltype(to)>;
       const auto initial = to.GetCount();
@@ -623,7 +623,7 @@ namespace Langulus::Annies
          // Type is statically creatable, and has default constructor   
          // therefore we can serialize it by serializing each           
          // reflected base and member                                   
-         for (Count i = 0; i < GetCount(); ++i) {
+         for (size_t i = 0; i < GetCount(); ++i) {
             auto element = GetElementResolved(i);
             if (IsResolvable())
                to += Bytes {element.GetType()};
@@ -656,7 +656,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class TYPE> LANGULUS(INLINED)
-   void Block<TYPE>::ReadInner(Offset start, Count count, Loader loader) const {
+   void Block<TYPE>::ReadInner(size_t start, size_t count, Loader loader) const {
       if (start >= mCount or mCount - start < count) {
          LANGULUS_ASSERT(loader, Access, "Reader lacks loader");
          loader(const_cast<Block&>(*this), count - (mCount - start));
@@ -670,8 +670,8 @@ namespace Langulus::Annies
    ///   @param loader - loader for streaming                                 
    ///   @return the number of read bytes from byte container                 
    template<class TYPE>
-   Offset Block<TYPE>::DeserializeAtom(
-      Offset& result, Offset read, const Header& header, Loader loader
+   size_t Block<TYPE>::DeserializeAtom(
+      size_t& result, size_t read, const Header& header, Loader loader
    ) const {
       if (header.mAtomSize == 4) {
          // We're deserializing data, that was serialized on a 32-bit   
@@ -680,7 +680,7 @@ namespace Langulus::Annies
          ReadInner(read, 4, loader);
          ::std::memcpy(&count4, At(read), 4);
          read += 4;
-         result = static_cast<Offset>(count4);
+         result = static_cast<size_t>(count4);
       }
       else if (header.mAtomSize == 8) {
          // We're deserializing data, that was serialized on a 64-bit   
@@ -690,10 +690,10 @@ namespace Langulus::Annies
          ::std::memcpy(&count8, At(read), 8);
          read += 8;
          LANGULUS_ASSERT(
-            count8 <= std::numeric_limits<Offset>::max(),
+            count8 <= std::numeric_limits<size_t>::max(),
             Convert, "Deserialized atom contains a value "
             "too powerful for your architecture");
-         result = static_cast<Offset>(count8);
+         result = static_cast<size_t>(count8);
       }
       else {
          LANGULUS_OOPS(Convert,
@@ -712,10 +712,10 @@ namespace Langulus::Annies
    ///   @param loader - loader for streaming                                 
    ///   @return number of read bytes                                         
    template<class TYPE>
-   Offset Block<TYPE>::DeserializeMeta(
-      CT::Meta auto& result, Offset read, const Header& header, Loader loader
+   size_t Block<TYPE>::DeserializeMeta(
+      CT::Meta auto& result, size_t read, const Header& header, Loader loader
    ) const {
-      Count count = 0;
+      size_t count = 0;
       read = DeserializeAtom(count, read, header, loader);
       if (count) {
          ReadInner(read, count, loader);
@@ -761,8 +761,8 @@ namespace Langulus::Annies
    ///   @param loader - loader for streaming                                 
    ///   @return the number of read/peek bytes from byte container            
    template<class TYPE> template<class NEXT>
-   Offset Block<TYPE>::DeserializeBinary(
-      CT::Block auto& to, const Header& header1, Offset readOffset, Loader loader1
+   size_t Block<TYPE>::DeserializeBinary(
+      CT::Block auto& to, const Header& header1, size_t readOffset, Loader loader1
    ) const {
       auto& header = header1; //Workaround: needed due to really weird clang error  
       auto& loader = loader1; //Workaround: needed due to really weird clang error  
@@ -776,8 +776,8 @@ namespace Langulus::Annies
       LglsAssumeDev(IsSimilar<Byte>(),
          "THIS isn't a byte container");
 
-      Count deserializedCount = 0;
-      Offset read = readOffset;
+      size_t deserializedCount = 0;
+      size_t read = readOffset;
 
       if constexpr (CT::TypeErased<T>) {
          // We have unpredictable data, so the deserializer expects     
@@ -897,8 +897,8 @@ namespace Langulus::Annies
             if constexpr (CT::TypeErased<T>)
                to.AllocateMore(deserializedCount);
 
-            for (Count i = 0; i < deserializedCount; ++i) {
-               Count count = 0;
+            for (size_t i = 0; i < deserializedCount; ++i) {
+               size_t count = 0;
                read = DeserializeAtom(count, read, header, loader);
                to.template InsertInner<void, false>(
                   IndexBack, Text::From(Disown(
@@ -914,8 +914,8 @@ namespace Langulus::Annies
             if constexpr (CT::TypeErased<T>)
                to.AllocateMore(deserializedCount);
 
-            for (Count i = 0; i < deserializedCount; ++i) {
-               Count count = 0;
+            for (size_t i = 0; i < deserializedCount; ++i) {
+               size_t count = 0;
                read = DeserializeAtom(count, read, header, loader);
                to.template InsertInner<void, false>(
                   IndexBack, Bytes::From(Disown(mRaw + read), count)
@@ -958,7 +958,7 @@ namespace Langulus::Annies
          if constexpr (CT::TypeErased<T>)
             to.AllocateMore(deserializedCount);
 
-         for (Count i = 0; i < deserializedCount; ++i) {
+         for (size_t i = 0; i < deserializedCount; ++i) {
             Many element;
             if constexpr (CT::TypeErased<T>) {
                // Default-initialize an instance to write on top of     

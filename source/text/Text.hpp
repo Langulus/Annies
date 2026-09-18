@@ -8,6 +8,8 @@
 #pragma once
 #include "../many/TMany.hpp"
 #include "../many/Bytes.hpp"
+#include <Langulus/CT/Character.hpp>
+#include <Langulus/CT/Number.hpp>
 #include <Langulus/Logger.hpp> // Logger has some core fmt::formatters defined  
 
 
@@ -109,12 +111,30 @@ namespace Langulus::Annies::Serial
 
 namespace Langulus::CT
 {
-   
+   /// Check if all T are literals - always bounded array with an extent   
+   template<class...T>
+   concept StringLiteral = sizeof...(T) > 0 and ((CT::Array<T>
+         and Character<Deext<Deref<T>>>
+      ) and ...);
+
+   /// Check if all T are string pointers, hopefully null-terminated       
+   /// This account to all string pointers that _do not have extents_      
+   template<class...T>
+   concept StringPointer = sizeof...(T) > 0 and ((CT::Sparse<T>
+         and not CT::Array<T>
+         and Character<Deptr<Deref<T>>>
+      ) and ...);
+
+   /// Check if all T are either StringLiteral, or StringPointer           
+   template<class...T>
+   concept String = sizeof...(T) > 0
+         and ((StringLiteral<T> or StringPointer<T>) and ...);
+         
    /// Concept for any possible standard library representation of a string   
    /// This includes not only std::string, but also any contiguous range      
    /// that's filled with dense characters                                    
    template<class...T>
-   concept StdString = StdContiguousContainer<T...>
+   concept StdString = (::std::ranges::contiguous_range<T> and ...)
        and Character<TypeOf<T>...>;
 
    /// Concept for differentiating managed text types, based on Annies::Text 
@@ -154,12 +174,12 @@ namespace Langulus::CT
       /// constructor can accept                                              
       template<class...T>
       concept Stringifiable = ((Text<T>
-           or BuiltinNumber<T>
+           or Number<T>
            or Exception<T>
            or Meta<T>
            or Bytes<T>
            or HasNamedValues<T>
-           or Similar<T, Annies::Serial::Operator>
+           or Same<T, Annies::Serial::Operator>
            or Inner::StringifiableByOperator<T>
          ) and ...);
 
@@ -193,8 +213,8 @@ namespace Langulus::A
 
    /// Check if a type is compatible with CT::Character concept at runtime    
    struct Text {
-      LANGULUS(ABSTRACT) true;
-      LANGULUS(CONCRETE) Annies::Text;
+      using CTTI_Abstract = Yup;
+      using CTTI_Concrete = Annies::Text;
 
       static constexpr bool CTTI_TextTrait = true;
 
@@ -208,7 +228,7 @@ namespace Langulus::Annies
 {
 
    ///                                                                        
-   ///   Count-terminated UTF text container                                  
+   ///   size_t-terminated UTF text container                                  
    ///                                                                        
    ///   This is a general purpose text container. It can contain serialized  
    /// data, but converting to it is a one way process. While serialization   
@@ -218,17 +238,18 @@ namespace Langulus::Annies
    /// formal format, convert to Flow::Code (or other isomorphic format)      
    /// instead.                                                               
    ///                                                                        
-   struct Text : Block<Letter> {
-      using Base = Block<Letter>;
+   struct Text : Block<char> {
+      using Base = Block<char>;
       static constexpr bool CTTI_TextTrait = true;
       static constexpr bool Ownership = true;
 
-      LANGULUS(NAME) "Text";
-      LANGULUS(DEEP) false;
-      LANGULUS(POD) false;
-      LANGULUS(FILES) "txt";
-      LANGULUS(ACT_AS) Text;
-      LANGULUS_BASES(A::Text, Base);
+      using CTTI_Named = Yes<"Text">;
+      using CTTI_Deep = No;
+      using CTTI_POD = No;
+      using CTTI_Files = Yes<"txt">;
+      using CTTI_ReflectAs = Text;
+      using CTTI_Bases = Types<A::Text, Base>;
+      
       LANGULUS_CONVERTS_FROM(
          Index, Byte, bool, float, double,
          uint8_t, uint16_t, uint32_t, uint64_t,
@@ -241,12 +262,12 @@ namespace Langulus::Annies
          // Text serializer can be lossy to omit unnecessary details,   
          // and you can configure how many elements to show             
          #ifdef LANGULUS_MAX_DEBUGGABLE_ELEMENTS
-            static constexpr Count MaxIterations
+            static constexpr size_t MaxIterations
                = LANGULUS_MAX_DEBUGGABLE_ELEMENTS;
          #elif LANGULUS(DEBUG) or LANGULUS(SAFE)
-            static constexpr Count MaxIterations = 32;
+            static constexpr size_t MaxIterations = 32;
          #else
-            static constexpr Count MaxIterations = 8;
+            static constexpr size_t MaxIterations = 8;
          #endif
 
          using Operator = Serial::Operator;
@@ -298,7 +319,7 @@ namespace Langulus::Annies
       explicit Text(Operator);
       explicit Text(const CT::HasNamedValues auto&);
 
-      template<CT::BuiltinNumber T> requires (not CT::Character<T>)
+      template<CT::Number T> requires (not CT::Character<T>)
       explicit Text(const T&);
 
       template<class T1, class T2, class...TN>
@@ -308,9 +329,9 @@ namespace Langulus::Annies
       ~Text();
 
       template<class T> requires CT::String<Deint<T>>
-      static Text From(T&&, Count);
+      static Text From(T&&, size_t);
 
-      template<Count PRECISION = 0, CT::BuiltinNumber T>
+      template<size_t PRECISION = 0, CT::Number T>
       static Text FromNumber(const T&);
 
       ///                                                                     
@@ -325,15 +346,15 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Capsulation                                                       
       ///                                                                     
-      Count GetLineCount() const noexcept;
+      size_t GetLineCount() const noexcept;
 
       operator Token () const noexcept;
 
       ///                                                                     
       ///   Indexing                                                          
       ///                                                                     
-      Text Select(CT::Index auto, Count) const IF_UNSAFE(noexcept);
-      Text Select(CT::Index auto, Count)       IF_UNSAFE(noexcept);
+      Text Select(CT::Index auto, size_t) const IF_UNSAFE(noexcept);
+      Text Select(CT::Index auto, size_t)       IF_UNSAFE(noexcept);
       Text Select(CT::Index auto) const IF_UNSAFE(noexcept);
       Text Select(CT::Index auto)       IF_UNSAFE(noexcept);
 
@@ -349,7 +370,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Insertion                                                         
       ///                                                                     
-      Text Extend(Count);
+      Text Extend(size_t);
       Text Terminate() const;
 
       template<class T> requires CT::Stringifiable<Deint<T>>

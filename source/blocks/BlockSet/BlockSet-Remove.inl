@@ -17,7 +17,7 @@ namespace Langulus::Annies
    ///   @param key - the key to search for                                   
    ///   @return the number of removed pairs                                  
    template<CT::Set THIS> LANGULUS(INLINED)
-   Count BlockSet::Remove(const CT::NoIntent auto& key) {
+   size_t BlockSet::Remove(const CT::NoIntent auto& key) {
       using K = Deref<decltype(key)>;
       if (IsEmpty())
          return 0;
@@ -44,7 +44,7 @@ namespace Langulus::Annies
    ///   @param key - the key to search for                                   
    ///   @return 1 if pair was removed                                        
    template<CT::Set THIS> LANGULUS(INLINED)
-   Count BlockSet::RemoveKeyInner(const CT::NoIntent auto& key) {
+   size_t BlockSet::RemoveKeyInner(const CT::NoIntent auto& key) {
       const auto found = FindInner<THIS>(key);
       if (found != InvalidOffset) {
          // Key found, remove it                                        
@@ -62,7 +62,7 @@ namespace Langulus::Annies
    ///              (aka type-erased)                                         
    ///   @param index - the index to remove                                   
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::RemoveInner(const Offset index) IF_UNSAFE(noexcept) {
+   void BlockSet::RemoveInner(const size_t index) IF_UNSAFE(noexcept) {
       auto psl = GetInfo() + index;
       LglsAssumeDev(*psl, "Removing an invalid key");
       BranchOut<THIS>();

@@ -20,13 +20,13 @@ namespace Langulus::Annies
    ///   @param start - the starting marker of the selection (optional)       
    ///   @param end - the ending marker of the selection (optional)           
    TEMPLATE() LANGULUS(INLINED)
-   TME()::Edit(T& container, Offset start, Offset end) noexcept
+   TME()::Edit(T& container, size_t start, size_t end) noexcept
       : mSource {container}
       , mStart {start}
       , mEnd {end} {}
 
    TEMPLATE() LANGULUS(INLINED)
-   TME()::Edit(T* container, Offset start, Offset end) noexcept
+   TME()::Edit(T* container, size_t start, size_t end) noexcept
       : Edit {*container, start, end} {}
 
    /// Select a subpattern                                                    
@@ -76,7 +76,7 @@ namespace Langulus::Annies
    ///   @param end - the ending marker of the selection                      
    ///   @return a reference to this editor                                   
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::Select(Offset start, Offset end) -> Edit& {
+   auto TME()::Select(size_t start, size_t end) -> Edit& {
       mStart = ::std::min(start, mSource.GetCount());
       mEnd = ::std::max(::std::min(end, mSource.GetCount()), mStart);
       return *this;
@@ -86,7 +86,7 @@ namespace Langulus::Annies
    ///   @param start - the starting marker of the selection                  
    ///   @return a reference to this editor                                   
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::Select(Offset start) -> Edit& {
+   auto TME()::Select(size_t start) -> Edit& {
       mEnd = mStart = ::std::min(start, mSource.GetCount());
       return *this;
    }
@@ -101,21 +101,21 @@ namespace Langulus::Annies
    /// Get the start of the selection                                         
    ///   @return the start of the selection                                   
    TEMPLATE() LANGULUS(INLINED)
-   Offset TME()::GetStart() const noexcept {
+   size_t TME()::GetStart() const noexcept {
       return mStart;
    }
 
    /// Get the end of the selection                                           
    ///   @return the end of the selection                                     
    TEMPLATE() LANGULUS(INLINED)
-   Offset TME()::GetEnd() const noexcept {
+   size_t TME()::GetEnd() const noexcept {
       return mEnd;
    }
 
    /// Get the size of the selection                                          
    ///   @return the size of the selection                                    
    TEMPLATE() LANGULUS(INLINED)
-   Count TME()::GetLength() const noexcept {
+   size_t TME()::GetLength() const noexcept {
       return mEnd - mStart;
    }
 
@@ -123,7 +123,7 @@ namespace Langulus::Annies
    ///   @param index - the index to get                                      
    ///   @return a reference to the element at that index                     
    TEMPLATE() LANGULUS(INLINED)
-   auto& TME()::operator[] (Offset index) const noexcept {
+   auto& TME()::operator[] (size_t index) const noexcept {
       return mSource[mStart + index];
    }
 
@@ -131,7 +131,7 @@ namespace Langulus::Annies
    ///   @param index - the index to get                                      
    ///   @return a reference to the element at that index                     
    TEMPLATE() LANGULUS(INLINED)
-   auto& TME()::operator[] (Offset index) noexcept {
+   auto& TME()::operator[] (size_t index) noexcept {
       return mSource[mStart + index];
    }
 

@@ -19,12 +19,11 @@ namespace Langulus::A
    /// Abstract verb, dictating canonical verb size, used in various concepts 
    ///                                                                        
    struct Verb : Annies::Many, Annies::Charge {
-      LANGULUS(POD) false;
-      LANGULUS(NULLIFIABLE) false;
-      LANGULUS(DEEP) false;
-      LANGULUS(ACT_AS) Verb;
-      LANGULUS_BASES(Annies::Many, Annies::Charge);
-      LANGULUS_CONVERTS_TO(Annies::Text);
+      using CTTI_POD = No;
+      using CTTI_Nullable = No;
+      using CTTI_Deep = No;
+      using CTTI_ReflectAs = Verb;
+      using CTTI_Bases = Types<Annies::Many, Annies::Charge>;
       static constexpr bool CTTI_Container = true;
 
    protected:
@@ -38,7 +37,7 @@ namespace Langulus::A
       // Verb meta, mass, rate, time and priority                       
       mutable VMeta mVerb {};
       // The number of successful executions                            
-      Count mSuccesses {};
+      size_t mSuccesses {};
       // Verb short-circuiting                                          
       VerbState mState {};
       // Verb context                                                   
@@ -46,11 +45,9 @@ namespace Langulus::A
       // The container where output goes after execution                
       Many mOutput;
 
-      LANGULUS_MEMBERS(
-         &Verb::mVerb,
-         &Verb::mState,
-         &Verb::mSource
-      );
+      using CTTI_Members = Members<&Verb::mVerb,
+                                   &Verb::mState,
+                                   &Verb::mSource>;
 
    public:
       ///                                                                     
@@ -95,7 +92,7 @@ namespace Langulus::A
       auto operator -> ()       noexcept -> Many*;
       auto operator -> () const noexcept -> Many const*;
       
-      auto GetSuccesses() const noexcept -> Count;
+      auto GetSuccesses() const noexcept -> size_t;
       auto GetVerbState() const noexcept -> VerbState;
       bool IsDone() const noexcept;
 
@@ -108,7 +105,7 @@ namespace Langulus::A
       bool IsMissingDeep() const noexcept;
       bool Validate(Annies::Index) const noexcept;
 
-      void Done(Count) noexcept;
+      void Done(size_t) noexcept;
       void Done() noexcept;
       void Undo() noexcept;
 
@@ -138,6 +135,7 @@ namespace Langulus::A
 
 } // namespace Langulus::A
 
+LANGULUS_MORPHISM(Langulus::A::Verb, Langulus::Annies::Text);
 
 namespace Langulus::CT
 {
@@ -152,10 +150,10 @@ namespace Langulus::CT
    concept Verb = VerbBased<T...> and ((
       sizeof(T) == sizeof(A::Verb) and (
          requires {
-            {Decay<T>::CTTI_Verb} -> Similar<Token>;
+            {Decay<T>::CTTI_Verb} -> Same<Token>;
          } or requires {
-            {Decay<T>::CTTI_PositiveVerb} -> Similar<Token>;
-            {Decay<T>::CTTI_NegativeVerb} -> Similar<Token>;
+            {Decay<T>::CTTI_PositiveVerb} -> Same<Token>;
+            {Decay<T>::CTTI_NegativeVerb} -> Same<Token>;
          }
       )) and ...);
 

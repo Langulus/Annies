@@ -20,7 +20,7 @@ namespace Langulus::Annies
    /// which would be slower, than batch zeroing                              
    ///   @param count - number of elements to zero-construct                  
    template<class TYPE> LANGULUS(INLINED)
-   void Block<TYPE>::Null(const Count count) {
+   void Block<TYPE>::Null(const size_t count) {
       if constexpr (not TypeErased) {
          if constexpr (CT::Nullifiable<TYPE>) {
             if (count < mReserved)
@@ -41,7 +41,7 @@ namespace Langulus::Annies
    ///   @param count - the number of elements to extend by                   
    ///   @return a container that represents only the extended part           
    template<class TYPE> template<CT::Block THIS> LANGULUS(INLINED)
-   THIS Block<TYPE>::Extend(const Count count) {
+   THIS Block<TYPE>::Extend(const size_t count) {
       const auto previousCount = mCount;
       AllocateMore<true>(mCount + count);
       const auto newRegion = CropInner(previousCount, count);
@@ -53,7 +53,7 @@ namespace Langulus::Annies
    ///   @param count - number of elements to construct                       
    ///   @return the number of new elements                                   
    template<class TYPE> LANGULUS(INLINED)
-   Count Block<TYPE>::New(const Count count)
+   size_t Block<TYPE>::New(const size_t count)
    requires (TypeErased or CT::Defaultable<TYPE>) {
       BranchOut();
       AllocateMore(mCount + count);
@@ -69,7 +69,7 @@ namespace Langulus::Annies
    ///      for each instance of T                                            
    ///   @return the number of new elements                                   
    template<class TYPE> template<class...A> LANGULUS(INLINED)
-   Count Block<TYPE>::New(const Count count, A&&...arguments)
+   size_t Block<TYPE>::New(const size_t count, A&&...arguments)
    requires (TypeErased or ::std::constructible_from<TYPE, A...>) {
       LglsAssumeUser(count, "Zero count not allowed");
       BranchOut();
@@ -236,7 +236,7 @@ namespace Langulus::Annies
    ///   @param item - item to unfold and insert, with or without intent      
    ///   @return the number of inserted elements after unfolding              
    template<class TYPE> template<class FORCE, bool MOVE_ASIDE>
-   Count Block<TYPE>::UnfoldInsert(CT::Index auto index, auto&& item) {
+   size_t Block<TYPE>::UnfoldInsert(CT::Index auto index, auto&& item) {
       using S = IntentOf<decltype(item)>;
       using T = TypeOf<S>;
       
@@ -270,7 +270,7 @@ namespace Langulus::Annies
    ///   @param item - item to unfold and insert, with or without intent      
    ///   @return the number of inserted elements after unfolding              
    template<class TYPE> template<class FORCE, bool MOVE_ASIDE>
-   Count Block<TYPE>::UnfoldMerge(CT::Index auto index, auto&& item) {
+   size_t Block<TYPE>::UnfoldMerge(CT::Index auto index, auto&& item) {
       using S = IntentOf<decltype(item)>;
       using T = TypeOf<S>;
       
@@ -326,9 +326,9 @@ namespace Langulus::Annies
    ///   @return number of inserted elements                                  
    template<class TYPE> 
    template<class FORCE, bool MOVE_ASIDE, class T1, class...TN> LANGULUS(INLINED)
-   Count Block<TYPE>::Insert(CT::Index auto idx, T1&& t1, TN&&...tn)
+   size_t Block<TYPE>::Insert(CT::Index auto idx, T1&& t1, TN&&...tn)
    requires (TypeErased or CT::UnfoldMakableFrom<TYPE, T1, TN...>) {
-      Count inserted = 0;
+      size_t inserted = 0;
         inserted += UnfoldInsert<FORCE, MOVE_ASIDE>(idx, Forward<T1>(t1));
       ((inserted += UnfoldInsert<FORCE, MOVE_ASIDE>(idx, Forward<TN>(tn))), ...);
       return inserted;
@@ -344,7 +344,7 @@ namespace Langulus::Annies
    ///   @return the number of inserted elements                              
    template<class TYPE> template<class FORCE, bool MOVE_ASIDE, class T>
    requires CT::Block<Deint<T>> LANGULUS(INLINED)
-   Count Block<TYPE>::InsertBlock(CT::Index auto index, T&& other) {
+   size_t Block<TYPE>::InsertBlock(CT::Index auto index, T&& other) {
       using S = IntentOf<decltype(other)>;
       auto& rhs = DeintCast(other);
       const auto count = rhs.GetCount();
@@ -374,9 +374,9 @@ namespace Langulus::Annies
    ///   @return the number of inserted elements                              
    template<class TYPE> 
    template<class FORCE, bool MOVE_ASIDE, class T1, class...TN> LANGULUS(INLINED)
-   Count Block<TYPE>::Merge(CT::Index auto index, T1&& t1, TN&&...tn)
+   size_t Block<TYPE>::Merge(CT::Index auto index, T1&& t1, TN&&...tn)
    requires (TypeErased or CT::UnfoldMakableFrom<TYPE, T1, TN...>) {
-      Count inserted = 0;
+      size_t inserted = 0;
         inserted += UnfoldMerge<FORCE, MOVE_ASIDE>(index, Forward<T1>(t1));
       ((inserted += UnfoldMerge<FORCE, MOVE_ASIDE>(index, Forward<TN>(tn))), ...);
       return inserted;
@@ -392,9 +392,9 @@ namespace Langulus::Annies
    ///   @return the number of inserted elements                              
    template<class TYPE> template<class FORCE, bool MOVE_ASIDE, class T>
    requires CT::Block<Deint<T>> LANGULUS(INLINED)
-   Count Block<TYPE>::MergeBlock(CT::Index auto index, T&& other) {
+   size_t Block<TYPE>::MergeBlock(CT::Index auto index, T&& other) {
       using S = IntentOf<decltype(other)>;
-      Count inserted = 0;
+      size_t inserted = 0;
       if (not FindBlock(DeintCast(other), IndexFront))
          inserted += InsertBlock<FORCE, MOVE_ASIDE>(index, S::Nest(other));
       return inserted;
@@ -493,7 +493,7 @@ namespace Langulus::Annies
    ///   @param state - a state to apply after pushing is done                
    ///   @return the number of pushed items (zero if unsuccessful)            
    template<class TYPE> template<bool ALLOW_CONCAT, class FORCE>
-   Count Block<TYPE>::SmartPush(
+   size_t Block<TYPE>::SmartPush(
       CT::Index auto index, auto&& value, DataState state
    ) {
       using S = IntentOf<decltype(value)>;
@@ -543,7 +543,7 @@ namespace Langulus::Annies
    ///   @param state - the state to apply after concatenation                
    ///   @return the number of inserted elements                              
    template<class TYPE> template<class FORCE, class T1> requires CT::Deep<Deint<T1>>
-   LANGULUS(INLINED) Count Block<TYPE>::SmartConcat(
+   LANGULUS(INLINED) size_t Block<TYPE>::SmartConcat(
       CT::Index auto index, bool sc, T1&& value, DataState state
    ) {
       if constexpr (TypeErased) {
@@ -600,7 +600,7 @@ namespace Langulus::Annies
    ///   @param state - the state to apply after concatenation                
    ///   @return the number of inserted elements                              
    template<class TYPE> template<class FORCE> LANGULUS(INLINED)
-   Count Block<TYPE>::SmartPushInner(
+   size_t Block<TYPE>::SmartPushInner(
       CT::Index auto index, auto&& value, DataState state
    ) {
       using S = IntentOf<decltype(value)>;
@@ -712,7 +712,7 @@ namespace Langulus::Annies
    template<class TYPE>
    void Block<TYPE>::CreateDefault() {
       LglsAssumeDev(mCount and mCount <= mReserved,
-         "Count outside limits", '(', mCount, " > ", mReserved);
+         "size_t outside limits", '(', mCount, " > ", mReserved);
       LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 
@@ -776,7 +776,7 @@ namespace Langulus::Annies
    void Block<TYPE>::CreateDescribe(A&&...arguments) {
       static_assert(sizeof...(A) > 0, "Bad number of arguments");
       LglsAssumeDev(mCount and mCount <= mReserved,
-         "Count outside limits", '(', mCount, " > ", mReserved);
+         "size_t outside limits", '(', mCount, " > ", mReserved);
       LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 
@@ -890,7 +890,7 @@ namespace Langulus::Annies
    template<class TYPE> template<class...A>
    void Block<TYPE>::Create(A&&...arguments) {
       LglsAssumeDev(mCount and mCount <= mReserved,
-         "Count outside limits", '(', mCount, " > ", mReserved);
+         "size_t outside limits", '(', mCount, " > ", mReserved);
       LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 
@@ -1042,7 +1042,7 @@ namespace Langulus::Annies
       using S = IntentOf<decltype(source)>;
       const auto count = DeintCast(source).mCount;
       LglsAssumeDev(count and count <= mReserved,
-         "Count outside limits", '(', count, " > ", mReserved);
+         "size_t outside limits", '(', count, " > ", mReserved);
 
       // Type-erased pointers (void*) are acceptable                    
       LglsAssumeDev(
@@ -1308,7 +1308,7 @@ namespace Langulus::Annies
       //static_assert(CT::Sparse<T>,
       //   "Handle isn't sparse");
       LglsAssumeDev(1 <= mReserved,
-         "Count outside limits (1 > ", mReserved);
+         "size_t outside limits (1 > ", mReserved);
       //LglsAssumeDev(IsSparse(),
       //   "Container is not sparse");
       LglsAssumeDev(GetUses() == 1,
@@ -1448,7 +1448,7 @@ namespace Langulus::Annies
    void Block<TYPE>::AssignWithIntent(T1&& source) requires CT::Block<Deint<T1>> {
       const auto count = source->mCount;
       LglsAssumeDev(count and count <= mReserved,
-         "Count outside limits", '(', count, " > ", mReserved);
+         "size_t outside limits", '(', count, " > ", mReserved);
       LglsAssumeDev(GetUses() == 1,
          "Data is referenced from multiple locations");
 

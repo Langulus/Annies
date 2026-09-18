@@ -102,12 +102,12 @@ namespace Langulus::Annies
       constexpr bool IsValueSparse() const noexcept;
       constexpr bool IsKeyDense() const noexcept;
       constexpr bool IsValueDense() const noexcept;
-      constexpr Size GetKeyStride() const noexcept;
-      constexpr Size GetValueStride() const noexcept;
-      Count GetKeyCountDeep() const noexcept;
-      Count GetKeyCountElementsDeep() const noexcept;
-      Count GetValueCountDeep() const noexcept;
-      Count GetValueCountElementsDeep() const noexcept;
+      constexpr size_t GetKeyStride() const noexcept;
+      constexpr size_t GetValueStride() const noexcept;
+      size_t GetKeyCountDeep() const noexcept;
+      size_t GetKeyCountElementsDeep() const noexcept;
+      size_t GetValueCountDeep() const noexcept;
+      size_t GetValueCountElementsDeep() const noexcept;
 
       bool IsKeyMissingDeep() const;
       bool IsValueMissingDeep() const;
@@ -183,39 +183,39 @@ namespace Langulus::Annies
       auto last() const noexcept -> ConstIterator;
 
       template<bool REVERSE = false>
-      Count ForEach(auto&&) const;
+      size_t ForEach(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEach(auto&&);
+      size_t ForEach(auto&&);
 
       template<bool REVERSE = false>
-      Count ForEachKeyElement(auto&&) const;
+      size_t ForEachKeyElement(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEachKeyElement(auto&&);
+      size_t ForEachKeyElement(auto&&);
 
       template<bool REVERSE = false>
-      Count ForEachValueElement(auto&&) const;
+      size_t ForEachValueElement(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEachValueElement(auto&&);
+      size_t ForEachValueElement(auto&&);
 
       template<bool REVERSE = false>
-      Count ForEachKey(auto&&...) const;
+      size_t ForEachKey(auto&&...) const;
       template<bool REVERSE = false>
-      Count ForEachKey(auto&&...);
+      size_t ForEachKey(auto&&...);
 
       template<bool REVERSE = false>
-      Count ForEachValue(auto&&...) const;
+      size_t ForEachValue(auto&&...) const;
       template<bool REVERSE = false>
-      Count ForEachValue(auto&&...);
-
-      template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachKeyDeep(auto&&...) const;
-      template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachKeyDeep(auto&&...);
+      size_t ForEachValue(auto&&...);
 
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachValueDeep(auto&&...) const;
+      size_t ForEachKeyDeep(auto&&...) const;
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachValueDeep(auto&&...);
+      size_t ForEachKeyDeep(auto&&...);
+
+      template<bool REVERSE = false, bool SKIP = true>
+      size_t ForEachValueDeep(auto&&...) const;
+      template<bool REVERSE = false, bool SKIP = true>
+      size_t ForEachValueDeep(auto&&...);
 
       ///                                                                     
       ///   Comparison                                                        
@@ -258,24 +258,24 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Memory management                                                 
       ///                                                                     
-      void Reserve(Count);
+      void Reserve(size_t);
 
       ///                                                                     
       ///   Insertion                                                         
       ///                                                                     
       template<class K1, class V1>
       requires (CT::MakableFrom<K, K1> and CT::MakableFrom<V, V1>)
-      Count Insert(K1&&, V1&&);
+      size_t Insert(K1&&, V1&&);
 
       template<class K1>
       requires (CT::MakableFrom<K, K1> and CT::Defaultable<V>)
-      Count Insert(K1&&);
+      size_t Insert(K1&&);
 
-      Count InsertBlock(auto&&, auto&&);
+      size_t InsertBlock(auto&&, auto&&);
 
       template<class T1, class...TN>
       requires CT::UnfoldMakableFrom<TPair<K, V>, T1, TN...>
-      Count InsertPair(T1&&, TN&&...);
+      size_t InsertPair(T1&&, TN&&...);
 
       template<class T1>
       requires CT::UnfoldMakableFrom<TPair<K, V>, T1>
@@ -291,11 +291,11 @@ namespace Langulus::Annies
       ///   Removal                                                           
       ///                                                                     
       template<CT::NoIntent K1> requires CT::Comparable<K, K1>
-      auto RemoveKey(const K1&) -> Count;
+      auto RemoveKey(const K1&) -> size_t;
       template<CT::NoIntent V1> requires CT::Comparable<V, V1>
-      auto RemoveValue(const V1&) -> Count;
+      auto RemoveValue(const V1&) -> size_t;
       template<CT::Pair P> requires CT::Comparable<TPair<K, V>, P>
-      auto RemovePair(const P&) -> Count;
+      auto RemovePair(const P&) -> size_t;
 
       auto RemoveIt(const Iterator&) -> Iterator;
 
@@ -304,7 +304,7 @@ namespace Langulus::Annies
       void Compact();
 
    protected:
-      static Size RequestValuesSize(Count) noexcept;
+      static size_t RequestValuesSize(size_t) noexcept;
    };
 
 } // namespace Langulus::Annies

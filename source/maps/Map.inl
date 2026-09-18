@@ -171,92 +171,92 @@ namespace Langulus::Annies
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&& call) const {
+   size_t TABLE()::ForEach(auto&& call) const {
       return BlockMap::ForEach<REVERSE, const Map>(
          Forward<Deref<decltype(call)>>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&& call) {
+   size_t TABLE()::ForEach(auto&& call) {
       return BlockMap::ForEach<REVERSE, Map>(
          Forward<Deref<decltype(call)>>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyElement(auto&& call) const {
+   size_t TABLE()::ForEachKeyElement(auto&& call) const {
       return BlockMap::ForEachKeyElement<REVERSE, const Map>(
          Forward<Deref<decltype(call)>>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyElement(auto&& call) {
+   size_t TABLE()::ForEachKeyElement(auto&& call) {
       return BlockMap::ForEachKeyElement<REVERSE, Map>(
          Forward<Deref<decltype(call)>>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueElement(auto&& call) const {
+   size_t TABLE()::ForEachValueElement(auto&& call) const {
       return BlockMap::ForEachValueElement<REVERSE, const Map>(
          Forward<Deref<decltype(call)>>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueElement(auto&& call) {
+   size_t TABLE()::ForEachValueElement(auto&& call) {
       return BlockMap::ForEachValueElement<REVERSE, Map>(
          Forward<Deref<decltype(call)>>(call));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachKey(auto&&...call) const {
+   size_t TABLE()::ForEachKey(auto&&...call) const {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachKey");
       return BlockMap::ForEachKey<REVERSE, const Map>(
          Forward<Deref<decltype(call)>>(call)...);
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachKey(auto&&...call) {
+   size_t TABLE()::ForEachKey(auto&&...call) {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachKey");
       return BlockMap::ForEachKey<REVERSE, Map>(
          Forward<Deref<decltype(call)>>(call)...);
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachValue(auto&&...call) const {
+   size_t TABLE()::ForEachValue(auto&&...call) const {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachValue");
       return BlockMap::ForEachValue<REVERSE, const Map>(
          Forward<Deref<decltype(call)>>(call)...);
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachValue(auto&&...call) {
+   size_t TABLE()::ForEachValue(auto&&...call) {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachValue");
       return BlockMap::ForEachValue<REVERSE, Map>(
          Forward<Deref<decltype(call)>>(call)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyDeep(auto&&...call) const {
+   size_t TABLE()::ForEachKeyDeep(auto&&...call) const {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachKeyDeep");
       return BlockMap::ForEachKeyDeep<REVERSE, SKIP, const Map>(
          Forward<Deref<decltype(call)>>(call)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachKeyDeep(auto&&...call) {
+   size_t TABLE()::ForEachKeyDeep(auto&&...call) {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachKeyDeep");
       return BlockMap::ForEachKeyDeep<REVERSE, SKIP, Map>(
          Forward<Deref<decltype(call)>>(call)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueDeep(auto&&...call) const {
+   size_t TABLE()::ForEachValueDeep(auto&&...call) const {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachValueDeep");
       return BlockMap::ForEachValueDeep<REVERSE, SKIP, const Map>(
          Forward<Deref<decltype(call)>>(call)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachValueDeep(auto&&...call) {
+   size_t TABLE()::ForEachValueDeep(auto&&...call) {
       static_assert(sizeof...(call) > 0, "No iterators in ForEachValueDeep");
       return BlockMap::ForEachValueDeep<REVERSE, SKIP, Map>(
          Forward<Deref<decltype(call)>>(call)...);
@@ -410,7 +410,7 @@ namespace Langulus::Annies
    ///   @attention does nothing if reserving less than current reserve       
    ///   @param count - number of pairs to allocate                           
    TEMPLATE() LANGULUS(INLINED)
-   void TABLE()::Reserve(Count count) {
+   void TABLE()::Reserve(size_t count) {
       BlockMap::Reserve<Map>(count);
    }
 
@@ -436,7 +436,7 @@ namespace Langulus::Annies
    ///   @param key - the key to search for                                   
    ///   @return 1 if key was found and pair was removed                      
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::RemoveKey(const CT::NoIntent auto& key) {
+   size_t TABLE()::RemoveKey(const CT::NoIntent auto& key) {
       return BlockMap::RemoveKey<Map>(key);
    }
 
@@ -444,7 +444,7 @@ namespace Langulus::Annies
    ///   @param value - the match to search for                               
    ///   @return the number of removed pairs                                  
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::RemoveValue(const CT::NoIntent auto& value) {
+   size_t TABLE()::RemoveValue(const CT::NoIntent auto& value) {
       return BlockMap::RemoveValue<Map>(value);
    }
      
@@ -452,7 +452,7 @@ namespace Langulus::Annies
    ///   @param value - the match to search for                               
    ///   @return the number of removed pairs                                  
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::RemovePair(const CT::Pair auto& pair) {
+   size_t TABLE()::RemovePair(const CT::Pair auto& pair) {
       return BlockMap::RemovePair<Map>(pair);
    }
      

@@ -18,7 +18,7 @@ namespace Langulus::Annies
    ///   @param call - function to execute for each element block             
    ///   @return the number of executions                                     
    template<class TYPE> template<bool REVERSE, bool MUTABLE>
-   Count Block<TYPE>::ForEachElement(auto&& call) const {
+   size_t Block<TYPE>::ForEachElement(auto&& call) const {
       using F = Deref<decltype(call)>;
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
@@ -28,7 +28,7 @@ namespace Langulus::Annies
       static_assert(CT::Slab<A> or CT::Constant<A> or MUTABLE,
          "Non constant iterator for constant memory block");
 
-      Count index = REVERSE ? mCount - 1 : 0;
+      size_t index = REVERSE ? mCount - 1 : 0;
       const auto next = [&index] {
          if constexpr (REVERSE)  --index;
          else                    ++index;
@@ -87,7 +87,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> template<bool REVERSE>
-   Count Block<TYPE>::ForEachElement(auto&& call) {
+   size_t Block<TYPE>::ForEachElement(auto&& call) {
       return const_cast<const Block*>(this)->template
          ForEachElement<REVERSE, true>(Forward<decltype(call)>(call));
    }
@@ -102,13 +102,13 @@ namespace Langulus::Annies
    ///   @return the number of executions                                     
    template<class TYPE>
    template<bool REVERSE, bool MUTABLE, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEach(F&&...calls) const {
+   size_t Block<TYPE>::ForEach(F&&...calls) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEach");
       if (IsEmpty())
          return 0;
 
       LoopControl loop = Loop::Break;
-      Count result = 0;
+      size_t result = 0;
       (void) (... or (Loop::NextLoop != (loop =
          ForEachInner<MUTABLE, REVERSE>(Forward<F>(calls), result)
       )));
@@ -119,7 +119,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> template<bool REVERSE, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEach(F&&...calls) {
+   size_t Block<TYPE>::ForEach(F&&...calls) {
       static_assert(sizeof...(F) > 0, "No iterators in ForEach");
       return const_cast<const Block*>(this)->template
          ForEach<REVERSE, true>(Forward<F>(calls)...);
@@ -138,10 +138,10 @@ namespace Langulus::Annies
    ///   @return the number of executions                                     
    template<class TYPE>
    template<bool REVERSE, bool SKIP, bool MUTABLE, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachDeep(F&&...calls) const {
+   size_t Block<TYPE>::ForEachDeep(F&&...calls) const {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachDeep");
       LoopControl loop = Loop::Break;
-      Count result = 0;
+      size_t result = 0;
       (void)(... or (Loop::Break == (loop = 
          ForEachDeepInner<MUTABLE, REVERSE, SKIP>(Forward<F>(calls), result)
       )));
@@ -153,7 +153,7 @@ namespace Langulus::Annies
 
    template<class TYPE>
    template<bool REVERSE, bool SKIP, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachDeep(F&&...calls) {
+   size_t Block<TYPE>::ForEachDeep(F&&...calls) {
       static_assert(sizeof...(F) > 0, "No iterators in ForEachDeep");
       return const_cast<const Block*>(this)->template
          ForEachDeep<REVERSE, SKIP, true>(Forward<F>(calls)...);
@@ -161,26 +161,26 @@ namespace Langulus::Annies
 
    /// Same as ForEachElement, but in reverse                                 
    template<class TYPE> template<bool MUTABLE, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachElementRev(F&&...f) const {
+   size_t Block<TYPE>::ForEachElementRev(F&&...f) const {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachElementRev");
       return ForEachElement<true, MUTABLE>(Forward<F>(f)...);
    }
 
    template<class TYPE> template<class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachElementRev(F&&...f) {
+   size_t Block<TYPE>::ForEachElementRev(F&&...f) {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachElementRev");
       return ForEachElement<true, true>(Forward<F>(f)...);
    }
 
    /// Same as ForEach, but in reverse                                        
    template<class TYPE> template<bool MUTABLE, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachRev(F&&...f) const {
+   size_t Block<TYPE>::ForEachRev(F&&...f) const {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachRev");
       return ForEach<true, MUTABLE>(Forward<F>(f)...);
    }
 
    template<class TYPE> template<class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachRev(F&&...f) {
+   size_t Block<TYPE>::ForEachRev(F&&...f) {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachRev");
       return ForEach<true, true>(Forward<F>(f)...);
    }
@@ -188,13 +188,13 @@ namespace Langulus::Annies
    /// Same as ForEachDeep, but in reverse                                    
    template<class TYPE>
    template<bool SKIP, bool MUTABLE, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachDeepRev(F&&...f) const {
+   size_t Block<TYPE>::ForEachDeepRev(F&&...f) const {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachDeepRev");
       return ForEachDeep<true, SKIP, MUTABLE>(Forward<F>(f)...);
    }
 
    template<class TYPE> template<bool SKIP, class...F> LANGULUS(INLINED)
-   Count Block<TYPE>::ForEachDeepRev(F&&...f) {
+   size_t Block<TYPE>::ForEachDeepRev(F&&...f) {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachDeepRev");
       return ForEachDeep<true, SKIP, true>(Forward<F>(f)...);
    }
@@ -207,7 +207,7 @@ namespace Langulus::Annies
    ///   @param f - the function to execute for each element of type A        
    ///   @return the last 'f' result                                          
    template<class T> template<bool MUTABLE, bool REVERSE> LANGULUS(INLINED)
-   LoopControl Block<T>::ForEachInner(auto&& f, Count& index) const
+   LoopControl Block<T>::ForEachInner(auto&& f, size_t& index) const
    noexcept(NoexceptIterator<decltype(f)>) {
       using F = Deref<decltype(f)>;
       using A = ArgumentOf<F>;
@@ -336,7 +336,7 @@ namespace Langulus::Annies
    ///   @param call - the function to execute for each element of type A     
    ///   @return the number of executions that occured                        
    template<class TYPE> template<bool MUTABLE, bool REVERSE, bool SKIP>
-   LoopControl Block<TYPE>::ForEachDeepInner(auto&& call, Count& counter) const {
+   LoopControl Block<TYPE>::ForEachDeepInner(auto&& call, size_t& counter) const {
       using F = Deref<decltype(call)>;
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
@@ -394,7 +394,7 @@ namespace Langulus::Annies
 
          if (IsDeep()) {
             // Iterate subblocks                                        
-            Count intermediateCounterSink = 0;
+            size_t intermediateCounterSink = 0;
             using SubBlock = Conditional<MUTABLE, Block<>&, const Block<>&>;
 
             loop = ForEachInner<MUTABLE, REVERSE>(
@@ -481,7 +481,7 @@ namespace Langulus::Annies
 
          if constexpr (CT::Deep<Decay<TYPE>>) {
             // Iterate subblocks                                        
-            Count intermediateCounterSink = 0;
+            size_t intermediateCounterSink = 0;
             using SubBlock = Conditional<MUTABLE, Decay<TYPE>&, const Decay<TYPE>&>;
 
             loop = ForEachInner<MUTABLE, REVERSE>(
@@ -521,7 +521,7 @@ namespace Langulus::Annies
    ///   @tparam REVERSE - direction we're iterating in                       
    ///   @param call - the constexpr noexcept function to call on each item   
    template<class TYPE> template<bool MUTABLE, bool REVERSE> LANGULUS(INLINED)
-   LoopControl Block<TYPE>::IterateInner(Count count, auto&& f) const
+   LoopControl Block<TYPE>::IterateInner(size_t count, auto&& f) const
    noexcept(NoexceptIterator<decltype(f)>) {
       using F = Deref<decltype(f)>;
       using A = ArgumentOf<F>;
@@ -590,7 +590,7 @@ namespace Langulus::Annies
                   if (mCount == 1)
                      return Loop::Discard;
 
-                  const Offset idx = raw - data;
+                  const size_t idx = raw - data;
                   const_cast<Block*>(this)->RemoveIndex(idx);
 
                   /*if (IsDeep() and mCount == 1) { //TODO this is quite experimental and not fully working right now. can be achieved by Optimize() after the loop for now
@@ -737,20 +737,20 @@ namespace Langulus::Annies
       return --copy;
    }
    
-   /// Offset the handle                                                      
+   /// size_t the handle                                                      
    ///   @param offset - the offset to apply                                  
    ///   @return the offsetted handle                                         
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::operator + (Offset offset) const IF_UNSAFE(noexcept) -> Block {
+   auto Block<TYPE>::operator + (size_t offset) const IF_UNSAFE(noexcept) -> Block {
       auto copy {*this};
       return copy += offset;
    }
 
-   /// Offset the handle                                                      
+   /// size_t the handle                                                      
    ///   @param offset - the offset to apply                                  
    ///   @return the offsetted handle                                         
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::operator - (Offset offset) const IF_UNSAFE(noexcept) -> Block {
+   auto Block<TYPE>::operator - (size_t offset) const IF_UNSAFE(noexcept) -> Block {
       auto copy {*this};
       return copy -= offset;
    }
@@ -758,7 +758,7 @@ namespace Langulus::Annies
    /// Prefix increment operator                                              
    ///   @return the next handle                                              
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::operator += (Offset offset) IF_UNSAFE(noexcept) -> Block& {
+   auto Block<TYPE>::operator += (size_t offset) IF_UNSAFE(noexcept) -> Block& {
       LglsAssumeDev(mRaw,
          "Block is not allocated");
 
@@ -779,14 +779,14 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::operator += (Offset offset) const IF_UNSAFE(noexcept) -> Block const& {
+   auto Block<TYPE>::operator += (size_t offset) const IF_UNSAFE(noexcept) -> Block const& {
       return const_cast<Block&>(*this).operator+=(offset);
    }
 
    /// Prefix decrement operator                                              
    ///   @return the next handle                                              
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::operator -= (Offset offset) IF_UNSAFE(noexcept) -> Block& {
+   auto Block<TYPE>::operator -= (size_t offset) IF_UNSAFE(noexcept) -> Block& {
       LglsAssumeDev(mRaw,
          "Block is not allocated");
 
@@ -807,7 +807,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::operator -= (Offset offset) const IF_UNSAFE(noexcept) -> Block const& {
+   auto Block<TYPE>::operator -= (size_t offset) const IF_UNSAFE(noexcept) -> Block const& {
       return const_cast<Block&>(*this).operator-=(offset);
    }
 

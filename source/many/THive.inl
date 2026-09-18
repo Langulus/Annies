@@ -112,7 +112,7 @@ namespace Langulus::Annies
    /// Get the number of initialized cells                                    
    ///   @return the number of valid entries                                  
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::GetCount() const noexcept -> Count {
+   auto TME()::GetCount() const noexcept -> size_t {
       return mCount;
    }
 

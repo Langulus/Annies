@@ -300,7 +300,7 @@ namespace Langulus::Annies
    ///   @param cookie - resume search from a given index                     
    ///   @return the index of the found item, or IndexNone if none found      
    template<class TYPE> template<bool REVERSE, CT::NoIntent T1>
-   Index Block<TYPE>::Find(const T1& item, Offset cookie) const noexcept
+   Index Block<TYPE>::Find(const T1& item, size_t cookie) const noexcept
    requires (TypeErased or CT::Comparable<TYPE, T1>) {
       if constexpr (not TypeErased) {
          auto start = REVERSE
@@ -322,7 +322,7 @@ namespace Langulus::Annies
          }
       }
       else {
-         Offset i = REVERSE ? mCount - 1 - cookie : cookie;
+         size_t i = REVERSE ? mCount - 1 - cookie : cookie;
          while (i < mCount) {
             if (GetElementInner(i) == item) {
                // Match found                                           
@@ -430,9 +430,9 @@ namespace Langulus::Annies
          return IndexNone;
       }
       else {
-         Offset i = REVERSE ? mCount - 1 - cookie : cookie;
+         size_t i = REVERSE ? mCount - 1 - cookie : cookie;
          const auto iend = REVERSE
-            ? static_cast<Offset>(-1)
+            ? static_cast<size_t>(-1)
             : mCount - item.GetCount() + 1;
 
          while (i != iend) {
@@ -540,7 +540,7 @@ namespace Langulus::Annies
    ///   @param output - [in/out] container that collects results             
    ///   @return the number of gathered elements                              
    template<class TYPE> template<bool REVERSE>
-   Count Block<TYPE>::GatherInner(CT::Block auto& output) const {
+   size_t Block<TYPE>::GatherInner(CT::Block auto& output) const {
       using OUT = Deref<decltype(output)>;
 
       if constexpr (not TypeErased and not OUT::TypeErased) {
@@ -549,7 +549,7 @@ namespace Langulus::Annies
       }
       else {
          if (IsDeep() and not output.IsDeep()) {
-            Count count = 0;
+            size_t count = 0;
             ForEach<REVERSE>([&](const Block<>& i) {
                count += i.template GatherInner<REVERSE>(output);
             });
@@ -590,7 +590,7 @@ namespace Langulus::Annies
    ///   @param state - the data state filter                                 
    ///   @return the number of gathered elements                              
    template<class TYPE> template<bool REVERSE>
-   Count Block<TYPE>::GatherPolarInner(
+   size_t Block<TYPE>::GatherPolarInner(
       DMeta type, CT::Block auto& output, DataState state
    ) const {
       if (GetState() % state) {
@@ -636,11 +636,11 @@ namespace Langulus::Annies
           or MatchesLoose(other) == mCount;
    }
 
-   /// Count how many consecutive elements match in two containers            
+   /// size_t how many consecutive elements match in two containers            
    ///   @param other - container to compare with                             
    ///   @return the number of matching items                                 
    template<class TYPE> LANGULUS(INLINED)
-   Count Block<TYPE>::Matches(const CT::Block auto& other) const noexcept {
+   size_t Block<TYPE>::Matches(const CT::Block auto& other) const noexcept {
       if (IsEmpty() or other.IsEmpty())
          return 0;
 
@@ -669,7 +669,7 @@ namespace Langulus::Annies
    ///   @param other - container to compare with                             
    ///   @return the number of loosely matching elements                      
    template<class TYPE> LANGULUS(INLINED)
-   Count Block<TYPE>::MatchesLoose(const CT::Block auto& other) const noexcept {
+   size_t Block<TYPE>::MatchesLoose(const CT::Block auto& other) const noexcept {
       if (IsEmpty() or other.IsEmpty())
          return 0;
 

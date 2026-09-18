@@ -45,8 +45,8 @@ namespace Langulus::Annies
          return;
 
       const auto tab2 = Logger::Section("Elements:");
-      Count remaining = mCount;
-      for (Offset i = 0; i < mReserved; ++i) {
+      size_t remaining = mCount;
+      for (size_t i = 0; i < mReserved; ++i) {
          if (not remaining)
             break;
 
@@ -190,7 +190,7 @@ namespace Langulus::Annies
    ///   @return the references for the memory block, or 0 if memory is       
    ///           outside authority (or unallocated)                           
    template<class TYPE> LANGULUS(INLINED)
-   constexpr Count Block<TYPE>::GetUses() const noexcept {
+   constexpr size_t Block<TYPE>::GetUses() const noexcept {
       return mEntry ? mEntry->GetUses() : 0;
    }
    
@@ -207,14 +207,14 @@ namespace Langulus::Annies
    /// Get the number of initialized elements                                 
    ///   @return the number of initialized elements                           
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   constexpr Count Block<TYPE>::GetCount() const noexcept {
+   constexpr size_t Block<TYPE>::GetCount() const noexcept {
       return mCount;
    }
 
    /// Get the number of reserved (maybe uninitialized) elements              
    ///   @return the number of reserved (maybe uninitialized) elements        
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   constexpr Count Block<TYPE>::GetReserved() const noexcept {
+   constexpr size_t Block<TYPE>::GetReserved() const noexcept {
       return mReserved;
    }
    
@@ -223,7 +223,7 @@ namespace Langulus::Annies
    ///              containers, when managed memory is enabled                
    ///   @return the number of reserved bytes                                 
    template<class TYPE> LANGULUS(INLINED)
-   constexpr Size Block<TYPE>::GetReservedSize() const noexcept {
+   constexpr size_t Block<TYPE>::GetReservedSize() const noexcept {
       if constexpr (TypeErased)
          return mType ? mReserved * mType->mSize : 0;
       else
@@ -233,12 +233,12 @@ namespace Langulus::Annies
    /// Get the number of sub-blocks (this one included)                       
    ///   @return the number of contained blocks, including this one           
    template<class TYPE>
-   Count Block<TYPE>::GetCountDeep() const noexcept {
+   size_t Block<TYPE>::GetCountDeep() const noexcept {
       if (IsEmpty() or not IsDeep())
          return 1;
 
       using B = decltype(GetDeep());
-      Count counter = 1;
+      size_t counter = 1;
       IterateInner<false, false>(mCount, [&counter](B block) noexcept {
          counter += block.GetCountDeep();
       });
@@ -248,7 +248,7 @@ namespace Langulus::Annies
    /// Get the sum of initialized non-deep elements in all sub-blocks         
    ///   @return the number of contained non-deep elements                    
    template<class TYPE>
-   Count Block<TYPE>::GetCountElementsDeep() const noexcept {
+   size_t Block<TYPE>::GetCountElementsDeep() const noexcept {
       if (IsEmpty() or not IsTyped())
          return 0;
 
@@ -256,7 +256,7 @@ namespace Langulus::Annies
          return mCount;
 
       using B = decltype(GetDeep());
-      Count counter = 0;
+      size_t counter = 0;
       IterateInner<false, false>(mCount, [&counter](B block) noexcept {
          counter += block.GetCountElementsDeep();
       });
@@ -475,7 +475,7 @@ namespace Langulus::Annies
    /// Get the size of the contained data, in bytes                           
    ///   @return the byte size                                                
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   constexpr Size Block<TYPE>::GetBytesize() const noexcept {
+   constexpr size_t Block<TYPE>::GetBytesize() const noexcept {
       return mCount * GetStride();
    }
 
@@ -490,7 +490,7 @@ namespace Langulus::Annies
    ///   @attention this returns zero if block is untyped                     
    ///   @return the size of a single element in bytes                        
    template<class TYPE> LANGULUS(INLINED)
-   constexpr Size Block<TYPE>::GetStride() const noexcept {
+   constexpr size_t Block<TYPE>::GetStride() const noexcept {
       if constexpr (TypeErased)
          return mType ? mType->mSize : 0_B;
       else

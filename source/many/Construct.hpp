@@ -58,9 +58,9 @@ namespace Langulus::Annies
    public:
       Hash GetHash() const;
 
-      template<CT::Data, CT::NotVoid T1, CT::NotVoid...TN>
+      template<CT::NotVoid, CT::NotVoid T1, CT::NotVoid...TN>
       static Construct From(T1&&, TN&&...);
-      template<CT::Data>
+      template<CT::NotVoid>
       static Construct From();
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
@@ -76,15 +76,15 @@ namespace Langulus::Annies
    public:
       bool operator == (const Construct&) const;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       bool CastsTo() const;
       bool CastsTo(DMeta) const;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       bool Is() const;
       bool Is(DMeta) const;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       void SetType();
       void SetType(DMeta) noexcept;
 
@@ -113,7 +113,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Conversion                                                        
       ///                                                                     
-      Count Serialize(CT::Serial auto&) const;
+      size_t Serialize(CT::Serial auto&) const;
    };
 
 } // namespace Langulus::Annies

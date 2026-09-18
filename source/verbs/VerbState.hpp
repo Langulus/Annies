@@ -16,8 +16,8 @@ namespace Langulus::Annies
    ///   Verb state flags                                                     
    ///                                                                        
    struct VerbState {
-      LANGULUS(POD) true;
-      LANGULUS(NULLIFIABLE) true;
+      using CTTI_POD = Yup;
+      using CTTI_Nullable = Yup;
 
       enum Enum : ::std::uint8_t {
          // Default verb state                                          

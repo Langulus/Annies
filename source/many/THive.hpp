@@ -49,7 +49,7 @@ namespace Langulus::Annies
       LANGULUS(TYPED) T;
       LANGULUS(ABSTRACT) false;
 
-      static constexpr Count DefaultFrameSize = 8;
+      static constexpr size_t DefaultFrameSize = 8;
       static constexpr bool Ownership = true;
 
    protected:
@@ -65,7 +65,7 @@ namespace Langulus::Annies
       // a free cell                                                    
       Cell* mReusable {};
       // Number of initialized elements across all frames               
-      Count mCount = 0;
+      size_t mCount = 0;
 
    public:
       ///                                                                     
@@ -94,7 +94,7 @@ namespace Langulus::Annies
       ///                                                                     
       auto Owns(const void*) const noexcept -> const Frame*;
       auto GetType() const noexcept -> DMeta;
-      auto GetCount() const noexcept -> Count;
+      auto GetCount() const noexcept -> size_t;
       bool IsEmpty() const noexcept;
       constexpr explicit operator bool() const noexcept;
 

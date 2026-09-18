@@ -465,7 +465,7 @@ namespace Langulus::Annies
                ->Keep(asFrom->GetCount());
 
             auto srcVal = coalescedVals.mRaw;
-            const Size valstride = coalescedVals.GetStride();
+            const size_t valstride = coalescedVals.GetStride();
             auto info = GetInfo();
             const auto infoEnd = GetInfoEnd();
             while (info != infoEnd) {
@@ -566,7 +566,7 @@ namespace Langulus::Annies
          // be rehashed and reinserted                                  
          auto ptr = coalescedKeys.mRaw;
          const auto ptrEnd = coalescedKeys.mRaw + coalescedKeys.GetBytesize();
-         const Size stride = coalescedKeys.GetStride();
+         const size_t stride = coalescedKeys.GetStride();
 
          if (not asFrom->mValues.mType->mIsSparse) {
             // Values are dense, however                                
@@ -603,7 +603,7 @@ namespace Langulus::Annies
                ->Keep(asFrom->GetCount());
 
             auto ptrVal = coalescedVals.mRaw;
-            const Size valstride = coalescedVals.GetStride();
+            const size_t valstride = coalescedVals.GetStride();
             while (ptr != ptrEnd) {
                InsertInner<B, false>(
                   GetBucket<B>(GetReserved() - 1, ptr),

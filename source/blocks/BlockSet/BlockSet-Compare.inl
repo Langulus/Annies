@@ -113,7 +113,7 @@ namespace Langulus::Annies
    ///   @param match - the key to search for                                 
    ///   @return the index, or InvalidOffset if not found                     
    template<CT::Set THIS>
-   Offset BlockSet::FindInner(const CT::NoIntent auto& match) const {
+   size_t BlockSet::FindInner(const CT::NoIntent auto& match) const {
       using K = Deref<decltype(match)>;
       if (IsEmpty())
          return InvalidOffset;
@@ -200,7 +200,7 @@ namespace Langulus::Annies
    ///   @param match - the key to search for                                 
    ///   @return the index, or InvalidOffset if not found                     
    template<CT::Set THIS>
-   Offset BlockSet::FindBlockInner(const Block<>& match) const {
+   size_t BlockSet::FindBlockInner(const Block<>& match) const {
       if (IsEmpty() or not IsSimilar<THIS>(match.GetType()))
          return InvalidOffset;
 

@@ -77,10 +77,10 @@ namespace Langulus::Annies
       using Base = Block<Byte>;
       static constexpr bool Ownership = true;
 
-      LANGULUS(DEEP) false;
-      LANGULUS(ACT_AS) Bytes;
-      LANGULUS(FILES) "lgls";
-      LANGULUS_BASES(Base);
+      using CTTI_Deep = No;
+      using CTTI_ReflectAs = Bytes;
+      using CTTI_Files = Yes<"lgls">;
+      using CTTI_Bases = Base;
 
       /// The presence of this structure makes Bytes a serializer             
       struct SerializationRules {
@@ -106,8 +106,8 @@ namespace Langulus::Annies
 
       ~Bytes();
 
-      template<class T> requires (CT::Sparse<Deint<T>> and CT::Byte<Decay<Deint<T>>>)
-      static Bytes From(T&&, Count);
+      template<class T> requires (CT::Sparse<Deint<T>> and std::is_same_v<Langulus::Byte, Decay<Deint<T>>>)
+      static Bytes From(T&&, size_t);
 
       ///                                                                     
       ///   Assignment                                                        
@@ -126,8 +126,8 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Indexing                                                          
       ///                                                                     
-      Bytes Select(Offset, Count) const IF_UNSAFE(noexcept);
-      Bytes Select(Offset, Count)       IF_UNSAFE(noexcept);
+      Bytes Select(size_t, size_t) const IF_UNSAFE(noexcept);
+      Bytes Select(size_t, size_t)       IF_UNSAFE(noexcept);
 
       ///                                                                     
       ///   Comparison                                                        
@@ -138,7 +138,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Insertion                                                         
       ///                                                                     
-      Bytes Extend(Count);
+      Bytes Extend(size_t);
 
       template<class T> requires CT::Binable<Deint<T>>
       Bytes& operator << (T&&);
@@ -166,7 +166,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Deserialization                                                   
       ///                                                                     
-      Count Deserialize(CT::NotVoid auto&) const;
+      size_t Deserialize(CT::NotVoid auto&) const;
 
       ///                                                                     
       ///   Conversion                                                        

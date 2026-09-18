@@ -22,7 +22,7 @@ namespace Langulus::Annies
    ///   @param size - the number of client bytes to allocate                 
    ///   @return a newly allocated memory that is correctly aligned           
    template<AllocationPrimitive T>
-   T* AlignedAllocate(Offset size) noexcept {
+   T* AlignedAllocate(size_t size) noexcept {
       const auto finalSize = T::GetNewAllocationSize(size) + Alignment;
       const auto base = ::std::malloc(finalSize);
       if (not base)
@@ -30,8 +30,8 @@ namespace Langulus::Annies
 
       // Align pointer to the alignment LANGULUS was built with         
       auto ptr = reinterpret_cast<T*>(
-         (reinterpret_cast<Offset>(base) + Alignment)
-         & ~(Alignment - Offset {1})
+         (reinterpret_cast<size_t>(base) + Alignment)
+         & ~(Alignment - size_t {1})
       );
 
       // Place the entry there                                          
@@ -50,13 +50,13 @@ namespace Langulus::Annies
       };
 
       LANGULUS(INLINED)
-      static Allocation* Allocate(DMeta, Offset size) IF_UNSAFE(noexcept) {
+      static Allocation* Allocate(DMeta, size_t size) IF_UNSAFE(noexcept) {
          LglsAssumeDev(size, "Zero allocation is not allowed");
          return AlignedAllocate<Allocation>(size);
       }
 
       LANGULUS(INLINED)
-      static Allocation* Reallocate(Offset size, Allocation* previous) IF_UNSAFE(noexcept) {
+      static Allocation* Reallocate(size_t size, Allocation* previous) IF_UNSAFE(noexcept) {
          LglsAssumeDev(previous,
             "Reallocating nullptr");
          LglsAssumeDev(size != previous->GetAllocatedSize(),

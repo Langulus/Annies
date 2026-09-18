@@ -65,19 +65,19 @@ namespace Langulus::Annies
       auto last()  const noexcept -> ConstIterator;
 
       template<bool REVERSE = false>
-      Count ForEach(auto&&...);
+      size_t ForEach(auto&&...);
       template<bool REVERSE = false>
-      Count ForEach(auto&&...) const;
+      size_t ForEach(auto&&...) const;
 
       template<bool REVERSE = false>
-      Count ForEachElement(auto&&);
+      size_t ForEachElement(auto&&);
       template<bool REVERSE = false>
-      Count ForEachElement(auto&&) const;
+      size_t ForEachElement(auto&&) const;
       
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachDeep(auto&&...);
+      size_t ForEachDeep(auto&&...);
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachDeep(auto&&...) const;
+      size_t ForEachDeep(auto&&...) const;
 
       ///                                                                     
       ///   RTTI                                                              
@@ -106,7 +106,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Memory management                                                 
       ///                                                                     
-      void Reserve(Count);
+      void Reserve(size_t);
 
       ///                                                                     
       ///   Insertion                                                         

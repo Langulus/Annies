@@ -11,14 +11,12 @@
 
 namespace Langulus::Annies
 {
-
    ///                                                                        
    ///   Charge, carrying the four verb dimensions                            
    ///                                                                        
    class Charge {
-      LANGULUS(POD) true;
-      LANGULUS(NULLIFIABLE) false;
-      LANGULUS_CONVERTS_TO(Text);
+      using CTTI_POD = Yup;
+      using CTTI_Nullable = No;
 
       // Mass of the verb                                               
       Real mMass = DefaultMass;
@@ -60,5 +58,6 @@ namespace Langulus::Annies
 
       operator Text() const;
    };
-
 }
+
+LANGULUS_MORPHISM(Langulus::Annies::Charge, Langulus::Annies::Text);

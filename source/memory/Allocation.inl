@@ -19,9 +19,9 @@ namespace Langulus::Annies
       ///   @param u - number                                                 
       ///   @return the log2                                                  
       LANGULUS(INLINED)
-      constexpr Offset FastLog2(const Offset x) noexcept {
+      constexpr size_t FastLog2(const size_t x) noexcept {
          return x < 2 ? 0 
-            : Offset {8 * sizeof(Offset)} - ::std::countl_zero(x) - Offset {1};
+            : size_t {8 * sizeof(size_t)} - ::std::countl_zero(x) - size_t {1};
       }
 
       /// Get least significant bit                                           
@@ -29,23 +29,23 @@ namespace Langulus::Annies
       ///   @param n - number                                                 
       ///   @return the least significant bit                                 
       LANGULUS(INLINED)
-      constexpr Offset LSB(const Offset n) noexcept {
+      constexpr size_t LSB(const size_t n) noexcept {
          #if LANGULUS(BITNESS) == 32
-            constexpr Offset DeBruijnBitPosition[32] = {
+            constexpr size_t DeBruijnBitPosition[32] = {
                0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
                31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
             };
-            constexpr Offset f = 0x077CB531u;
-            return DeBruijnBitPosition[(Offset {n & (0 - n)} * f) >> Offset {27}];
+            constexpr size_t f = 0x077CB531u;
+            return DeBruijnBitPosition[(size_t {n & (0 - n)} * f) >> size_t {27}];
          #elif LANGULUS(BITNESS) == 64
-            constexpr Offset DeBruijnBitPosition[64] = {
+            constexpr size_t DeBruijnBitPosition[64] = {
                0,   1,  2, 53,  3,  7, 54, 27,  4, 38, 41,  8, 34, 55, 48, 28,
                62,  5, 39, 46, 44, 42, 22,  9, 24, 35, 59, 56, 49, 18, 29, 11,
                63, 52,  6, 26, 37, 40, 33, 47, 61, 45, 43, 21, 23, 58, 17, 10,
                51, 25, 36, 32, 60, 20, 57, 16, 50, 31, 19, 15, 30, 14, 13, 12
             };
-            constexpr Offset f = 0x022fdd63cc95386dul;
-            return DeBruijnBitPosition[(Offset {n & (0 - n)} * f) >> Offset {58}];
+            constexpr size_t f = 0x022fdd63cc95386dul;
+            return DeBruijnBitPosition[(size_t {n & (0 - n)} * f) >> size_t {58}];
          #else
             #error Implement for your architecture
          #endif
@@ -60,7 +60,7 @@ namespace Langulus::Annies
    ///   @param bytes - the number of allocated bytes                         
    ///   @param pool - the pool/handle of the entry                           
    LANGULUS(INLINED)
-   constexpr Allocation::Allocation(Offset bytes, Pool* pool) noexcept
+   constexpr Allocation::Allocation(size_t bytes, Pool* pool) noexcept
       : mAllocatedBytes {bytes}
       , mReferences     {1}
       , mPool           {pool} {}
@@ -68,7 +68,7 @@ namespace Langulus::Annies
    /// Get the size of the Allocation structure, rounded up for alignment     
    ///   @return the byte size of the entry, including alignment              
    LANGULUS(INLINED)
-   constexpr Offset Allocation::GetSize() noexcept {
+   constexpr size_t Allocation::GetSize() noexcept {
       static_assert(IsPowerOfTwo(Alignment),
          "Alignment is not a power-of-two number");
       return sizeof(Allocation) + Alignment - (sizeof(Allocation) % Alignment);
@@ -79,7 +79,7 @@ namespace Langulus::Annies
    ///   @param size - the usable number of bytes required                    
    ///   @return the byte size for a new Allocation, including padding        
    LANGULUS(INLINED)
-   constexpr Offset Allocation::GetNewAllocationSize(Offset size) noexcept {
+   constexpr size_t Allocation::GetNewAllocationSize(size_t size) noexcept {
       const auto minimum = Allocation::GetMinAllocation();
       const auto proposed = Allocation::GetSize() + size;
       return ::std::max(proposed, minimum);
@@ -88,14 +88,14 @@ namespace Langulus::Annies
    /// Get the minimum possible allocation, including the overhead            
    ///   @return the byte size                                                
    LANGULUS(INLINED)
-   constexpr Offset Allocation::GetMinAllocation() noexcept {
+   constexpr size_t Allocation::GetMinAllocation() noexcept {
       return Allocation::GetSize() + Alignment;
    }
 
    /// Check if the memory of the entry is in use                             
    ///   @return true if entry has any references                             
    LANGULUS(INLINED)
-   auto Allocation::GetUses() const noexcept -> Count {
+   auto Allocation::GetUses() const noexcept -> size_t {
       return mReferences;
    }
 
@@ -117,14 +117,14 @@ namespace Langulus::Annies
    /// Get the total of the entry, and its allocated data, in bytes           
    ///   @return the byte size of the entry plus the usable region after it   
    LANGULUS(INLINED)
-   Offset Allocation::GetTotalSize() const noexcept {
+   size_t Allocation::GetTotalSize() const noexcept {
       return Allocation::GetSize() + mAllocatedBytes;
    }
 
    /// Get the number of allocated bytes in this entry                        
    ///   @return the byte size of usable memory region                        
    LANGULUS(INLINED)
-   Offset Allocation::GetAllocatedSize() const noexcept {
+   size_t Allocation::GetAllocatedSize() const noexcept {
       return mAllocatedBytes;
    }
 
@@ -165,7 +165,7 @@ namespace Langulus::Annies
    /// Reference the entry 'c' times                                          
    ///   @param c - the number of references to add                           
    LANGULUS(INLINED)
-   constexpr void Allocation::Keep(Count c) noexcept {
+   constexpr void Allocation::Keep(size_t c) noexcept {
       mReferences += c;
    }
 
@@ -178,7 +178,7 @@ namespace Langulus::Annies
    /// Dereference the entry 'c' times                                        
    ///   @param c - the number of references to remove                        
    LANGULUS(INLINED)
-   constexpr void Allocation::Free(Count c) noexcept {
+   constexpr void Allocation::Free(size_t c) noexcept {
       mReferences -= c;
    }
 

@@ -7,6 +7,9 @@
 ///                                                                           
 #pragma once
 #include "Config.hpp"
+#include <Langulus/CT/Integer.hpp>
+#include <Langulus/CT/Signed.hpp>
+#include <Langulus/CT/Real.hpp>
 
 
 namespace Langulus::Annies
@@ -96,20 +99,20 @@ namespace Langulus::Annies
       constexpr Index(const Index&) noexcept = default;
       constexpr Index(const SpecialIndices& value) noexcept
          : mIndex {value} { }
-      template<CT::BuiltinSignedInteger T>
+      template<CT::Integer T> requires CT::Signed<T>
       constexpr Index(const T&) noexcept (sizeof(T) < sizeof(Type));
-      template<CT::BuiltinUnsignedInteger T>
+      template<CT::Integer T> requires CT::Unsigned<T>
       constexpr Index(const T&) noexcept (sizeof(T) <= sizeof(Type)/2);
       constexpr Index(const CT::Real auto&);
 
       constexpr Index& operator = (const Index&) noexcept = default;
 
    public:
-      constexpr Index Constrained(Count) const noexcept;
-      Offset GetOffset() const;
-      Offset GetOffsetUnsafe() const noexcept;
+      constexpr Index Constrained(size_t) const noexcept;
+      size_t GetOffset() const;
+      size_t GetOffsetUnsafe() const noexcept;
 
-      constexpr void Constrain(Count) noexcept;
+      constexpr void Constrain(size_t) noexcept;
       constexpr void Concat(const Index&) noexcept;
 
       constexpr bool IsValid() const noexcept;

@@ -13,7 +13,19 @@
 #include "../one/Handle.hpp"
 #include "../one/Own.hpp"
 #include <Langulus/Utils/Sequences.hpp>
+#include <Langulus/CT/Describable.hpp>
+#include <Langulus/CT/Allocatable.hpp>
+#include <Langulus/CT/Meta.hpp>
+#include <Langulus/Lambda.hpp>
 
+namespace Langulus::Flow
+{
+   template<class TYPE>
+   struct TVerb;
+
+   template<class VERB, bool NOEXCEPT>
+   struct ArithmeticVerb;
+}
 
 namespace Langulus
 {
@@ -25,9 +37,9 @@ namespace Langulus
       /// It defines the size for CT::Block and CT::Deep concepts             
       ///                                                                     
       struct Block {
-         LANGULUS(ABSTRACT) true;
-         LANGULUS(DEEP) true;
-         LANGULUS(POD) true;
+         using CTTI_Abstract = Yup;
+         using CTTI_Deep     = Yup;
+         using CTTI_POD      = Yup;
          static constexpr bool CTTI_Container = true;
 
       protected:
@@ -46,9 +58,9 @@ namespace Langulus
          };
    
          // Number of initialized elements inside memory block          
-         Count mCount {};
+         size_t mCount {};
          // Number of allocated elements in the memory block            
-         Count mReserved {};
+         size_t mReserved {};
          // Meta data about the elements inside the memory block        
          mutable DMeta mType {};
          // Pointer to the allocated block. If entry is zero, then data 
@@ -67,11 +79,11 @@ namespace Langulus
          constexpr Block(const DataState&, DMeta) noexcept;
 
          Block(const DataState&, CMeta) IF_UNSAFE(noexcept);
-         Block(const DataState&, DMeta, Count) IF_UNSAFE(noexcept);
-         Block(const DataState&, DMeta, Count, const void*) IF_UNSAFE(noexcept);
-         Block(const DataState&, DMeta, Count, void*) IF_UNSAFE(noexcept);
-         Block(const DataState&, DMeta, Count, const void*, const Allocation*) IF_UNSAFE(noexcept);
-         Block(const DataState&, DMeta, Count, void*, const Allocation*) IF_UNSAFE(noexcept);
+         Block(const DataState&, DMeta, size_t) IF_UNSAFE(noexcept);
+         Block(const DataState&, DMeta, size_t, const void*) IF_UNSAFE(noexcept);
+         Block(const DataState&, DMeta, size_t, void*) IF_UNSAFE(noexcept);
+         Block(const DataState&, DMeta, size_t, const void*, const Allocation*) IF_UNSAFE(noexcept);
+         Block(const DataState&, DMeta, size_t, void*, const Allocation*) IF_UNSAFE(noexcept);
 
          constexpr Block& operator = (const Block&) noexcept = default;
          constexpr Block& operator = (Block&&) noexcept = default;
@@ -84,14 +96,14 @@ namespace Langulus
 
       template<class...T>
       concept Iteratable = requires (T...a) {
-         {(a.begin(), ...)} -> Data;
-         {(a.end(),   ...)} -> Data;
+         {(a.begin(), ...)} -> NotVoid;
+         {(a.end(),   ...)} -> NotVoid;
       };
 
       template<class...T>
       concept IteratableInReverse = requires (T...a) {
-         {(a.rbegin(), ...)} -> Data;
-         {(a.rend(),   ...)} -> Data;
+         {(a.rbegin(), ...)} -> NotVoid;
+         {(a.rend(),   ...)} -> NotVoid;
       };
 
       /// Any origin type that inherits A::Block                              
@@ -122,17 +134,17 @@ namespace Langulus
       /// executed in each of their elements/members, instead on the type     
       /// itself. Use LANGULUS(DEEP) macro as member to tag deep types        
       /// Keep in mind, that sparse types are never considered Deep!          
-      template<class...T>
-      concept Deep = ((Block<T> and Decay<T>::CTTI_Deep) and ...);
+      //template<class...T>
+      //concept Deep = ((Block<T> and Decay<T>::CTTI_Deep) and ...);
 
       /// Check if Ts can be deepened 'WITH' the provided type                
       template<class WITH, class...T>
       concept CanBeDeepened = Deep<T...> and not CT::Void<WITH>
-          and ((not CT::Typed<T> or CT::Similar<WITH, TypeOf<T>>) and ...);
+          and ((not CT::Typed<T> or Same<WITH, TypeOf<T>>) and ...);
 
       /// Type that is not deep, see CT::Deep                                 
-      template<class...T>
-      concept Flat = ((not Deep<T>) and ...);
+      //template<class...T>
+      //concept Flat = ((not Deep<T>) and ...);
 
       /// Check if origin of T(s) are Neat(s)                                 
       template<class...T>
@@ -171,7 +183,7 @@ namespace Langulus
          ///   @return a pointer of the most inner type                       
          template<class T, class UNLESS = void>
          consteval auto Unfold() {
-            if constexpr (CT::Similar<T, UNLESS>)
+            if constexpr (Same<T, UNLESS>)
                return (Deref<Deint<T>>*) nullptr;
             else if constexpr (CT::Sparse<Deint<T>>) {
                if constexpr (CT::Array<Deint<T>>)
@@ -203,7 +215,7 @@ namespace Langulus
       concept UnfoldMakableFrom = ((not Same<A, Describe> and (
                ::std::constructible_from<T, A>
             or ::std::constructible_from<T, Unfold<A>>
-         )) and ...) or DescriptorMakable<T>;
+         )) and ...) or DescribeConstructible<T>;
 
       /// Check if T is assignable with the provided argument,                
       /// either directly, or by unfolding that argument                      
@@ -215,7 +227,7 @@ namespace Langulus
       /// Check if T is insertable to containers, either directly, or while   
       /// wrapped in an intent                                                
       template<class...TN>
-      concept UnfoldInsertable = ((Reflectable<Deint<TN>> or Handle<Deint<TN>>) and ...);
+      concept UnfoldInsertable = ((Reflectable<Deref<Deint<TN>>> or Handle<Deint<TN>>) and ...);
 
       namespace Inner
       {
@@ -227,9 +239,9 @@ namespace Langulus
          template<class T, class...A>
          consteval bool DeepMakable() noexcept {
             using FA = FirstOf<A...>;
-            using SA = IntentOf<FA>;
+            using SA = IntentOf(LglsFake(FA));
 
-            if constexpr (TypeErased<T>) {
+            if constexpr (not CT::Typed<T>) {
                // Type-erased containers accept almost any type - they  
                // will report errors at runtime instead, if any         
                return UnfoldInsertable<A...>;
@@ -241,7 +253,7 @@ namespace Langulus
                   // but copying will call element constructors, so we  
                   // have to check if the contained type supports it    
                   if constexpr (CT::Copied<SA>)
-                     return ReferMakable<T>;
+                     return ReferConstructible<T>;
                   else
                      return true;
                }
@@ -249,7 +261,7 @@ namespace Langulus
                   // Cloning always calls element constructors, and     
                   // we have to check whether contained elements can    
                   // do it                                              
-                  return IntentMakable<Langulus::Cloned, T>;
+                  return IntentConstructible<Langulus::Clone, T>;
                }
             }
             else return UnfoldMakableFrom<T, A...>;
@@ -261,9 +273,9 @@ namespace Langulus
          ///   @return true if TMany<T> is assignable using = A               
          template<class T, class A>
          consteval bool DeepAssignable() noexcept {
-            using SA = IntentOf<A>;
+            using SA = IntentOf(LglsFake(A));
 
-            if constexpr (TypeErased<T>) {
+            if constexpr (not CT::Typed<T>) {
                // Type-erased containers accept almost any type - they  
                // will report errors at runtime instead, if any         
                return UnfoldInsertable<A>;
@@ -281,7 +293,7 @@ namespace Langulus
                else {
                   // Cloning always calls element assigners, and we     
                   // have to check whether contained elements can do it 
-                  return IntentAssignable<Langulus::Cloned, T>;
+                  return IntentAssignable<Langulus::Clone, T>;
                }
             }
             else return UnfoldAssignableFrom<T, A>;
@@ -361,14 +373,14 @@ namespace Langulus::Annies
    ///                                                                        
    template<class TYPE>
    struct Block : A::Block {
-      LANGULUS(TYPED) TYPE;
-      LANGULUS(ABSTRACT) false;
-      LANGULUS(ACT_AS) Block<>;
-      LANGULUS_BASES(A::Block);
+      using CTTI_Typed = TYPE;
+      using CTTI_Abstract = No;
+      using CTTI_ReflectAs = Block<void>;
+      using CTTI_Bases = A::Block;
 
       static constexpr bool Ownership  = false;
       static constexpr bool Sequential = true;
-      static constexpr bool TypeErased = CT::TypeErased<TYPE>;
+      static constexpr bool TypeErased = CT::Void<TYPE>;
       static constexpr bool Sparse     = CT::Sparse<TYPE>;
       static constexpr bool Dense      = not Sparse;
 
@@ -378,27 +390,27 @@ namespace Langulus::Annies
       template<class>
       friend struct TBlockIterator;
 
-      friend class Many;
-      template<CT::Data>
+      friend struct Many;
+      template<CT::NotVoid>
       friend class TMany;
 
       friend struct BlockMap;
       template<bool>
       friend struct Map;
-      template<CT::Data, CT::Data, bool>
+      template<CT::NotVoid, CT::NotVoid, bool>
       friend struct TMap;
 
       friend struct BlockSet;
       template<bool>
       friend struct Set;
-      template<CT::Data, bool>
+      template<CT::NotVoid, bool>
       friend struct TSet;
 
       friend struct Bytes;
       friend struct Text;
       friend struct Path;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       friend class Own;
       template<class>
       friend class Ref;
@@ -461,13 +473,13 @@ namespace Langulus::Annies
 
       bool Owns(const void*) const noexcept;
       constexpr auto GetAllocation() const noexcept -> const Allocation*;
-      constexpr Count GetUses() const noexcept;
+      constexpr size_t GetUses() const noexcept;
       constexpr DMeta GetType() const noexcept;
-      constexpr Count GetCount() const noexcept;
-      constexpr Count GetReserved() const noexcept;
-      constexpr Size GetReservedSize() const noexcept;
-      Count GetCountDeep() const noexcept;
-      Count GetCountElementsDeep() const noexcept;
+      constexpr size_t GetCount() const noexcept;
+      constexpr size_t GetReserved() const noexcept;
+      constexpr size_t GetReservedSize() const noexcept;
+      size_t GetCountDeep() const noexcept;
+      size_t GetCountElementsDeep() const noexcept;
       constexpr bool IsAllocated() const noexcept;
       constexpr bool IsPast() const noexcept;
       constexpr bool IsFuture() const noexcept;
@@ -492,15 +504,15 @@ namespace Langulus::Annies
       constexpr bool IsDeep() const noexcept;
       constexpr bool IsBlock() const noexcept;
       constexpr bool CanFitState(const CT::Block auto&) const noexcept;
-      constexpr Size GetBytesize() const noexcept;
+      constexpr size_t GetBytesize() const noexcept;
       constexpr Token GetToken() const noexcept;
-      constexpr Size GetStride() const noexcept;
+      constexpr size_t GetStride() const noexcept;
       constexpr DataState GetState() const noexcept;
       constexpr DataState GetUnconstrainedState() const noexcept;
       constexpr bool IsMissingDeep() const;
       constexpr bool IsConcatable(const CT::Block auto&) const noexcept;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       constexpr bool IsInsertable() const noexcept;
       constexpr bool IsInsertable(DMeta) const noexcept;
 
@@ -535,26 +547,26 @@ namespace Langulus::Annies
 
       template<class...>
       bool ExtractTrait(CT::NotVoid auto&...) const;
-      auto ExtractData(CT::NotVoid auto&) const -> Count;
+      auto ExtractData(CT::NotVoid auto&) const -> size_t;
 
       // Intentionally undefined, because it requires Langulus::Flow    
       // and relies on Verbs::Interpret                                 
       // If you receive missing externals, include the following:       
       //    #include <Flow/Verbs/Interpret.hpp>                         
-      auto ExtractDataAs(CT::NotVoid auto&) const -> Count;
+      auto ExtractDataAs(CT::NotVoid auto&) const -> size_t;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       auto FindType()      const -> DMeta;
       auto FindType(DMeta) const -> DMeta;
 
-      void SetTrait(auto&&, Offset = 0);
+      void SetTrait(auto&&, size_t = 0);
 
    protected:
       template<class>
       bool ExtractTraitInner(CT::NotVoid auto&...) const;
-      template<class, Offset...IDX>
+      template<class, size_t...IDX>
       bool ExtractTraitInner(ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
-      template<class, Offset>
+      template<class, size_t>
       bool ExtractTraitInnerInner(CT::NotVoid auto&) const;
 
    public:
@@ -564,9 +576,9 @@ namespace Langulus::Annies
       decltype(auto) operator[] (CT::Index auto);
       decltype(auto) operator[] (CT::Index auto) const;
 
-      template<CT::Data>
+      template<CT::NotVoid>
       decltype(auto) As(CT::Index auto);
-      template<CT::Data>
+      template<CT::NotVoid>
       decltype(auto) As(CT::Index auto) const;
 
       template<CT::NotVoid T> LANGULUS(ALWAYS_INLINED)
@@ -595,33 +607,33 @@ namespace Langulus::Annies
       }
    
       template<CT::Block THIS> IF_UNSAFE(constexpr)
-      THIS Select(Offset, Count) IF_UNSAFE(noexcept);
+      THIS Select(size_t, size_t) IF_UNSAFE(noexcept);
       template<CT::Block THIS> IF_UNSAFE(constexpr)
-      THIS Select(Offset, Count) const IF_UNSAFE(noexcept);
+      THIS Select(size_t, size_t) const IF_UNSAFE(noexcept);
 
-      template<Count = CountMax>
-      auto GetElementDense(Offset = 0) -> Block<>;
-      template<Count = CountMax>
-      auto GetElementDense(Offset = 0) const -> Block<>;
+      template<size_t = -1>
+      auto GetElementDense(size_t = 0) -> Block<>;
+      template<size_t = -1>
+      auto GetElementDense(size_t = 0) const -> Block<>;
    
-      auto GetElementResolved(Offset = 0)       -> Block<>;
-      auto GetElementResolved(Offset = 0) const -> Block<>;
+      auto GetElementResolved(size_t = 0)       -> Block<>;
+      auto GetElementResolved(size_t = 0) const -> Block<>;
 
-      auto GetElement(Offset = 0)       IF_UNSAFE(noexcept) -> Block<>;
-      auto GetElement(Offset = 0) const IF_UNSAFE(noexcept) -> Block<>;
+      auto GetElement(size_t = 0)       IF_UNSAFE(noexcept) -> Block<>;
+      auto GetElement(size_t = 0) const IF_UNSAFE(noexcept) -> Block<>;
    
-      auto GetBlockDeep(Offset)       noexcept -> Block<>*;
-      auto GetBlockDeep(Offset) const noexcept -> Block<> const*;
+      auto GetBlockDeep(size_t)       noexcept -> Block<>*;
+      auto GetBlockDeep(size_t) const noexcept -> Block<> const*;
    
-      auto GetElementDeep(Offset)       noexcept -> Block<>;
-      auto GetElementDeep(Offset) const noexcept -> Block<>;
+      auto GetElementDeep(size_t)       noexcept -> Block<>;
+      auto GetElementDeep(size_t) const noexcept -> Block<>;
 
       auto GetResolved()       -> Block<>;
       auto GetResolved() const -> Block<>;
 
-      template<Count = CountMax>
+      template<size_t = -1>
       auto GetDense() -> Block<>;
-      template<Count = CountMax>
+      template<size_t = -1>
       auto GetDense() const -> Block<>;
 
       auto operator * () -> Block<>;
@@ -632,45 +644,45 @@ namespace Langulus::Annies
       void Swap(T&&);
 
       template<bool REVERSE = false>
-      Count GatherFrom(const CT::Block auto&);
+      size_t GatherFrom(const CT::Block auto&);
       template<bool REVERSE = false>
-      Count GatherFrom(const CT::Block auto&, DataState);
+      size_t GatherFrom(const CT::Block auto&, DataState);
 
       template<Index>
       Index GetIndex() const IF_UNSAFE(noexcept);
-      Index GetIndexMode(Count&) const IF_UNSAFE(noexcept);
+      Index GetIndexMode(size_t&) const IF_UNSAFE(noexcept);
 	  
       template<CT::NotVoid = TYPE> IF_UNSAFE(constexpr)
-      decltype(auto) Get(Offset = 0)       IF_UNSAFE(noexcept);
+      decltype(auto) Get(size_t = 0)       IF_UNSAFE(noexcept);
       template<CT::NotVoid = TYPE> IF_UNSAFE(constexpr)
-      decltype(auto) Get(Offset = 0) const IF_UNSAFE(noexcept);
+      decltype(auto) Get(size_t = 0) const IF_UNSAFE(noexcept);
    
       IF_UNSAFE(constexpr)
-      decltype(auto) GetDeep(Offset = 0)       IF_UNSAFE(noexcept);
+      decltype(auto) GetDeep(size_t = 0)       IF_UNSAFE(noexcept);
       IF_UNSAFE(constexpr)
-      decltype(auto) GetDeep(Offset = 0) const IF_UNSAFE(noexcept);
+      decltype(auto) GetDeep(size_t = 0) const IF_UNSAFE(noexcept);
 
    protected: 
-      Block<> GetElementInner(Offset = 0)       IF_UNSAFE(noexcept);
-      Block<> GetElementInner(Offset = 0) const IF_UNSAFE(noexcept);
+      Block<> GetElementInner(size_t = 0)       IF_UNSAFE(noexcept);
+      Block<> GetElementInner(size_t = 0) const IF_UNSAFE(noexcept);
 
       IF_UNSAFE(constexpr)
-      auto At(Offset = 0) IF_UNSAFE(noexcept) -> Byte*;
+      auto At(size_t = 0) IF_UNSAFE(noexcept) -> Byte*;
       IF_UNSAFE(constexpr)
-      auto At(Offset = 0) const IF_UNSAFE(noexcept) -> Byte const*;
+      auto At(size_t = 0) const IF_UNSAFE(noexcept) -> Byte const*;
    
       Index Constrain(Index) const IF_UNSAFE(noexcept);
-      Block CropInner(Offset, Count) const IF_UNSAFE(noexcept);
+      Block CropInner(size_t, size_t) const IF_UNSAFE(noexcept);
 
       template<bool SAFE = true, CT::Index INDEX>
-      Offset SimplifyIndex(INDEX) const
-      noexcept(not LANGULUS_SAFE() and CT::BuiltinInteger<INDEX>);
+      size_t SimplifyIndex(INDEX) const
+      noexcept(not LANGULUS_SAFE() and CT::Integer<INDEX>);
 
    public:
       template<class = TYPE>
-      auto GetHandle(Offset = 0)       IF_UNSAFE(noexcept);
+      auto GetHandle(size_t = 0)       IF_UNSAFE(noexcept);
       template<class = TYPE>
-      auto GetHandle(Offset = 0) const IF_UNSAFE(noexcept);
+      auto GetHandle(size_t = 0) const IF_UNSAFE(noexcept);
    
       ///                                                                     
       ///   Iteration                                                         
@@ -686,32 +698,32 @@ namespace Langulus::Annies
       constexpr A::IteratorEnd end() const noexcept { return {}; }
 
       template<bool REVERSE = false, bool MUTABLE = false>
-      Count ForEachElement(auto&&) const;
+      size_t ForEachElement(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEachElement(auto&&);
+      size_t ForEachElement(auto&&);
 
       template<bool MUTABLE = false>
-      Count ForEachElementRev(auto&&...) const;
-      Count ForEachElementRev(auto&&...);
+      size_t ForEachElementRev(auto&&...) const;
+      size_t ForEachElementRev(auto&&...);
 
       template<bool REVERSE = false, bool MUTABLE = false>
-      Count ForEach(auto&&...) const;
+      size_t ForEach(auto&&...) const;
       template<bool REVERSE = false>
-      Count ForEach(auto&&...);
+      size_t ForEach(auto&&...);
 
       template<bool MUTABLE = false>
-      Count ForEachRev(auto&&...) const;
-      Count ForEachRev(auto&&...);
+      size_t ForEachRev(auto&&...) const;
+      size_t ForEachRev(auto&&...);
 
       template<bool REVERSE = false, bool SKIP = true, bool MUTABLE = false>
-      Count ForEachDeep(auto&&...) const;
+      size_t ForEachDeep(auto&&...) const;
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachDeep(auto&&...);
+      size_t ForEachDeep(auto&&...);
 
       template<bool SKIP = true, bool MUTABLE = false>
-      Count ForEachDeepRev(auto&&...) const;
+      size_t ForEachDeepRev(auto&&...) const;
       template<bool SKIP = true>
-      Count ForEachDeepRev(auto&&...);
+      size_t ForEachDeepRev(auto&&...);
 
    protected:
       template<class F>
@@ -719,13 +731,13 @@ namespace Langulus::Annies
          and noexcept(Fake<F&&>().operator() (Fake<ArgumentOf<F>>()));
 
       template<bool MUTABLE, bool REVERSE>
-      LoopControl ForEachInner(auto&& f, Count&) const noexcept(NoexceptIterator<decltype(f)>);
+      LoopControl ForEachInner(auto&& f, size_t&) const noexcept(NoexceptIterator<decltype(f)>);
 
       template<bool MUTABLE, bool REVERSE, bool SKIP>
-      LoopControl ForEachDeepInner(auto&&, Count&) const;
+      LoopControl ForEachDeepInner(auto&&, size_t&) const;
 
       template<bool MUTABLE, bool REVERSE>
-      LoopControl IterateInner(Count, auto&& f) const noexcept(NoexceptIterator<decltype(f)>);
+      LoopControl IterateInner(size_t, auto&& f) const noexcept(NoexceptIterator<decltype(f)>);
 
       // Prefix operators                                               
       auto operator ++ ()       IF_UNSAFE(noexcept) -> Block&;
@@ -737,29 +749,29 @@ namespace Langulus::Annies
       auto operator ++ (int) const IF_UNSAFE(noexcept) -> Block;
       auto operator -- (int) const IF_UNSAFE(noexcept) -> Block;
 
-      auto operator +  (Offset) const IF_UNSAFE(noexcept) -> Block;
-      auto operator -  (Offset) const IF_UNSAFE(noexcept) -> Block;
+      auto operator +  (size_t) const IF_UNSAFE(noexcept) -> Block;
+      auto operator -  (size_t) const IF_UNSAFE(noexcept) -> Block;
 
-      auto operator += (Offset)       IF_UNSAFE(noexcept) -> Block&;
-      auto operator += (Offset) const IF_UNSAFE(noexcept) -> Block const&;
-      auto operator -= (Offset)       IF_UNSAFE(noexcept) -> Block&;
-      auto operator -= (Offset) const IF_UNSAFE(noexcept) -> Block const&;
+      auto operator += (size_t)       IF_UNSAFE(noexcept) -> Block&;
+      auto operator += (size_t) const IF_UNSAFE(noexcept) -> Block const&;
+      auto operator -= (size_t)       IF_UNSAFE(noexcept) -> Block&;
+      auto operator -= (size_t) const IF_UNSAFE(noexcept) -> Block const&;
 
    public:
       ///                                                                     
       ///   RTTI                                                              
       ///                                                                     
-      template<CT::Data, CT::NotVoid...>
+      template<CT::NotVoid, CT::NotVoid...>
       constexpr bool Is() const noexcept;
       bool Is(DMeta) const noexcept;
       bool Is(const CT::Block auto&) const noexcept;
 
-      template<CT::Data, CT::NotVoid...>
+      template<CT::NotVoid, CT::NotVoid...>
       constexpr bool IsSimilar() const noexcept;
       bool IsSimilar(DMeta) const noexcept;
       bool IsSimilar(const CT::Block auto&) const noexcept;
 
-      template<CT::Data, CT::NotVoid...>
+      template<CT::NotVoid, CT::NotVoid...>
       constexpr bool IsExact() const noexcept;
       bool IsExact(DMeta) const noexcept;
       bool IsExact(const CT::Block auto&) const noexcept;
@@ -767,28 +779,28 @@ namespace Langulus::Annies
       template<bool BINARY_COMPATIBLE = false, bool ADVANCED = false>
       bool CastsToMeta(DMeta) const;
       template<bool BINARY_COMPATIBLE = false>
-      bool CastsToMeta(DMeta, Count) const;
+      bool CastsToMeta(DMeta, size_t) const;
 
-      template<CT::Data, bool BINARY_COMPATIBLE = false, bool ADVANCED = false>
+      template<CT::NotVoid, bool BINARY_COMPATIBLE = false, bool ADVANCED = false>
       bool CastsTo() const;
-      template<CT::Data, bool BINARY_COMPATIBLE = false>
-      bool CastsTo(Count) const;
+      template<CT::NotVoid, bool BINARY_COMPATIBLE = false>
+      bool CastsTo(size_t) const;
 
       template<CT::Block B>
       B ReinterpretAs(const B&) const;
       template<CT::NotVoid T>
       TMany<T> ReinterpretAs() const;
 
-      Block<> GetMember(const RTTI::Member&, CT::Index auto);
-      Block<> GetMember(const RTTI::Member&, CT::Index auto) const;
+      Block<> GetMember(const RTTI::DefinitionData::Member&, CT::Index auto);
+      Block<> GetMember(const RTTI::DefinitionData::Member&, CT::Index auto) const;
    
       template<bool CONSTRAIN = false>
       void SetType(DMeta) requires TypeErased;
-      template<CT::Data, bool CONSTRAIN = false>
+      template<CT::NotVoid, bool CONSTRAIN = false>
       void SetType() requires TypeErased;
 
    protected:
-      template<CT::Data, class FORCE = Many>
+      template<CT::NotVoid, class FORCE = Many>
       bool Mutate();
       template<class FORCE = Many>
       bool Mutate(DMeta);
@@ -796,10 +808,10 @@ namespace Langulus::Annies
       constexpr void ResetType() noexcept;
 
    public:
-      Block<> GetBaseMemory(DMeta, const RTTI::Base&);
-      Block<> GetBaseMemory(DMeta, const RTTI::Base&) const;
-      Block<> GetBaseMemory(const RTTI::Base&);
-      Block<> GetBaseMemory(const RTTI::Base&) const;
+      Block<> GetBaseMemory(DMeta, const RTTI::DefinitionData::Base&);
+      Block<> GetBaseMemory(DMeta, const RTTI::DefinitionData::Base&) const;
+      Block<> GetBaseMemory(const RTTI::DefinitionData::Base&);
+      Block<> GetBaseMemory(const RTTI::DefinitionData::Base&) const;
 
       ///                                                                     
       ///   Comparison                                                        
@@ -815,7 +827,7 @@ namespace Langulus::Annies
       Hash GetHash() const requires (TypeErased or CT::Hashable<TYPE>);
 
       template<bool REVERSE = false, CT::NoIntent T1>
-      Index Find(const T1&, Offset = 0) const noexcept
+      Index Find(const T1&, size_t = 0) const noexcept
       requires (TypeErased or CT::Comparable<TYPE, T1>);
 
       auto FindIt(const CT::NoIntent auto&)       -> Iterator;
@@ -825,42 +837,46 @@ namespace Langulus::Annies
       Index FindBlock(const CT::Block auto&, CT::Index auto) const noexcept;
 
       template<bool ASCEND = false>
-      void Sort() requires (TypeErased or CT::Sortable<TYPE, TYPE>);
+      void Sort() requires (TypeErased or CT::Comparable<TYPE, TYPE>);
 
       bool  CompareLoose(const CT::Block auto&) const noexcept;
-      Count Matches(const CT::Block auto&) const noexcept;
-      Count MatchesLoose(const CT::Block auto&) const noexcept;
+      size_t Matches(const CT::Block auto&) const noexcept;
+      size_t MatchesLoose(const CT::Block auto&) const noexcept;
       bool  Contains(const CT::NoIntent auto&) const;
 
    protected:
       bool CompareSingleValue(const CT::NoIntent auto&) const;
       bool CompareStates(const Block&) const noexcept;
-      bool CompareTypes(const CT::Block auto&, RTTI::Base&) const;
-      bool CallComparer(const Block&, const RTTI::Base&) const;
+      bool CompareTypes(const CT::Block auto&, RTTI::DefinitionData::Base&) const;
+      bool CallComparer(const Block&, const RTTI::DefinitionData::Base&) const;
 
       template<bool REVERSE = false>
-      Count GatherInner(CT::Block auto&) const;
+      size_t GatherInner(CT::Block auto&) const;
       template<bool REVERSE = false>
-      Count GatherPolarInner(DMeta, CT::Block auto&, DataState) const;
+      size_t GatherPolarInner(DMeta, CT::Block auto&, DataState) const;
 
    public:
       ///                                                                     
       ///   Memory management                                                 
       ///                                                                     
       template<bool SETSIZE = false>
-      void Reserve(Count);
+      void Reserve(size_t);
       void TakeAuthority();
 
    protected:
       /// @cond show_protected                                                
-      auto RequestSize(Count) const IF_UNSAFE(noexcept) -> AllocationRequest;
+      struct AllocationRequest {
+         
+      };
+
+      auto RequestSize(size_t) const IF_UNSAFE(noexcept) -> AllocationRequest;
 
       template<bool CREATE = false, bool SETSIZE = false>
-      void AllocateMore(Count);
-      void AllocateLess(Count);
+      void AllocateMore(size_t);
+      void AllocateLess(size_t);
 
       template<bool CREATE = false>
-      void AllocateInner(Count);
+      void AllocateInner(size_t);
       void AllocateFresh(const AllocationRequest&);
 
       template<bool DEEP = false>
@@ -882,44 +898,44 @@ namespace Langulus::Annies
       ///   Insertion                                                         
       ///                                                                     
       template<class FORCE = Many, bool MOVE_ASIDE = true, class T1, class...TN>
-      Count Insert(CT::Index auto, T1&&, TN&&...)
+      size_t Insert(CT::Index auto, T1&&, TN&&...)
       requires (TypeErased or CT::UnfoldMakableFrom<TYPE, T1, TN...>);
 
       template<class FORCE = Many, bool MOVE_ASIDE = true, class T>
       requires CT::Block<Deint<T>>
-      Count InsertBlock(CT::Index auto, T&&);
+      size_t InsertBlock(CT::Index auto, T&&);
 
       template<class FORCE = Many, bool MOVE_ASIDE = true, class T1, class...TN>
-      Count Merge(CT::Index auto, T1&&, TN&&...)
+      size_t Merge(CT::Index auto, T1&&, TN&&...)
       requires (TypeErased or CT::UnfoldMakableFrom<TYPE, T1, TN...>);
 
       template<class FORCE = Many, bool MOVE_ASIDE = true, class T>
       requires CT::Block<Deint<T>>
-      Count MergeBlock(CT::Index auto, T&&);
+      size_t MergeBlock(CT::Index auto, T&&);
    
       template<bool MOVE_ASIDE = true, class...A>
       decltype(auto) Emplace(CT::Index auto, A&&...)
       requires (TypeErased or ::std::constructible_from<TYPE, A...>);
 
       template<class...A>
-      Count New(Count, A&&...)
+      size_t New(size_t, A&&...)
       requires (TypeErased or ::std::constructible_from<TYPE, A...>);
 
-      Count New(Count = 1) requires (TypeErased or CT::Defaultable<TYPE>);
+      size_t New(size_t = 1) requires (TypeErased or CT::Defaultable<TYPE>);
 
       template<bool CONCAT = true, class FORCE = Many>
-      Count SmartPush(CT::Index auto, auto&&, DataState = {});
+      size_t SmartPush(CT::Index auto, auto&&, DataState = {});
 
       template<CT::Deep T, bool TRANSFER_OR = true>
       T& Deepen();
 
-      void Null(Count);
+      void Null(size_t);
 
       template<class A>
       void Fill(A&&) requires (TypeErased or CT::AssignableFrom<TYPE, A>);
 
       template<CT::Block THIS>
-      THIS Extend(Count);
+      THIS Extend(size_t);
 
    protected:
       template<class FORCE, bool MOVE_ASIDE>
@@ -929,15 +945,15 @@ namespace Langulus::Annies
       void InsertBlockInner(CT::Index auto, T&&);
 
       template<class FORCE, bool MOVE_ASIDE>
-      Count UnfoldInsert(CT::Index auto, auto&&);
+      size_t UnfoldInsert(CT::Index auto, auto&&);
       template<class FORCE, bool MOVE_ASIDE>
-      Count UnfoldMerge(CT::Index auto, auto&&);
+      size_t UnfoldMerge(CT::Index auto, auto&&);
 
       template<class FORCE, class T> requires CT::Deep<Deint<T>>
-      Count SmartConcat(const CT::Index auto, bool, T&&, DataState);
+      size_t SmartConcat(const CT::Index auto, bool, T&&, DataState);
 
       template<class FORCE>
-      Count SmartPushInner(const CT::Index auto, auto&&, DataState);
+      size_t SmartPushInner(const CT::Index auto, auto&&, DataState);
 
       template<CT::Block THIS, class T> requires CT::Block<Deint<T>>
       THIS ConcatBlock(T&&) const;
@@ -967,12 +983,12 @@ namespace Langulus::Annies
       ///   Removal                                                           
       ///                                                                     
       template<bool REVERSE = false>
-      Count Remove(const CT::NoIntent auto&);
-      Count RemoveIndex(CT::Index auto, Count = 1);
-      Count RemoveIndexDeep(CT::Index auto);
-      auto  RemoveIt(const Iterator&, Count = 1) -> Iterator;
+      size_t Remove(const CT::NoIntent auto&);
+      size_t RemoveIndex(CT::Index auto, size_t = 1);
+      size_t RemoveIndexDeep(CT::Index auto);
+      auto  RemoveIt(const Iterator&, size_t = 1) -> Iterator;
 
-      void Trim(Count);
+      void Trim(size_t);
       void Optimize();
       void Clear();
       void Reset();
@@ -982,54 +998,54 @@ namespace Langulus::Annies
       ///   Compression                                                       
       ///                                                                     
       #if LANGULUS_FEATURE(COMPRESSION)
-         Size Compress(Block&, Compression = Compression::Default) const;
-         Size Decompress(Block&) const;
+         size_t Compress(Block&, Compression = Compression::Default) const;
+         size_t Decompress(Block&) const;
       #endif
 
       ///                                                                     
       ///   Encryption                                                        
       ///                                                                     
-      Size Encrypt(Block&, const ::std::size_t*, Count) const;
-      Size Decrypt(Block&, const ::std::size_t*, Count) const;
+      size_t Encrypt(Block&, const ::std::size_t*, size_t) const;
+      size_t Decrypt(Block&, const ::std::size_t*, size_t) const;
 
       ///                                                                     
       ///   Conversion                                                        
       ///                                                                     
-      Count Convert(CT::Block auto&) const;
-      Count Serialize(CT::Serial auto&) const;
+      size_t Convert(CT::Block auto&) const;
+      size_t Serialize(CT::Serial auto&) const;
 
    protected:
       #pragma pack(push, 1)
       struct Header {
          enum { Default, BigEndian };
 
-         ::std::uint8_t  mAtomSize = sizeof(Offset);
-         ::std::uint8_t  mFlags    = BigEndianMachine ? BigEndian : Default;
+         ::std::uint8_t  mAtomSize = sizeof(size_t);
+         ::std::uint8_t  mFlags    = std::endian::native == std::endian::big ? BigEndian : Default;
          ::std::uint16_t mVersion  = 0;
          ::std::uint32_t mDefinitionCount = 0;
       };
       #pragma pack(pop)
 
-      using Loader = void(*)(Block&, Count);
+      using Loader = void(*)(Block&, size_t);
 
       template<class>
-      Count SerializeToText(CT::Serial auto&) const;
+      size_t SerializeToText(CT::Serial auto&) const;
       template<class>
-      Count SerializeToBinary(CT::Serial auto&) const;
+      size_t SerializeToBinary(CT::Serial auto&) const;
       template<class, class...RULES>
-      Count SerializeByRules(CT::Serial auto&, Types<RULES...>) const;
+      size_t SerializeByRules(CT::Serial auto&, Types<RULES...>) const;
       template<class, class RULE>
-      Count SerializeApplyRule(CT::Serial auto&) const;
+      size_t SerializeApplyRule(CT::Serial auto&) const;
 
       template<class>
-      Offset DeserializeBinary(CT::Block auto&, const Header&, Offset = 0, Loader = nullptr) const;
-      void   ReadInner(Offset, Count, Loader) const;
-      Offset DeserializeAtom(Offset&, Offset, const Header&, Loader) const;
-      Offset DeserializeMeta(CT::Meta auto&, Offset, const Header&, Loader) const;
+      size_t DeserializeBinary(CT::Block auto&, const Header&, size_t = 0, Loader = nullptr) const;
+      void   ReadInner(size_t, size_t, Loader) const;
+      size_t DeserializeAtom(size_t&, size_t, const Header&, Loader) const;
+      size_t DeserializeMeta(CT::Meta auto&, size_t, const Header&, Loader) const;
    };
 
    template<class BLOCK = void>
-   auto MakeBlock(auto&&, Count = 1);
+   auto MakeBlock(auto&&, size_t = 1);
 
    template<class BLOCK = void, CT::NotVoid...TN>
    auto WrapBlock(TN&&...);
@@ -1150,10 +1166,9 @@ namespace Langulus::Annies
    struct TBlockIterator : A::Iterator {
       static_assert(CT::Block<B>, "B must be a Block type");
       static constexpr bool Mutable = CT::Mutable<B>;
-      using Type = Conditional<Mutable, TypeOf<B>, const TypeOf<B>>;
-
-      LANGULUS(ABSTRACT) false;
-      LANGULUS(TYPED)    Type;
+      using Type           = std::conditional_t<Mutable, TypeOf<B>, const TypeOf<B>>;
+      using CTTI_Abstract  = No;
+      using CTTI_Typed     = Type;
 
    protected:
       template<class>
@@ -1161,7 +1176,7 @@ namespace Langulus::Annies
       template<class>
       friend struct TBlockIterator;
 
-      using TypeInner = Conditional<B::TypeErased, B, Type*>;
+      using TypeInner = std::conditional_t<B::TypeErased, B, Type*>;
 
       // Current iterator position pointer                              
       TypeInner   mValue = nullptr;
@@ -1206,10 +1221,8 @@ namespace Langulus::Annies
    };
 }
 
-namespace Langulus::CT::TI
+namespace Langulus::CTTI
 {
    template<CT::Sparse T>
-   struct SparseTrait<::Langulus::Annies::LocalRef<T>> {
-      static constexpr bool Value = true;
-   };
+   struct Sparse<::Langulus::Annies::LocalRef<T>> {};
 }

@@ -22,7 +22,7 @@ namespace Langulus::Annies
    template<CT::Map THIS> LANGULUS(INLINED)
    auto BlockMap::RemoveIt(const Iterator<THIS>& index) -> Iterator<THIS> {
       const auto sentinel = GetReserved();
-      auto offset = static_cast<Offset>(index.mInfo - mInfo);
+      auto offset = static_cast<size_t>(index.mInfo - mInfo);
       if (offset >= sentinel)
          return end();
 
@@ -49,7 +49,7 @@ namespace Langulus::Annies
    ///   @param key - the key to search for                                   
    ///   @return the number of removed pairs                                  
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::RemoveKey(const CT::NoIntent auto& key) {
+   size_t BlockMap::RemoveKey(const CT::NoIntent auto& key) {
       using K = Deref<decltype(key)>;
       if (IsEmpty())
          return 0;
@@ -69,7 +69,7 @@ namespace Langulus::Annies
          else if (IsKeySimilar<THIS, Deext<K>>()
          or (CT::Typed<THIS> and CT::Comparable<typename THIS::Key, Deext<K>>)) {
             // Remove all matching keys in the array                    
-            Count removed = 0;
+            size_t removed = 0;
             for (auto& element : key)
                removed += RemoveKeyInner<THIS>(key);
             return removed;
@@ -96,7 +96,7 @@ namespace Langulus::Annies
    ///   @param key - the key to search for                                   
    ///   @return 1 if pair was removed                                        
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::RemoveKeyInner(const CT::NoIntent auto& key) {
+   size_t BlockMap::RemoveKeyInner(const CT::NoIntent auto& key) {
       const auto found = FindInner<THIS>(key);
       if (found != InvalidOffset) {
          // Key found, remove the pair                                  
@@ -112,7 +112,7 @@ namespace Langulus::Annies
    ///   @param value - the values to search for                              
    ///   @return the number of removed pairs                                  
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::RemoveValue(const CT::NoIntent auto& value) {
+   size_t BlockMap::RemoveValue(const CT::NoIntent auto& value) {
       using V = Deref<decltype(value)>;
       if (IsEmpty())
          return 0;
@@ -132,7 +132,7 @@ namespace Langulus::Annies
          else if (IsValueSimilar<THIS, Deext<V>>()
          or (CT::Typed<THIS> and CT::Comparable<typename THIS::Value, Deext<V>>)) {
             // Remove all matching values in the array                  
-            Count removed = 0;
+            size_t removed = 0;
             for (auto& element : value)
                removed += RemoveValInner<THIS>(value);
             return removed;
@@ -155,8 +155,8 @@ namespace Langulus::Annies
    ///   @param value - the value to search for                               
    ///   @return the number of removed pairs                                  
    template<CT::Map THIS>
-   Count BlockMap::RemoveValInner(const CT::NoIntent auto& value) {
-      Count removed = 0;
+   size_t BlockMap::RemoveValInner(const CT::NoIntent auto& value) {
+      size_t removed = 0;
       auto psl = GetInfo();
       const auto pslEnd = GetInfoEnd();
       auto val = GetValHandle<THIS>(0);
@@ -194,7 +194,7 @@ namespace Langulus::Annies
    ///   @attention assumes that index points to a valid entry                
    ///   @param index - the index to remove                                   
    template<CT::Map THIS>
-   void BlockMap::RemoveInner(const Offset index) {
+   void BlockMap::RemoveInner(const size_t index) {
       BranchOut<THIS>();
       auto psl = GetInfo() + index;
       LglsAssumeDev(*psl, "Removing an invalid pair");

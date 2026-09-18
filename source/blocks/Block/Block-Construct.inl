@@ -44,7 +44,7 @@ namespace Langulus::A
    ///   @param count - initial element count and reserve                     
    ///   @param raw - pointer to the mutable memory                           
    LANGULUS(INLINED)
-   Block::Block(const DataState& state, DMeta meta, Count count, void* raw) IF_UNSAFE(noexcept)
+   Block::Block(const DataState& state, DMeta meta, size_t count, void* raw) IF_UNSAFE(noexcept)
       : Block {state, meta, count, raw, Allocator::Find(meta, raw)} {}
 
    /// Manual construction from mutable data                                  
@@ -53,7 +53,7 @@ namespace Langulus::A
    ///   @param meta - the type of the memory block                           
    ///   @param count - initial element count and reserve                     
    LANGULUS(INLINED)
-   Block::Block(const DataState& state, DMeta meta, Count count) IF_UNSAFE(noexcept)
+   Block::Block(const DataState& state, DMeta meta, size_t count) IF_UNSAFE(noexcept)
       : Block {state, meta, count, (void*) nullptr, nullptr} {}
    
    /// Manual construction from constant data                                 
@@ -64,7 +64,7 @@ namespace Langulus::A
    ///   @param count - initial element count and reserve                     
    ///   @param raw - pointer to the constant memory                          
    LANGULUS(INLINED)
-   Block::Block(const DataState& state, DMeta meta, Count count, const void* raw)
+   Block::Block(const DataState& state, DMeta meta, size_t count, const void* raw)
       IF_UNSAFE(noexcept)
       : Block {state + DataState::Constant, meta, count, const_cast<void*>(raw)}
    {}
@@ -79,7 +79,7 @@ namespace Langulus::A
    ///   @param raw - pointer to the mutable memory                           
    ///   @param entry - the memory entry                                      
    LANGULUS(INLINED)
-   Block::Block(const DataState& state, DMeta meta, Count count, void* raw, const Allocation* entry)
+   Block::Block(const DataState& state, DMeta meta, size_t count, void* raw, const Allocation* entry)
    IF_UNSAFE(noexcept)
       : mRaw {static_cast<Byte*>(raw)}
       , mCount {count}
@@ -105,7 +105,7 @@ namespace Langulus::A
    ///   @param raw - pointer to the constant memory                          
    ///   @param entry - the memory entry                                      
    LANGULUS(INLINED)
-   Block::Block(const DataState& state, DMeta meta, Count count, const void* raw, const Allocation* entry)
+   Block::Block(const DataState& state, DMeta meta, size_t count, const void* raw, const Allocation* entry)
       IF_UNSAFE(noexcept)
       : Block {state + DataState::Constant, meta, count, const_cast<void*>(raw), entry}
    {}
@@ -445,7 +445,7 @@ namespace Langulus::Annies
    ///      the array's extent, for the final number of elements              
    ///   @return the memory wrapped inside a block                            
    template<class BLOCK>
-   auto MakeBlock(auto&& what, Count count) {
+   auto MakeBlock(auto&& what, size_t count) {
       static_assert(CT::Void<BLOCK> or CT::Block<BLOCK>,
          "BLOCK can be either void, or a Block type");
 

@@ -18,23 +18,22 @@ namespace Langulus::Annies
    ///                                                                        
    template<class TRAIT>
    struct TTrait : Trait {
-      LANGULUS(TRAIT) RTTI::CppNameOf<TRAIT>();
-      LANGULUS_BASES(Trait);
-
+      using CTTI_Tags = TRAIT;
+      using CTTI_Bases = Trait;
       using TraitType = TRAIT;
 
-      template<class T>
-      using Tag = RTTI::Tag<T, TRAIT>;
+      //template<class T>
+      //using Tag = RTTI::Tag<T, TRAIT>;
 
    public:
       using Trait::Trait;
       TTrait(const TTrait&);
       TTrait(TTrait&&);
 
-      template<class T> requires (CT::Trait<Deint<T>> and not CT::Same<typename T::TraitType, TRAIT>)
+      template<class T> requires (CT::Trait<Deint<T>> and not Akin<typename T::TraitType, TRAIT>)
       TTrait(T&&);
 
-      template<CT::Data>
+      template<CT::NotVoid>
       static TRAIT OfType();
       static TRAIT OfType(DMeta);
 
@@ -68,7 +67,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Conversion                                                        
       ///                                                                     
-      Count Serialize(CT::Serial auto&) const;
+      size_t Serialize(CT::Serial auto&) const;
 
    private:
       using Trait::From;
@@ -86,14 +85,15 @@ namespace Langulus::Annies
    namespace Langulus::Traits \
    { \
       struct T : Annies::TTrait<T> { \
-         LANGULUS(INFO) INFOSTRING; \
+         using CTTI_DefineTag = Yes<#T>; \
+         using CTTI_Info = Yes<INFOSTRING>; \
          using TTrait<T>::TTrait; \
          using TTrait<T>::operator =; \
          using TTrait<T>::operator ==; \
          using TTrait<T>::operator +; \
          using TTrait<T>::operator +=; \
-         T Select(Offset s, Langulus::Count c)       IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
-         T Select(Offset s, Langulus::Count c) const IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
+         T Select(size_t s, size_t c)       IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
+         T Select(size_t s, size_t c) const IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
       }; \
    }
 
@@ -106,14 +106,15 @@ namespace Langulus::Annies
    namespace Langulus::Traits \
    { \
       struct T : Annies::TTrait<T> { \
-         LANGULUS(INFO) INFOSTRING; \
+         using CTTI_DefineTag = Yes<#T>; \
+         using CTTI_Info = Yes<INFOSTRING>; \
          using TTrait<T>::TTrait; \
          using TTrait<T>::operator =; \
          using TTrait<T>::operator ==; \
          using TTrait<T>::operator +; \
          using TTrait<T>::operator +=; \
-         T Select(Offset s, Langulus::Count c)       IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
-         T Select(Offset s, Langulus::Count c) const IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
+         T Select(size_t s, size_t c)       IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
+         T Select(size_t s, size_t c) const IF_UNSAFE(noexcept) { return {Many::Select(s, c)}; } \
          PROPERTIES; \
       }; \
    }

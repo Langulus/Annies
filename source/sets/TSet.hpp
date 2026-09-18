@@ -90,7 +90,7 @@ namespace Langulus::Annies
       constexpr bool IsDeep() const noexcept;
       constexpr bool IsSparse() const noexcept;
       constexpr bool IsDense() const noexcept;
-      constexpr Size GetStride() const noexcept;
+      constexpr size_t GetStride() const noexcept;
 
       constexpr bool IsInsertable(DMeta) const noexcept;
       template<CT::Data>
@@ -130,19 +130,19 @@ namespace Langulus::Annies
       using Base::end;
 
       template<bool REVERSE = false>
-      Count ForEach(auto&&...) const;
+      size_t ForEach(auto&&...) const;
       template<bool REVERSE = false>
-      Count ForEach(auto&&...);
+      size_t ForEach(auto&&...);
 
       template<bool REVERSE = false>
-      Count ForEachElement(auto&&) const;
+      size_t ForEachElement(auto&&) const;
       template<bool REVERSE = false>
-      Count ForEachElement(auto&&);
+      size_t ForEachElement(auto&&);
 
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachDeep(auto&&...) const;
+      size_t ForEachDeep(auto&&...) const;
       template<bool REVERSE = false, bool SKIP = true>
-      Count ForEachDeep(auto&&...);
+      size_t ForEachDeep(auto&&...);
 
       ///                                                                     
       ///   RTTI                                                              
@@ -188,20 +188,20 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Memory management                                                 
       ///                                                                     
-      void Reserve(Count);
+      void Reserve(size_t);
 
       ///                                                                     
       ///   Insertion                                                         
       ///                                                                     
       template<class T1, class...TN>
       requires CT::UnfoldMakableFrom<T, T1, TN...>
-      Count Insert(T1&&, TN&&...);
+      size_t Insert(T1&&, TN&&...);
 
       template<class T1> requires CT::Set<Deint<T1>>
-      Count InsertBlock(T1&&);
+      size_t InsertBlock(T1&&);
 
       template<class T1> requires CT::Block<Deint<T1>>
-      Count InsertBlock(T1&&);
+      size_t InsertBlock(T1&&);
 
       template<class T1> requires CT::UnfoldMakableFrom<T, T1>
       TSet& operator << (T1&&);
@@ -212,7 +212,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Removal                                                           
       ///                                                                     
-      auto Remove(const T&) -> Count;
+      auto Remove(const T&) -> size_t;
       auto RemoveIt(const Iterator&) -> Iterator;
 
       void Clear();

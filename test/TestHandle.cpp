@@ -441,9 +441,9 @@ TEMPLATE_TEST_CASE("Managed handle swapping", "[handle]", RT*, RT, int, int*) {
 
    constexpr bool sparse = CT::Sparse<T> and LANGULUS_FEATURE(MANAGED_MEMORY);
    constexpr bool referenced = sparse and CT::Referencable<Deptr<T>>;
-   constexpr Count refs1 = CT::Sparse<T> and LANGULUS_FEATURE(MANAGED_MEMORY) ? 10 : 1;
-   constexpr Count refs1_1 = CT::Sparse<T> and LANGULUS_FEATURE(MANAGED_MEMORY) ? 11 : 1;
-   constexpr Count refs2 = CT::Sparse<T> and LANGULUS_FEATURE(MANAGED_MEMORY) ? 2 : 1;
+   constexpr size_t refs1 = CT::Sparse<T> and LANGULUS_FEATURE(MANAGED_MEMORY) ? 10 : 1;
+   constexpr size_t refs1_1 = CT::Sparse<T> and LANGULUS_FEATURE(MANAGED_MEMORY) ? 11 : 1;
+   constexpr size_t refs2 = CT::Sparse<T> and LANGULUS_FEATURE(MANAGED_MEMORY) ? 2 : 1;
 
    GIVEN("A stack-based swapper") {
       TMany<T> factory1 = CreateManagedElements<T>(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
@@ -642,7 +642,7 @@ TEMPLATE_TEST_CASE("Managed handle swapping", "[handle]", RT*, RT, int, int*) {
       if constexpr (referenced)
          REQUIRE(DenseCast(start.Get()).GetReferences() == 1);
 
-      for (Count i = 1; i < factory1.GetCount(); ++i) {
+      for (size_t i = 1; i < factory1.GetCount(); ++i) {
          auto h = factory1.GetHandle(i);
          if constexpr (LANGULUS_FEATURE(MANAGED_MEMORY))
             REQUIRE(h.GetEntry()->GetUses() == refs1);

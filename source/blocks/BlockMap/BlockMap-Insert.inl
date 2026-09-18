@@ -70,7 +70,7 @@ namespace Langulus::Annies
    ///   @param item - the argument to unfold and insert, can have intent     
    ///   @return the number of inserted elements after unfolding              
    template<CT::Map THIS>
-   Count BlockMap::UnfoldInsert(auto&& item) {
+   size_t BlockMap::UnfoldInsert(auto&& item) {
       using E = Conditional<CT::Typed<THIS>, typename THIS::Pair, Annies::Pair>;
       using S = IntentOf<decltype(item)>;
       using T = TypeOf<S>;
@@ -80,7 +80,7 @@ namespace Langulus::Annies
          mValues.mType = MetaDataOf<typename THIS::Value>();
       }
 
-      Count inserted = 0;
+      size_t inserted = 0;
       if constexpr (CT::Array<T>) {
          if constexpr (CT::Typed<THIS>) {
             if constexpr (CT::MakableFrom<E, Deext<T>>) {
@@ -182,7 +182,7 @@ namespace Langulus::Annies
    ///   @param val - the value to insert                                     
    ///   @return 1 if pair was inserted, zero otherwise                       
    template<CT::Map THIS> LANGULUS(INLINED)
-   Count BlockMap::Insert(auto&& key, auto&& val) {
+   size_t BlockMap::Insert(auto&& key, auto&& val) {
       using SK = IntentOf<decltype(key)>;
       using SV = IntentOf<decltype(val)>;
 
@@ -201,7 +201,7 @@ namespace Langulus::Annies
    ///   @return 1 if pair was inserted or value was overwritten              
    template<CT::Map THIS, class T1, class T2>
    requires CT::Block<Deint<T1>, Deint<T2>> LANGULUS(INLINED)
-   Count BlockMap::InsertBlock(T1&& key, T2&& val) {
+   size_t BlockMap::InsertBlock(T1&& key, T2&& val) {
       using SK = IntentOf<decltype(key)>;
       using SV = IntentOf<decltype(val)>;
       using KB = TypeOf<SK>;
@@ -224,7 +224,7 @@ namespace Langulus::Annies
 
       Reserve<THIS>(GetCount() + count);
 
-      for (Offset i = 0; i < count; ++i) {
+      for (size_t i = 0; i < count; ++i) {
          if constexpr (not CT::Typed<KB> or not CT::Typed<VB>) {
             // Type-erased insertion                                    
             auto keyBlock = DeintCast(key).GetElement(i);
@@ -253,8 +253,8 @@ namespace Langulus::Annies
    ///   @param tn... - the rest of the pairs to insert (optional)            
    ///   @return the number of inserted pairs                                 
    template<CT::Map THIS, class T1, class...TN>
-   Count BlockMap::InsertPair(T1&& t1, TN&&...tn) {
-      Count inserted = 0;
+   size_t BlockMap::InsertPair(T1&& t1, TN&&...tn) {
+      size_t inserted = 0;
         inserted += UnfoldInsert<THIS>(Forward<T1>(t1));
       ((inserted += UnfoldInsert<THIS>(Forward<TN>(tn))), ...);
       return inserted;
@@ -271,10 +271,10 @@ namespace Langulus::Annies
    ///   @param infoStart - [out] the offset at which info bytes start        
    ///   @return the requested byte size                                      
    template<CT::Map THIS> LANGULUS(INLINED)
-   Size BlockMap::RequestKeyAndInfoSize(
-      const Count request, Offset& infoStart
+   size_t BlockMap::RequestKeyAndInfoSize(
+      const size_t request, size_t& infoStart
    ) const IF_UNSAFE(noexcept) {
-      Offset keymemory;
+      size_t keymemory;
       if constexpr (CT::Typed<THIS>) {
          using K = typename THIS::Key;
          keymemory = request * sizeof(K);
@@ -296,7 +296,7 @@ namespace Langulus::Annies
    ///   @param count - number of values to allocate                          
    ///   @return the requested byte size                                      
    LANGULUS(INLINED)
-   Size BlockMap::RequestValuesSize(const Count count) const IF_UNSAFE(noexcept) {
+   size_t BlockMap::RequestValuesSize(const size_t count) const IF_UNSAFE(noexcept) {
       LglsAssumeDev(mValues.mType, "Value type was not set");
       auto valueByteSize = count * mValues.mType->mSize;
       if (mValues.mType->mIsSparse)
@@ -314,7 +314,7 @@ namespace Langulus::Annies
    ///   @param oldVals - source of values (use nullptr to reuse the current) 
    ///   @return true if map requires another resize and rehash (very rare)   
    template<CT::Map THIS, class KEY_SOURCE, class VAL_SOURCE>
-   bool BlockMap::Rehash(const InfoType* oldInfo, const Count oldCount, KEY_SOURCE& oldKeys, VAL_SOURCE& oldVals) {
+   bool BlockMap::Rehash(const InfoType* oldInfo, const size_t oldCount, KEY_SOURCE& oldKeys, VAL_SOURCE& oldVals) {
       LglsAssumeDev(mKeys.mReserved > oldCount,
          "New count is not larger than oldCount");
       LglsAssumeDev(IsPowerOfTwo(mKeys.mReserved),
@@ -395,7 +395,7 @@ namespace Langulus::Annies
          }
 
          // Where does the pair want to move after a rehash?            
-         const Offset current = info - mInfo;
+         const size_t current = info - mInfo;
          auto key = [&] {
             if constexpr (ReusingKeys) return GetKeyHandle<THIS>(current);
             else return oldKeys.template GetKeyHandle<THIS>(current);
@@ -405,7 +405,7 @@ namespace Langulus::Annies
             else return oldVals.template GetValHandle<THIS>(current);
          }();
 
-         Offset moveTo = 0;
+         size_t moveTo = 0;
          if constexpr (CT::TypedMap<THIS>)
             moveTo = GetBucket<THIS>(hashmask, key.Get());
          else
@@ -478,10 +478,10 @@ namespace Langulus::Annies
          }
 
          // Where does the pair want to move after a rehash?            
-         const Offset current = info - mInfo;
+         const size_t current = info - mInfo;
          auto key = GetKeyHandle<THIS>(current);
          auto val = GetValHandle<THIS>(current);
-         Offset moveTo = 0;
+         size_t moveTo = 0;
          if constexpr (CT::TypedMap<THIS>)
             moveTo = GetBucket<THIS>(hashmask, key.Get());
          else
@@ -511,7 +511,7 @@ namespace Langulus::Annies
                   // we need another one, and it should tidy things up. 
                   // This can repeat indefinitely until RAM ends.       
                   //Logger::Special("Sequential resize triggered, ", GetCount(), "/", GetReserved(), " full");
-                  Offset last = 0;
+                  size_t last = 0;
                   while (mInfo[last] and last < GetReserved())
                      ++last;
 
@@ -533,7 +533,7 @@ namespace Langulus::Annies
                else psl = mInfo;
             }
 
-            const Offset index = psl - GetInfo();
+            const size_t index = psl - GetInfo();
             LglsAssumeDev(current != index,
                "Shouldn't ever happen, but better safe than sorry");
 
@@ -565,10 +565,10 @@ namespace Langulus::Annies
          while (oldInfo != newInfoEnd) {
             if (*oldInfo > 1) {
                // Entry can be moved by *oldInfo - 1 cells to the left  
-               const Offset oldIndex = oldInfo - GetInfo();
+               const size_t oldIndex = oldInfo - GetInfo();
 
                // Will loop around if it goes beyond mKeys.mReserved    
-               Offset to = mKeys.mReserved + oldIndex - *oldInfo + 1;
+               size_t to = mKeys.mReserved + oldIndex - *oldInfo + 1;
                if (to >= mKeys.mReserved)
                   to -= mKeys.mReserved;
 
@@ -614,7 +614,7 @@ namespace Langulus::Annies
    ///   @param val - value to insert, with or without intent                 
    ///   @return the offset at which pair was inserted                        
    template<CT::Map THIS, bool CHECK_FOR_MATCH>
-   Offset BlockMap::InsertInner(Offset start, auto&& key, auto&& val) {
+   size_t BlockMap::InsertInner(size_t start, auto&& key, auto&& val) {
       BranchOut<THIS>();
       using SK = IntentOf<decltype(key)>;
       using SV = IntentOf<decltype(val)>;
@@ -625,7 +625,7 @@ namespace Langulus::Annies
       auto psl = GetInfo() + start;
       auto pslEnd = GetInfoEnd();
       InfoType attempts = 1;
-      Offset insertedAt = mKeys.mReserved;
+      size_t insertedAt = mKeys.mReserved;
       while (*psl) {
          const auto index = psl - GetInfo();
 
@@ -707,14 +707,14 @@ namespace Langulus::Annies
    ///   @return the offset at which pair was inserted                        
    template<CT::Map THIS, bool CHECK_FOR_MATCH, template<class> class S1, template<class> class S2, CT::Block T>
    requires CT::Intent<S1<T>, S2<T>>
-   Offset BlockMap::InsertBlockInner(const Offset start, S1<T>&& key, S2<T>&& val) {
+   size_t BlockMap::InsertBlockInner(const size_t start, S1<T>&& key, S2<T>&& val) {
       BranchOut<THIS>();
 
       // Get the starting index based on the key hash                   
       auto psl = GetInfo() + start;
       const auto pslEnd = GetInfoEnd();
       InfoType attempts = 1;
-      Offset insertedAt = mKeys.mReserved;
+      size_t insertedAt = mKeys.mReserved;
       while (*psl) {
          const auto index = psl - GetInfo();
          if constexpr (CHECK_FOR_MATCH) {
@@ -787,7 +787,7 @@ namespace Langulus::Annies
    ///   @return the number of newly inserted pairs                           
    template<CT::Map THIS, bool CHECK_FOR_MATCH, template<class> class S, CT::Pair T>
    requires CT::Intent<S<T>>
-   Count BlockMap::InsertPairInner(const Count hashmask, S<T>&& pair) {
+   size_t BlockMap::InsertPairInner(const size_t hashmask, S<T>&& pair) {
       const auto initialCount = GetCount();
       if constexpr (CT::Typed<T>) {
          // Insert a statically typed pair                              

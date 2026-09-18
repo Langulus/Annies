@@ -14,14 +14,14 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
    (TypePair<Trait, RT*>),
 
    (TypePair<TMany<Trait*>, Trait*>),
-   (TypePair<Many, Traits::Count*>),
+   (TypePair<Many, Traits::size_t*>),
    (TypePair<Trait, Text*>),
 
    (TypePair<Traits::Name, Text*>),
    (TypePair<Traits::Name, RT*>),
 
    (TypePair<TMany<int*>, int*>),
-   (TypePair<TMany<Traits::Count*>, Traits::Count*>),
+   (TypePair<TMany<Traits::size_t*>, Traits::size_t*>),
    (TypePair<TMany<Many*>, Many*>),
    (TypePair<TMany<Text*>, Text*>),
    (TypePair<TMany<RT*>, RT*>),

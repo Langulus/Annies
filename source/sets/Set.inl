@@ -149,14 +149,14 @@ namespace Langulus::Annies
    ///   @param f - the functions to call for each key block                  
    ///   @return the number of successful f() executions                      
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&&...f) const {
+   size_t TABLE()::ForEach(auto&&...f) const {
       static_assert(sizeof...(f) > 0, "No iterators in ForEach");
       return BlockSet::ForEach<REVERSE, const Set>(
          Forward<Deref<decltype(f)>>(f)...);
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&&...f) {
+   size_t TABLE()::ForEach(auto&&...f) {
       static_assert(sizeof...(f) > 0, "No iterators in ForEach");
       return BlockSet::ForEach<REVERSE, Set>(
          Forward<Deref<decltype(f)>>(f)...);
@@ -167,13 +167,13 @@ namespace Langulus::Annies
    ///   @param f - the function to call for each key block                   
    ///   @return the number of successful f() executions                      
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachElement(auto&& f) const {
+   size_t TABLE()::ForEachElement(auto&& f) const {
       return BlockSet::ForEachElement<REVERSE, const Set>(
          Forward<Deref<decltype(f)>>(f));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachElement(auto&& f) {
+   size_t TABLE()::ForEachElement(auto&& f) {
       return BlockSet::ForEachElement<REVERSE, Set>(
          Forward<Deref<decltype(f)>>(f));
    }
@@ -183,14 +183,14 @@ namespace Langulus::Annies
    ///   @param f - the functions to call for each key block                  
    ///   @return the number of successful f() executions                      
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachDeep(auto&&...f) const {
+   size_t TABLE()::ForEachDeep(auto&&...f) const {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachDeep");
       return BlockSet::ForEachDeep<REVERSE, const Set>(
          Forward<Deref<decltype(f)>>(f)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachDeep(auto&&...f) {
+   size_t TABLE()::ForEachDeep(auto&&...f) {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachDeep");
       return BlockSet::ForEachDeep<REVERSE, Set>(
          Forward<Deref<decltype(f)>>(f)...);
@@ -295,7 +295,7 @@ namespace Langulus::Annies
    ///   @attention does nothing if reserving less than current reserve       
    ///   @param count - number of elements to allocate                        
    TEMPLATE() LANGULUS(INLINED)
-   void TABLE()::Reserve(Count count) {
+   void TABLE()::Reserve(size_t count) {
       BlockSet::Reserve<Set>(count);
    }
 

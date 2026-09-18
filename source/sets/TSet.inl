@@ -188,7 +188,7 @@ namespace Langulus::Annies
    /// Get the size of a single key, in bytes                                 
    ///   @return the number of bytes a single key contains                    
    TEMPLATE()
-   constexpr Size TABLE()::GetStride() const noexcept {
+   constexpr size_t TABLE()::GetStride() const noexcept {
       return sizeof(T); 
    }
 
@@ -291,7 +291,7 @@ namespace Langulus::Annies
    ///   @attention does nothing if reserving less than current reserve       
    ///   @param count - number of pairs to allocate                           
    TEMPLATE() LANGULUS(INLINED)
-   void TABLE()::Reserve(Count count) {
+   void TABLE()::Reserve(size_t count) {
       BlockSet::Reserve<TSet>(count);
    }
 
@@ -301,7 +301,7 @@ namespace Langulus::Annies
    ///   @return the number of inserted elements                              
    TEMPLATE() template<class T1, class...TN>
    requires CT::UnfoldMakableFrom<T, T1, TN...> LANGULUS(INLINED)
-   Count TABLE()::Insert(T1&& t1, TN&&...tn) {
+   size_t TABLE()::Insert(T1&& t1, TN&&...tn) {
       return BlockSet::Insert<TSet>(Forward<T1>(t1), Forward<TN>(tn)...);
    }
    
@@ -309,7 +309,7 @@ namespace Langulus::Annies
    ///   @param t1 - the set to insert                                        
    ///   @return number of inserted elements                                  
    TEMPLATE() template<class T1> requires CT::Set<Deint<T1>> LANGULUS(INLINED)
-   Count TABLE()::InsertBlock(T1&& t1) {
+   size_t TABLE()::InsertBlock(T1&& t1) {
       return BlockSet::InsertBlock<TSet>(Forward<T1>(t1));
    }
    
@@ -317,7 +317,7 @@ namespace Langulus::Annies
    ///   @param t1 - the block to insert                                      
    ///   @return number of inserted elements                                  
    TEMPLATE() template<class T1> requires CT::Block<Deint<T1>> LANGULUS(INLINED)
-   Count TABLE()::InsertBlock(T1&& t1) {
+   size_t TABLE()::InsertBlock(T1&& t1) {
       return BlockSet::InsertBlock<TSet>(Forward<T1>(t1));
    }
 
@@ -351,7 +351,7 @@ namespace Langulus::Annies
    TEMPLATE()
    auto TABLE()::RemoveIt(const Iterator& index) -> Iterator {
       const auto sentinel = GetReserved();
-      auto offset = static_cast<Offset>(index.mInfo - mInfo);
+      auto offset = static_cast<size_t>(index.mInfo - mInfo);
       if (offset >= sentinel)
          return end();
 
@@ -370,7 +370,7 @@ namespace Langulus::Annies
    ///   @param match - the key to search for                                 
    ///   @return the number of removed pairs                                  
    TEMPLATE() LANGULUS(INLINED)
-   Count TABLE()::Remove(const T& match) {
+   size_t TABLE()::Remove(const T& match) {
       return BlockSet::template Remove<TABLE(), T>(match);
    }
 
@@ -464,14 +464,14 @@ namespace Langulus::Annies
    ///   @param f - the functions to call for each key block                  
    ///   @return the number of successful f() executions                      
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&&...f) const {
+   size_t TABLE()::ForEach(auto&&...f) const {
       static_assert(sizeof...(f) > 0, "No iterators in ForEach");
       return BlockSet::ForEach<REVERSE, const TSet>(
          Forward<Deref<decltype(f)>>(f)...);
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEach(auto&&...f) {
+   size_t TABLE()::ForEach(auto&&...f) {
       static_assert(sizeof...(f) > 0, "No iterators in ForEach");
       return BlockSet::ForEach<REVERSE, TSet>(
          Forward<Deref<decltype(f)>>(f)...);
@@ -482,13 +482,13 @@ namespace Langulus::Annies
    ///   @param f - the function to call for each key block                   
    ///   @return the number of successful f() executions                      
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachElement(auto&& f) const {
+   size_t TABLE()::ForEachElement(auto&& f) const {
       return BlockSet::ForEachElement<REVERSE, const TSet>(
          Forward<Deref<decltype(f)>>(f));
    }
 
    TEMPLATE() template<bool REVERSE> LANGULUS(INLINED)
-   Count TABLE()::ForEachElement(auto&& f) {
+   size_t TABLE()::ForEachElement(auto&& f) {
       return BlockSet::ForEachElement<REVERSE, TSet>(
          Forward<Deref<decltype(f)>>(f));
    }
@@ -498,14 +498,14 @@ namespace Langulus::Annies
    ///   @param f - the functions to call for each key block                  
    ///   @return the number of successful f() executions                      
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachDeep(auto&&...f) const {
+   size_t TABLE()::ForEachDeep(auto&&...f) const {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachDeep");
       return BlockSet::ForEachDeep<REVERSE, const TSet>(
          Forward<Deref<decltype(f)>>(f)...);
    }
 
    TEMPLATE() template<bool REVERSE, bool SKIP> LANGULUS(INLINED)
-   Count TABLE()::ForEachDeep(auto&&...f) {
+   size_t TABLE()::ForEachDeep(auto&&...f) {
       static_assert(sizeof...(f) > 0, "No iterators in ForEachDeep");
       return BlockSet::ForEachDeep<REVERSE, TSet>(
          Forward<Deref<decltype(f)>>(f)...);

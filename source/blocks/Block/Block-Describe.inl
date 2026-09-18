@@ -61,9 +61,9 @@ namespace Langulus::Annies
    ///   @param value - [out] where to save the value(s), if found            
    ///   @return the number of extracted values (always 1 if not an array)    
    template<class TYPE>
-   auto Block<TYPE>::ExtractData(CT::NotVoid auto& value) const -> Count {
+   auto Block<TYPE>::ExtractData(CT::NotVoid auto& value) const -> size_t {
       using D = Deref<decltype(value)>;
-      Count progress = 0;
+      size_t progress = 0;
 
       if constexpr (CT::Vector<D> or CT::Array<D>) {
          ForEachDeep([&](const TypeOf<D>& data) {
@@ -88,14 +88,14 @@ namespace Langulus::Annies
    ///   @param value - [out] where to save the value, if found               
    ///   @return the number of extracted values (always 1 if not an array)    
    template<class TYPE>
-   auto Block<TYPE>::ExtractDataAs(CT::NotVoid auto& value) const -> Count {
+   auto Block<TYPE>::ExtractDataAs(CT::NotVoid auto& value) const -> size_t {
       using D = Deref<decltype(value)>;
-      Count progress = 0;
+      size_t progress = 0;
 
       ForEachDeep([&](const Many& group) {
          if constexpr (CT::Vector<D> or CT::Array<D>) {
             const auto toscan = ::std::min(CountOf<D> - progress, group.GetCount());
-            for (Offset i = 0; i < toscan; ++i) {
+            for (size_t i = 0; i < toscan; ++i) {
                //TODO can be optimized-out for POD
                try {
                   value[progress] = group.template AsCast<TypeOf<D>>(i);
@@ -172,7 +172,7 @@ namespace Langulus::Annies
    }
 
    ///                                                                        
-   template<class TYPE> template<class TRAIT, Offset...IDX>
+   template<class TYPE> template<class TRAIT, size_t...IDX>
    bool Block<TYPE>::ExtractTraitInner(
       ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
@@ -181,12 +181,12 @@ namespace Langulus::Annies
    }
 
    ///                                                                        
-   template<class TYPE> template<class TRAIT, Offset IDX>
+   template<class TYPE> template<class TRAIT, size_t IDX>
    bool Block<TYPE>::ExtractTraitInnerInner(CT::NotVoid auto& value) const {
       static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
       using D = Deref<decltype(value)>;
       bool satisfied = false;
-      Count counter = 0;
+      size_t counter = 0;
 
       ForEachDeep([&](const TRAIT& trait) {
          if (counter < IDX) {
@@ -212,14 +212,14 @@ namespace Langulus::Annies
    ///   @param trait - trait to set                                          
    ///   @param index - the index we're interested with if repeated           
    template<class TYPE> template<class TRAIT>
-   void Block<TYPE>::SetTrait(TRAIT&& trait, Offset index) {
+   void Block<TYPE>::SetTrait(TRAIT&& trait, size_t index) {
       using S = IntentOf<TRAIT>;
       using T = TypeOf<S>;
       static_assert(CT::TraitBased<T>, "T is not trait-based");
 
       // First attempt setting an already existing trait at given index 
       bool satisfied = false;
-      Offset counter = 0;
+      size_t counter = 0;
       ForEachDeep([&](T& found) {
          if (counter == index) {
             found = Forward<TRAIT>(trait);

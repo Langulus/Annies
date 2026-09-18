@@ -54,7 +54,7 @@ namespace Langulus::Annies
    /// Get the size of a single key, in bytes                                 
    ///   @return the number of bytes a single key contains                    
    template<CT::Set THIS> LANGULUS(INLINED)
-   constexpr Size BlockSet::GetStride() const noexcept {
+   constexpr size_t BlockSet::GetStride() const noexcept {
       return GetValues<THIS>().GetStride();
    }
 
@@ -109,14 +109,14 @@ namespace Langulus::Annies
    /// Get the number of inserted pairs                                       
    ///   @return the number of inserted pairs                                 
    LANGULUS(INLINED)
-   constexpr Count BlockSet::GetCount() const noexcept {
+   constexpr size_t BlockSet::GetCount() const noexcept {
       return mKeys.GetCount();
    }
 
    /// Get the number of allocated pairs                                      
    ///   @return the number of allocated pairs                                
    LANGULUS(INLINED)
-   constexpr Count BlockSet::GetReserved() const noexcept {
+   constexpr size_t BlockSet::GetReserved() const noexcept {
       return mKeys.GetReserved();
    }
 
@@ -215,7 +215,7 @@ namespace Langulus::Annies
    ///   @attention always returns zero if we don't have authority            
    ///   @return the number of references                                     
    LANGULUS(INLINED)
-   constexpr Count BlockSet::GetUses() const noexcept {
+   constexpr size_t BlockSet::GetUses() const noexcept {
       return mKeys.GetUses();
    }
 

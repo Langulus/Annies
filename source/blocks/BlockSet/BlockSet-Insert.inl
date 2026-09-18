@@ -41,7 +41,7 @@ namespace Langulus::Annies
    ///   @param item - the argument and intent to unfold and insert           
    ///   @return the number of inserted elements after unfolding              
    template<CT::Set THIS>
-   Count BlockSet::UnfoldInsert(auto&& item) {
+   size_t BlockSet::UnfoldInsert(auto&& item) {
       using E = Conditional<CT::Typed<THIS>, TypeOf<THIS>, void>;
       using S = IntentOf<decltype(item)>;
       using T = TypeOf<S>;
@@ -67,7 +67,7 @@ namespace Langulus::Annies
             else if constexpr (CT::MakableFrom<E, CT::Unfold<Deext<T>>>) {
                // Construct from an array of things, which can't be used
                // to directly construct elements, so nest this insert   
-               Count inserted = 0;
+               size_t inserted = 0;
                for (auto& key : DeintCast(item))
                   inserted += UnfoldInsert<THIS>(S::Nest(key));
                return inserted;
@@ -88,7 +88,7 @@ namespace Langulus::Annies
             // Insert the array                                         
             Mutate<THIS, Decvq<Deext<T>>>();
             Reserve(GetCount() + ExtentOf<T>);
-            Count inserted = 0;
+            size_t inserted = 0;
             for (auto& e : DeintCast(item)) {
                inserted += InsertInner<THIS, true>(
                   GetBucket(GetReserved() - 1, e),
@@ -138,7 +138,7 @@ namespace Langulus::Annies
                }
                else if constexpr (CT::MakableFrom<E, CT::Unfold<T2>>) {
                   // Set elements need to be unfolded one by one        
-                  Count inserted = 0;
+                  size_t inserted = 0;
                   for (auto& key : DeintCast(item))
                      inserted += UnfoldInsert<THIS>(S::Nest(key));
                   return inserted;
@@ -193,8 +193,8 @@ namespace Langulus::Annies
    ///   @param tn... - the rest of items to insert (optional)                
    ///   @return number of inserted elements                                  
    template<CT::Set THIS, class T1, class...TN> LANGULUS(INLINED)
-   Count BlockSet::Insert(T1&& t1, TN&&...tn) {
-      Count inserted = 0;
+   size_t BlockSet::Insert(T1&& t1, TN&&...tn) {
+      size_t inserted = 0;
         inserted += UnfoldInsert<THIS>(Forward<T1>(t1));
       ((inserted += UnfoldInsert<THIS>(Forward<TN>(tn))), ...);
       return inserted;
@@ -204,7 +204,7 @@ namespace Langulus::Annies
    ///   @param item - the set to insert                                      
    ///   @return number of inserted elements                                  
    template<CT::Set THIS, class T> requires CT::Set<Deint<T>> LANGULUS(INLINED)
-   Count BlockSet::InsertBlock(T&& item) {
+   size_t BlockSet::InsertBlock(T&& item) {
       using S  = IntentOf<decltype(item)>;
       using ST = TypeOf<S>;
       const auto count = DeintCast(item).GetCount();
@@ -268,7 +268,7 @@ namespace Langulus::Annies
    ///   @param item - the set to insert                                      
    ///   @return number of inserted elements                                  
    template<CT::Set THIS, class T> requires CT::Block<Deint<T>> LANGULUS(INLINED)
-   Count BlockSet::InsertBlock(T&& item) {
+   size_t BlockSet::InsertBlock(T&& item) {
       using S  = IntentOf<decltype(item)>;
       using ST = TypeOf<S>;
       const auto count = DeintCast(item).GetCount();
@@ -311,10 +311,10 @@ namespace Langulus::Annies
    ///   @param infoStart - [out] the offset at which info bytes start        
    ///   @return the requested byte size                                      
    template<CT::Set THIS> LANGULUS(INLINED)
-   Size BlockSet::RequestKeyAndInfoSize(
-      const Count request, Offset& infoStart
+   size_t BlockSet::RequestKeyAndInfoSize(
+      const size_t request, size_t& infoStart
    ) const IF_UNSAFE(noexcept) {
-      Offset keymemory;
+      size_t keymemory;
       if constexpr (CT::Typed<THIS>) {
          using T = TypeOf<THIS>;
          keymemory = request * sizeof(T);
@@ -337,7 +337,7 @@ namespace Langulus::Annies
    ///   @attention assumes count > oldCount                                  
    ///   @param oldCount - the old number of pairs                            
    template<CT::Set THIS>
-   void BlockSet::Rehash(const Count oldCount) {
+   void BlockSet::Rehash(const size_t oldCount) {
       LglsAssumeDev(mKeys.mReserved > oldCount,
          "New count is not larger than oldCount");
       LglsAssumeDev(IsPowerOfTwo(mKeys.mReserved),
@@ -355,9 +355,9 @@ namespace Langulus::Annies
       while (oldInfo != oldInfoEnd) {
          if (*oldInfo) {
             // Rehash and check if hashes match                         
-            const Offset oldIndex = oldInfo - GetInfo();
-            Offset oldBucket = (oldCount + oldIndex) - *oldInfo + 1;
-            Offset newBucket = 0;
+            const size_t oldIndex = oldInfo - GetInfo();
+            size_t oldBucket = (oldCount + oldIndex) - *oldInfo + 1;
+            size_t newBucket = 0;
             if constexpr (CT::TypedSet<THIS>)
                newBucket += GetBucket(hashmask, oldKey.Get());
             else
@@ -413,10 +413,10 @@ namespace Langulus::Annies
          while (oldInfo != newInfoEnd) {
             if (*oldInfo > 1) {
                // Entry can be moved by *oldInfo - 1 cells to the left  
-               const Offset oldIndex = oldInfo - GetInfo();
+               const size_t oldIndex = oldInfo - GetInfo();
 
                // Might loop around                                     
-               Offset to = mKeys.mReserved + oldIndex - *oldInfo + 1;
+               size_t to = mKeys.mReserved + oldIndex - *oldInfo + 1;
                if (to >= mKeys.mReserved)
                   to -= mKeys.mReserved;
 
@@ -452,7 +452,7 @@ namespace Langulus::Annies
    ///   @param key - key and intent to insert                                
    ///   @return the offset at which pair was inserted                        
    template<CT::Set THIS, bool CHECK_FOR_MATCH>
-   Offset BlockSet::InsertInner(const Offset start, auto&& key) {
+   size_t BlockSet::InsertInner(const size_t start, auto&& key) {
       BranchOut<THIS>();
       using S = IntentOf<decltype(key)>;
       auto keyswapper = CreateValHandle<THIS>(S::Nest(key));
@@ -461,7 +461,7 @@ namespace Langulus::Annies
       auto psl = GetInfo() + start;
       const auto pslEnd = GetInfoEnd();
       InfoType attempts {1};
-      Offset insertedAt = mKeys.mReserved;
+      size_t insertedAt = mKeys.mReserved;
       while (*psl) {
          const auto index = psl - GetInfo();
 
@@ -510,14 +510,14 @@ namespace Langulus::Annies
    ///   @return the offset at which pair was inserted                        
    template<CT::Set THIS, bool CHECK_FOR_MATCH, template<class> class S, CT::Block B>
    requires CT::Intent<S<B>>
-   Offset BlockSet::InsertBlockInner(const Offset start, S<B>&& key) {
+   size_t BlockSet::InsertBlockInner(const size_t start, S<B>&& key) {
       BranchOut<THIS>();
 
       // Get the starting index based on the key hash                   
       auto psl = GetInfo() + start;
       const auto pslEnd = GetInfoEnd();
       InfoType attempts {1};
-      Offset insertedAt = mKeys.mReserved;
+      size_t insertedAt = mKeys.mReserved;
       while (*psl) {
          const auto index = psl - GetInfo();
          if constexpr (CHECK_FOR_MATCH) {

@@ -48,7 +48,7 @@ TEMPLATE_TEST_CASE("Map corner cases", "[map]",
       T map {pairs};
 
       WHEN("Removing around-the-end elements by value (corner case)") {
-         Count removed = 0;
+         size_t removed = 0;
          removed += map.RemoveValue("VulkanRenderer");
          removed += map.RemoveValue("VulkanCamera");
          removed += map.RemoveValue("Vulkan");
@@ -72,7 +72,7 @@ TEMPLATE_TEST_CASE("Map corner cases", "[map]",
       }
 
       WHEN("Removing around-the-end elements by key (corner case)") {
-         Count removed = 0;
+         size_t removed = 0;
          removed += map.RemoveKey(MetaOf<VulkanRenderer>());
          removed += map.RemoveKey(MetaOf<VulkanCamera>());
          removed += map.RemoveKey(MetaOf<Vulkan>());

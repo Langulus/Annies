@@ -137,12 +137,12 @@ namespace Langulus::Annies
    ///   @param count - number of elements                                    
    ///   @return the container                                                
    TEMPLATE() LANGULUS(INLINED)
-   auto TMany<T>::Select(Offset start, Count count) const IF_UNSAFE(noexcept) -> TMany {
+   auto TMany<T>::Select(size_t start, size_t count) const IF_UNSAFE(noexcept) -> TMany {
       return Base::template Select<TMany>(start, count);
    }
    
    TEMPLATE() LANGULUS(INLINED)
-   auto TMany<T>::Select(Offset start, Count count) IF_UNSAFE(noexcept) -> TMany {
+   auto TMany<T>::Select(size_t start, size_t count) IF_UNSAFE(noexcept) -> TMany {
       return Base::template Select<TMany>(start, count);
    }
    
@@ -150,7 +150,7 @@ namespace Langulus::Annies
    ///   @param count - the number of elements to extend by                   
    ///   @return a container that represents only the extended part           
    TEMPLATE() LANGULUS(INLINED)
-   auto TMany<T>::Extend(const Count count) -> TMany {
+   auto TMany<T>::Extend(const size_t count) -> TMany {
       return Base::template Extend<TMany>(count);
    }
   
