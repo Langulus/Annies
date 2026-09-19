@@ -19,19 +19,12 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
    fetch_langulus_module(SIMD GIT_TAG wip)
 endif()
 
-file(GLOB_RECURSE
-   LANGULUS_ANNIES_SOURCES 
-   LIST_DIRECTORIES FALSE CONFIGURE_DEPENDS
-   source/*.cpp
-)
-
 # Build and install Annies library												
 add_langulus_library(LangulusAnnies
    SOURCES  $<TARGET_OBJECTS:LangulusLogger>
             $<TARGET_OBJECTS:LangulusRTTI>
             $<$<BOOL:${LANGULUS_OPTION_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
             $<$<BOOL:${LANGULUS_OPTION_PROFILING}>:$<TARGET_OBJECTS:LangulusPercist>>
-            ${LANGULUS_ANNIES_SOURCES}
 )
 
 target_include_directories(LangulusAnnies
