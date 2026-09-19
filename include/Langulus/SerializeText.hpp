@@ -23,6 +23,10 @@
 #include "Map.hpp"
 #include "TMap.hpp"*/
 
+namespace Langulus::Flow
+{
+   struct Code;
+}
 
 namespace Langulus::CTTI
 {
@@ -245,7 +249,7 @@ namespace Langulus::CTTI
    void SerializationRule<Annies::Text, C>::Serialize(
       ConstAll<C&> item, Annies::Text& out, [[maybe_unused]] Context* context
    ) {
-      if constexpr (Same<C, Annies::Code>) {
+      if constexpr (Same<C, Flow::Code>) {
          out += Serial::OpenCode;
          out += item;
          out += Serial::CloseCode;
