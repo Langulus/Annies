@@ -6,23 +6,16 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Any.hpp"
-#include "Annies/Components/Charged-Stack.hpp"
-#include "Annies/Components/Verbed-Stack.hpp"
-#include <compare>
+#include "Verb.hpp"
 
-
-namespace Langulus::Flow
-{
-   struct Code;
-}
 
 namespace Langulus::Annies::Inner
 {
-   /// Verbs extend the usual type-erased Any, by adding charge and verb ID   
+   /// TVerbs extend the usual type-erased Any, by adding charge and verb ID  
    /// as members.                                                            
-   using VerbBase = typename AnyBase::template Include<
-      Com::VerbedStack<VMeta>,     // Add verb, make executable         
+   template<CT::DefineVerb V>
+   using TVerbBase = typename AnyBase::template Include<
+      Com::VerbedStack<VMeta, V>,  // Add verb, make executable         
       Com::ChargedStack<>          // Add charge                        
    >;
 }
@@ -30,39 +23,42 @@ namespace Langulus::Annies::Inner
 namespace Langulus::Annies
 {
    ///                                                                        
-   /// MARK: Verb                                                             
+   /// MARK: TVerb                                                            
    /// A type-erased container specifically designed for fully capsulating    
-   /// function calls.                                                        
-   struct Verb : Inner::VerbBase {
+   /// function calls. This one is verb-constrained, i.e. the verb it contains
+   /// is known at compile-time.                                              
+   template<CT::DefineVerb V>
+   struct TVerb : Inner::TVerbBase<V> {
+      using CTTI_ReflectAs = Verb;
+
    private:
       // The number of successful executions                            
       size_t successes = 0;
 
    public:
       // Verb context                                                   
-      Any source;
+      Any context;
       // The container where output goes after execution                
       Any output;
 
-      using CTTI_Members = Members<&Verb::source, &Verb::output>;
+      using CTTI_Members = Members<&TVerb::context, &TVerb::output>;
 
-   public:
       /// MARK: Construct                                                     
-      constexpr Verb() noexcept = default;
-      Verb(const Verb&);
-      Verb(Verb&&);
+      constexpr TVerb() noexcept = default;
+      TVerb(const TVerb&);
+      TVerb(TVerb&&);
 
-      template<template<class> class S> requires CT::Intent<S<Verb>>
-      Verb(S<Verb>&&);
+      template<template<class> class S> requires CT::Intent<S<TVerb>>
+      TVerb(S<TVerb>&&);
 
-      ~Verb() = default;
+      ~TVerb() = default;
 
       /// MARK: Assign                                                        
-      Verb& operator = (const Verb&);
-      Verb& operator = (Verb&&);
+      TVerb& operator = (const TVerb&);
+      TVerb& operator = (TVerb&&);
 
-      template<template<class> class S> requires CT::Intent<S<Verb>>
-      Verb& operator = (S<Verb>&&);
+      template<template<class> class S> requires CT::Intent<S<TVerb>>
+      TVerb& operator = (S<TVerb>&&);
 
       /// MARK: Access                                                        
       auto GetHash() const -> Hash;
@@ -92,8 +88,8 @@ namespace Langulus::Annies
       void Undo() noexcept;
 
       /// MARK: Compare                                                       
-      bool operator ==  (const Verb&) const;
-      auto operator <=> (const Verb&) const -> std::partial_ordering;
+      bool operator ==  (const TVerb&) const;
+      auto operator <=> (const TVerb&) const -> std::partial_ordering;
 
       /// MARK: Removal                                                       
       void Reset();
@@ -102,7 +98,7 @@ namespace Langulus::Annies
 
 namespace Langulus
 {
-   using Annies::Verb;
+   using Annies::TVerb;
 }
 
-LANGULUS_MORPHISM(Langulus::Annies::Verb, Langulus::Annies::Text, Langulus::Flow::Code);
+//LANGULUS_MORPHISM(Langulus::Annies::TVerb, Langulus::Annies::Text, Langulus::Flow::Code);

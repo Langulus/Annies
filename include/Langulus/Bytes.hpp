@@ -295,3 +295,8 @@ namespace Langulus::Annies
 LANGULUS_MORPHISM_CONCEPT(Langulus::CT::POD, Langulus::Annies::Bytes);
 
 #include "SerializeBytes.hpp"
+
+namespace Langulus
+{
+   using Annies::Bytes;
+}

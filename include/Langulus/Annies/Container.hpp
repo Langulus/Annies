@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -20,18 +20,24 @@
 
 #define if_available(...) if constexpr (requires { __VA_ARGS__; }) { __VA_ARGS__; }
 
-///WORKAROUND G++ (up to version 16 when a last checked) has a notorious bug when       
-///WORKAROUND parsing requires { with a relative base specifier inside }. I've pondered 
-///WORKAROUND this for too long, and this is the only workaround that was actually able 
-///WORKAROUND to do the trick.                                                          
-///WORKAROUND   @important: in order for this to work, you might need your              
-///WORKAROUND      'deduced this' functions spell out their 'this' argument explicitly  
+//WORKAROUND G++ (up to version 16 when a last checked) has a notorious bug when       
+//WORKAROUND parsing requires { with a relative base specifier inside }. I've pondered 
+//WORKAROUND this for too long, and this is the only workaround that was actually able 
+//WORKAROUND to do the trick.                                                          
+//WORKAROUND   @important: in order for this to work, you might need your              
+//WORKAROUND      'deduced this' functions spell out their 'this' argument explicitly  
 #define if_available_gcc(...) \
    if constexpr (requires { &__VA_ARGS__; }) self.__VA_ARGS__
 
 namespace Langulus::Annies
 {
    /// MARK: Predeclarations                                                  
+   namespace Component
+   {
+      template<CT::Component...C> requires ValidComponentOrder<C...>
+      struct LANGULUS_EBCO Container;
+   }
+
    struct Handle;
    struct HandleMut;
    struct HandleDisowned;
@@ -43,7 +49,8 @@ namespace Langulus::Annies
       template<class> struct THandleDisowned;
    #endif
    
-   template<CT::Handle, CT::Handle> struct THandlePair;
+   template<CT::Handle, CT::Handle>
+   struct THandlePair;
 
    struct Any;
    struct Bytes;
@@ -62,14 +69,22 @@ namespace Langulus::Annies
    template<CT::NotVoid> struct THive;
    template<CT::NotVoid> struct TMany;
 
-   template<CT::NotVoid,              StateValue SORT = StateValue::Variable> struct TSet;
-   template<CT::NotVoid, CT::NotVoid, StateValue SORT = StateValue::Variable> struct TMap;
-   template<CT::NotVoid, CT::NotVoid> struct TPair;
+   template<CT::NotVoid, StateValue SORT = StateValue::Variable>
+   struct TSet;
+
+   template<CT::NotVoid, CT::NotVoid, StateValue SORT = StateValue::Variable>
+   struct TMap;
+
+   template<CT::NotVoid, CT::NotVoid>
+   struct TPair;
 
    namespace Inner
    {
-      template<StateValue SORT = StateValue::Variable> struct Map;
-      template<StateValue SORT = StateValue::Variable> struct Set;
+      template<StateValue SORT = StateValue::Variable>
+      struct Map;
+
+      template<StateValue SORT = StateValue::Variable>
+      struct Set;
 
       struct DisambiguatorTag {
          using CTTI_Void      = void;
@@ -183,6 +198,45 @@ namespace Langulus::Annies
          }
          #endif
       }
+
+      /// MARK: CoalesceComponents                                            
+      template<CT::Typelist OLD, CT::Component NEW1, CT::Component...NEWN>
+      consteval auto CoalesceComponentsInner() {
+         auto lower_precedence = Extract(OLD{}, []<class O> static {
+            if constexpr (O::ComponentPrecedence < NEW1::ComponentPrecedence)
+               return Types<O>{};
+            else if constexpr (O::ComponentPrecedence > NEW1::ComponentPrecedence)
+               return NoTypes{};
+            else {
+               static_assert(not Same<O, NEW1>,
+                  "Duplicated component");
+               static_assert(O::Id::template Intersect<typename NEW1::Id>::Empty,
+                  "Overlapping ids");
+               return Types<O>{};
+            }
+         });
+         auto higher_precedence = Extract(OLD{}, []<class O> static {
+            if constexpr (O::ComponentPrecedence > NEW1::ComponentPrecedence)
+               return Types<O>{};
+            else
+               return NoTypes{};
+         });
+
+         auto result = lower_precedence + Types<NEW1>{} + higher_precedence;
+         if constexpr (sizeof...(NEWN) == 0)
+            return result;
+         else
+            return CoalesceComponentsInner<decltype(result), NEWN...>();
+      }
+
+      /// Inserts new components at the proper place, considering precedence  
+      /// and Ids. Produces a new Container<OLD + NEW>.                       
+      template<class OLD, CT::Component...NEW>
+      consteval auto CoalesceComponents() {
+         return Expand(CoalesceComponentsInner<OLD, NEW...>(), []<class...C> {
+            return ::std::type_identity<Component::Container<C...>> {};
+         });
+      }
    }
 
    constexpr Inner::Stackwise Stackwise {};
@@ -220,27 +274,9 @@ namespace Langulus::Annies
       using Base           = Container;
 
       /// Generate a new container type with additional components            
-      ///   @attention doesn't check for duplicates                           
-      //template<CT::Component...MORE_COMPONENTS>
-      //using Include = Container<COMPONENTS..., MORE_COMPONENTS...>;
+      template<CT::Component...MORE>
+      using Include = typename decltype(Annies::Inner::CoalesceComponents<Types<COMPONENTS...>, MORE...>())::type;
 
-      /// Check if container is valid                                         
-      /*constexpr bool IsValid() const noexcept {
-         if (this->GetCount() > 0)
-            return true;
-
-         bool for_other_reasons = false;
-         ComponentList::ForEach([this, &for_other_reasons]<class C>{
-            if_available(for_other_reasons |= this->C::IsValid());
-         });
-         return for_other_reasons;
-      }*/
-      
-      /// Check if a component is included at compile-time                    
-      /*template<class C>
-      static constexpr bool HasComponent
-         = AkinAsOneOf<C, COMPONENTS..., DecideStateComponent<COMPONENTS...>>;*/
-      
       /// Get the number of heap providers (all dimensions)                   
       /// Needs to be public, because it's used in concept checks.            
       template<CT::Typelist L = ComponentList>

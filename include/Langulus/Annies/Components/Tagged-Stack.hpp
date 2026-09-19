@@ -6,13 +6,10 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Component.hpp"
-#include "../States/Typed.hpp"
+#include "../States/Tagged.hpp"
 #include "Langulus/IntentOf.hpp"
 #include "Langulus/Typenav.hpp"
-#include <Langulus/MetaOf.hpp>
-#include <Langulus/CT/Akin.hpp>
-#include <Langulus/CT/Deep.hpp>
+#include <Langulus/RTTI/MetaTag.hpp>
 
 
 namespace Langulus::Annies
@@ -37,14 +34,14 @@ namespace Langulus::Annies::Component
    ///   @tparam CONSTRAIN override tag-constraint                            
    ///   @tparam ID data provider that gets tagged                            
    template<class META, class TYPE, bool CONSTRAIN, Cid ID>
-   struct TaggedStack : State::Tagged<CONSTRAIN or CT::NotVoid<TYPE> ? StateValue::Enabled : StateValue::Variable, ID> {
+   struct TaggedStack : State::Tagged<StateValueIf(CONSTRAIN or not ::std::is_void_v<TYPE>), ID> {
       using CTTI_Component = Yup;
       using CTTI_Tags      = TYPE;
       using CTTI_ReflectAs = void;
       using StackRequest   = META;
       using Id             = Values<ID>;
 
-      static constexpr int  ComponentPrecedence = -3000;
+      static constexpr int  ComponentPrecedence = -2900;
       static constexpr bool TagErased = CT::Void<TYPE>;
 
       /// MARK: Public                                                        
@@ -68,7 +65,7 @@ namespace Langulus::Annies::Component
          if constexpr (TagErased)
             return ThisCom::GetTagInner().GetName();
          else
-            return RTTI::NameOfTag<TYPE>();
+            return NameOfTag<TYPE>;
       }
 
       /// Check if block has a tag                                            
@@ -149,7 +146,7 @@ namespace Langulus::Annies::Component
             ThisCom::SetTag(T);
          }
          else {
-            using T = Deref<TagOf<I, SID>>;
+            using T = TagOf<I, SID>;
             ThisCom::template SetTag<T>();
          }
       }

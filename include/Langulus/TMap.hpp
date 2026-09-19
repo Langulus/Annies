@@ -185,3 +185,8 @@ namespace Langulus::Annies
    template<CT::NotVoid K, CT::NotVoid V>
    using TMapUnsorted = TMap<K, V, StateValue::Disabled>;
 }
+
+namespace Langulus
+{
+   using Annies::TMap;
+}

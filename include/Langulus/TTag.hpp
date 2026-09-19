@@ -11,34 +11,11 @@
 
 namespace Langulus::Annies::Inner
 {
-   template<CT::DefineTag TAG, CT::NotVoid T> requires (CT::NotHandle<T> and CT::NotReference<T>)
-   using TTagBase = Com::Container<
-      Com::State::Disowned<>,          // Allows disownment             
-      Com::TypedStack<DMeta, T>,       // Type-constrained              
-      Com::TaggedStack<TMeta, TAG>,    // Tag-constrained               
-      Com::HeapMovable<0, 0, HeapEntry<0, T*>>,
-      Com::CountStack<>,               // Dynamically sized             
-      Com::ReserveStack<>,             // Reserve kept as member        
-      Com::IndexedLinear<>,            // Indexed directly              
-      Com::OwnershipStack<>,           // Allocation is referenced      
-      EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
-      Com::HashStack<>,                // Hash can be cached            
-      Com::Insertion<>,                // Allows insertion              
-      Com::InsertionOperators<>,       // << and >> insertion           
-      Com::Merging<>,                  // Allows merging                
-      Com::MergingOperators<>,         // <<= and >>= merging           
-      Com::Emplacement<>,              // Allows emplacement            
-      Com::Assignment<>,               // Allows assignment             
-      Com::Removal<>,                  // Allows clear/reset            
-      Com::Conversion<>,               // Allows conversions            
-      Com::Comparison<>,               // Allows comparisons            
-      Com::IterationForEach<>,         // ForEach iteration             
-      Com::IterationRange<>,           // Ranged iteration              
-      Com::State::Future<>,            // Toggle future linking         
-      Com::State::Past<>,              // Toggle past linking           
-      Com::State::Or<>,                // Toggle disjunction            
-      Com::State::Compressed<>,        // Toggle compression            
-      Com::State::Encrypted<>          // Toggle encrypted              
+   /// Verbs extend the usual type-erased Any, by adding charge and verb ID   
+   /// as members.                                                            
+   template<CT::DefineTag TAG>
+   using TTagBase = typename ManyBase::template Include<
+      Com::TaggedStack<TMeta, TAG>  // Add tag                          
    >;
 }
 
@@ -47,8 +24,8 @@ namespace Langulus::Annies
    /// MARK: TTag                                                             
    ///                                                                        
    /// A statically-tagged and statically-tagged equivalent of Tag            
-   template<CT::DefineTag TAG, CT::NotVoid T> 
-   struct TTag : Inner::TTagBase<TAG, T> {
+   template<CT::DefineTag TAG> 
+   struct TTag : Inner::TTagBase<TAG> {
       using CTTI_ReflectAs = Tag;
       using CTTI_Deep      = No;
       using Base           = Inner::TTagBase<TAG, T>;
@@ -152,3 +129,33 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    TTag(Inner::Piecewise, T&&) -> TTag<Decvq<Deref<Deint<T>>>>;
 }
+
+namespace Langulus
+{
+   using Annies::TTag;
+}
+
+/// Define a tag                                                              
+///   @param T - the trait, as it appears in namespace Langulus::Traits       
+///   @param INFOSTRING - information about the trait's purpose               
+#define LANGULUS_DEFINE_TAG(T, INFOSTRING) \
+   namespace Langulus::Tags { \
+      struct T : Annies::TTag<T> { \
+         using CTTI_DefineTag = NamedTag<#T>; \
+         using CTTI_Info      = Yes<INFOSTRING>; \
+      }; \
+   }
+
+
+/// Define a tag with any additional properties                               
+///   @param T - the trait, as it appears in namespace Langulus::Traits       
+///   @param INFOSTRING - information about the trait's purpose               
+///   @param PROPERTIES - any properties tha will be added to T               
+#define LANGULUS_DEFINE_TAG_WITH_PROPERTIES(T, INFOSTRING, PROPERTIES) \
+   namespace Langulus::Tags { \
+      struct T : Annies::TTag<T> { \
+         using CTTI_DefineTag = NamedTag<#T>; \
+         using CTTI_Info      = Yes<INFOSTRING>; \
+         PROPERTIES; \
+      }; \
+   }

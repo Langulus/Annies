@@ -10,7 +10,7 @@
 #include "../States/Typed.hpp"
 #include "Langulus/IntentOf.hpp"
 #include "Langulus/Typenav.hpp"
-#include <Langulus/MetaOf.hpp>
+#include <Langulus/RTTI/MetaData.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/CT/Deep.hpp>
 
@@ -18,7 +18,6 @@
 namespace Langulus::Annies
 {
    using DMeta = RTTI::DMeta;
-   //using TMeta = RTTI::TMeta;
 }
 
 namespace Langulus::Annies::Component
@@ -38,7 +37,7 @@ namespace Langulus::Annies::Component
    ///   @tparam CONSTRAIN override type-constraint                           
    ///   @tparam ID data provider that gets typed                             
    template<class META, class TYPE, bool CONSTRAIN, Cid ID>
-   struct TypedStack : State::Typed<CONSTRAIN or CT::NotVoid<TYPE> ? StateValue::Enabled : StateValue::Variable, ID> {
+   struct TypedStack : State::Typed<StateValueIf(CONSTRAIN or not ::std::is_void_v<TYPE>), ID> {
       using CTTI_Component = Yup;
       using CTTI_Typed     = TYPE;
       using CTTI_ReflectAs = void;

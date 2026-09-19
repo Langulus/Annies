@@ -83,3 +83,8 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    using Own = TOwn<T>;
 }
+
+namespace Langulus
+{
+   using Annies::Own;
+}

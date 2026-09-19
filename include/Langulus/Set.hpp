@@ -169,3 +169,8 @@ namespace Langulus::Annies
    using SetSorted   = Inner::Set<StateValue::Enabled>;
    using SetUnsorted = Inner::Set<StateValue::Disabled>;
 }
+
+namespace Langulus
+{
+   using Annies::Set;
+}

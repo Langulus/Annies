@@ -116,3 +116,8 @@ namespace Langulus::Annies
    };
 }
 */
+
+namespace Langulus
+{
+   using Annies::Construct;
+}

@@ -167,3 +167,8 @@ namespace Langulus::Annies
       using Com::Comparison<>::operator ==;
    };
 }
+
+namespace Langulus
+{
+   using Annies::Many;
+}

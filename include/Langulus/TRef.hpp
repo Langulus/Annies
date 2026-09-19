@@ -180,3 +180,8 @@ namespace Langulus::Annies
    template<class T>
    using Ref = TRef<T>;
 }
+
+namespace Langulus
+{
+   using Annies::Ref;
+}

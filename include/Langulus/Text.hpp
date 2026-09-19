@@ -549,3 +549,8 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Array, {
 );
 
 #include "SerializeText.hpp"
+
+namespace Langulus
+{
+   using Annies::Text;
+}

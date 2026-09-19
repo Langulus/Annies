@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,26 +7,25 @@
 ///                                                                           
 #pragma once
 #include "Handle.hpp"
-#include <source/components/Typed-Stack.hpp>
-#include <source/components/Heap-Movable.hpp>
-#include <source/components/Ownership-Stack.hpp>
-#include <source/components/Count-Static.hpp>
-#include <source/components/Reserve-Emergent.hpp>
-#include <source/components/OwnershipDeep-Heap.hpp>
-#include <source/components/Hash-Emergent.hpp>
-#include <source/components/Emplacement.hpp>
-#include <source/components/Assignment.hpp>
-#include <source/components/Removal.hpp>
-#include <source/components/Conversion.hpp>
-#include <source/components/Comparison.hpp>
-#include <source/components/State-Stack.hpp>
-#include <source/states/Typed.hpp>
-#include <source/states/Future.hpp>
-#include <source/states/Past.hpp>
-#include <source/states/Compressed.hpp>
-#include <source/states/Encrypted.hpp>
-#include <source/states/Tracked.hpp>
-#include <source/states/Disowned.hpp>
+#include "Annies/Components/Typed-Stack.hpp"
+#include "Annies/Components/Heap-Movable.hpp"
+#include "Annies/Components/Ownership-Stack.hpp"
+#include "Annies/Components/Count-Static.hpp"
+#include "Annies/Components/Reserve-Emergent.hpp"
+#include "Annies/Components/OwnershipDeep-Heap.hpp"
+#include "Annies/Components/Hash-Emergent.hpp"
+#include "Annies/Components/Emplacement.hpp"
+#include "Annies/Components/Assignment.hpp"
+#include "Annies/Components/Removal.hpp"
+#include "Annies/Components/Conversion.hpp"
+#include "Annies/Components/Comparison.hpp"
+#include "Annies/Components/State-Stack.hpp"
+#include "Annies/States/Future.hpp"
+#include "Annies/States/Past.hpp"
+#include "Annies/States/Compressed.hpp"
+#include "Annies/States/Encrypted.hpp"
+#include "Annies/States/Tracked.hpp"
+#include "Annies/States/Disowned.hpp"
 
 
 namespace Langulus::Annies::Inner
@@ -133,4 +132,9 @@ namespace Langulus::Annies
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
    };
+}
+
+namespace Langulus
+{
+   using Annies::Any;
 }

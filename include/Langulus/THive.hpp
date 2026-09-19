@@ -50,3 +50,8 @@ namespace Langulus::Annies
       using PickMut       = Tif<CT::Sparse<T>, PickSparseMut, PickDenseMut>;
    };
 }
+
+namespace Langulus
+{
+   using Annies::THive;
+}

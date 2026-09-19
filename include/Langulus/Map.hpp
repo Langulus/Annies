@@ -211,3 +211,8 @@ namespace Langulus::Annies
    using MapSorted   = Inner::Map<StateValue::Enabled>;
    using MapUnsorted = Inner::Map<StateValue::Disabled>;
 }
+
+namespace Langulus
+{
+   using Annies::Map;
+}

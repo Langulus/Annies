@@ -8,11 +8,11 @@
 #pragma once
 #include <Langulus/CT/Contiguous.hpp>
 #include <Langulus/CT/Akin.hpp>
+#include <Langulus/CT/Typed.hpp>
 #include <Langulus/Utils/Tuple.hpp>
 #include <Langulus/Utils/Types.hpp>
 #include <Langulus/Utils/Pot.hpp>
 #include <Langulus/Utils/Values.hpp>
-#include <Langulus/TypeOf.hpp>
 #include <Langulus/HashOf.hpp>
 
 
@@ -186,6 +186,16 @@ namespace Langulus::CT
    template<class...T>
    concept TypeErased = Container<T...>
       and ((ShedDeref<T>::TypeErased) and ...);
+   
+   /// Check if listed types are tag-erased containers                        
+   template<class...T>
+   concept TagErased = Container<T...>
+      and ((ShedDeref<T>::TagErased) and ...);
+   
+   /// Check if listed types are verb-erased containers                       
+   template<class...T>
+   concept VerbErased = Container<T...>
+      and ((ShedDeref<T>::VerbErased) and ...);
 
    /// Check if listed types are containers, and are indexed                  
    template<class...T>
@@ -221,6 +231,10 @@ namespace Langulus::Annies
       Disabled = 2
    };
 
+   constexpr auto StateValueIf(bool condition) -> StateValue {
+      return condition ? StateValue::Enabled : StateValue::Variable;
+   }
+
    /// A helper structure for pairing heap components with type components    
    ///   @tparam ID the type component ID                                     
    ///   @tparam POINTER_TYPE associated heap pointer type - mainly a         
@@ -245,6 +259,8 @@ namespace Langulus::Annies
          Sorted,
          Tracked,
          Typed,
+         Tagged,
+         Verbed,
          Disowned
       };
 
@@ -373,6 +389,15 @@ namespace Langulus::Annies
       template<class META, CT::NotVoid TYPE, Cid = 0> struct TaggedStatic;
       #define LglsComTaggedStatic(modifier) \
          template<class, CT::NotVoid, Cid> modifier struct TaggedStatic
+
+      /// Verb providers                                                      
+      template<class META, class TYPE = void, bool CONSTRAIN = not ::std::is_void_v<TYPE>, Cid = 0> struct VerbedStack;
+      #define LglsComVerbedStack(modifier) \
+         template<class, class, bool, Cid> modifier struct VerbedStack
+
+      template<class META, CT::NotVoid TYPE, Cid = 0> struct VerbedStatic;
+      #define LglsComVerbedStatic(modifier) \
+         template<class, CT::NotVoid, Cid> modifier struct VerbedStatic
 
       /// Data providers                                                      
       template<CT::HeapEntry = HeapEntry<0, void*>, CT::HeapEntry...> struct HeapReference;
@@ -629,7 +654,10 @@ namespace Langulus::Annies
 
       /// Other services                                                      
       struct Descriptor;
-      struct Charge;
+
+      template<Cid = 0> struct ChargedStack;
+      #define LglsComChargedStack(modifier) \
+            template<Cid> modifier struct ChargedStack
 
       template<Cid = 0> struct Extrapolation;
       #define LglsComExtrapolation(modifier) \

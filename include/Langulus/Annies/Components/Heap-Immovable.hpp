@@ -7,7 +7,6 @@
 ///                                                                           
 #pragma once
 #include "../Component.hpp"
-#include <Langulus/TypeOf.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -24,7 +23,7 @@ namespace Langulus::Annies::Component
    ///      containers in order to control hash table growth on reallocation. 
    ///      If 0, the heap will grow according to reflected type properties.  
    ///   @tparam POINTER_TYPE heap pointer type (you can use packed pointers) 
-   template<uint INITIAL_SIZE, uint GROWTH_FACTOR, CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
+   template<unsigned INITIAL_SIZE, unsigned GROWTH_FACTOR, CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
    struct HeapImmovable {
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
@@ -32,12 +31,12 @@ namespace Langulus::Annies::Component
       using HeapProvider   = Id;
       using StackRequest   = typename ENTRY0::T;
 
-      static constexpr bool Shared = sizeof...(ENTRYN) > 0;
+      static constexpr bool Shared              = sizeof...(ENTRYN) > 0;
       static constexpr int  ComponentPrecedence = -2000;
-      static constexpr bool HeapCanBeNull = true;
-      static constexpr bool Reallocatable = true;
-      static constexpr uint InitialSize   = INITIAL_SIZE;
-      static constexpr uint GrowthFactor  = GROWTH_FACTOR;
+      static constexpr bool HeapCanBeNull       = true;
+      static constexpr bool Reallocatable       = true;
+      static constexpr unsigned InitialSize     = INITIAL_SIZE;
+      static constexpr unsigned GrowthFactor    = GROWTH_FACTOR;
       //template<Cid SID>
       //static constexpr bool Relevant = Id::template Contains<SID>;
 

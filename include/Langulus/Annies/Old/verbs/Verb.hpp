@@ -18,8 +18,9 @@ namespace Langulus::A
 {
 
    ///                                                                        
-   /// Abstract verb, dictating canonical verb size, used in various concepts 
-   ///                                                                        
+   /// MARK: Verb                                                             
+   /// A type-erased container specifically designed for fully capsulating    
+   /// function calls.                                                        
    struct Verb : Annies::Many, Annies::Components::Charge {
       using CTTI_POD = No;
       using CTTI_Nullable = No;
@@ -30,7 +31,7 @@ namespace Langulus::A
 
    protected:
       using Real      = Langulus::Real;
-      using Charge    = Annies::Charge;
+      using Charge    = Langulus::Charge;
       using VMeta     = Annies::VMeta;
       using VerbState = Annies::VerbState;
       using Many      = Annies::Many;

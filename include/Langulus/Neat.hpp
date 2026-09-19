@@ -168,3 +168,8 @@ namespace Langulus::Annies
       Count RemoveTag();
    };
 }
+
+namespace Langulus
+{
+   using Annies::Neat;
+}

@@ -238,3 +238,8 @@ namespace Langulus::Annies
    template<CT::Handle K, CT::Handle V>
    TPair(K&&, V&&) -> TPair<TypeOf<Deint<K>>, TypeOf<Deint<V>>>;
 }
+
+namespace Langulus
+{
+   using Annies::TPair;
+}

@@ -169,3 +169,8 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    using TSetUnsorted = TSet<T, StateValue::Disabled>;
 }
+
+namespace Langulus
+{
+   using Annies::TSet;
+}

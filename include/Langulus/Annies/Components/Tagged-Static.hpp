@@ -32,7 +32,7 @@ namespace Langulus::Annies::Component
       using CTTI_ReflectAs = void;
       using Id             = Values<ID>;
 
-      static constexpr int  ComponentPrecedence = -3000;
+      static constexpr int  ComponentPrecedence = -2900;
       static constexpr bool TagErased  = false;
 
       /// MARK: Public                                                        
@@ -45,7 +45,7 @@ namespace Langulus::Annies::Component
       /// Get the reflected tag name                                          
       template<Cid SID = ID>
       constexpr auto GetTagName() const noexcept {
-         return RTTI::NameOfTag<TYPE>();
+         return NameOfTag<TYPE>;
       }
 
       /// Statically tagged containers are always tagged                      
@@ -108,7 +108,7 @@ namespace Langulus::Annies::Component
             self.template SetTag<ID>(T);
          }
          else {
-            using T = Deref<TagOf<I, SID>>;
+            using T = TagOf<I, SID>;
             self.template SetTag<T, ID>();
          }
       }
