@@ -95,13 +95,58 @@ namespace Langulus::Annies
          this->Destroy();
       }
 
+      /// Create an empty container from a dynamic type and state             
+      ///   @param type - type of the container                               
+      ///   @param states - optional states of the container                  
+      ///   @return the new container instance                                
+      static Many Typed(DMeta type, int states = 0) noexcept {
+         Many result;
+         result.SetType(type);
+
+         if (states & static_cast<int>(Annies::State::Disowned))
+            result.EnableDisowned();
+         if (states & static_cast<int>(Annies::State::Future))
+            result.EnableFuture();
+         if (states & static_cast<int>(Annies::State::Past))
+            result.EnablePast();
+         if (states & static_cast<int>(Annies::State::Or))
+            result.EnableOr();
+         if (states & static_cast<int>(Annies::State::Compressed))
+            result.EnableCompressed();
+         if (states & static_cast<int>(Annies::State::Encrypted))
+            result.EnableEncrypted();
+         return result;
+      }
+   
+      /// Create an empty container by copying another container's state      
+      ///   @attention only the unconstrained state is copied                 
+      ///   @param states - states of the container                           
+      ///   @param additional - additional states of the container            
+      ///   @return the new container instance                                
+      static Many CopyStates(CT::Container auto const& states, int additional = 0) noexcept {
+         Many result;
+         if (additional & static_cast<int>(Annies::State::Disowned))
+            result.EnableDisowned();
+         if (states.IsFuture() or (additional & static_cast<int>(Annies::State::Future)))
+            result.EnableFuture();
+         if (states.IsPast() or (additional & static_cast<int>(Annies::State::Past)))
+            result.EnablePast();
+         if (states.IsOr() or (additional & static_cast<int>(Annies::State::Or)))
+            result.EnableOr();
+         if (states.IsCompressed() or (additional & static_cast<int>(Annies::State::Compressed)))
+            result.EnableCompressed();
+         if (states.IsEncrypted() or (additional & static_cast<int>(Annies::State::Encrypted)))
+            result.EnableEncrypted();
+         return result;
+      }
+   
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
       template<NotTag A1, class...AN>
       constexpr Many(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (CT::DeepDense<Deint<A1>>) {
-               LglsAssumeUser((Same<Deint<A1>, Many>),
+               LglsAssumeUser(Same<Deint<A1>, Many>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "
@@ -151,7 +196,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr Many& operator = (A&& argument) {
          if constexpr (CT::DeepDense<Deint<A>>) {
-            LglsAssumeUser((Same<Deint<A>, Many>),
+            LglsAssumeUser(Same<Deint<A>, Many>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

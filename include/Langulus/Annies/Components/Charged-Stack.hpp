@@ -29,7 +29,7 @@ namespace Langulus::Annies::Component
       using StackRequest   = Langulus::Charge;
       using Id             = Values<ID>;
 
-      static constexpr int ComponentPrecedence = 0;
+      static constexpr int ComponentPrecedence = -100;
       
       /// Get the contained charge                                            
       template<Cid SID = ID>

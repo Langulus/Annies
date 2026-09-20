@@ -36,7 +36,7 @@ namespace Langulus::Annies::Component::State
 
       // Every state needs a unique ID in order to find matches even    
       // when template arguments are different                          
-      static constexpr StateUid UID = StateUid::Future;
+      static constexpr Annies::State UID = Annies::State::Future;
 
       template<Cid SID = ID> requires Relevant<SID>
       constexpr bool IsFuture() const requires Static {

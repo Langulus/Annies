@@ -462,6 +462,7 @@ namespace Langulus::Annies::Component
       }
 
       /// Check if container contains executable items                        
+      ///   @attention this is a deep check!                                  
       ///   @return true if the container has at least one executable element 
       template<Cid SID = 0>
       constexpr bool IsExecutable(this auto const& self) noexcept {

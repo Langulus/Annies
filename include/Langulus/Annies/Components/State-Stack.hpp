@@ -91,9 +91,11 @@ namespace Langulus::Annies::Component
       -> StateType requires HasStates {
          StateWrapper r = self.GetStateInner();
          ForEach(StateList{}, [&r]<class S>{
-            if constexpr (S::UID == StateUid::Typed
-            or            S::UID == StateUid::Tracked
-            or            S::UID == StateUid::Disowned) {
+            if constexpr (S::UID == Annies::State::Typed
+            or            S::UID == Annies::State::Tagged
+            or            S::UID == Annies::State::Verbed
+            or            S::UID == Annies::State::Tracked
+            or            S::UID == Annies::State::Disowned) {
                r -= S {};
             }
          });
@@ -102,7 +104,7 @@ namespace Langulus::Annies::Component
 
    protected:
       /// Check if container supports any of the mentioned states             
-      template<StateUid...ID>
+      template<Annies::State...ID>
       static consteval bool CheckStateSupport() {
          return ForEachOr(StateList{}, []<class S> noexcept {
             return ((S::UID == ID and (S::Dynamic or S::Enable)) or ...);
@@ -110,15 +112,15 @@ namespace Langulus::Annies::Component
       }
 
    public:
-      static constexpr bool CanBeMissing  = CheckStateSupport<StateUid::Past, StateUid::Future>();
-      static constexpr bool CanBeDisowned = CheckStateSupport<StateUid::Disowned>();
+      static constexpr bool CanBeMissing  = CheckStateSupport<Annies::State::Past, Annies::State::Future>();
+      static constexpr bool CanBeDisowned = CheckStateSupport<Annies::State::Disowned>();
 
       /// Check if container is marked as missing past/future                 
       ///   @return true if this container is marked as missing               
       constexpr bool IsMissing(this auto const& self) noexcept requires CanBeMissing { //TODO dimensions?
          bool r = false;
          ForEachConstOr(StateList{}, [&]<class S>{
-            if constexpr (S::UID == StateUid::Past or S::UID == StateUid::Future) {
+            if constexpr (S::UID == Annies::State::Past or S::UID == Annies::State::Future) {
                if constexpr (S::Static) {
                   if constexpr (S::Enable) {
                      r = true;
@@ -153,7 +155,7 @@ namespace Langulus::Annies::Component
             if constexpr (CanBeDisowned) {
                // Disown state component exists in the container        
                ForEachConstOr(StateList{}, [&]<class S>{
-                  if constexpr (S::UID == StateUid::Disowned) {
+                  if constexpr (S::UID == Annies::State::Disowned) {
                      if constexpr (S::Static) {
                         if constexpr (S::Enable) {
                            r = true;

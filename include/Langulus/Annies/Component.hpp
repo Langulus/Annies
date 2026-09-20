@@ -24,6 +24,7 @@ namespace Langulus::CTTI
    template<class T> struct Container;
    template<class T> struct Map;
    template<class T> struct Set;
+   template<class T> struct Tag;
    template<class T> struct Pair;
    template<class T> struct Handle;
    template<class T> struct Iterator;
@@ -34,6 +35,7 @@ LANGULUS_CTTI_CONCEPT_DECVQ(Component);
 LANGULUS_CTTI_CONCEPT_DECVQE(Container);
 LANGULUS_CTTI_CONCEPT_DECVQ(Map);
 LANGULUS_CTTI_CONCEPT_DECVQ(Set);
+LANGULUS_CTTI_CONCEPT_DECVQ(Tag);
 LANGULUS_CTTI_CONCEPT_DECVQ(Pair);
 LANGULUS_CTTI_CONCEPT_DECVQ(Handle);
 LANGULUS_CTTI_CONCEPT_DECVQ(Iterator);
@@ -246,24 +248,27 @@ namespace Langulus::Annies
       using T = POINTER_TYPE;
    };
 
+   /// Unique IDs for state components.                                       
+   /// These are used to interface with the outside world, but the true       
+   /// values of the states are determined on per-container basis, depending  
+   /// on the enabled components.                                             
+   enum class State {
+      Invalid     = 0,
+      Compressed  = 1,
+      Encrypted   = 2,
+      Future      = 4,
+      Past        = 8,
+      Or          = 16,
+      Sorted      = 32,
+      Tracked     = 64,
+      Typed       = 128,
+      Tagged      = 256,
+      Verbed      = 512,
+      Disowned    = 1024
+   };
+
    namespace Component
    {
-      /// Unique IDs for state components                                     
-      enum class StateUid {
-         Invalid = 0,
-         Compressed,
-         Encrypted,
-         Future,
-         Past,
-         Or,
-         Sorted,
-         Tracked,
-         Typed,
-         Tagged,
-         Verbed,
-         Disowned
-      };
-
       /// Check if a type definition depicts a modifier                       
       template<class T>
       concept IsRequestModifier = requires { T::AllocatedPerDimension;

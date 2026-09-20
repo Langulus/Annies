@@ -32,7 +32,7 @@ namespace Langulus::Annies::Component::State
 
       // Every state needs a unique ID in order to find matches even    
       // when template arguments are different                          
-      static constexpr StateUid UID = StateUid::Encrypted;
+      static constexpr Annies::State UID = Annies::State::Encrypted;
 
       template<Cid SID = ID> requires Relevant<SID>
       constexpr bool IsEncrypted() const requires Static {

@@ -28,7 +28,7 @@ namespace Langulus::Annies::Component
    template<class META, CT::NotVoid TYPE, Cid ID>
    struct TaggedStatic {
       using CTTI_Component = Yup;
-      using CTTI_Tags      = TYPE;
+      using CTTI_Tagged    = TYPE;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID>;
 

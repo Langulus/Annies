@@ -14,7 +14,7 @@ namespace Langulus::Annies::Inner
    /// TVerbs extend the usual type-erased Any, by adding charge and verb ID  
    /// as members.                                                            
    template<CT::DefineVerb V>
-   using TVerbBase = typename AnyBase::template Include<
+   using TVerbBase = typename ManyBase::template Include<
       Com::VerbedStack<VMeta, V>,  // Add verb, make executable         
       Com::ChargedStack<>          // Add charge                        
    >;
@@ -37,9 +37,9 @@ namespace Langulus::Annies
 
    public:
       // Verb context                                                   
-      Any context;
+      Many context;
       // The container where output goes after execution                
-      Any output;
+      Many output;
 
       using CTTI_Members = Members<&TVerb::context, &TVerb::output>;
 
@@ -102,3 +102,16 @@ namespace Langulus
 }
 
 //LANGULUS_MORPHISM(Langulus::Annies::TVerb, Langulus::Annies::Text, Langulus::Flow::Code);
+
+/// Define a verb                                                             
+///   @param P - positive verb name, as it exists in namespace Langulus::Verbs
+///   @param N - negative verb name (optional, same as positive if "")        
+///   @param INFOSTRING - information about the trait's purpose               
+#define LANGULUS_DEFINE_VERB(P, N, INFOSTRING) \
+   namespace Langulus::Verbs { struct P; } \
+   namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N> {}; } \
+   namespace Langulus::Verbs { \
+      struct P : Annies::TVerb<P> { \
+         using CTTI_Info = Yes<INFOSTRING>; \
+      }; \
+   }

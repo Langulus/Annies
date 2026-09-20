@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -26,8 +26,8 @@ namespace Langulus::Annies::Component
       static constexpr bool Relevant = Id::template Contains<SID>;
 
    private:
-      template<CT::Container C>
-      using Count = typename Deref<C>::CountType;
+      //template<CT::Container C>
+      //using Count = typename Deref<C>::CountType;
 
    public:
       //TODO add dimensionality
@@ -37,7 +37,7 @@ namespace Langulus::Annies::Component
       ///   @param out What are we converting to?                             
       ///   @return 1 on success                                              
       template<CT::Container C, CT::ContainsOne OUT>
-      auto ConvertTo(this C const& self, OUT& out) -> Count<C> {
+      auto ConvertTo(this C const& self, OUT& out) -> size_t {
          if (self.IsEmpty())
             return 0;
 
@@ -101,7 +101,7 @@ namespace Langulus::Annies::Component
       ///   @return the number of converted elements inserted in 'out'.       
       ///      this will be smaller than self.GetCount() on partial success   
       template<CT::Container C, CT::ContainsMany OUT>
-      auto ConvertTo(this C const& self, OUT& out) -> Count<C> {
+      auto ConvertTo(this C const& self, OUT& out) -> size_t {
          if (self.IsEmpty())
             return 0;
 

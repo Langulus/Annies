@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Any.hpp"
+#include "Many.hpp"
 #include "Annies/Components/Charged-Stack.hpp"
 #include "Annies/Components/Verbed-Stack.hpp"
 #include <compare>
@@ -21,7 +21,7 @@ namespace Langulus::Annies::Inner
 {
    /// Verbs extend the usual type-erased Any, by adding charge and verb ID   
    /// as members.                                                            
-   using VerbBase = typename AnyBase::template Include<
+   using VerbBase = typename ManyBase::template Include<
       Com::VerbedStack<VMeta>,     // Add verb, make executable         
       Com::ChargedStack<>          // Add charge                        
    >;
@@ -40,9 +40,9 @@ namespace Langulus::Annies
 
    public:
       // Verb context                                                   
-      Any source;
+      Many source;
       // The container where output goes after execution                
-      Any output;
+      Many output;
 
       using CTTI_Members = Members<&Verb::source, &Verb::output>;
 

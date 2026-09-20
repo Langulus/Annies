@@ -36,7 +36,7 @@ namespace Langulus::Annies::Component
    template<class META, class TYPE, bool CONSTRAIN, Cid ID>
    struct TaggedStack : State::Tagged<StateValueIf(CONSTRAIN or not ::std::is_void_v<TYPE>), ID> {
       using CTTI_Component = Yup;
-      using CTTI_Tags      = TYPE;
+      using CTTI_Tagged    = TYPE;
       using CTTI_ReflectAs = void;
       using StackRequest   = META;
       using Id             = Values<ID>;

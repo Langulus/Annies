@@ -64,7 +64,6 @@ namespace Langulus::Annies
 
    template<CT::NotVoid> struct TOwn;
    template<class>       struct TRef;
-   template<CT::NotVoid> struct TTag;
    template<CT::NotVoid> struct TAny;
    template<CT::NotVoid> struct THive;
    template<CT::NotVoid> struct TMany;
