@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,46 +9,46 @@
 #include "Many.hpp"
 #include "TMany.hpp"
 #include "TMap.hpp"
-#include "Construct.hpp"
+#include "Recipe.hpp"
 #include "Tag.hpp"
 
 
 namespace Langulus::Annies
 {
+   using Messy = Many;
+
    ///                                                                        
-   ///   Neat - a normalized data container                                   
+   /// MARK: Neat                                                             
    ///                                                                        
-   ///   Turns messy containers into neatly and consistently ordered ones,    
-   /// that are very fast on compare/search/insert/remove, albeit quite a bit 
-   /// larger.                                                                
+   ///   Normalized data container. Turns messy containers into neatly and    
+   /// consistently ordered ones, that are very fast on compare, search,      
+   /// insert, or remove, albeit quite a bit larger.                          
    ///   Neats are extensively used as descriptors in factories, to check     
    /// whether an element with the same signature already exists.             
    ///   Elements that are marked missing are never considered part of the    
-   /// descriptor and are filled by the context (i.e. Tags::Parent(?))        
-   class Neat {
-      using ConstructList = TMany<Construct>;
-      using TailList      = TMany<Messy>;
-      using TagList       = TMany<Tag>;
-      using Count         = ::std::size_t;
-      using Offset        = ::std::size_t;
+   /// recipe and are filled by the context (i.e. Tags::Parent(?)).           
+   struct Neat {
+      using RecipeList = TMany<Recipe>;
+      using TailList   = TMany<Messy>;
+      using TagList    = TMany<Tag>;
 
-      // The hash of the container                                      
-      // Kept as first member, in order to quickly access it            
+      // The hash of the container.                                     
+      // Kept as first member, in order to quickly access it.           
       mutable Hash mHash;
 
       // Tags are ordered first by their tag type, then by their        
-      // order of appearance. Duplicate tag types are allowed           
-      // Tag contents may or may not also be normalized                 
+      // order of appearance. Duplicate tag types are allowed.          
+      // Tag contents may or may not also be normalized.                
       TMapUnsorted<TMeta, TagList> mTags;
 
-      // Subconstructs are sorted first by the construct type, and then 
+      // Subconstructs are sorted first by the recipe subject, and then 
       // by their order of appearance. Their contents may or may not    
-      // also be normalized                                             
-      TMapUnsorted<DMeta, ConstructList> mConstructs;
+      // also be normalized.                                            
+      TMapUnsorted<DMeta, RecipeList> mRecipes;
 
-      // Any other block type that doesn't fit in the above is sorted   
-      // first by the block type, then by the order of appearance       
-      // These sub-blocks' contents may or may not be normalized        
+      // Any other container that doesn't fit in the above is sorted    
+      // first by its type, then by the order of appearance.            
+      // Contents may or may not be normalized.                         
       TMapUnsorted<DMeta, TailList> mAnythingElse;
 
    public:
@@ -63,8 +63,8 @@ namespace Langulus::Annies
       template<template<class> class S> requires CT::Intent<S<Neat>>
       Neat(S<Neat>&&);
 
-      template<class A1, class...AN>
-      Neat(A1&&, AN&&...) requires CT::RangeInsertable<Many, A1, AN...>;
+      /*template<class A1, class...AN>
+      Neat(A1&&, AN&&...) requires CT::RangeInsertable<Many, A1, AN...>;*/
 
       ///                                                                     
       ///   Assignment                                                        
@@ -99,8 +99,8 @@ namespace Langulus::Annies
       auto GetData(DMeta) -> TailList*;
       
       template<CT::NotVoid>
-      auto GetConstructs()      -> ConstructList*;
-      auto GetConstructs(DMeta) -> ConstructList*;
+      auto GetRecipes()      -> RecipeList*;
+      auto GetRecipes(DMeta) -> RecipeList*;
 
       template<CT::NotVoid>
       auto FindType()      const -> DMeta;
@@ -111,46 +111,46 @@ namespace Langulus::Annies
 
       template<CT::DefineTag...>
       bool ExtractTag    (CT::NotVoid auto&...) const;
-      auto ExtractData   (CT::NotVoid auto&) const -> Count;
-      auto ExtractDataAs (CT::NotVoid auto&) const -> Count;
+      auto ExtractData   (CT::NotVoid auto&) const -> size_t;
+      auto ExtractDataAs (CT::NotVoid auto&) const -> size_t;
 
       template<CT::DefineTag>
-      auto GetTag(Offset = 0)        const -> const Tag*;
-      auto GetTag(TMeta, Offset = 0) const -> const Tag*;
+      auto GetTag(size_t = 0)        const -> const Tag*;
+      auto GetTag(TMeta, size_t = 0) const -> const Tag*;
 
    protected:
       template<CT::DefineTag>
       bool ExtractTagInner(CT::NotVoid auto&...) const;
-      template<Offset...IDX>
+      template<size_t...IDX>
       bool ExtractTagInner(const TagList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
-      template<Offset>
+      template<size_t>
       bool ExtractTagInnerInner(const TagList&, CT::NotVoid auto&) const;
 
    public:
       ///                                                                     
       ///   Iteration                                                         
-      Count ForEach          (auto&&...);
-      Count ForEachTag       (auto&&);
-      Count ForEachDeep      (auto&&...);
-      Count ForEachConstruct (auto&&);
-      Count ForEachTail      (auto&&);
+      size_t ForEach          (auto&&...);
+      size_t ForEachTag       (auto&&);
+      size_t ForEachDeep      (auto&&...);
+      size_t ForEachConstruct (auto&&);
+      size_t ForEachTail      (auto&&);
 
    protected:
-      Count ForEachInner     (auto&&);
+      size_t ForEachInner     (auto&&);
 
    public:
       ///                                                                     
       ///   Insertion                                                         
       template<class T1, class...TN>
-      Count Insert(T1&&, TN&&...);
+      size_t Insert(T1&&, TN&&...);
       void  Merge(const Neat&);
-      Neat& SetTag(CT::DefineTag auto&&, Offset = 0);
+      Neat& SetTag(CT::DefineTag auto&&, size_t = 0);
 
       Neat& operator <<  (auto&&);
       Neat& operator <<= (auto&&);
 
    protected:
-      auto UnfoldInsert (auto&&) -> Count;
+      auto UnfoldInsert (auto&&) -> size_t;
       void InsertInner  (auto&&);
 
       void AddTag       (CT::Intent auto&&);
@@ -161,11 +161,11 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Removal                                                           
       template<CT::NotVoid, bool EMPTY_TOO = false>
-      Count RemoveData();
+      size_t RemoveData();
       template<CT::NotVoid>
-      Count RemoveConstructs();
+      size_t RemoveConstructs();
       template<CT::DefineTag, bool EMPTY_TOO = false>
-      Count RemoveTag();
+      size_t RemoveTag();
    };
 }
 

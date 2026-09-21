@@ -27,7 +27,6 @@ namespace Langulus::Annies
    template<CT::DefineTag TAG> 
    struct TTag : Inner::TTagBase<TAG> {
       using CTTI_ReflectAs = Tag;
-      using CTTI_Deep      = No;
       using CTTI_Tag       = Yup;
       using Base           = Inner::TTagBase<TAG>;
 
@@ -133,8 +132,8 @@ namespace Langulus
 }
 
 /// Define a tag                                                              
-///   @param T - the trait, as it appears in namespace Langulus::Traits       
-///   @param INFOSTRING - information about the trait's purpose               
+///   @param T the tag, as it appears in namespace Langulus::Tags             
+///   @param INFOSTRING information about the tag's purpose                   
 #define LANGULUS_DEFINE_TAG(T, INFOSTRING, ...) \
    namespace Langulus::Tags { struct T; } \
    namespace Langulus::CTTI { template<> struct DefineTag<::Langulus::Tags::T> : NamedTag<#T> {}; } \

@@ -42,7 +42,7 @@ namespace Langulus::Annies::Component
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::ComponentPrecedence == 1000; }),
          "All precedences should match");
 
-      static constexpr uint Owned = Subcomponents::First::Owned;
+      static constexpr unsigned Owned = Subcomponents::First::Owned;
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::Owned == Owned; }),
          "Currently all shallow ownerships must be of the same style");
 

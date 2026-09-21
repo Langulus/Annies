@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -15,16 +15,21 @@ namespace Langulus::Annies::Component
 {
    template<class...> struct MultiownDeep;
 
+   /// Empty multiown                                                         
    template<CT::Component...TN> requires (CountEnabled<TN...> == 0)
    struct MultiownDeep<TN...> {
       using CTTI_Component = Yup;
       static constexpr bool SkipThisComponent = true;
    };
 
+   /// Multiown with a single component just acts like it                     
+   template<CT::Component...TN> requires (CountEnabled<TN...> == 1)
+   struct MultiownDeep<TN...> : TN... {};
+
    ///                                                                        
    /// Combines multiple deep ownership components into a unified interface to
    /// combat C++ base method ambiguities, and to add a bit more convenience. 
-   ///   @tparam TN... all the deep ownership components to unify              
+   ///   @tparam TN... all the deep ownership components to unify             
    template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
    struct LANGULUS_EBCO MultiownDeep<TN...> : TN... {
       using CTTI_Component = Yup;
@@ -42,7 +47,7 @@ namespace Langulus::Annies::Component
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::ComponentPrecedence == 2000; }),
          "All precedences should match");
 
-      static constexpr uint OwnedDeep = Subcomponents::First::OwnedDeep;
+      static constexpr unsigned OwnedDeep = Subcomponents::First::OwnedDeep;
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::OwnedDeep == OwnedDeep; }),
          "Currently all deep ownerships must be of the same style");
 

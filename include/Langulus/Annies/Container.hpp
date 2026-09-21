@@ -71,7 +71,7 @@ namespace Langulus::Annies
    template<CT::NotVoid, StateValue SORT = StateValue::Variable>
    struct TSet;
 
-   template<CT::NotVoid, CT::NotVoid, StateValue SORT = StateValue::Variable>
+   template<class, class, StateValue SORT = StateValue::Variable>
    struct TMap;
 
    template<CT::NotVoid, CT::NotVoid>

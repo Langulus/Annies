@@ -1,20 +1,20 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Langulus/IntentOf.hpp"
 #include "Map.hpp"
+#include "Annies/Components/Multiown-Deep.hpp"
 
 
 namespace Langulus::Annies::Inner
 {
    /// MARK: TMapBase                                                         
-   template<CT::NotVoid K, CT::NotVoid V, StateValue SORT>
-   requires (CT::NotHandle<K, V> and CT::NotReference<K, V>)
+   template<class K, class V, StateValue SORT>
+   requires (/*CT::NotHandle<K, V> and*/ CT::NotReference<K, V>)
    using TMapBase = Com::Container<
       Com::State::Disowned<>,             // Allows disownment          
       Com::Multitype<Com::TypedStack<DMeta, K, true, 0>,
@@ -48,7 +48,7 @@ namespace Langulus::Annies
    /// Emplacement is disabled for maps, because keys aren't allowed to       
    /// change in-place. This also means that they are only const-iteratable.  
    /// Values, on the other hand, are mutable.                                
-   template<CT::NotVoid K, CT::NotVoid V, StateValue SORT>
+   template<class K, class V, StateValue SORT>
    struct TMap : Inner::TMapBase<K, V, SORT> {
       using CTTI_ReflectAs = Map;
       using CTTI_Map       = Yup;
@@ -179,10 +179,10 @@ namespace Langulus::Annies
    };
 
    /// MARK: CTAD                                                             
-   template<CT::NotVoid K, CT::NotVoid V>
+   template<class K, class V>
    using TMapSorted = TMap<K, V, StateValue::Enabled>;
 
-   template<CT::NotVoid K, CT::NotVoid V>
+   template<class K, class V>
    using TMapUnsorted = TMap<K, V, StateValue::Disabled>;
 }
 

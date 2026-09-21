@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,39 +7,39 @@
 ///                                                                           
 #pragma once
 #include <Langulus/Many.hpp>
+#include <Langulus/Annies/Components/Stack.hpp>
+#include <Langulus/Annies/Components/Charged-Stack.hpp>
+
+
+namespace Langulus::Annies::Inner
+{
+   /// Recipe extends the usual type-erased Many, by adding charge and        
+   /// type as members.                                                       
+   using RecipeBase = typename ManyBase::template Include<
+      Com::Stack<DMeta, 1>,         // Add the constructed type         
+      Com::ChargedStack<>           // Add charge                       
+   >;
+}
 
 namespace Langulus::Annies
 {
 
    ///                                                                        
-   ///   Construct                                                            
+   ///   Recipe                                                               
    ///                                                                        
    ///   Used to contain creation instructions for any type. It is just a     
    /// type-erased Many - a descriptor - with a charge and a type.            
-   /// Optimized for detecting small differences in descriptors.              
+   /// Optimized for detecting small differences in descriptions.             
    /// These scripts mean the completely same thing:                          
    /// 1) create*2(input(name("test")) output(Thing))                         
-   /// 2) create*2 Thing(name("test"))                                        
-   /// 3) create Thing*2(name("test"))                                        
-   /// 4) create Thing*2("test")                                              
-   /// 5) create Construct*2(type(Thing), input(name("test")))                
-   /// 6) create*2 Construct(Thing, name("test"))                             
+   /// 2) create*2 Thing(name("test"))      // memoized as Recipe             
+   /// 3) create Thing*2(name("test"))      // memoized as Recipe             
+   /// 4) create Thing*2("test")            // memoized as Recipe             
+   /// 5) create Recipe*2(type(Thing), input(name("test")))                   
+   /// 6) create*2 Recipe(Thing, name("test"))                                
    /// After execution all these are replaced by the two created Things       
-   struct Construct {
-   private:
-      // What are we constructing?                                      
-      DMeta  mType {};
-      // Precomputed hash                                               
-      mutable Hash mHash {};
-      // How many things, when, at what frequency/priority?             
-      Charge mCharge;
-      // What properties does the thing have?                           
-      Many   mDescriptor;
-
-   public:
-      static constexpr bool Ownership = true;
-
-      constexpr Construct() noexcept = default;
+   struct Recipe : Inner::RecipeBase {
+      /*constexpr Construct() noexcept = default;
       Construct(const Construct&) noexcept;
       Construct(Construct&&) noexcept;
 
@@ -112,12 +112,11 @@ namespace Langulus::Annies
       auto operator -> ()       ->       Many*;
 
       Construct& operator <<  (auto&&);
-      Construct& operator <<= (auto&&);
+      Construct& operator <<= (auto&&);*/
 
       ///                                                                     
       ///   Conversion                                                        
       ///                                                                     
       //size_t Serialize(CT::Serial auto&) const;
    };
-
-} // namespace Langulus::Annies
+}

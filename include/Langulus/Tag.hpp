@@ -25,7 +25,6 @@ namespace Langulus::Annies
    ///   This is the same as Many, but also carries tag information as a      
    /// member. Binary-compatible with its templated equivalent TTag.          
    struct Tag : Inner::TagBase {
-      using CTTI_Deep = No;
       using CTTI_Tag  = Yup;
       using Base      = Inner::TagBase;
 

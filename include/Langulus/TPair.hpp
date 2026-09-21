@@ -6,26 +6,26 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <source/components/Typed-Static.hpp>
-#include <source/components/Typed-Stack.hpp>
-#include <source/components/Heap-Movable.hpp>
-#include <source/components/Stack.hpp>
-#include <source/components/Count-Static.hpp>
-#include <source/components/Reserve-Static.hpp>
-#include <source/components/Ownership-Stack.hpp>
-#include <source/components/OwnershipDeep-Heap.hpp>
-#include <source/components/Hash-Emergent.hpp>
-#include <source/components/Emplacement.hpp>
-#include <source/components/Assignment.hpp>
-#include <source/components/Removal.hpp>
-#include <source/components/Conversion.hpp>
-#include <source/components/Comparison.hpp>
-#include <source/states/Encrypted.hpp>
-#include <source/states/Disowned.hpp>
-#include <source/components/Multitype.hpp>
-#include <source/components/Multiprovider.hpp>
-#include <source/components/Multiown-Deep.hpp>
 #include "HandlePair.hpp"
+#include <Annies/Components/Typed-Static.hpp"
+#include <Annies/Components/Typed-Stack.hpp"
+#include <Annies/Components/Heap-Movable.hpp"
+#include <Annies/Components/Stack.hpp"
+#include <Annies/Components/Count-Static.hpp"
+#include <Annies/Components/Reserve-Static.hpp"
+#include <Annies/Components/Ownership-Stack.hpp"
+#include <Annies/Components/OwnershipDeep-Heap.hpp"
+#include <Annies/Components/Hash-Emergent.hpp"
+#include <Annies/Components/Emplacement.hpp"
+#include <Annies/Components/Assignment.hpp"
+#include <Annies/Components/Removal.hpp"
+#include <Annies/Components/Conversion.hpp"
+#include <Annies/Components/Comparison.hpp"
+#include <Annies/Components/Multitype.hpp"
+#include <Annies/Components/Multiprovider.hpp"
+#include <Annies/Components/Multiown-Deep.hpp"
+#include <Annies/States/Encrypted.hpp"
+#include <Annies/States/Disowned.hpp"
 
 
 namespace Langulus::Annies::Inner
