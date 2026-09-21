@@ -77,7 +77,7 @@ namespace Langulus::Annies
    /// A continuous text container of variable size                           
    ///                                                                        
    struct Text : Inner::TextBase {
-      using CTTI_ReflectAs = Text;
+      //using CTTI_ReflectAs = Text;
       using CTTI_Text      = Yup;
       using CountType      = Base::CountType;
 
@@ -128,7 +128,7 @@ namespace Langulus::Annies
          this->Absorb(LglsFwd(text));
       }
 
-      /// Construction from any kind of text that isn't an Annies container  
+      /// Construction from any kind of text that isn't an Annies container   
       ///   @attention non-owning constructor unless you use Copy/Clone. Data 
       ///      lifetime is _your_ responsibility, unless you use Copy/Clone.  
       template<CT::Text T> requires CT::NotContainer<T>

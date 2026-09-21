@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
+#include "Handle.hpp"
 #include "Annies/Container.hpp"
 #include "Annies/Components/Typed-Stack.hpp"
 #include "Annies/Components/Heap-Movable.hpp"

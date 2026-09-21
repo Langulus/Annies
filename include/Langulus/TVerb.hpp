@@ -106,12 +106,21 @@ namespace Langulus
 /// Define a verb                                                             
 ///   @param P - positive verb name, as it exists in namespace Langulus::Verbs
 ///   @param N - negative verb name (optional, same as positive if "")        
-///   @param INFOSTRING - information about the trait's purpose               
+///   @param INFOSTRING - information about the verb's purpose                
 #define LANGULUS_DEFINE_VERB(P, N, INFOSTRING) \
    namespace Langulus::Verbs { struct P; } \
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N> {}; } \
-   namespace Langulus::Verbs { \
-      struct P : Annies::TVerb<P> { \
-         using CTTI_Info = Yes<INFOSTRING>; \
-      }; \
-   }
+   namespace Langulus::Verbs { struct P : Annies::TVerb<P> { using CTTI_Info = Yes<INFOSTRING>; }; }
+
+/// Define a verb with operators                                              
+///   @param P - positive verb name, as it exists in namespace Langulus::Verbs
+///   @param N - negative verb name (optional, same as positive if "")        
+///   @param OP - positive verb operator                                      
+///   @param ON - negative verb operator                                      
+///   @param PRECEDENCE - operator precedence                                 
+///   @param INFOSTRING - information about the verb's purpose                
+#define LANGULUS_DEFINE_OPERATOR(P, N, OP, ON, PRECEDENCE, INFOSTRING) \
+   namespace Langulus::Verbs { struct P; } \
+   namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
+   namespace Langulus::CTTI  { template<> struct DefineVerbOp<::Langulus::Verbs::P> : NamedOperator<OP,ON> {}; } \
+   namespace Langulus::Verbs { struct P : Annies::TVerb<P> { using CTTI_Info = Yes<INFOSTRING>; }; }
