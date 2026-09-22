@@ -264,7 +264,8 @@ namespace Langulus::Annies
       Typed       = 128,
       Tagged      = 256,
       Verbed      = 512,
-      Disowned    = 1024
+      Disowned    = 1024,
+      Pinned      = 2048
    };
 
    namespace Component
@@ -557,6 +558,14 @@ namespace Langulus::Annies
          #define LglsStateTracked(modifier) \
             template<StateValue, Cid, Cid...> modifier struct State::Tracked
 
+         template<StateValue = StateValue::Variable, Cid = 0, Cid...> struct Tagged;
+         #define LglsStateTagged(modifier) \
+            template<StateValue, Cid, Cid...> modifier struct State::Tagged
+
+         template<StateValue = StateValue::Variable, Cid = 0, Cid...> struct Verbed;
+         #define LglsStateVerbed(modifier) \
+            template<StateValue, Cid, Cid...> modifier struct State::Verbed
+
          template<StateValue = StateValue::Variable, Cid = 0, Cid...> struct Typed;
          #define LglsStateTyped(modifier) \
             template<StateValue, Cid, Cid...> modifier struct State::Typed
@@ -564,6 +573,10 @@ namespace Langulus::Annies
          template<StateValue = StateValue::Variable, Cid = 0, Cid...> struct Disowned;
          #define LglsStateDisowned(modifier) \
             template<StateValue, Cid, Cid...> modifier struct State::Disowned
+
+         template<StateValue = StateValue::Variable, Cid = 0, Cid...> struct Pinned;
+         #define LglsStatePinned(modifier) \
+            template<StateValue, Cid, Cid...> modifier struct State::Pinned
       }
 
       namespace StateInner

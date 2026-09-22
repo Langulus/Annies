@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,6 +9,7 @@
 #include "../Component.hpp"
 #include "Langulus/Assume.hpp"
 #include "Langulus/IntentOf.hpp"
+#include "Langulus/Typenav.hpp"
 #include "Langulus/Utils/Types.hpp"
 #include <Langulus/CT/Unfold.hpp>
 #include <Langulus/CT/Index.hpp>
@@ -18,61 +19,8 @@
 #include <Langulus/CT/Defaultable.hpp>
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/Deep.hpp>
+#include <type_traits>
 
-
-/*namespace Langulus::CT
-{
-   /// Check if container's elements are unfold-constructible                 
-   ///   @attention type-erased elements are always insertable, and will fail 
-   ///      at runtime if not reflected as such                               
-   template<class C, class...A>
-   concept RangeInsertable = Container<C> and (
-      Untyped<C> or UnfoldConstructible<TypeOf<C>, A...>
-   );
-
-   namespace Inner
-   {
-      /// Test whether a container is constructible with the given arguments  
-      ///   @tparam C the contained type                                      
-      ///   @tparam ...A the arguments to test                                
-      ///   @return true if container is constructible using {A...}           
-      template<Container C, class...A>
-      consteval bool DeepConstructible() noexcept {
-         using FA = FirstOf<A...>;
-         using SA = IntentOfT<FA>;
-         using T  = TypeOf<C>;
-
-         if constexpr (Untyped<C>) {
-            // Type-erased containers accept almost any type - they     
-            // will report errors at runtime instead, if any            
-            return Reflectable<Deint<A>...>;
-         }
-         else if constexpr (sizeof...(A) == 1 and Container<FA>) {
-            // If only one A provided, it HAS to be a container         
-            if constexpr (SA::IsShallow()) {
-               // Generally, shallow intents are always supported,      
-               // but copying will call element constructors, so we     
-               // have to check if the contained type supports it       
-               if constexpr (Copied<SA>)
-                  return ReferConstructible<T>;
-               else
-                  return true;
-            }
-            else {
-               // Cloning always calls decayed constructors, and        
-               // we have to check whether decayed elements can do it   
-               return IntentConstructible<Langulus::Clone, T>;
-            }
-         }
-         else return UnfoldConstructible<T, A...>;
-      };
-   }
-
-   /// Concept for recognizing arguments, with which a statically typed       
-   /// container can be constructed                                           
-   template<class C, class...A>
-   concept DeepConstructible = Inner::DeepConstructible<C, A...>();
-}*/
 
 namespace Langulus::Annies::Component
 {
@@ -740,9 +688,141 @@ namespace Langulus::Annies::Component
          self.SetCountInner(all_count);
          return rhs_count;
       }
+         
+      /// Gather items from source container, and fill this one               
+      ///   @param source container to gather from, type acts as filter       
+      ///   @return the number of gathered elements                           
+      template<CT::Container C, CT::Container SRC>
+      size_t GatherFrom(this C& self, SRC&& source) {
+         return ThisCom::template GatherInner<false>(FWDIntent(source));
+      }
+   
+      /// Same as above, but in reverse                                       
+      template<CT::Container C, CT::Container SRC>
+      size_t GatherFromReverse(this C& self, SRC&& source) {
+         return ThisCom::template GatherInner<true>(FWDIntent(source));
+      }
+   
+      /// Gather items of specific state from source container, and fill this 
+      ///   @tparam D custom deep type to nest in. WIll use C::DeepType if    
+      ///      not specified or void                                          
+      ///   @param source container to gather from, type acts as filter       
+      ///   @param state state filter                                         
+      ///   @return the number of gathered elements                           
+      template<class D = void, CT::Container C, CT::Container SRC>
+      size_t GatherFrom(this C& self, SRC&& source, auto&& condition) {
+         using DEEP = Tif<::std::is_void_v<D>, typename C::DeepType, D>;
+         return ThisCom::template GatherPolarInner<false, DEEP>(
+            FWDIntent(source), LglsFwd(condition)
+         );
+      }
 
+      /// Same as above, but in reverse                                       
+      template<class D = void, CT::Container C, CT::Container SRC>
+      size_t GatherFromReverse(this C& self, SRC&& source, int state) {
+         using DEEP = Tif<::std::is_void_v<D>, typename C::DeepType, D>;
+         return ThisCom::template GatherPolarInner<true, DEEP>(
+            FWDIntent(source), state
+         );
+      }
+   
    protected:
       /// MARK: Protected                                                     
+      /// Gather items from source container, and fill this one.              
+      /// Local type acts as a filter to what gets gathered.                  
+      ///   @tparam REVERSE are we gathering in reverse?                      
+      ///   @tparam D custom deep type to nest in. No nesting will happen if  
+      ///      void                                                           
+      ///   @param source source container and intent                         
+      ///   @return the number of gathered elements                           
+      template<bool REVERSE, class D, CT::Container C, CT::Container SRC> requires CT::Intent<SRC>
+      size_t GatherInner(this C& self, SRC&& source) {
+         if constexpr (not ::std::is_void_v<D>) {
+            static_assert(CT::Deep<D> and CT::Decayed<D>, "D is not deep");
+            if (source->template Is<D>() and not self.IsDeep()) {
+               // Gather from each subcontainer, regardless if sparse   
+               // or not                                                
+               size_t count = 0;
+               source.Apply([&](auto& i) {//TODO reverse?
+                  count += ThisCom::template GatherInner<REVERSE>(NestIntentOf(source, *i.GetDense().template Get<D>()));
+               });
+               return count;
+            }
+         }
+
+         //TODO why all these checks? can't we just Concat and disregard any exceptions?
+         if constexpr (not CT::TypeErased<C>) {
+            // Output container is strictly typed, we can't make loose  
+            // matches                                                  
+            if (source->IsSame(self))
+               return ThisCom::Concat(LglsFwd(source));
+            else
+               return 0;
+         }
+         else {
+            if (self.IsTypeConstrained()) {
+               // Output container is strictly typed, we can't make     
+               // loose matches                                         
+               if (source->IsSame(self))
+                  return ThisCom::Concat(LglsFwd(source));
+               else
+                  return 0;
+            }
+            else {
+               // Output is not strictly typed, so we can afford a      
+               // looser comparison                                     
+               return ThisCom::Concat(LglsFwd(source));
+            }
+         }
+      }
+   
+      /// Gather items of specific phase from input container and fill output 
+      ///   @tparam REVERSE are we gathering in reverse?                      
+      ///   @tparam D custom deep type to nest in. No nesting will happen if  
+      ///      void                                                           
+      ///   @param source source container and intent                         
+      ///   @param state the data state filter                                
+      ///   @return the number of gathered elements                           
+      template<bool REVERSE, class D, CT::Container C, CT::Container SRC> requires CT::Intent<SRC>
+      size_t GatherPolarInner(this C& self, SRC&& source, auto&& condition) {
+         if (not condition(*source)) {
+            if constexpr (not ::std::is_void_v<D>) {
+               static_assert(CT::Deep<D> and CT::Decayed<D>, "D is not deep");  
+               if (source->IsNow() and source->template Is<D>()) {
+                  // States don't match, but we can dig deeper if Deep  
+                  // and Now, since Now state is permissive, regardless 
+                  // if sparse or not.                                  
+                  C localOutput;
+                  localOutput.SetType(self.GetType());
+                  localOutput.SetState(source->GetUnconstrainedState());
+                  source.Apply([&](auto& i) {//TODO reverse?
+                     localOutput.template GatherPolarInner<REVERSE, D>(NestIntentOf(source, *i.GetDense().template Get<D>()), condition);
+                  });
+                  localOutput.MakeNow();
+                  return ThisCom::Compose(Abandon(localOutput));
+               }
+            }
+   
+            // State mismatch                                           
+            return 0;
+         }
+   
+         //                                                             
+         // If reached, then source is flat and neutral/same            
+         if (not self.IsTyped()) {
+            // Any output will do, so no need to iterate at all         
+            return ThisCom::Compose(LglsFwd(source));
+         }
+   
+         // Iterate subpacks if any                                     
+         C localOutput;
+         localOutput.SetType(self.GetType());
+         localOutput.SetState(source->GetState());
+         localOutput.template GatherInner<REVERSE, D>(LglsFwd(source));
+         localOutput.MakeNow();
+         return ThisCom::Concat(Abandon(localOutput));
+      }
+
       /// Helper function that gathers the number of elements and types.      
       /// An incompatible type will result in 'deepened' being true, and      
       /// 'out_count' being rewritten to reflect the number of required sub-  

@@ -62,7 +62,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = Any;
       using CTTI_Deep      = Yup;
       using Base           = Inner::AnyBase;
-      using DeepType       = Any;
+      using DeepType       = Many;//Any;
 
       constexpr Any() noexcept {
          this->ConstructDefault();

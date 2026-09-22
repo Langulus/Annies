@@ -58,13 +58,12 @@ namespace Langulus::Annies
 
       static constexpr bool ReferenceElements = true;
 
-      using Base     = Inner::PairBase;
-      using DeepType = Any;
-
-      using HandleType    = THandlePair<Handle, Handle>;
-      using HandleMutType = THandlePair<HandleMut, HandleMut>;
-      using Pick          = HandleType;
-      using PickMut       = HandleMutType;
+      using Base           = Inner::PairBase;
+      using DeepType       = Many;//Any;
+      using HandleType     = THandlePair<Handle, Handle>;
+      using HandleMutType  = THandlePair<HandleMut, HandleMut>;
+      using Pick           = HandleType;
+      using PickMut        = HandleMutType;
 
       constexpr Pair() noexcept {
          this->ConstructDefault();

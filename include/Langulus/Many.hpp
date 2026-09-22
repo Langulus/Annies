@@ -102,6 +102,8 @@ namespace Langulus::Annies
       static Many Typed(DMeta type, int states = 0) noexcept {
          Many result;
          result.SetType(type);
+         if (not states)
+            return result;
 
          if (states & static_cast<int>(Annies::State::Disowned))
             result.EnableDisowned();

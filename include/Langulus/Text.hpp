@@ -77,7 +77,6 @@ namespace Langulus::Annies
    /// A continuous text container of variable size                           
    ///                                                                        
    struct Text : Inner::TextBase {
-      //using CTTI_ReflectAs = Text;
       using CTTI_Text = Yup;
       using CountType = Base::CountType;
 

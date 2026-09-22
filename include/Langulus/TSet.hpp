@@ -51,7 +51,7 @@ namespace Langulus::Annies
       using CTTI_Deep      = Yup;
 
       using Base           = Inner::TSetBase<T, SORT>;
-      using DeepType       = Any;
+      using DeepType       = Many;//Any;
 
       #if LANGULUS(FORCE_TYPE_ERASURE)
          using HandleType     = Handle;

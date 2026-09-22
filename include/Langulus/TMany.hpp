@@ -52,7 +52,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = Many;
       using CTTI_Deep      = Yup;
       using Base           = Inner::TManyBase<T>;
-      using DeepType       = Any;
+      using DeepType       = Many;//Any;
 
       constexpr TMany() noexcept {
          this->ConstructDefault();

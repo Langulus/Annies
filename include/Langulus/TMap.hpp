@@ -55,7 +55,7 @@ namespace Langulus::Annies
       using CTTI_Deep      = Yup;
 
       using Base           = Inner::TMapBase<K, V, SORT>;
-      using DeepType       = Any;
+      using DeepType       = Many;//Any;
 
       #if not LANGULUS(FORCE_TYPE_ERASURE)
          using HandleType     = THandlePair<THandle<ConstAll<K&>>, THandle<ConstAll<V&>>>;

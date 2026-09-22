@@ -175,5 +175,12 @@ namespace Langulus::Annies::Component
          out.SetHashInner(0);
          return self.GetCount();
       }
+
+      template<CT::NotVoid TO, CT::Container C, class OUT = typename C::template Retype<TO>>
+      auto ConvertTo(this C const& self) -> OUT {
+         OUT result;
+         self.ConvertTo(result);
+         return Abandon(result);
+      }
    };
 }

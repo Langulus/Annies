@@ -107,7 +107,7 @@ namespace Langulus::Annies::Component
       ///   @param argument the argument to assign                            
       ///   @return reference to self                                         
       template<CT::Container C, class A>
-      C& Assign(this C& self, A&& argument) {
+      C& Assign(this C& self, A&& argument) {//TODO pinnables
          if constexpr (not CT::Contiguous<C>) {
             // Assignment for maps/sets falls back to merge             
             self.Clear();
@@ -175,7 +175,7 @@ namespace Langulus::Annies::Component
       ///   @param argument the argument to swap with                         
       ///   @return reference to self                                         
       template<CT::ContainsOne C, CT::ContainsOne A> requires CT::NoIntent<A>
-      C& SwapContents(this C& self, A& argument) {
+      C& SwapContents(this C& self, A& argument) {//TODO pinnables
          LglsAssumeUser(not argument.IsEmpty(),
             "Can't swap with empty container");
 

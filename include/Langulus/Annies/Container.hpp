@@ -1006,7 +1006,10 @@ namespace Langulus::Annies
       ///   @param cookie the element/hash table spot to start off from       
       ///   @attention this will ignore any ordering                          
       ///   @attention assumes container isn't empty                          
-      template<bool SKIP_EMPTY = true, CT::Container C>
+      ///   @note when applying only to the keys/values of a map, you should  
+      ///      first slice the map in the desired dimension, and then Apply   
+      ///      for better overall performance.                                
+      template<bool SKIP_EMPTY = true, CT::Container C>//TODO reverse?
       void Apply(this C& self, auto&& lambda, [[maybe_unused]] size_t cookie = 0) {
          LglsAssumeDev(not self.IsEmpty(), "Make sure container isn't empty");
 
@@ -1073,6 +1076,7 @@ namespace Langulus::Annies
       /// Fallback to AssignDefault otherwise.                                
       template<CT::Container LHS, CT::Container RHS>
       constexpr LHS& AssignAbsorb(this LHS& self, RHS&& rhs) {
+         //TODO pinnables
          static_assert(CT::Contiguous<LHS> == CT::Contiguous<RHS>,
             "You can't assign-absorb from containers with different contiguousness");
 

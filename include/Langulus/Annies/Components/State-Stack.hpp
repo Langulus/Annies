@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Component.hpp"
+#include "Langulus/Assume.hpp"
 #include <Langulus/IntentOf.hpp>
 #include <Langulus/Utils/Sequence.hpp>
 
@@ -78,9 +79,23 @@ namespace Langulus::Annies::Component
 
       /// MARK: Public                                                        
       /// Get the current state of the container                              
-      constexpr auto GetState(this auto const& self) noexcept
-      -> StateType requires HasStates {
-         return self.GetStateInner().mState;
+      constexpr int GetState(this auto const& self) noexcept requires HasStates {
+         return ToAbsoluteState(self.GetStateInner());
+      }
+
+      /// Set the current state of the container. Allowed only while container
+      /// is empty.                                                           
+      constexpr void SetState(this auto& self, int state) requires HasStates {
+         LglsAssert(self.GetAllocation() == nullptr,
+            "Changing state of an allocated container is not permitted in this way. "
+            "Use Enable/Disable methods one by one instead."
+         );
+         self.SetStateInner(ToInternalState(state));
+         LglsAssert(state == 0,
+            "There are leftover states after translating to internal representation. "
+            "This indicates that state information was lost during translation. "
+            "The involved containers are likely state-incompatible."
+         );
       }
 
       /// Get the relevant state when relaying one container to another.      
@@ -95,11 +110,9 @@ namespace Langulus::Annies::Component
             or            S::UID == Annies::State::Tagged
             or            S::UID == Annies::State::Verbed
             or            S::UID == Annies::State::Tracked
-            or            S::UID == Annies::State::Disowned) {
-               r -= S {};
-            }
+            or            S::UID == Annies::State::Disowned)   r -= S {};
          });
-         return r.mState;
+         return ToAbsoluteState(r);
       }
 
    protected:
@@ -109,6 +122,41 @@ namespace Langulus::Annies::Component
          return ForEachOr(StateList{}, []<class S> noexcept {
             return ((S::UID == ID and (S::Dynamic or S::Enable)) or ...);
          });
+      }
+
+      /// Convert the internal representation of the states into absolute one 
+      static constexpr int ToAbsoluteState(StateWrapper r) noexcept {
+         int accumulator = 0;
+         ForEach(StateList{}, [&]<class S>{
+            if (r & S{}) accumulator |= static_cast<int>(S::UID);
+         });
+         return accumulator;
+      }
+
+      /// Convert the absolute representation of the states into internal one 
+      ///   @param r [in/out] the state to translate. Each transferred bit    
+      ///      is removed, so that you can detect states that weren't         
+      ///      supported - if 'r' is not 0 at the end could indicate problems.
+      static constexpr auto ToInternalState(int& r) -> StateWrapper {
+         StateWrapper accumulator {0};
+         ForEach(StateList{}, [&]<class S>{
+            if constexpr (S::Dynamic) {
+               if (r & static_cast<int>(S::UID)) {
+                  accumulator += S{};
+                  r &= ~static_cast<int>(S::UID);
+               }
+            }
+            else if constexpr (S::Enable) {
+               LglsAssert(0 != (r & static_cast<int>(S::UID)),
+                  "A state is statically enabled - you tried to disable it at runtime");
+               r &= ~static_cast<int>(S::UID);
+            }
+            else {
+               LglsAssert(0 == (r & static_cast<int>(S::UID)),
+                  "A state is statically disabled - you tried to enable it at runtime");
+            }
+         });
+         return accumulator;
       }
 
    public:
@@ -228,7 +276,7 @@ namespace Langulus::Annies::Component
       }
 
       /// Get the default set of state bits                                   
-      static consteval StateType GetDefaultState() requires HasStates {
+      static consteval auto GetDefaultState() -> StateWrapper requires HasStates  {
          StateType i = 0;
          StateType accumulator = 0;
          ForEach(StateList{}, [&]<class S>{
@@ -236,7 +284,7 @@ namespace Langulus::Annies::Component
                accumulator |= (StateType {1} << i);
             ++i;
          });
-         return accumulator;
+         return {accumulator};
       }
 
       /// Clear the state to the default value                                
@@ -250,8 +298,8 @@ namespace Langulus::Annies::Component
       }
 
       /// Set the contained state (inner)                                     
-      constexpr void SetStateInner(this auto& self, const StateType& type) noexcept requires HasStates {
-         self.GetStateInner().mState = type;
+      constexpr void SetStateInner(this auto& self, const StateWrapper& type) noexcept requires HasStates {
+         self.GetStateInner() = type;
       }
       
       /// Default-initialize state                                            
@@ -266,7 +314,7 @@ namespace Langulus::Annies::Component
          decltype(auto) from = LglsFwd(intent.what);
          
          if constexpr (requires { from.GetStateInner(); }) {
-            self.SetStateInner(from.GetStateInner().mState);
+            self.AbsorbState(from);
 
             // Don't propagate disowned state unless explicitly required
             if constexpr (CanBeDisowned and not CT::Disowned<I>)
