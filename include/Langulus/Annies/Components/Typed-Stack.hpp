@@ -10,7 +10,7 @@
 #include "../States/Typed.hpp"
 #include "Langulus/IntentOf.hpp"
 #include "Langulus/Typenav.hpp"
-#include <Langulus/RTTI/MetaData.hpp>
+#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/CT/Deep.hpp>
 
