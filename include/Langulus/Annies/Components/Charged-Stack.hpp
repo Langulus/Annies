@@ -61,6 +61,46 @@ namespace Langulus::Annies::Component
       constexpr void ResetAllCharges(this auto& self) noexcept {
          ThisCom::ResetCharge();
       }
+
+      /// Get the mass component                                              
+      Real GetMass(this auto const& self) noexcept {
+         return ThisCom::GetChargeInner().mass;
+      }
+      
+      /// Get the rate component                                              
+      Real GetRate(this auto const& self) noexcept {
+         return ThisCom::GetChargeInner().rate;
+      }
+      
+      /// Get the time component                                              
+      Real GetTime(this auto const& self) noexcept {
+         return ThisCom::GetChargeInner().time;
+      }
+      
+      /// Get the precedence component                                        
+      Real GetPrecedence(this auto const& self) noexcept {
+         return ThisCom::GetChargeInner().precedence;
+      }
+      
+      /// Get the mass component                                              
+      void SetMass(this auto& self, Real mass) noexcept {
+         ThisCom::GetChargeInner().mass = mass;
+      }
+      
+      /// Get the rate component                                              
+      void SetRate(this auto& self, Real rate) noexcept {
+         ThisCom::GetChargeInner().rate = rate;
+      }
+      
+      /// Get the time component                                              
+      void SetTime(this auto& self, Real time) noexcept {
+         ThisCom::GetChargeInner().time = time;
+      }
+      
+      /// Get the precedence component                                        
+      void SetPrecedence(this auto& self, Real precedence) noexcept {
+         ThisCom::GetChargeInner().precedence = precedence;
+      }
       
    protected:
       /// MARK: Protected                                                     

@@ -23,7 +23,6 @@ namespace Langulus::Annies::Inner
 
 namespace Langulus::Annies
 {
-
    ///                                                                        
    ///   Recipe                                                               
    ///                                                                        
@@ -119,4 +118,9 @@ namespace Langulus::Annies
       ///                                                                     
       //size_t Serialize(CT::Serial auto&) const;
    };
+}
+
+namespace Langulus
+{
+   using Annies::Recipe;
 }

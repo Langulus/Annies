@@ -15,14 +15,15 @@ namespace Langulus::Annies::Inner
    /// Verbs extend the usual type-erased Any, by adding charge and verb ID   
    /// as members.                                                            
    using TagBase = typename ManyBase::template Include<
-      Com::TaggedStack<TMeta>      // Add tag                           
+      Com::TaggedStack<TMeta>      // Add tag meta data                 
    >;
 }
 
 namespace Langulus::Annies
 {
    ///                                                                        
-   ///   This is the same as Many, but also carries tag information as a      
+   /// MARK: Tag                                                              
+   /// This is the same as Many, but also carries tag meta information as a   
    /// member. Binary-compatible with its templated equivalent TTag.          
    struct Tag : Inner::TagBase {
       using CTTI_Tag  = Yup;
@@ -39,6 +40,18 @@ namespace Langulus::Annies
       }
       constexpr ~Tag() noexcept {
          this->Destroy();
+      }
+
+      /// Create a tag by manually specifying the tag ID                      
+      static Tag From(TMeta tag, auto&&...arguments) {
+         Tag result {LglsFwd(arguments)...};
+         result.SetTag(tag);
+         return result;
+      }
+
+      /// Create a tag by extracting tag ID from another container            
+      static Tag From(CT::Tag auto const& source, auto&&...arguments) {
+         return From(source.GetTag(), LglsFwd(arguments)...);
       }
 
       /// Construction that either absorbs the provided containers, or        

@@ -324,6 +324,7 @@ namespace Langulus::Annies
       LglsComIndexedLinear(friend);
       LglsComRemoval(friend);
       LglsComIterationOperators(friend);
+      LglsComChargedStack(friend);
 
       // Here lies the stack. It is an optimized tuple that is filled   
       // with StackRequest(s) from components.                          

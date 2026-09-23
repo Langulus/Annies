@@ -374,16 +374,36 @@ namespace Langulus::Annies::Component
       constexpr size_t GetBytesize(this auto const& self) noexcept {
          return ThisCom::GetStride() * self.template GetCount<ID>();
       }
-
-      /*template<bool BINARY_COMPATIBLE = false, bool ADVANCED = false>
-      bool CastsToMeta(META) const;
-      template<bool BINARY_COMPATIBLE = false>
-      bool CastsToMeta(META, size_t) const;
-
-      template<CT::NotVoid, bool BINARY_COMPATIBLE = false, bool ADVANCED = false>
-      bool CastsTo() const;
-      template<CT::NotVoid, bool BINARY_COMPATIBLE = false>
-      bool CastsTo(size_t) const;*/
+      
+      /// Check if contained data can be interpreted as a given type by doing 
+      /// only pointer arithmetics                                            
+      ///   @attention direction matters, if block is dense                   
+      ///   @param type the type check if current type interprets to          
+      ///   @param count allows casts to arrays (Vec4f casts to float[4])     
+      ///   @param binary_compatible do we require for the type to be         
+      ///      binary compatible with this container's type (have same size)  
+      ///   @param advanced an advanced check will also involve dynamic_cast, 
+      ///      essentially making it bidirectional                            
+      ///   @return true if able to interpret current type to 'type'          
+      bool CastsTo(
+         this auto const& self,
+         META type, size_t count = 1,
+         bool binary_compatible = false,
+         bool advanced = false
+      ) {
+         const META t = ThisCom::GetType();
+         return t and t.CastsTo(type, count, binary_compatible, advanced);
+      }
+   
+      template<CT::NotVoid TO>
+      bool CastsTo(
+         this auto const& self,
+         size_t count = 1,
+         bool binary_compatible = false,
+         bool advanced = false
+      ) {
+         return self.CastsTo(MetaDataOf<TO>(), count, binary_compatible, advanced);
+      }
 
       /// Dereference the first element inside the container                  
       constexpr auto& operator * (this auto&& self) assumptious
