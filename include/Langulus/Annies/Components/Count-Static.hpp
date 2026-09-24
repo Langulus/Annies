@@ -37,7 +37,7 @@ namespace Langulus::Annies::Component
       using CTTI_Component  = Yup;
       using CTTI_ReflectAs  = void;
       using CTTI_Contiguous = Maybe<COUNT == 1>;
-      using Id = Values<ID, SHARED...>;
+      using Id              = Values<ID, SHARED...>;
 
       static constexpr int  ComponentPrecedence = -1000;
       static constexpr bool ContainsMany = COUNT > 1;

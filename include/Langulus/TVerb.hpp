@@ -64,11 +64,11 @@ namespace Langulus::Annies
 
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
-      template<NotTag A1, class...AN>
+      template<Disambiguate A1, class...AN>
       constexpr TVerb(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (CT::DeepDense<Deint<A1>> or CT::Executable<Deint<A1>>) {
-               LglsAssumeUser(SameAsOneOf<Deint<A1>, TVerb, Verb>,
+               LglsAssumeUser(CT::Executable<Deint<A1>>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "
@@ -118,7 +118,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr TVerb& operator = (A&& argument) {
          if constexpr (CT::DeepDense<Deint<A>> or CT::Executable<Deint<A>>) {
-            LglsAssumeUser(SameAsOneOf<Deint<A>, TVerb, Verb>,
+            LglsAssumeUser(CT::Executable<Deint<A>>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

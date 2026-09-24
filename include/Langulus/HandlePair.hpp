@@ -537,7 +537,7 @@ namespace Langulus::Annies
          else this->ConstructDefault();
       }
 
-      constexpr THandlePair(NotTag auto&& a1, auto&& a2) noexcept
+      constexpr THandlePair(Disambiguate auto&& a1, auto&& a2) noexcept
          : THandlePair {Piecewise, LglsFwd(a1), LglsFwd(a2)} {}
 
       constexpr THandlePair(Inner::Piecewise, auto&& a1, auto&& a2) noexcept {

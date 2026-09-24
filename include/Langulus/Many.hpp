@@ -126,7 +126,7 @@ namespace Langulus::Annies
    
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
-      template<NotTag A1, class...AN>
+      template<Disambiguate A1, class...AN>
       constexpr Many(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (CT::DeepDense<Deint<A1>>) {

@@ -95,11 +95,11 @@ namespace Langulus::Annies
    
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
-      template<NotTag A1, class...AN>
+      template<Disambiguate A1, class...AN>
       constexpr Recipe(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
-            if constexpr (Same<Deint<A1>, Recipe>) {
-               LglsAssumeUser(false,
+            if constexpr (CT::DeepDense<Deint<A1>> or Same<Deint<A1>, Recipe>) {
+               LglsAssumeUser(Same<Deint<A1>, Recipe>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "
@@ -148,8 +148,8 @@ namespace Langulus::Annies
       
       template<class A>
       constexpr Recipe& operator = (A&& argument) {
-         if constexpr (Same<Deint<A>, Recipe>) {
-            LglsAssumeUser(false,
+         if constexpr (CT::DeepDense<Deint<A>> or Same<Deint<A>, Recipe>) {
+            LglsAssumeUser(Same<Deint<A>, Recipe>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

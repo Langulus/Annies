@@ -86,8 +86,8 @@ namespace Langulus::Annies
       struct Set;
 
       struct DisambiguatorTag {
-         using CTTI_Void      = void;
-         using CTTI_ReflectAs = void;
+         using CTTI_Void          = void;
+         using CTTI_ReflectAs     = void;
          using CTTI_Disambiguator = Yup;
       };
 
@@ -251,7 +251,7 @@ namespace Langulus::Annies
    using DecidePick = typename decltype(Inner::DecidePickType<Deref<C>>())::First;
 
    template<class...T>
-   concept NotTag = ((not requires { typename Decay<T>::CTTI_Disambiguator; }) and ...);
+   concept Disambiguate = ((not requires { typename Decay<T>::CTTI_Disambiguator; }) and ...);
 
    
    namespace Component

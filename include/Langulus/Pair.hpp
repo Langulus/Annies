@@ -86,7 +86,7 @@ namespace Langulus::Annies
          this->Absorb(LglsFwd(p));
       }
 
-      constexpr Pair(NotTag auto&& a1, NotTag auto&& a2) {
+      constexpr Pair(Disambiguate auto&& a1, auto&& a2) {
          this->ResetState();
          this->DeduceType(a1, a2);
          this->AllocateFresh(1);

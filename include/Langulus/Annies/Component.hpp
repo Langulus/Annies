@@ -671,8 +671,6 @@ namespace Langulus::Annies
          template<Cid, Cid...> modifier struct Removal
 
       /// Other services                                                      
-      struct Descriptor;
-
       template<Cid = 0> struct ChargedStack;
       #define LglsComChargedStack(modifier) \
             template<Cid> modifier struct ChargedStack

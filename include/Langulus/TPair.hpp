@@ -139,7 +139,7 @@ namespace Langulus::Annies
 
       /// Stack-based constructors                                            
       template<CT::NotHandle K_ALT, CT::NotHandle V_ALT>
-      constexpr TPair(K_ALT&& a1, V_ALT&& a2) requires (Inner::PairOnStack<K, V> and NotTag<K_ALT, V_ALT>)
+      constexpr TPair(K_ALT&& a1, V_ALT&& a2) requires (Inner::PairOnStack<K, V> and Disambiguate<K_ALT, V_ALT>)
          : Base {Stackwise, LglsFwd(a1), LglsFwd(a2)} {
          if constexpr (CT::Sparse<K> or CT::Sparse<V>)
             this->Com::OwnershipDeepEmergent<Com::StrongOwnership, true, 0, 1>::Keep();
@@ -160,7 +160,7 @@ namespace Langulus::Annies
       }
 
       /// Construct from handles                                              
-      template<NotTag K_ALT, NotTag V_ALT>
+      template<Disambiguate K_ALT, class V_ALT>
       constexpr TPair(K_ALT&& a1, V_ALT&& a2)
       requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT> or CT::Handle<V_ALT>) {
          this->ResetState();
