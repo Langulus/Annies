@@ -99,24 +99,17 @@ namespace Langulus::Annies
       ///   @param type - type of the container                               
       ///   @param states - optional states of the container                  
       ///   @return the new container instance                                
-      static Many Typed(DMeta type, int states = 0) noexcept {
+      static Many Typed(DMeta type, int states = 0) {
          Many result;
          result.SetType(type);
-         if (not states)
-            return result;
-
-         if (states & static_cast<int>(Annies::State::Disowned))
-            result.EnableDisowned();
-         if (states & static_cast<int>(Annies::State::Future))
-            result.EnableFuture();
-         if (states & static_cast<int>(Annies::State::Past))
-            result.EnablePast();
-         if (states & static_cast<int>(Annies::State::Or))
-            result.EnableOr();
-         if (states & static_cast<int>(Annies::State::Compressed))
-            result.EnableCompressed();
-         if (states & static_cast<int>(Annies::State::Encrypted))
-            result.EnableEncrypted();
+         result.SetState(states);
+         return result;
+      }
+   
+      static Many Typed(CT::Container auto const& typed, int states = 0) {
+         Many result;
+         result.SetType(typed.GetType());
+         result.SetState(states);
          return result;
       }
    
@@ -125,20 +118,9 @@ namespace Langulus::Annies
       ///   @param states - states of the container                           
       ///   @param additional - additional states of the container            
       ///   @return the new container instance                                
-      static Many CopyStates(CT::Container auto const& states, int additional = 0) noexcept {
+      static Many CopyStates(CT::Container auto const& states, int additional = 0) {
          Many result;
-         if (additional & static_cast<int>(Annies::State::Disowned))
-            result.EnableDisowned();
-         if (states.IsFuture() or (additional & static_cast<int>(Annies::State::Future)))
-            result.EnableFuture();
-         if (states.IsPast() or (additional & static_cast<int>(Annies::State::Past)))
-            result.EnablePast();
-         if (states.IsOr() or (additional & static_cast<int>(Annies::State::Or)))
-            result.EnableOr();
-         if (states.IsCompressed() or (additional & static_cast<int>(Annies::State::Compressed)))
-            result.EnableCompressed();
-         if (states.IsEncrypted() or (additional & static_cast<int>(Annies::State::Encrypted)))
-            result.EnableEncrypted();
+         result.SetState(states.GetState() | additional);
          return result;
       }
    

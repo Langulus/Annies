@@ -189,4 +189,6 @@ namespace Langulus::Annies
 namespace Langulus
 {
    using Annies::TMap;
+   using Annies::TMapSorted;
+   using Annies::TMapUnsorted;
 }

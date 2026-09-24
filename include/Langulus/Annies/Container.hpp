@@ -293,6 +293,8 @@ namespace Langulus::Annies
    protected:
       LglsComIterationOperators(friend);
       LglsComTypedStack(friend);
+      LglsComVerbedStack(friend);
+      LglsComTaggedStack(friend);
       LglsComStack(friend);
       LglsComHeapReference(friend);
       LglsComHeapMovable(friend);

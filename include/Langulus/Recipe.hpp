@@ -38,85 +38,131 @@ namespace Langulus::Annies
    /// 6) create*2 Recipe(Thing, name("test"))                                
    /// After execution all these are replaced by the two created Things       
    struct Recipe : Inner::RecipeBase {
-      /*constexpr Construct() noexcept = default;
-      Construct(const Construct&) noexcept;
-      Construct(Construct&&) noexcept;
+      using Base     = Inner::RecipeBase;
+      using DeepType = Many;
 
-      template<template<class> class S> requires CT::Intent<S<Construct>>
-      Construct(S<Construct>&&);
+      constexpr Recipe() noexcept {
+         this->ConstructDefault();
+      }
+      constexpr Recipe(Recipe const& other) {
+         this->Absorb(Refer(other));
+      }
+      constexpr Recipe(Recipe&& other) noexcept  {
+         this->Absorb(Move(other));
+      }
+      constexpr ~Recipe() noexcept {
+         this->Destroy();
+      }
 
-      Construct(DMeta);
-      Construct(DMeta, auto&&, const Charge& = {});
+      /// Create an empty recipe for a particular target type                 
+      ///   @param type what is the recipe for?                               
+      ///   @param arguments... arguments for the descriptor                  
+      ///   @return the new recipe instance                                   
+      static Recipe Of(DMeta type, auto&&...arguments) {
+         Recipe result {LglsFwd(arguments)...};
+         result.SetTarget(type);
+         return Abandon(result);
+      }
+   
+      static Recipe Of(CT::Container auto const& typed, auto&&...arguments) {
+         Recipe result {LglsFwd(arguments)...};
+         result.SetTarget(typed.GetType());
+         return Abandon(result);
+      }
 
-      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         Construct(const Token&);
-         Construct(const Token&, auto&&, const Charge& = {});
-      #endif
+      /// Copy target and charge from another recipe                          
+      static Recipe From(Recipe const& target_and_charge, auto&&...arguments) {
+         Recipe result {LglsFwd(arguments)...};
+         result.SetTarget(target_and_charge.GetTarget());
+         result.SetCharge(target_and_charge.GetCharge());
+         return Abandon(result);
+      }
 
-      Construct& operator = (const Construct&) noexcept;
-      Construct& operator = (Construct&&) noexcept;
-      template<template<class> class S> requires CT::Intent<S<Construct>>
-      Construct& operator = (S<Construct>&&);
+      /// Set what this recipe is for                                         
+      void SetTarget(DMeta type) noexcept {
+         *Com::Stack<DMeta, 1>::Get() = type;
+      }
 
-   public:
-      Hash GetHash() const;
+      /// What is this a recipe for?                                          
+      DMeta GetTarget() const noexcept {
+         return *Com::Stack<DMeta, 1>::Get();
+      }
+   
+      /// Get the descriptor for the recipe                                   
+      Many GetDescriptor() const noexcept {
+         return Many {Inner::Absorb{}, *this};
+      }
+   
+      /// Construction that either absorbs the provided containers, or        
+      /// emplaces all A in the container                                     
+      template<NotTag A1, class...AN>
+      constexpr Recipe(A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0) {
+            if constexpr (Same<Deint<A1>, Recipe>) {
+               LglsAssumeUser(false,
+                  "Ambiguous use of construction "
+                  "- you should use tag-dispatch with first argument either Absorb "
+                  "(if you want to overwrite the container itself) or Piecewise "
+                  "(if you want to overwrite the first item) in order to clearly "
+                  "state your intent. Absorb will be used by default!"
+               );
+               this->Absorb(LglsFwd(a1));
+            }
+            else this->EmplaceConstruct(LglsFwd(a1));
+         }
+         else {
+            this->ConstructDefault();
+            this->Insert(LglsFwd(a1), LglsFwd(an)...);
+         }
+      }
+      
+      /// Construction that absorbs the provided containers                   
+      template<class A1, class...AN>
+      constexpr Recipe(Inner::Absorb, A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0)
+            this->Absorb(LglsFwd(a1));
+         else {
+            this->ConstructDefault();
+            this->Concat(LglsFwd(a1), LglsFwd(an)...);
+         }
+      }
+      
+      /// Construction that emplaces all arguments inside                     
+      template<class A1, class...AN>
+      constexpr Recipe(Inner::Piecewise, A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0)
+            this->EmplaceConstruct(LglsFwd(a1));
+         else {
+            this->ConstructDefault();
+            this->Insert(LglsFwd(a1), LglsFwd(an)...);
+         }
+      }
+      
+      /// Assignment                                                          
+      constexpr Recipe& operator = (Many const& other) {
+         return this->AssignAbsorb(Refer(other));
+      }
+      constexpr Recipe& operator = (Many&& other) noexcept {
+         return this->AssignAbsorb(Move(other));
+      }
+      
+      template<class A>
+      constexpr Recipe& operator = (A&& argument) {
+         if constexpr (Same<Deint<A>, Recipe>) {
+            LglsAssumeUser(false,
+               "Ambiguous use of assignment "
+               "- you should use either AssignAbsorb (if you want to overwrite "
+               "the container itself) or Assign (if you want to overwrite the "
+               "first item) in order to clearly state your intent. "
+               "AssignAbsorb will be used by default!"
+            );
+            return this->AssignAbsorb(LglsFwd(argument));
+         }
+         else return this->Assign(LglsFwd(argument));
+      }
 
-      template<CT::NotVoid, CT::NotVoid T1, CT::NotVoid...TN>
-      static Construct From(T1&&, TN&&...);
-      template<CT::NotVoid>
-      static Construct From();
-
-      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         template<CT::NotVoid T1, CT::NotVoid...TN>
-         static Construct FromToken(const Token&, T1&&, TN&&...);
-         static Construct FromToken(const Token&);
-      #endif
-
-      // Intentionally undefined, because it requires Langulus::Flow    
-      // and relies on Verbs::Create                                    
-      bool StaticCreation(Many&) const;
-
-   public:
-      bool operator == (const Construct&) const;
-
-      template<CT::NotVoid>
-      bool CastsTo() const;
-      bool CastsTo(DMeta) const;
-
-      template<CT::NotVoid>
-      bool Is() const;
-      bool Is(DMeta) const;
-
-      template<CT::NotVoid>
-      void SetType();
-      void SetType(DMeta) noexcept;
-
-      auto GetDescriptor() const noexcept -> Many const&;
-      auto GetDescriptor()       noexcept -> Many&;
-      auto GetCharge() const noexcept -> Charge const&;
-      auto GetCharge()       noexcept -> Charge&;
-
-      DMeta GetType() const noexcept;
-      Token GetToken() const noexcept;
-      DMeta GetProducer() const noexcept;
-      bool  IsExecutable() const noexcept;
-      bool  IsTyped() const noexcept;
-      bool  IsUntyped() const noexcept;
-
-      void Clear();
-      void Reset();
-      void ResetCharge() noexcept;
-
-      auto operator -> () const -> const Many*;
-      auto operator -> ()       ->       Many*;
-
-      Construct& operator <<  (auto&&);
-      Construct& operator <<= (auto&&);*/
-
-      ///                                                                     
-      ///   Conversion                                                        
-      ///                                                                     
-      //size_t Serialize(CT::Serial auto&) const;
+      using Com::Comparison<>::operator <=>;
+      using Com::Comparison<>::operator ==;
    };
 }
 

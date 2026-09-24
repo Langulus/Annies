@@ -173,4 +173,6 @@ namespace Langulus::Annies
 namespace Langulus
 {
    using Annies::TSet;
+   using Annies::TSetSorted;
+   using Annies::TSetUnsorted;
 }
