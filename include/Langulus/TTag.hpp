@@ -6,14 +6,15 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Tag.hpp"
+#include "Many.hpp"
+#include "Annies/Components/Tagged-Stack.hpp"
 
 
 namespace Langulus::Annies::Inner
 {
    /// Verbs extend the usual type-erased Any, by adding charge and verb ID   
    /// as members.                                                            
-   template<CT::DefineTag TAG>
+   template<class TAG>
    using TTagBase = typename ManyBase::template Include<
       Com::TaggedStack<TMeta, TAG>  // Add tag                          
    >;
@@ -24,7 +25,7 @@ namespace Langulus::Annies
    /// MARK: TTag                                                             
    ///                                                                        
    /// A statically-tagged and statically-tagged equivalent of Tag            
-   template<CT::DefineTag TAG> 
+   template<class TAG> 
    struct TTag : Inner::TTagBase<TAG> {
       using CTTI_ReflectAs = Tag;
       using CTTI_Tag       = Yup;
@@ -114,21 +115,12 @@ namespace Langulus::Annies
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
    };
-
-   /// MARK: CTAD                                                             
-   template<CT::NotVoid T>
-   TTag(T&&) -> TTag<Decvq<Deref<Deint<T>>>>;
-
-   template<CT::NotVoid T>
-   TTag(Inner::Absorb, T&&) -> TTag<TypeOf<T>>;
-
-   template<CT::NotVoid T>
-   TTag(Inner::Piecewise, T&&) -> TTag<Decvq<Deref<Deint<T>>>>;
 }
 
 namespace Langulus
 {
    using Annies::TTag;
+   using Annies::Tag;
 }
 
 /// Define a tag                                                              

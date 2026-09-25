@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -33,10 +33,12 @@ namespace Langulus::Annies
    ///                                                                        
    /// A statically typed stack-based container of size 1.                    
    /// Mainly serves to transfer values and/or pointers on move.              
-   template<CT::NotVoid T>
+   /// You can optionally add tags to it.                                     
+   template<CT::NotVoid T, class...TAGS>
    struct TOwn : Inner::TOwnBase<T> {
-      using CTTI_Deep      = Yup;
-      using Base           = Inner::TOwnBase<T>;
+      using CTTI_Deep   = Yup;
+      using Base        = Inner::TOwnBase<T>;
+      using CTTI_Tagged = Types<TAGS...>;
 
       constexpr  TOwn() noexcept {
          this->ConstructDefault();
@@ -80,8 +82,8 @@ namespace Langulus::Annies
       operator bool() = delete;
    };
 
-   template<CT::NotVoid T>
-   using Own = TOwn<T>;
+   template<CT::NotVoid T, class...TAGS>
+   using Own = TOwn<T, TAGS...>;
 }
 
 namespace Langulus

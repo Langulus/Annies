@@ -60,9 +60,14 @@ namespace Langulus::Annies
    struct Pair;
    struct Path;
    struct Text;
-   struct Tag;
+   template<class> 
+   struct TTag;
+   using Tag = TTag<void>;
+   template<class> 
+   struct TVerb;
+   using Verb = TVerb<void>;
 
-   template<CT::NotVoid> struct TOwn;
+   template<CT::NotVoid, class...> struct TOwn;
    template<class>       struct TRef;
    template<CT::NotVoid> struct TAny;
    template<CT::NotVoid> struct THive;

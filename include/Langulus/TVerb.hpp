@@ -6,16 +6,19 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
+#include "Many.hpp"
+#include "Annies/Components/Charged-Stack.hpp"
+#include "Annies/Components/Verbed-Stack.hpp"
+#include "Langulus/CT/Able.hpp"
 #include "Langulus/CT/Akin.hpp"
 #include "Langulus/CT/Executable.hpp"
-#include "Verb.hpp"
 
 
 namespace Langulus::Annies::Inner
 {
    /// TVerbs extend the usual type-erased Any, by adding charge and verb ID  
    /// as members.                                                            
-   template<CT::DefineVerb V>
+   template<class V>
    using TVerbBase = typename ManyBase::template Include<
       Com::VerbedStack<VMeta, V>,  // Add verb, make executable         
       Com::ChargedStack<>          // Add charge                        
@@ -33,7 +36,7 @@ namespace Langulus::Annies
    /// can directly use specific verbs as containers, like so:                
    /// Verbs::Write{Verbs::Catenate{1,2,3}}.In(file).AndThen(Verbs::Halt{});  
    ///   Cool, huh?                                                           
-   template<CT::DefineVerb V>
+   template<class V>
    struct TVerb : Inner::TVerbBase<V> {
       using CTTI_ReflectAs = Verb;
       
@@ -130,6 +133,91 @@ namespace Langulus::Annies
          else return this->Assign(LglsFwd(argument));
       }
 
+      /// Set source                                                          
+      TVerb& In(auto&&...arguments) {
+         context = Many {LglsFwd(arguments)...};
+         return *this;
+      }
+
+      /// Execute the verb                                                    
+      bool Run() {
+         if (not context) {
+            // Context is empty and doesn't have any relevant states,   
+            // and execution happens only in stateless mode. Check if   
+            // verb is implemented for type 'void'.                     
+            if constexpr (CT::Able<void, V>) {
+
+            }
+            verb.SetSource(context);
+            Execute<DISPATCH, DEFAULT, true>(context, verb);
+            return verb.GetSuccesses();
+         }
+   
+         if (context.IsDeep()) {
+            // Nest if context is deep                                     
+            // There is no escape from this scope                          
+            size_t successCount = 0;
+            auto output = Many::CopyStates(context);
+            for (size_t i = 0; i < context.GetCount(); ++i) {
+               DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(
+                  context.template Get<Many>(i), verb);
+   
+               if (verb.IsDone()) {
+                  if (verb.GetOutput()) {
+                     // Cache output, conserving the context hierarchy     
+                     output.SmartPush(Index::Back, Langulus::Move(verb.GetOutput()));
+                  }
+   
+                  ++successCount;
+                  verb.Undo();
+               }
+            }
+   
+            if (context.IsOr())
+               return verb.template CompleteDispatch<true >(successCount, Abandon(output));
+            else
+               return verb.template CompleteDispatch<false>(successCount, Abandon(output));
+         }
+         else if (context.template Is<Tag>()) {
+            // Nest if context is trait                                    
+            // Traits are considered deep only when executing in them      
+            // There is no escape from this scope                          
+            size_t successCount = 0;
+            auto output = Many::CopyStates(context);
+            for (size_t i = 0; i < context.GetCount(); ++i) {
+               auto& t = context.template Get<Tag>(i);
+               if constexpr (CT::Constant<decltype(context)>) {
+                  DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(
+                     static_cast<const Many&>(t), verb);
+               }
+               else {
+                  DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(
+                     static_cast<Many&>(t), verb);
+               }
+   
+               if (verb.IsDone()) {
+                  if (verb.GetOutput()) {
+                     // Cache output, conserving the context hierarchy     
+                     output.SmartPush(Index::Back, Langulus::Move(verb.GetOutput()));
+                  }
+   
+                  ++successCount;
+                  verb.Undo();
+               }
+            }
+   
+            if (context.IsOr())
+               return verb.template CompleteDispatch<true >(successCount, Abandon(output));
+            else
+               return verb.template CompleteDispatch<false>(successCount, Abandon(output));
+         }
+   
+         // If reached, then block is flat                                 
+         // Execute implemented verbs if available, or fallback to         
+         // default verbs, eventually                                      
+         return DispatchFlat<RESOLVE, DISPATCH, DEFAULT>(context, verb);
+      }
+
       /// MARK: Access                                                        
       auto GetHash() const -> Hash;
       auto GetOperatorToken(bool& tokenized) const -> Text;
@@ -169,6 +257,7 @@ namespace Langulus::Annies
 namespace Langulus
 {
    using Annies::TVerb;
+   using Annies::Verb;
 }
 
 //LANGULUS_MORPHISM(Langulus::Annies::TVerb, Langulus::Annies::Text, Langulus::Flow::Code);

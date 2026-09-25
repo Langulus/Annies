@@ -20,7 +20,7 @@ namespace Langulus::Annies::Inner
 {
    template<CT::NotVoid T> requires (CT::NotHandle<T> and CT::NotReference<T>)
    using TPinBase = Com::Container<
-      Com::State::Pinned<>,               // Allows disownment          
+      Com::State::Pinned<>,               // Allows pinning             
       Com::TypedStatic<DMeta, T>,         // Statically typed           
       Com::Stack<T>,                      // Element on the stack       
       Com::CountStatic<1u>,               // Statically sized           
@@ -35,6 +35,9 @@ namespace Langulus::Annies
    ///                                                                        
    /// A statically typed stack-based container of size 1.                    
    /// Mainly serves to transfer values and/or pointers on move.              
+   /// Allows for pinning, which disables overwrite on assignment.            
+   /// Especially useful for members that are part of a hierarchy and can     
+   /// be overridden by things from upper in the hierarchy.                   
    template<CT::NotVoid T>
    struct TPin : Inner::TPinBase<T> {
       using CTTI_Deep      = Yup;
