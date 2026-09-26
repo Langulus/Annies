@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
+#include "Langulus/CT/Convertible.hpp"
 #include "Many.hpp"
 #include "Annies/Components/Charged-Stack.hpp"
 #include "Annies/Components/Verbed-Stack.hpp"
@@ -42,15 +43,14 @@ namespace Langulus::Annies
       
    private:
       // The number of successful executions                            
-      size_t successes = 0;
+      mutable size_t mSuccesses = 0;
+      // The container where output goes after execution                
+      mutable Many mOutput;
+      // Verb context                                                   
+      Many mContext;
 
    public:
-      // Verb context                                                   
-      Many context;
-      // The container where output goes after execution                
-      Many output;
-
-      using CTTI_Members = Members<&TVerb::context, &TVerb::output>;
+      using CTTI_Members = Members<&TVerb::mContext, &TVerb::mOutput>;
 
       constexpr TVerb() noexcept {
          this->ConstructDefault();
@@ -70,14 +70,14 @@ namespace Langulus::Annies
       template<Disambiguate A1, class...AN>
       constexpr TVerb(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
-            if constexpr (CT::DeepDense<Deint<A1>> or CT::Executable<Deint<A1>>) {
-               LglsAssumeUser(CT::Executable<Deint<A1>>,
+            if constexpr (CT::DeepDense<Deint<A1>> and not CT::Executable<Deint<A1>>) {
+               /*LglsAssumeUser(CT::Executable<Deint<A1>>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "
                   "(if you want to overwrite the first item) in order to clearly "
                   "state your intent. Absorb will be used by default!"
-               );
+               );*/
                this->Absorb(LglsFwd(a1));
             }
             else this->EmplaceConstruct(LglsFwd(a1));
@@ -110,6 +110,20 @@ namespace Langulus::Annies
          }
       }
       
+      /// Create a tag by manually specifying the tag ID                      
+      static TVerb From(TVerb verb, auto&&...arguments) {
+         TVerb result {LglsFwd(arguments)...};
+         result.SetVerb(verb);
+         return result;
+      }
+
+      /// Create a tag by extracting tag ID and charge from another container 
+      static TVerb From(CT::Executable auto const& source, auto&&...arguments) {
+         TVerb result = From(source.GetVerb(), LglsFwd(arguments)...);
+         result.SetCharge(source.GetCharge());
+         return result;
+      }
+
       /// Assignment                                                          
       constexpr TVerb& operator = (TVerb const& other) {
          return this->AssignAbsorb(Refer(other));
@@ -121,7 +135,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr TVerb& operator = (A&& argument) {
          if constexpr (CT::DeepDense<Deint<A>> or CT::Executable<Deint<A>>) {
-            LglsAssumeUser(CT::Executable<Deint<A>>,
+            LglsAssumeUser(not CT::Executable<Deint<A>>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "
@@ -135,37 +149,46 @@ namespace Langulus::Annies
 
       /// Set source                                                          
       TVerb& In(auto&&...arguments) {
-         context = Many {LglsFwd(arguments)...};
+         mContext = Many {LglsFwd(arguments)...};
          return *this;
       }
 
-      /// Execute the verb                                                    
-      bool Run() {
-         if (not context) {
-            // Context is empty and doesn't have any relevant states,   
-            // and execution happens only in stateless mode. Check if   
-            // verb is implemented for type 'void'.                     
-            if constexpr (CT::Able<void, V>) {
+      /// Execute the verb in stateless mode (ignores context)                
+      bool RunStateless() const {
+         TODO();
+         return false;
+      }
 
-            }
-            verb.SetSource(context);
-            Execute<DISPATCH, DEFAULT, true>(context, verb);
-            return verb.GetSuccesses();
+      /// Execute the verb                                                    
+      bool Run() const {
+         if (not mContext) {
+            // Context is empty and doesn't have any relevant states,   
+            // and execution happens only in stateless mode by using    
+            // verb argument as the context. This sometimes happens with
+            // unary operators, like -5. Since 5 is a number, stateless 
+            // subtraction on numbers will be sought and executed.      
+            // Another example is selecting global objects, like the    
+            // logger, by using `.logger`                               
+            return RunStateless();
          }
    
-         if (context.IsDeep()) {
-            // Nest if context is deep                                     
-            // There is no escape from this scope                          
+         auto& abilities = mContext.GetType().GetVerbs();
+         auto found = abilities.find(GetVerb().GetDefinition());
+         if (found == abilities.end())
+            return false;
+
+         /*if (mContext.IsDeep()) { //implemented in LglsImplementAbilitiesFor(Annies::Many)
+            // Nest if context is deep                                  
+            // There is no escape from this scope                       
             size_t successCount = 0;
-            auto output = Many::CopyStates(context);
-            for (size_t i = 0; i < context.GetCount(); ++i) {
-               DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(
-                  context.template Get<Many>(i), verb);
+            auto output = Many::CopyStates(mContext);
+            for (size_t i = 0; i < mContext.GetCount(); ++i) {
+               DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(mContext.template Get<Many>(i), verb);
    
                if (verb.IsDone()) {
                   if (verb.GetOutput()) {
-                     // Cache output, conserving the context hierarchy     
-                     output.SmartPush(Index::Back, Langulus::Move(verb.GetOutput()));
+                     // Cache output, conserving the context hierarchy  
+                     output.Compose(Move(verb.GetOutput()));
                   }
    
                   ++successCount;
@@ -173,32 +196,24 @@ namespace Langulus::Annies
                }
             }
    
-            if (context.IsOr())
-               return verb.template CompleteDispatch<true >(successCount, Abandon(output));
-            else
-               return verb.template CompleteDispatch<false>(successCount, Abandon(output));
-         }
-         else if (context.template Is<Tag>()) {
-            // Nest if context is trait                                    
-            // Traits are considered deep only when executing in them      
-            // There is no escape from this scope                          
+            return verb.CompleteDispatch(mContext.IsOr(), successCount, Abandon(output));
+         }*/
+
+         /*if (mContext.template Is<Tag>()) { // implemented in LglsImplementAbilitiesFor(Annies::Tag)
+            // Nest if context is tag.                                  
+            // Tags are considered deep only when executing them, as the
+            // contents might be executable and need to be evaluated.   
+            // There is no escape from this scope.                      
             size_t successCount = 0;
-            auto output = Many::CopyStates(context);
-            for (size_t i = 0; i < context.GetCount(); ++i) {
-               auto& t = context.template Get<Tag>(i);
-               if constexpr (CT::Constant<decltype(context)>) {
-                  DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(
-                     static_cast<const Many&>(t), verb);
-               }
-               else {
-                  DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(
-                     static_cast<Many&>(t), verb);
-               }
+            auto output = Many::CopyStates(mContext);
+            for (size_t i = 0; i < mContext.GetCount(); ++i) {
+               auto& t = *mContext.template Get<Tag>(i);
+               DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(t.GetData(), verb);
    
                if (verb.IsDone()) {
                   if (verb.GetOutput()) {
-                     // Cache output, conserving the context hierarchy     
-                     output.SmartPush(Index::Back, Langulus::Move(verb.GetOutput()));
+                     // Cache output, conserving the context hierarchy  
+                     output.Compose(Move(verb.GetOutput()));
                   }
    
                   ++successCount;
@@ -206,16 +221,39 @@ namespace Langulus::Annies
                }
             }
    
-            if (context.IsOr())
-               return verb.template CompleteDispatch<true >(successCount, Abandon(output));
-            else
-               return verb.template CompleteDispatch<false>(successCount, Abandon(output));
-         }
+            return verb.CompleteDispatch(mContext.IsOr(), successCount, Abandon(output));
+         }*/
    
-         // If reached, then block is flat                                 
-         // Execute implemented verbs if available, or fallback to         
-         // default verbs, eventually                                      
-         return DispatchFlat<RESOLVE, DISPATCH, DEFAULT>(context, verb);
+         
+         //                                                             
+         // If reached, then block is flat                              
+         size_t successCount = 0;
+         auto output = Many::CopyStates(mContext);
+   
+         // Iterate elements in the current context                     
+         for (size_t i = 0; i < mContext.GetCount(); ++i) {
+            //verb.SetSource(context.GetElement(i));
+            auto ith = mContext.GetElement(i);
+            if constexpr (RESOLVE)
+               ith = ith.GetResolved();
+            else
+               ith = ith.GetDense();
+   
+            verb.SetSource(ith);
+            Execute<DISPATCH, DEFAULT, false>(ith, verb);
+            
+            if (verb.IsDone()) {
+               if (verb.GetOutput()) {
+                  // Cache output, conserving the context hierarchy     
+                  output.Compose(Move(verb.GetOutput()));
+               }
+   
+               ++successCount;
+               verb.Undo();
+            }
+         }
+         
+         return verb.CompleteDispatch(mContext.IsOr(), successCount, Abandon(output));
       }
 
       /// MARK: Access                                                        
@@ -243,7 +281,13 @@ namespace Langulus::Annies
 
       void Done(size_t) noexcept;
       void Done() noexcept;
-      void Undo() noexcept;
+
+      /// Reset progress by marking verb as undone and zeroing output         
+      TVerb& Clear() noexcept {
+         mSuccesses = 0;
+         mOutput.Reset();
+         return *this;
+      }
 
       /// MARK: Compare                                                       
       bool operator ==  (const TVerb&) const;
@@ -260,12 +304,13 @@ namespace Langulus
    using Annies::Verb;
 }
 
-//LANGULUS_MORPHISM(Langulus::Annies::TVerb, Langulus::Annies::Text, Langulus::Flow::Code);
+LANGULUS_MORPHISM_CONCEPT(CT::Executable, Annies::Text, Flow::Code);
 
 /// Define a verb                                                             
 ///   @param P - positive verb name, as it exists in namespace Langulus::Verbs
 ///   @param N - negative verb name (optional, same as positive if "")        
 ///   @param INFOSTRING - information about the verb's purpose                
+///   @attention call this macro only in the global namespace!                
 #define LANGULUS_DEFINE_VERB(P, N, PRECEDENCE, INFOSTRING) \
    namespace Langulus::Verbs { struct P; } \
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
@@ -278,6 +323,7 @@ namespace Langulus
 ///   @param ON - negative verb operator                                      
 ///   @param PRECEDENCE - operator precedence                                 
 ///   @param INFOSTRING - information about the verb's purpose                
+///   @attention call this macro only in the global namespace!                
 #define LANGULUS_DEFINE_OPERATOR(P, N, OP, ON, PRECEDENCE, INFOSTRING) \
    namespace Langulus::Verbs { struct P; } \
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \

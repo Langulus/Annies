@@ -123,6 +123,18 @@ namespace Langulus::Annies
          result.SetState(states.GetState() | additional);
          return result;
       }
+
+      template<CT::Container AS>
+      auto ReinterpretAs() const -> AS const& {
+         //TODO perform binary compatiblity check between Many and AS by comparing stack requests in components
+         return reinterpret_cast<AS const&>(*this);
+      }
+   
+      template<CT::Container AS>
+      auto ReinterpretAs() const -> AS& {
+         //TODO perform binary compatiblity check between Many and AS by comparing stack requests in components
+         return reinterpret_cast<AS&>(*this);
+      }
    
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     

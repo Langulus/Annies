@@ -89,6 +89,18 @@ namespace Langulus::Annies
          }
       }
       
+      /// Create a tag by manually specifying the tag ID                      
+      static TTag From(TMeta tag, auto&&...arguments) {
+         TTag result {LglsFwd(arguments)...};
+         result.SetTag(tag);
+         return result;
+      }
+
+      /// Create a tag by extracting tag ID from another container            
+      static TTag From(CT::Tag auto const& source, auto&&...arguments) {
+         return From(source.GetTag(), LglsFwd(arguments)...);
+      }
+
       /// Assignment                                                          
       constexpr TTag& operator = (TTag const& other) {
          return this->AssignAbsorb(Refer(other));
@@ -114,6 +126,11 @@ namespace Langulus::Annies
 
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
+
+      /// Get the data part of the tag                                        
+      Many GetData() const {
+         return Many {Absorb, *this};
+      }
    };
 }
 
