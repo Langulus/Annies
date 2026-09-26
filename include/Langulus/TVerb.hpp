@@ -110,16 +110,23 @@ namespace Langulus::Annies
          }
       }
       
-      /// Create a tag by manually specifying the tag ID                      
+      /// Create a verb by manually specifying the verb ID                    
       static TVerb From(TVerb verb, auto&&...arguments) {
          TVerb result {LglsFwd(arguments)...};
          result.SetVerb(verb);
          return result;
       }
 
-      /// Create a tag by extracting tag ID and charge from another container 
+      /// Create a verb by extracting verb ID and charge from another verb    
       static TVerb From(CT::Executable auto const& source, auto&&...arguments) {
          TVerb result = From(source.GetVerb(), LglsFwd(arguments)...);
+         result.SetCharge(source.GetCharge());
+         return result;
+      }
+
+      /// Create a verb by extracting verb ID, charge and argument from verb  
+      static TVerb Like(CT::Executable auto const& source) {
+         TVerb result = From(source.GetVerb(), source.GetArgument());
          result.SetCharge(source.GetCharge());
          return result;
       }
@@ -159,102 +166,10 @@ namespace Langulus::Annies
          return false;
       }
 
-      /// Execute the verb                                                    
-      bool Run() const {
-         if (not mContext) {
-            // Context is empty and doesn't have any relevant states,   
-            // and execution happens only in stateless mode by using    
-            // verb argument as the context. This sometimes happens with
-            // unary operators, like -5. Since 5 is a number, stateless 
-            // subtraction on numbers will be sought and executed.      
-            // Another example is selecting global objects, like the    
-            // logger, by using `.logger`                               
-            return RunStateless();
-         }
-   
-         auto& abilities = mContext.GetType().GetVerbs();
-         auto found = abilities.find(GetVerb().GetDefinition());
-         if (found == abilities.end())
-            return false;
-
-         /*if (mContext.IsDeep()) { //implemented in LglsImplementAbilitiesFor(Annies::Many)
-            // Nest if context is deep                                  
-            // There is no escape from this scope                       
-            size_t successCount = 0;
-            auto output = Many::CopyStates(mContext);
-            for (size_t i = 0; i < mContext.GetCount(); ++i) {
-               DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(mContext.template Get<Many>(i), verb);
-   
-               if (verb.IsDone()) {
-                  if (verb.GetOutput()) {
-                     // Cache output, conserving the context hierarchy  
-                     output.Compose(Move(verb.GetOutput()));
-                  }
-   
-                  ++successCount;
-                  verb.Undo();
-               }
-            }
-   
-            return verb.CompleteDispatch(mContext.IsOr(), successCount, Abandon(output));
-         }*/
-
-         /*if (mContext.template Is<Tag>()) { // implemented in LglsImplementAbilitiesFor(Annies::Tag)
-            // Nest if context is tag.                                  
-            // Tags are considered deep only when executing them, as the
-            // contents might be executable and need to be evaluated.   
-            // There is no escape from this scope.                      
-            size_t successCount = 0;
-            auto output = Many::CopyStates(mContext);
-            for (size_t i = 0; i < mContext.GetCount(); ++i) {
-               auto& t = *mContext.template Get<Tag>(i);
-               DispatchDeep<RESOLVE, DISPATCH, DEFAULT>(t.GetData(), verb);
-   
-               if (verb.IsDone()) {
-                  if (verb.GetOutput()) {
-                     // Cache output, conserving the context hierarchy  
-                     output.Compose(Move(verb.GetOutput()));
-                  }
-   
-                  ++successCount;
-                  verb.Undo();
-               }
-            }
-   
-            return verb.CompleteDispatch(mContext.IsOr(), successCount, Abandon(output));
-         }*/
-   
-         
-         //                                                             
-         // If reached, then block is flat                              
-         size_t successCount = 0;
-         auto output = Many::CopyStates(mContext);
-   
-         // Iterate elements in the current context                     
-         for (size_t i = 0; i < mContext.GetCount(); ++i) {
-            //verb.SetSource(context.GetElement(i));
-            auto ith = mContext.GetElement(i);
-            if constexpr (RESOLVE)
-               ith = ith.GetResolved();
-            else
-               ith = ith.GetDense();
-   
-            verb.SetSource(ith);
-            Execute<DISPATCH, DEFAULT, false>(ith, verb);
-            
-            if (verb.IsDone()) {
-               if (verb.GetOutput()) {
-                  // Cache output, conserving the context hierarchy     
-                  output.Compose(Move(verb.GetOutput()));
-               }
-   
-               ++successCount;
-               verb.Undo();
-            }
-         }
-         
-         return verb.CompleteDispatch(mContext.IsOr(), successCount, Abandon(output));
-      }
+      /// Execute the verb.                                                   
+      /// Implemented in Langulus::Flow, as it requires some prime verbs      
+      /// being defined, such as Verbs::Do                                    
+      bool Run() const;
 
       /// MARK: Access                                                        
       auto GetHash() const -> Hash;
@@ -303,8 +218,6 @@ namespace Langulus
    using Annies::TVerb;
    using Annies::Verb;
 }
-
-LANGULUS_MORPHISM_CONCEPT(CT::Executable, Annies::Text, Flow::Code);
 
 /// Define a verb                                                             
 ///   @param P - positive verb name, as it exists in namespace Langulus::Verbs

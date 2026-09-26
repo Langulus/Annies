@@ -8,6 +8,7 @@
 #pragma once
 #include "Component.hpp"
 #include "Components/State-Stack.hpp"
+#include "Langulus/Annies/Components/Multiprovider.hpp"
 #include <Langulus/IntentOf.hpp>
 #include <Langulus/Utils/Sequence.hpp>
 #include <Langulus/HashOf.hpp>
@@ -211,14 +212,27 @@ namespace Langulus::Annies
                return Types<O>{};
             else if constexpr (O::ComponentPrecedence > NEW1::ComponentPrecedence)
                return NoTypes{};
+            else if constexpr (requires { typename O::Subcomponents; }) {
+               // Integrate inside a multitype/multiprovider/multiowner 
+               return Types<typename O::template Include<NEW1>>{};
+            }
             else {
                static_assert(not Same<O, NEW1>,
                   "Duplicated component");
                static_assert(O::Id::template Intersect<typename NEW1::Id>::Empty,
                   "Overlapping ids");
-               return Types<O>{};
+               
+               // If both components are providers, combine them into a 
+               // multiprovider                                         
+               //TODO do the same for multitype and multiown            
+               if constexpr ((requires { typename    O::StackProvider; } or requires { typename    O::HeapProvider; })
+               and           (requires { typename NEW1::StackProvider; } or requires { typename NEW1::HeapProvider; })) {
+                  return Types<Com::Multiprovider<O, NEW1>>{};
+               }
+               else return Types<O, NEW1>{};
             }
          });
+
          auto higher_precedence = Extract(OLD{}, []<class O> static {
             if constexpr (O::ComponentPrecedence > NEW1::ComponentPrecedence)
                return Types<O>{};
@@ -226,7 +240,7 @@ namespace Langulus::Annies
                return NoTypes{};
          });
 
-         auto result = lower_precedence + Types<NEW1>{} + higher_precedence;
+         auto result = lower_precedence + higher_precedence;
          if constexpr (sizeof...(NEWN) == 0)
             return result;
          else
@@ -422,8 +436,8 @@ namespace Langulus::Annies
          return ForEachConstOr(L{}, []<class C> {
             if constexpr (requires { typename C::Subcomponents; })
                return FindProvider<SID, typename C::Subcomponents>();
-            else if constexpr (requires { C::StackProvider; }) {
-               if constexpr (C::StackProvider == SID)
+            else if constexpr (requires { typename C::StackProvider; }) {
+               if constexpr (C::StackProvider::template Contains<SID>)
                   return Types<C> {};
                else
                   return No {};

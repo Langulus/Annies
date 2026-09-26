@@ -38,6 +38,7 @@ namespace Langulus
 
       auto& operator *  () const noexcept { return  what; }
       auto* operator -> () const noexcept { return &what; }
+      explicit operator bool () const noexcept { return static_cast<bool>(what); }
 
       template<CT::DefineTag>
       void Set(auto&&, bool force = false);

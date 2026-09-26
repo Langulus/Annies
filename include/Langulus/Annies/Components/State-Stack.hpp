@@ -314,7 +314,7 @@ namespace Langulus::Annies::Component
          decltype(auto) from = LglsFwd(intent.what);
          
          if constexpr (requires { from.GetStateInner(); }) {
-            self.AbsorbState(from);
+            self.SetState(from.GetState());
 
             // Don't propagate disowned state unless explicitly required
             if constexpr (CanBeDisowned and not CT::Disowned<I>)

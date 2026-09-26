@@ -27,8 +27,8 @@ namespace Langulus::Annies::Component
       using CTTI_ReflectAs = void;
       using StackRequest   = T;
       using Id             = Values<ID>;
+      using StackProvider  = Id;
 
-      static constexpr Cid StackProvider = ID;
       static constexpr int ComponentPrecedence = -2000;
       
       /// Get a direct access to the stack memory                             

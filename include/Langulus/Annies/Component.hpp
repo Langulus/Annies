@@ -14,6 +14,7 @@
 #include <Langulus/Utils/Pot.hpp>
 #include <Langulus/Utils/Values.hpp>
 #include <Langulus/HashOf.hpp>
+#include <Langulus/IntentOf.hpp>
 
 
 namespace Langulus::CTTI
@@ -718,8 +719,8 @@ namespace Langulus::Annies
             static_assert(C1::ComponentPrecedence >= PRECEDENCE,
                "Wrong component order");
 
-            if constexpr (requires { C1::StackProvider; }) {
-               static_assert(C1::StackProvider == ACC,
+            if constexpr (requires { typename C1::StackProvider; }) {
+               static_assert(C1::StackProvider::First == ACC,
                   "Invalid stack provider ID");
                static_assert(not requires { typename C1::HeapProvider; },
                   "Component can't be both a stack and a heap provider");
@@ -732,7 +733,7 @@ namespace Langulus::Annies
             else if constexpr (requires { typename C1::HeapProvider; }) {
                static_assert(C1::HeapProvider::First == ACC,
                   "Invalid heap provider ID");
-               static_assert(not requires { C1::StackProvider; },
+               static_assert(not requires { typename C1::StackProvider; },
                   "Component can't be both a stack and a heap provider");
 
                if constexpr (sizeof...(CN) > 0)

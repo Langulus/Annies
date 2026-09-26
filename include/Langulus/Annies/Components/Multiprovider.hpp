@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -8,9 +8,15 @@
 #pragma once
 #include "../Component.hpp"
 #include <Langulus/IntentOf.hpp>
+
+
+namespace Langulus::Annies
+{
+   struct HandleDisowned;
+}
+
 LglsDisableWarningPush
 LglsDisableWarning_UnusedLocalTypedef
-
 
 namespace Langulus::Annies::Component
 {
@@ -25,7 +31,7 @@ namespace Langulus::Annies::Component
    ///                                                                        
    /// Combines multiple heap/stack components into a unified interface to    
    /// combat C++ base method ambiguities, and to add a bit more convenience. 
-   ///   @tparam TC0, TC1, TCN... all the heap/stack components to unify      
+   ///   @tparam TN... all the heap/stack components to unify                 
    template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
    struct LANGULUS_EBCO Multiprovider<TN...> : TN... {
       using CTTI_Component = Yup;
@@ -112,11 +118,9 @@ namespace Langulus::Annies::Component
       /// A safe way to get the first sparse entry after being resolved to    
       /// the most concrete type. Available only if container has DeepType.   
       ///   @return the most concrete representation of the first item        
+      ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = 0>
-      auto GetResolved(this auto&& self) -> HandleDisowned {
-         using C = typename Subcomponents::template At<SID>;
-         return self.C::template GetResolved<SID>();
-      }
+      auto GetResolved(this auto&& self) -> HandleDisowned;
 
       /// Get first element, removing 'count' indirections                    
       ///   @attention throws if type is incomplete and origin was reached    
@@ -125,11 +129,9 @@ namespace Langulus::Annies::Component
       ///      Using 'void' will default to C::DeepType.                      
       ///   @param count how many levels of indirection to remove?            
       ///   @return the dense first element for chosen dimension              
+      ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = 0>
-      auto GetDense(this auto&& self, size_t count = -1) -> HandleDisowned {
-         using C = typename Subcomponents::template At<SID>;
-         return self.C::template GetDense<SID>(count);
-      }
+      auto GetDense(this auto&& self, size_t count = -1) -> HandleDisowned;
 
    protected:
       LglsComIterationOperators(friend);
