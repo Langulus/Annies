@@ -22,6 +22,7 @@ namespace Langulus::Annies::Component
 {
    template<class...> struct Multiprovider;
 
+   /// Empty multiprovider just gets skipped                                  
    template<CT::Component...TN> requires (CountEnabled<TN...> == 0)
    struct Multiprovider<TN...> {
       using CTTI_Component = Yup;
@@ -49,8 +50,19 @@ namespace Langulus::Annies::Component
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::ComponentPrecedence == -2000; }),
          "All precedences should match");
 
-      static constexpr bool HeapCanBeNull = ForEachOr(Subcomponents{}, []<class C> { return C::HeapCanBeNull; });
-      static constexpr bool Reallocatable = ForEachOr(Subcomponents{}, []<class C> { return C::Reallocatable; });
+      static constexpr bool HeapCanBeNull = ForEachOr(Subcomponents{}, []<class C> {
+         if constexpr (requires { C::HeapCanBeNull; })
+            return C::HeapCanBeNull;
+         else 
+            return false;
+      });
+      
+      static constexpr bool Reallocatable = ForEachOr(Subcomponents{}, []<class C> {
+         if constexpr (requires { C::Reallocatable; })
+            return C::Reallocatable;
+         else 
+            return false;
+      });
 
       #define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
 

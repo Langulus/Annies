@@ -423,6 +423,10 @@ namespace Langulus::Annies
       #define LglsComStack(modifier) \
          template<CT::NotVoid, Cid> modifier struct Stack
 
+      template<class...> struct Multiprovider;
+      #define LglsComMultiprovider(modifier) \
+      template<class...> modifier struct Multiprovider
+
       /// Count, reserve, dimensions                                          
       template<class T = size_t, Cid = 0, Cid...> struct CountHeap;
       #define LglsComCountHeap(modifier) \

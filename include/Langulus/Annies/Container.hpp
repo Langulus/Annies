@@ -8,7 +8,7 @@
 #pragma once
 #include "Component.hpp"
 #include "Components/State-Stack.hpp"
-#include "Langulus/Annies/Components/Multiprovider.hpp"
+//#include "Langulus/Annies/Components/Multiprovider.hpp"
 #include <Langulus/IntentOf.hpp>
 #include <Langulus/Utils/Sequence.hpp>
 #include <Langulus/HashOf.hpp>
@@ -204,43 +204,64 @@ namespace Langulus::Annies
          #endif
       }
 
+      /// Either integrate in an already existing multi-, or create           
+      /// one to incorporate similar components.                              
+      template<class OLD, class NEW>
+      consteval auto CoalesceComponentsIntegrate() {
+         static_assert(OLD::ComponentPrecedence == NEW::ComponentPrecedence);
+         if constexpr (requires { typename OLD::Subcomponents; }) {
+            // Integrate inside a multitype/multiprovider/multiowner    
+            // of the same precedence                                   
+            return Types<typename OLD::template Include<NEW>>{};
+         }
+         else {
+            // Matching precedence - NEW has to be integrated           
+            static_assert(not Same<OLD, NEW>,
+               "Duplicated component");
+            static_assert(OLD::Id::template Intersect<typename NEW::Id>::Empty,
+               "Overlapping ids");
+            
+            // If both components are providers, combine them into a    
+            // multiprovider                                            
+            //TODO do the same for multitype and multiown               
+            if constexpr ((requires { typename OLD::StackProvider; } or requires { typename OLD::HeapProvider; })
+            and           (requires { typename NEW::StackProvider; } or requires { typename NEW::HeapProvider; })) {
+               return Types<Com::Multiprovider<OLD, NEW>>{};
+            }
+            else return Types<OLD, NEW>{};
+         }
+      }
+
       /// MARK: CoalesceComponents                                            
-      template<CT::Typelist OLD, CT::Component NEW1, CT::Component...NEWN>
+      template<class NEW1, class OLD1, class OLD2, class...OLDN>
+      consteval auto CoalesceComponentsInnerInner() {
+         if constexpr (NEW1::ComponentPrecedence < OLD1::ComponentPrecedence)
+            return Types<NEW1, OLD1, OLD2, OLDN...> {};
+         else if constexpr (NEW1::ComponentPrecedence == OLD1::ComponentPrecedence)
+            return CoalesceComponentsIntegrate<OLD1, NEW1>() + Types<OLD2, OLDN...>{};
+         else if constexpr (NEW1::ComponentPrecedence < OLD2::ComponentPrecedence)
+            return Types<OLD1, NEW1, OLD2, OLDN...> {};
+         else if constexpr (NEW1::ComponentPrecedence == OLD2::ComponentPrecedence)
+            return Types<OLD1>{} + CoalesceComponentsIntegrate<OLD2, NEW1>() + Types<OLDN...>{};
+         else
+            return Types<OLD1, OLD2>{} + CoalesceComponentsInnerInner<NEW1, OLDN...>();
+      }
+
+      /// MARK: CoalesceComponents                                            
+      template<class OLD, class NEW1, class...NEWN>
       consteval auto CoalesceComponentsInner() {
-         auto lower_precedence = Extract(OLD{}, []<class O> static {
-            if constexpr (O::ComponentPrecedence < NEW1::ComponentPrecedence)
-               return Types<O>{};
-            else if constexpr (O::ComponentPrecedence > NEW1::ComponentPrecedence)
-               return NoTypes{};
-            else if constexpr (requires { typename O::Subcomponents; }) {
-               // Integrate inside a multitype/multiprovider/multiowner 
-               return Types<typename O::template Include<NEW1>>{};
+         auto result = Expand(OLD{}, []<class...O> {
+            if constexpr (sizeof...(O) == 1) {
+               if constexpr (((NEW1::ComponentPrecedence < O::ComponentPrecedence) and ...))
+                  return Types<NEW1, O...> {};
+               else if constexpr (((NEW1::ComponentPrecedence == O::ComponentPrecedence) and ...))
+                  return CoalesceComponentsIntegrate<O..., NEW1>();
+               else
+                  return Types<O..., NEW1>{};
             }
-            else {
-               static_assert(not Same<O, NEW1>,
-                  "Duplicated component");
-               static_assert(O::Id::template Intersect<typename NEW1::Id>::Empty,
-                  "Overlapping ids");
-               
-               // If both components are providers, combine them into a 
-               // multiprovider                                         
-               //TODO do the same for multitype and multiown            
-               if constexpr ((requires { typename    O::StackProvider; } or requires { typename    O::HeapProvider; })
-               and           (requires { typename NEW1::StackProvider; } or requires { typename NEW1::HeapProvider; })) {
-                  return Types<Com::Multiprovider<O, NEW1>>{};
-               }
-               else return Types<O, NEW1>{};
-            }
+            else return CoalesceComponentsInnerInner<NEW1, O...>();
          });
 
-         auto higher_precedence = Extract(OLD{}, []<class O> static {
-            if constexpr (O::ComponentPrecedence > NEW1::ComponentPrecedence)
-               return Types<O>{};
-            else
-               return NoTypes{};
-         });
-
-         auto result = lower_precedence + higher_precedence;
          if constexpr (sizeof...(NEWN) == 0)
             return result;
          else
@@ -249,7 +270,7 @@ namespace Langulus::Annies
 
       /// Inserts new components at the proper place, considering precedence  
       /// and Ids. Produces a new Container<OLD + NEW>.                       
-      template<class OLD, CT::Component...NEW>
+      template<CT::Typelist OLD, CT::Component...NEW>
       consteval auto CoalesceComponents() {
          return Expand(CoalesceComponentsInner<OLD, NEW...>(), []<class...C> {
             return ::std::type_identity<Component::Container<C...>> {};

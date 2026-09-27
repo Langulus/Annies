@@ -39,8 +39,8 @@ namespace Langulus::Annies::Component
       
       /// Set the charge                                                      
       ///   @param c the new charge                                           
-      template<Cid SID = ID, CT::Container C>
-      void SetCharge(this C& self, Langulus::Charge const& c) {
+      template<Cid SID = ID>
+      void SetCharge(this auto& self, Langulus::Charge const& c) {
          ThisCom::GetChargeInner() = c;
       }
       
