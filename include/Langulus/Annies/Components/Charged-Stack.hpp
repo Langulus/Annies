@@ -48,7 +48,10 @@ namespace Langulus::Annies::Component
       ///   @param other the container to copy charge from                    
       template<Cid SID = ID, CT::Container I, class SELF> requires CT::NoIntent<I>
       void AbsorbCharge(this SELF& self, I const& other) {
-         ThisCom::SetCharge(other.template GetCharge<SID>());
+         if constexpr (requires { other.template GetCharge<SID>(); })
+            ThisCom::SetCharge(other.template GetCharge<SID>());
+         else
+            ThisCom::SetCharge({});
       }
 
       /// Reset the charge                                                    
@@ -122,14 +125,14 @@ namespace Langulus::Annies::Component
       template<Cid D, class SELF, CT::Intent I> requires CT::Container<I>
       void SliceFrom(this SELF& self, I&& intent) {
          static_assert(CT::Disowned<I>);
-         ThisCom::template AbsorbCharge<D>(LglsFwd(intent));
+         ThisCom::template AbsorbCharge<D>(DeintCast(intent));
       }
 
       /// Transfer from any kind of container, respecting intents             
       ///   @param intent the intent and container to transfer from           
       template<class SELF, CT::Intent I> requires CT::Container<I>
       void ConstructFrom(this SELF& self, I&& intent) {
-         ThisCom::AbsorbCharge(LglsFwd(intent));
+         ThisCom::AbsorbCharge(DeintCast(intent));
          
          if constexpr (CT::Moved<I>)
             intent->template SetChargeInner<ID>({});

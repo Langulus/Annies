@@ -64,6 +64,9 @@ namespace Langulus::Annies::Component
             return false;
       });
 
+      template<class...MORE>
+      using Include = Multiprovider<TN..., MORE...>;
+
       #define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
 
       /// Get a direct access to the heap memory                              
