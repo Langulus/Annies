@@ -1120,8 +1120,8 @@ namespace Langulus::Annies
       template<CT::Container LHS, CT::Container RHS>
       constexpr LHS& AssignAbsorb(this LHS& self, RHS&& rhs) {
          //TODO pinnables
-         static_assert(CT::Contiguous<LHS> == CT::Contiguous<RHS>,
-            "You can't assign-absorb from containers with different contiguousness");
+         //static_assert(CT::Contiguous<LHS> == CT::Contiguous<RHS>,
+          //  "You can't assign-absorb from containers with different contiguousness"); //TODO causes circular dependency due to ::std::contiguous_range and IterateRange
 
          decltype(auto) from = DeintCast(rhs);
          // Make sure 'lhs' and 'rhs' are different instances,          

@@ -134,8 +134,9 @@ namespace Langulus::Annies::Component
       void ConstructFrom(this SELF& self, I&& intent) {
          ThisCom::AbsorbCharge(DeintCast(intent));
          
-         if constexpr (CT::Moved<I>)
-            intent->template SetChargeInner<ID>({});
+         if constexpr (CT::Moved<I>) {
+            if_available(intent->template SetChargeInner<ID>({}));
+         }
       }
    };
 }
