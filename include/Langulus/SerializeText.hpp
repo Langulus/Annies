@@ -299,8 +299,8 @@ namespace Langulus::CTTI
 namespace fmt
 {
    /// MARK: {fmt}                                                            
-   /// Extend FMT to be capable of logging any Annies container that is      
-   /// serializable to Annies::Text.                                         
+   /// Extend FMT to be capable of logging any Annies container that is       
+   /// serializable to Annies::Text.                                          
    template<::Langulus::CT::Container T>
    struct formatter<T> {
       template<class CONTEXT>
@@ -311,6 +311,26 @@ namespace fmt
          try {
             ::Langulus::Annies::Text result;
             ::Langulus::Serialize(e, result);
+            return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(result));
+         }
+         catch(...) {
+            // Don't allow any exceptions to leak out of here           
+            return format_to(ctx.out(), "<error while serializing to text>");
+         }
+      }
+   };
+
+   /// MARK: {fmt}                                                            
+   /// Extend FMT to be capable of logging anything with Text operator        
+   template<class T> requires requires (T const& cast) { cast.operator ::Langulus::Annies::Text(); }
+   struct formatter<T> {
+      template<class CONTEXT>
+      constexpr auto parse(CONTEXT& ctx) { return ctx.begin(); }
+
+      template<class CONTEXT>
+      auto format(T const& e, CONTEXT& ctx) const {
+         try {
+            auto result = e.operator ::Langulus::Annies::Text();
             return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(result));
          }
          catch(...) {

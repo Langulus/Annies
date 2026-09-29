@@ -273,8 +273,17 @@ namespace Langulus::Annies
          else static_assert(false, "No such dimension");
       }
    };
+}
+
 
 #if not LANGULUS(FORCE_TYPE_ERASURE)
+#include "Annies/Components/Ownership-Stack.hpp"
+#include "Annies/Components/Ownership-Emergent.hpp"
+#include "Annies/Components/OwnershipDeep-Emergent.hpp"
+#include "Annies/Components/OwnershipDeep-Heap.hpp"
+
+namespace Langulus::Annies
+{
    /// MARK: HE/HE                                                            
    ///                                                                        
    /// Statically typed emergent handles                                      
@@ -577,5 +586,5 @@ namespace Langulus::Annies
 
    template<CT::Handle K, CT::Handle V>
    THandlePair(K&&, V&&) -> THandlePair<Decay<K>, Decay<V>>;
-#endif
 }
+#endif
