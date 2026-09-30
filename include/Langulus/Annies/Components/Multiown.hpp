@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,19 +7,28 @@
 ///                                                                           
 #pragma once
 #include "../Component.hpp"
+#include <Langulus/Allocator.hpp>
+
 LglsDisableWarningPush
 LglsDisableWarning_UnusedLocalTypedef
+
+#define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
 
 
 namespace Langulus::Annies::Component
 {
    template<class...> struct Multiown;
 
+   /// Empty multiown                                                         
    template<CT::Component...TN> requires (CountEnabled<TN...> == 0)
    struct Multiown<TN...> {
       using CTTI_Component = Yup;
       static constexpr bool SkipThisComponent = true;
    };
+
+   /// Multiown with a single component just acts like it                     
+   template<CT::Component...TN> requires (CountEnabled<TN...> == 1)
+   struct Multiown<TN...> : TN... {};
 
    ///                                                                        
    /// Combines multiple ownership components into a unified interface to     
@@ -46,7 +55,6 @@ namespace Langulus::Annies::Component
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::Owned == Owned; }),
          "Currently all shallow ownerships must be of the same style");
 
-      #define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
 
       /// Get the allocation                                                  
       template<Cid SID = 0>
@@ -165,5 +173,7 @@ namespace Langulus::Annies::Component
       }
    };
 }
+
+#undef if_inherits
 
 LglsDisableWarningPop

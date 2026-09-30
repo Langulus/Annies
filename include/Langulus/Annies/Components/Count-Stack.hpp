@@ -8,6 +8,7 @@
 #pragma once
 #include "../Component.hpp"
 #include <Langulus/CT/Index.hpp>
+#include <Langulus/CT/Signed.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -28,7 +29,7 @@ namespace Langulus::Annies::Component
    struct CountStack {
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
-      using Id = Values<ID, SHARED...>;
+      using Id             = Values<ID, SHARED...>;
 
       using CountType    = T;
       using IndexType    = Index::At<T>;

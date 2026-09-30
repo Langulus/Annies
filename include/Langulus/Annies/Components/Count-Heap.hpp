@@ -9,6 +9,7 @@
 #include "../Component.hpp"
 #include <Langulus/CT/Index.hpp>
 #include <Langulus/CT/Contiguous.hpp>
+#include <Langulus/CT/Signed.hpp>
 
 
 namespace Langulus::Annies::Component

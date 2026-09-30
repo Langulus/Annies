@@ -173,18 +173,7 @@ namespace Langulus::Annies::Component
       ///   @return the most concrete representation of the first item        
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = ID, CT::Container C>// requires (SID == ID)
-      auto GetResolved(this C&& self) -> HandleDisowned; /*{
-         if (self.IsEmpty())
-            return {};
-         
-         if (not self.IsSparse())
-            return {Slice<SID>, self};
-
-         if constexpr (CT::Resolvable<T>)
-            return DenseCast(ThisCom::Get()).GetResolved();
-         else
-            return {Stackwise, self.template GetType<SID>().GetOrigin(), &DenseCast(ThisCom::Get())};
-      }*/
+      auto GetResolved(this C&& self) -> HandleDisowned;
 
       /// Get the first contained element, removing 'count' indirections.     
       /// Available only if container has DeepType defined.                   
@@ -196,42 +185,7 @@ namespace Langulus::Annies::Component
       ///   @return the dense first element                                   
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = ID, CT::Container C>// requires (SID == ID)
-      auto GetDense(this C&& self, size_t count = -1) -> HandleDisowned; /*{
-         if (self.IsEmpty())
-            return {};
-
-         if (not self.IsSparse() or count <= 0)
-            return {Slice<SID>, self};
-
-         // Check if origin type is complete before attempting anything 
-         if (count >= IndirectsOf<T>) {
-            LglsAssert(CT::Complete<Decay<T>>,
-               "Trying to interface incomplete data `", self.GetType(),
-               "` as dense"
-            );
-         }
-
-         void* src = DecvqAllCast(&ThisCom::GetStackInner());
-         auto type = self.GetType();
-         while (count and type.IsSparse()) {
-            auto nextType = type.GetDeptr();
-            
-            if (nextType.IsSparse()) {
-               // Pointer T -> Pointer nextT                            
-               type.GetDereffer()(src, &src);
-            }
-            else {
-               // Pointer T -> Dense nextT                              
-               return {Stackwise, nextType, UnpackPointer(type, nextType, src)};
-            }
-
-            type = nextType;
-            --count;
-         }
-         
-         LglsError("Should never be reached");
-         return {};
-      }*/
+      auto GetDense(this C&& self, size_t count = -1) -> HandleDisowned;
 
    protected:
       /// Get a direct access to the stack memory                             

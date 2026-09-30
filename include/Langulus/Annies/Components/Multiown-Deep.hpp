@@ -7,8 +7,13 @@
 ///                                                                           
 #pragma once
 #include "../Component.hpp"
+#include <Langulus/Allocator.hpp>
+#include <Langulus/CT/Index.hpp>
+
 LglsDisableWarningPush
 LglsDisableWarning_UnusedLocalTypedef
+
+#define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
 
 
 namespace Langulus::Annies::Component
@@ -50,8 +55,6 @@ namespace Langulus::Annies::Component
       static constexpr unsigned OwnedDeep = Subcomponents::First::OwnedDeep;
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::OwnedDeep == OwnedDeep; }),
          "Currently all deep ownerships must be of the same style");
-
-      #define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
 
       /// MARK: Public                                                        
       /// Get entry array if containing pointers                              
@@ -199,9 +202,9 @@ namespace Langulus::Annies::Component
             if_available_gcc(C::template ResetAllEntries<SELF>)();
          });
       }
-
-      #undef if_inherits
    };
 }
+
+#undef if_inherits
 
 LglsDisableWarningPop

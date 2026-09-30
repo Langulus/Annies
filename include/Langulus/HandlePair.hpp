@@ -39,7 +39,7 @@ namespace Langulus::Annies
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
-      using DeepType  = HandleDisowned; // TODO why disowned?
+      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = Handle;
       using ValHandle = Handle;
 
@@ -127,7 +127,7 @@ namespace Langulus::Annies
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
-      using DeepType  = HandleDisowned; // TODO why disowned?
+      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = HandleMut;
       using ValHandle = HandleMut;
 
@@ -212,7 +212,7 @@ namespace Langulus::Annies
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
-      using DeepType  = HandleDisowned; // TODO why disowned?
+      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = Handle;
       using ValHandle = HandleMut;
 
@@ -310,7 +310,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = void;
 
       using Denser    = THandlePair<typename THandleEmergent<K>::Denser, typename THandleEmergent<V>::Denser>;
-      using DeepType  = HandleDisowned; // TODO why disowned?
+      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = THandleEmergent<K>;
       using ValHandle = THandleEmergent<V>;
 
@@ -409,7 +409,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = void;
 
       using Denser    = THandlePair<typename THandle<K>::Denser, typename THandle<V>::Denser>;
-      using DeepType  = HandleDisowned; // TODO why disowned?
+      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = THandle<K>;
       using ValHandle = THandle<V>;
 
@@ -517,7 +517,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = void;
 
       using Denser    = THandlePair<typename THandle<K>::Denser, typename THandle<V>::Denser>;
-      using DeepType  = HandleDisowned; // TODO why disowned?
+      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = Tif<CT::Sparse<K>, THandle<K&>, THandleEmergent<K&>>;
       using ValHandle = Tif<CT::Sparse<V>, THandle<V&>, THandleEmergent<V&>>;
 

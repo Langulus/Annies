@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -8,19 +8,28 @@
 #pragma once
 #include "../Component.hpp"
 #include "Langulus/IntentOf.hpp"
+
 LglsDisableWarningPush
 LglsDisableWarning_UnusedLocalTypedef
+
+#define if_inherits(...) requires (ForEachOr(Subcomponents{}, [&]<class C> { \
+   return requires { self.C::__VA_ARGS__; }; }))
 
 
 namespace Langulus::Annies::Component
 {
    template<class...> struct Multitype;
 
+   /// Empty multitype just gets skipped                                      
    template<CT::Component...TN> requires (CountEnabled<TN...> == 0)
    struct Multitype<TN...> {
       using CTTI_Component = Yup;
       static constexpr bool SkipThisComponent = true;
    };
+
+   /// Multitype with a single component just acts like it                    
+   template<CT::Component...TN> requires (CountEnabled<TN...> == 1)
+   struct Multitype<TN...> : TN... {};
 
    ///                                                                        
    /// Combines multiple type components into a unified interface to combat   
@@ -50,9 +59,6 @@ namespace Langulus::Annies::Component
       static constexpr bool TypeErased = ForEachOr(Subcomponents{}, []<class C> { return C::TypeErased; });
       static_assert(ForEachAnd(Subcomponents{}, []<class C> { return C::TypeErased == TypeErased; }),
          "Currently all types must either be type-erased or not");
-
-      #define if_inherits(...) requires (ForEachOr(Subcomponents{}, [&]<class C> { \
-         return requires { self.C::__VA_ARGS__; }; }))
 
       /// Get the contained type                                              
       ///   @tparam SID - type selector                                       
@@ -622,9 +628,9 @@ namespace Langulus::Annies::Component
             if_available(self.C::ConstructFrom(LglsFwd(intent)));
          });
       }
-
-      #undef if_inherits
    };
 }
+
+#undef if_inherits
 
 LglsDisableWarningPop

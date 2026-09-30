@@ -18,6 +18,9 @@ namespace Langulus::Annies
 LglsDisableWarningPush
 LglsDisableWarning_UnusedLocalTypedef
 
+#define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
+
+
 namespace Langulus::Annies::Component
 {
    template<class...> struct Multiprovider;
@@ -28,6 +31,10 @@ namespace Langulus::Annies::Component
       using CTTI_Component = Yup;
       static constexpr bool SkipThisComponent = true;
    };
+
+   /// Multiprovider with a single component just acts like it                
+   template<CT::Component...TN> requires (CountEnabled<TN...> == 1)
+   struct Multiprovider<TN...> : TN... {};
 
    ///                                                                        
    /// Combines multiple heap/stack components into a unified interface to    
@@ -66,8 +73,6 @@ namespace Langulus::Annies::Component
 
       template<class...MORE>
       using Include = Multiprovider<TN..., MORE...>;
-
-      #define if_inherits(...) requires requires { self.C::__VA_ARGS__; }
 
       /// Get a direct access to the heap memory                              
       ///   @attention using raw pointer while self.IsEmpty() may lead to     
@@ -285,9 +290,9 @@ namespace Langulus::Annies::Component
          using C = typename Subcomponents::template At<SID>;
          self.C::BranchOut(elements);
       }
-
-      #undef if_inherits
    };
 }
+
+#undef if_inherits
 
 LglsDisableWarningPop

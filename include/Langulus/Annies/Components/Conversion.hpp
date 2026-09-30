@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Component.hpp"
+#include <Langulus/CT/Convertible.hpp>
 
 
 namespace Langulus::Annies::Component

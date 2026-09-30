@@ -19,16 +19,6 @@
 #define LANGULUS_LIBRARY_ANYNESS() 1
 #define LANGULUS_ANYNESS_VERBOSITY_MASTER_SWITCH() 0
 
-#define if_available(...) if constexpr (requires { __VA_ARGS__; }) { __VA_ARGS__; }
-
-//WORKAROUND G++ (up to version 16 when a last checked) has a notorious bug when       
-//WORKAROUND parsing requires { with a relative base specifier inside }. I've pondered 
-//WORKAROUND this for too long, and this is the only workaround that was actually able 
-//WORKAROUND to do the trick.                                                          
-//WORKAROUND   @important: in order for this to work, you might need your              
-//WORKAROUND      'deduced this' functions spell out their 'this' argument explicitly  
-#define if_available_gcc(...) \
-   if constexpr (requires { &__VA_ARGS__; }) self.__VA_ARGS__
 
 namespace Langulus::Annies
 {

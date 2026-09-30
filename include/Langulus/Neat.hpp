@@ -10,7 +10,7 @@
 #include "TMany.hpp"
 #include "TMap.hpp"
 #include "Recipe.hpp"
-#include "Tag.hpp"
+#include "TTag.hpp"
 
 
 namespace Langulus::Annies

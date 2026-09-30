@@ -11,6 +11,7 @@
 #include <Langulus/CT/MinAlloc.hpp>
 #include <Langulus/MetaOf.hpp>
 #include <Langulus/Utils/Pot.hpp>
+#include <Langulus/Utils/Align.hpp>
 #include <Langulus/Allocator.hpp>
 
 

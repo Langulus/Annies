@@ -10,6 +10,7 @@
 #include "Langulus/Assume.hpp"
 #include "Langulus/IntentOf.hpp"
 #include "Langulus/Typenav.hpp"
+#include "Langulus/Allocator.hpp"
 #include <Langulus/CT/Unfold.hpp>
 #include <Langulus/CT/ReflectAs.hpp>
 #include "Langulus/CT/Contiguous.hpp"

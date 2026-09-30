@@ -11,7 +11,6 @@
 #include <Langulus/CT/ReflectAs.hpp>
 #include <Langulus/CT/DefineTag.hpp>
 #include <Langulus/Lambda.hpp>
-//#include <Langulus/Tag.hpp>
 #include <Langulus/Assume.hpp>
 #include <Langulus/MetaOf.hpp>
 
