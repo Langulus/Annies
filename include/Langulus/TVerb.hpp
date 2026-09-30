@@ -31,8 +31,8 @@ namespace Langulus::Annies
    ///                                                                        
    /// MARK: TVerb                                                            
    ///   A type-erased container specifically designed for fully capsulating  
-   /// function calls. This one is verb-constrained: the verb it contains     
-   /// is known at compile-time.                                              
+   /// function calls. May be verb-constrained: the verb it contains could    
+   /// be known at compile-time.                                              
    ///   This template is used as base for all verb definitions, so that you  
    /// can directly use specific verbs as containers, like so:                
    /// Verbs::Write{Verbs::Catenate{1,2,3}}.In(file).AndThen(Verbs::Halt{});  
@@ -66,7 +66,7 @@ namespace Langulus::Annies
       }
 
       /// Construction that either absorbs the provided containers, or        
-      /// emplaces all A in the container                                     
+      /// emplaces all A in place of verb's argument                          
       template<Disambiguate A1, class...AN>
       constexpr TVerb(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
@@ -88,7 +88,8 @@ namespace Langulus::Annies
          }
       }
       
-      /// Construction that absorbs the provided containers                   
+      /// Construction that absorbs the provided containers into the verb's   
+      /// argument.                                                           
       template<class A1, class...AN>
       constexpr TVerb(Inner::Absorb, A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0)
@@ -99,7 +100,7 @@ namespace Langulus::Annies
          }
       }
       
-      /// Construction that emplaces all arguments inside                     
+      /// Construction that emplaces all arguments inside the verb's argument 
       template<class A1, class...AN>
       constexpr TVerb(Inner::Piecewise, A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0)
@@ -110,21 +111,23 @@ namespace Langulus::Annies
          }
       }
       
-      /// Create a verb by manually specifying the verb ID                    
+      /// Create a verb by manually specifying the verb ID and arguments      
       static TVerb From(TVerb verb, auto&&...arguments) {
          TVerb result {LglsFwd(arguments)...};
          result.SetVerb(verb);
          return result;
       }
 
-      /// Create a verb by extracting verb ID and charge from another verb    
+      /// Create a verb by extracting verb ID and charge from another verb,   
+      /// supplying custom arguments.                                         
       static TVerb From(CT::Executable auto const& source, auto&&...arguments) {
          TVerb result = From(source.GetVerb(), LglsFwd(arguments)...);
          result.SetCharge(source.GetCharge());
          return result;
       }
 
-      /// Create a verb by extracting verb ID, charge and argument from verb  
+      /// Create a verb by extracting verb ID, charge and argument from verb. 
+      /// Source and output remain empty.                                     
       static TVerb Like(CT::Executable auto const& source) {
          TVerb result = From(source.GetVerb(), source.GetArgument());
          result.SetCharge(source.GetCharge());
@@ -159,16 +162,36 @@ namespace Langulus::Annies
          mContext = Many {LglsFwd(arguments)...};
          return *this;
       }
+      
+      /// Set arguments                                                       
+      template<class...A>
+      TVerb& SetArgument(A&&...arguments) {
+         if constexpr (sizeof...(A) == 1) {
+            if constexpr (((CT::DeepDense<Deint<A>> and not CT::Executable<Deint<A>>) and ...))
+               this->Absorb(LglsFwd(arguments)...);
+            else
+               this->EmplaceConstruct(LglsFwd(arguments)...);
+         }
+         else this->Insert(LglsFwd(arguments)...);
+         return *this;
+      }
+
+      // Set output                                                           
+      TVerb& SetOutput(auto&&...arguments) {
+         mOutput = Many {LglsFwd(arguments)...};
+         return *this;
+      }
 
       /// Execute the verb in stateless mode (ignores context)                
-      bool RunStateless() const {
-         TODO();
-         return false;
-      }
+      /// The ability is determined by the contents of the argument instead.  
+      /// Useful for instantiating constants, unary operations, etc.          
+      /// Implemented in Langulus::Flow, as it requires some prime verbs      
+      /// being defined, such as Verbs::Do.                                   
+      bool RunStateless() const;
 
       /// Execute the verb.                                                   
       /// Implemented in Langulus::Flow, as it requires some prime verbs      
-      /// being defined, such as Verbs::Do                                    
+      /// being defined, such as Verbs::Do.                                   
       bool Run() const;
 
       /// MARK: Access                                                        
@@ -178,8 +201,8 @@ namespace Langulus::Annies
       auto GetSource()       noexcept -> Many&;
       auto GetSource() const noexcept -> Many const&;
 
-      auto GetArgument()       noexcept -> Many&;
-      auto GetArgument() const noexcept -> Many const&;
+      //auto GetArgument()       noexcept -> Many&;
+      auto GetArgument() const noexcept -> Many;
 
       auto GetOutput()       noexcept -> Many&;
       auto GetOutput() const noexcept -> Many const&;
@@ -220,9 +243,9 @@ namespace Langulus
 }
 
 /// Define a verb                                                             
-///   @param P - positive verb name, as it exists in namespace Langulus::Verbs
-///   @param N - negative verb name (optional, same as positive if "")        
-///   @param INFOSTRING - information about the verb's purpose                
+///   @param P positive verb name, as it exists in namespace Langulus::Verbs  
+///   @param N negative verb name (optional, same as positive if "")          
+///   @param INFOSTRING information about the verb's purpose                  
 ///   @attention call this macro only in the global namespace!                
 #define LANGULUS_DEFINE_VERB(P, N, PRECEDENCE, INFOSTRING) \
    namespace Langulus::Verbs { struct P; } \
@@ -230,12 +253,12 @@ namespace Langulus
    namespace Langulus::Verbs { struct P : Annies::TVerb<P> { using CTTI_Info = Yes<INFOSTRING>; }; }
 
 /// Define a verb with operators                                              
-///   @param P - positive verb name, as it exists in namespace Langulus::Verbs
-///   @param N - negative verb name (optional, same as positive if "")        
-///   @param OP - positive verb operator                                      
-///   @param ON - negative verb operator                                      
-///   @param PRECEDENCE - operator precedence                                 
-///   @param INFOSTRING - information about the verb's purpose                
+///   @param P positive verb name, as it exists in namespace Langulus::Verbs  
+///   @param N negative verb name (optional, same as positive if "")          
+///   @param OP positive verb operator                                        
+///   @param ON negative verb operator                                        
+///   @param PRECEDENCE operator precedence                                   
+///   @param INFOSTRING information about the verb's purpose                  
 ///   @attention call this macro only in the global namespace!                
 #define LANGULUS_DEFINE_OPERATOR(P, N, OP, ON, PRECEDENCE, INFOSTRING) \
    namespace Langulus::Verbs { struct P; } \

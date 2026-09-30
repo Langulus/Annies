@@ -1,14 +1,11 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-//#include "Langulus/Core.hpp"
-//#include "Langulus/Typenav.hpp"
-//#include "source/Component.hpp"
 #include "Annies/Container.hpp"
 #include "Annies/Components/Typed-Stack.hpp"
 #include "Annies/Components/Heap-Reference.hpp"
@@ -70,7 +67,10 @@ namespace Langulus::Annies::Inner
 #include "Annies/Components/Typed-Static.hpp"
 #include "Annies/Components/Stack.hpp"
 #include "Annies/Components/Reserve-Emergent.hpp"
+#include "Annies/Components/Ownership-Stack.hpp"
+#include "Annies/Components/Ownership-Emergent.hpp"
 #include "Annies/Components/OwnershipDeep-Heap.hpp"
+#include "Annies/Components/OwnershipDeep-Emergent.hpp"
 #include <Langulus/CT/Deep.hpp>
 
 
