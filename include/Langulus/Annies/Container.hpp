@@ -320,6 +320,11 @@ namespace Langulus::Annies
          return count;
       }
 
+      // Here lies the stack. It is an optimized tuple that is filled   
+      // with StackRequest(s) from components.                          
+      // Needs to be public, so that containers can be used in unions!  
+      compact_tuple_from_typelist<decltype(Inner::DefineStack(ComponentList{}))> mStack;
+
    protected:
       LglsComIterationOperators(friend);
       LglsComTypedStack(friend);
@@ -358,10 +363,6 @@ namespace Langulus::Annies
       LglsComIterationOperators(friend);
       LglsComChargedStack(friend);
 
-      // Here lies the stack. It is an optimized tuple that is filled   
-      // with StackRequest(s) from components.                          
-      compact_tuple_from_typelist<decltype(Inner::DefineStack(ComponentList{}))> mStack;
-      
       /// Default constructor doesn't initialize anything.                    
       /// Your container needs to call ConstructDefault manually.             
       constexpr Container() noexcept = default;
