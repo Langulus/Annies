@@ -16,21 +16,21 @@ TEMPLATE_TEST_CASE(
    (MapTest<UnorderedMap, Text, int>),
 
    (MapTest<TUnorderedMap<Text, int>, Text, int>),
-   (MapTest<TUnorderedMap<Text, Trait>, Text, Trait>),
+   (MapTest<TUnorderedMap<Text, Tag>, Text, Tag>),
    (MapTest<TUnorderedMap<Text, Traits::Count>, Text, Traits::Count>),
    (MapTest<TUnorderedMap<Text, Many>, Text, Many>),
 
    (MapTest<TOrderedMap<Text, int>, Text, int>),
-   (MapTest<TOrderedMap<Text, Trait>, Text, Trait>),
+   (MapTest<TOrderedMap<Text, Tag>, Text, Tag>),
    (MapTest<TOrderedMap<Text, Traits::Count>, Text, Traits::Count>),
    (MapTest<TOrderedMap<Text, Many>, Text, Many>),
 
-   (MapTest<UnorderedMap, Text, Trait>),
+   (MapTest<UnorderedMap, Text, Tag>),
    (MapTest<UnorderedMap, Text, Traits::Count>),
    (MapTest<UnorderedMap, Text, Many>),
 
    (MapTest<OrderedMap, Text, int>),
-   (MapTest<OrderedMap, Text, Trait>),
+   (MapTest<OrderedMap, Text, Tag>),
    (MapTest<OrderedMap, Text, Traits::Count>),
    (MapTest<OrderedMap, Text, Many>)
 ) {
@@ -815,12 +815,12 @@ TEMPLATE_TEST_CASE(
 
 TEMPLATE_TEST_CASE("Dense templated map stress test", "[map]",
    (MapTest<TUnorderedMap<int, int>, int, int>),
-   (MapTest<TUnorderedMap<int, Trait>, int, Trait>),
+   (MapTest<TUnorderedMap<int, Tag>, int, Tag>),
    (MapTest<TUnorderedMap<int, Traits::Count>, int, Traits::Count>),
    (MapTest<TUnorderedMap<int, Many>, int, Many>),
 
    (MapTest<TOrderedMap<int, int>, int, int>),
-   (MapTest<TOrderedMap<int, Trait>, int, Trait>),
+   (MapTest<TOrderedMap<int, Tag>, int, Tag>),
    (MapTest<TOrderedMap<int, Traits::Count>, int, Traits::Count>),
    (MapTest<TOrderedMap<int, Many>, int, Many>)
 ) {

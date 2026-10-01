@@ -9,7 +9,7 @@
 #include <Langulus/Annies/Path.hpp>
 #include <Langulus/Annies/TMap.hpp>
 #include <Langulus/Annies/TSet.hpp>
-#include <Langulus/Annies/Trait.hpp>
+#include <Langulus/Annies/Tag.hpp>
 #include "Common.hpp"
 
 
@@ -45,10 +45,10 @@ SCENARIO("Hashing different kinds of containers", "[hash]") {
 /// Cross-container consistency tests                                         
 TEMPLATE_TEST_CASE(
    "Cross-container consistency tests for TOrderedMap/TUnorderedMap/OrderedMap/UnorderedMap", "[map]",
-   (HashTest<Text, Trait*>),
+   (HashTest<Text, Tag*>),
 
    (HashTest<Text, int>),
-   (HashTest<Text, Trait>),
+   (HashTest<Text, Tag>),
    (HashTest<Text, Traits::Count>),
    (HashTest<Text, Many>),
 
@@ -100,8 +100,8 @@ TEMPLATE_TEST_CASE(
 /// Cross-container consistency tests                                         
 TEMPLATE_TEST_CASE(
    "Cross-container consistency tests for TOrderedSet/TUnorderedSet/OrderedSet/UnorderedSet", "[set]",
-   int,  Trait,  Traits::Count,  Many,
-   int*, Trait*, Traits::Count*, Many*
+   int,  Tag,  Traits::Count,  Many,
+   int*, Tag*, Traits::Count*, Many*
 ) {
    Allocator::State memoryState;
 

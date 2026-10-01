@@ -368,7 +368,7 @@ namespace Langulus::Annies
 
       /// A tag-dispatch constructor that forwards arguments to mStack.       
       /// Used in some niche container cases, like TOwn.                      
-      explicit constexpr Container(Inner::Stackwise, auto&&...arguments)
+      /*explicit*/ constexpr Container(Inner::Stackwise, auto&&...arguments)
          : mStack({LglsFwd(arguments)}...) {}
 
       /// Default destructor does nothing. Each container has to implement    

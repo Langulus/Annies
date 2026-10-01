@@ -9,7 +9,7 @@
 /// INTENTIONALLY NOT GUARDED                                                 
 /// Include this file once in each cpp file, after all other headers          
 #include <Langulus/Annies/Text.hpp>
-#include <Langulus/Annies/Trait.hpp>
+#include <Langulus/Annies/Tag.hpp>
 #include <Langulus/Annies/Many.hpp>
 #include "../Common.hpp"
 
@@ -18,7 +18,7 @@ template<class T, class E>
 decltype(auto) FromHelper() {
    if constexpr (not CT::Typed<T>) {
       if constexpr (CT::TraitBased<T>) {
-         if constexpr (CT::Trait<T>)
+         if constexpr (CT::Tag<T>)
             return T::template OfType<E>();
          else
             return T::template From<Traits::Count, E>();

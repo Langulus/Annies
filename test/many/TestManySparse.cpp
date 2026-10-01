@@ -11,11 +11,11 @@
 /// The main test for Many/TMany containers, with all kinds of items, from    
 /// sparse to dense, from trivial to complex, from flat to deep               
 TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
-   (TypePair<Trait, RT*>),
+   (TypePair<Tag, RT*>),
 
-   (TypePair<TMany<Trait*>, Trait*>),
+   (TypePair<TMany<Tag*>, Tag*>),
    (TypePair<Many, Traits::size_t*>),
-   (TypePair<Trait, Text*>),
+   (TypePair<Tag, Text*>),
 
    (TypePair<Traits::Name, Text*>),
    (TypePair<Traits::Name, RT*>),
@@ -27,7 +27,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
    (TypePair<TMany<RT*>, RT*>),
 
    (TypePair<Many, int*>),
-   (TypePair<Many, Trait*>),
+   (TypePair<Many, Tag*>),
    (TypePair<Many, Many*>),
    (TypePair<Many, Text*>),
    (TypePair<Many, RT*>)
@@ -878,8 +878,8 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEach flat dense element (immutable)") {
          const auto foreachit = const_cast<const T&>(pack).ForEach(
             [&](const int&)   {FAIL();},
-            [&](const Trait&) {FAIL();},
-            [&](const Many&)  {FAIL();}
+            [&](const Tag&) {FAIL();},
+            [&](Many const&)  {FAIL();}
          );
 
          REQUIRE(0 == foreachit);
@@ -888,7 +888,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEach flat dense element (mutable)") {
          const auto foreachit = const_cast<T&>(pack).ForEach(
             [&](int&)         {FAIL(); },
-            [&](Trait&)       {FAIL(); },
+            [&](Tag&)       {FAIL(); },
             [&](Many&)        {FAIL(); }
          );
 
@@ -898,8 +898,8 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEach flat sparse element (immutable)") {
          const auto foreachit = const_cast<const T&>(pack).ForEach(
             [&](const int*)   {FAIL(); },
-            [&](const Trait*) {FAIL(); },
-            [&](const Many*)  {FAIL(); }
+            [&](const Tag*) {FAIL(); },
+            [&](Many const*)  {FAIL(); }
          );
 
          REQUIRE(0 == foreachit);
@@ -908,7 +908,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEach flat sparse element (mutable)") {
          const auto foreachit = const_cast<T&>(pack).ForEach(
             [&](int*)         {FAIL(); },
-            [&](Trait*)       {FAIL(); },
+            [&](Tag*)       {FAIL(); },
             [&](Many*)        {FAIL(); }
          );
 
@@ -918,8 +918,8 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEachRev flat dense element (immutable)") {
          const auto foreachit = const_cast<const T&>(pack).ForEachRev(
             [&](const int&)   {FAIL(); },
-            [&](const Trait&) {FAIL(); },
-            [&](const Many&)  {FAIL(); }
+            [&](const Tag&) {FAIL(); },
+            [&](Many const&)  {FAIL(); }
          );
 
          REQUIRE(0 == foreachit);
@@ -928,8 +928,8 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEachRev flat dense element (mutable)") {
          const auto foreachit = pack.ForEachRev(
             [&](const int&)   {FAIL(); },
-            [&](const Trait&) {FAIL(); },
-            [&](const Many&)  {FAIL(); }
+            [&](const Tag&) {FAIL(); },
+            [&](Many const&)  {FAIL(); }
          );
 
          REQUIRE(0 == foreachit);
@@ -938,8 +938,8 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEachRev flat sparse element (immutable)") {
          const auto foreachit = const_cast<const T&>(pack).ForEachRev(
             [&](const int*)   {FAIL(); },
-            [&](const Trait*) {FAIL(); },
-            [&](const Many*)  {FAIL(); }
+            [&](const Tag*) {FAIL(); },
+            [&](Many const*)  {FAIL(); }
          );
 
          REQUIRE(0 == foreachit);
@@ -948,8 +948,8 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       WHEN("ForEachRev flat sparse element (mutable)") {
          const auto foreachit = pack.ForEachRev(
             [&](const int*)   {FAIL(); },
-            [&](const Trait*) {FAIL(); },
-            [&](const Many*)  {FAIL(); }
+            [&](const Tag*) {FAIL(); },
+            [&](Many const*)  {FAIL(); }
          );
 
          REQUIRE(0 == foreachit);
@@ -2382,7 +2382,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(i == it + 1);
                ++it;
             },
-            [&](const Trait& i) {
+            [&](const Tag& i) {
                REQUIRE(i == it + 1);
                ++it;
             },
@@ -2390,9 +2390,9 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(i == it + 1);
                ++it;
             },
-            [&](const Many& i) {
+            [&](Many const& i) {
                const auto temp = CreateElement<DenseE>(it + 1);
-               REQUIRE(i == static_cast<const Many&>(temp));
+               REQUIRE(i == static_cast<Many const&>(temp));
                ++it;
             }
          );
@@ -2411,7 +2411,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(i == it + 1);
                ++it;
             },
-            [&](Trait& i) {
+            [&](Tag& i) {
                REQUIRE(i == it + 1);
                ++it;
             },
@@ -2421,7 +2421,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             },
             [&](Many& i) {
                const auto temp = CreateElement<DenseE>(it + 1);
-               REQUIRE(i == static_cast<const Many&>(temp));
+               REQUIRE(i == static_cast<Many const&>(temp));
                ++it;
             }
          );
@@ -2440,7 +2440,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(*i == it + 1);
                ++it;
             },
-            [&](const Trait* i) {
+            [&](const Tag* i) {
                REQUIRE(*i == it + 1);
                ++it;
             },
@@ -2448,9 +2448,9 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(*i == it + 1);
                ++it;
             },
-            [&](const Many* i) {
+            [&](Many const* i) {
                const auto temp = CreateElement<DenseE>(it + 1);
-               REQUIRE(*i == static_cast<const Many&>(temp));
+               REQUIRE(*i == static_cast<Many const&>(temp));
                ++it;
             }
          );
@@ -2469,7 +2469,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(*i == it + 1);
                ++it;
             },
-            [&](Trait* i) {
+            [&](Tag* i) {
                REQUIRE(*i == it + 1);
                ++it;
             },
@@ -2479,7 +2479,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             },
             [&](Many* i) {
                const auto temp = CreateElement<DenseE>(it + 1);
-               REQUIRE(*i == static_cast<const Many&>(temp));
+               REQUIRE(*i == static_cast<Many const&>(temp));
                ++it;
             }
          );
@@ -2498,7 +2498,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(i == 5 - it);
                ++it;
             },
-            [&](const Trait& i) {
+            [&](const Tag& i) {
                REQUIRE(i == 5 - it);
                ++it;
             },
@@ -2506,9 +2506,9 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(i == 5 - it);
                ++it;
             },
-            [&](const Many& i) {
+            [&](Many const& i) {
                const auto temp = CreateElement<DenseE>(5 - it);
-               REQUIRE(i == static_cast<const Many&>(temp));
+               REQUIRE(i == static_cast<Many const&>(temp));
                ++it;
             }
          );
@@ -2527,7 +2527,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(i == 5 - it);
                ++it;
             },
-            [&](Trait& i) {
+            [&](Tag& i) {
                REQUIRE(i == 5 - it);
                ++it;
             },
@@ -2537,7 +2537,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             },
             [&](Many& i) {
                const auto temp = CreateElement<DenseE>(5 - it);
-               REQUIRE(i == static_cast<const Many&>(temp));
+               REQUIRE(i == static_cast<Many const&>(temp));
                ++it;
             }
          );
@@ -2556,7 +2556,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(*i == 5 - it);
                ++it;
             },
-            [&](const Trait* i) {
+            [&](const Tag* i) {
                REQUIRE(*i == 5 - it);
                ++it;
             },
@@ -2564,9 +2564,9 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(*i == 5 - it);
                ++it;
             },
-            [&](const Many* i) {
+            [&](Many const* i) {
                const auto temp = CreateElement<DenseE>(5 - it);
-               REQUIRE(*i == static_cast<const Many&>(temp));
+               REQUIRE(*i == static_cast<Many const&>(temp));
                ++it;
             }
          );
@@ -2585,7 +2585,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
                REQUIRE(*i == 5 - it);
                ++it;
             },
-            [&](Trait* i) {
+            [&](Tag* i) {
                REQUIRE(*i == 5 - it);
                ++it;
             },
@@ -2595,7 +2595,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             },
             [&](Many* i) {
                const auto temp = CreateElement<DenseE>(5 - it);
-               REQUIRE(*i == static_cast<const Many&>(temp));
+               REQUIRE(*i == static_cast<Many const&>(temp));
                ++it;
             }
          );

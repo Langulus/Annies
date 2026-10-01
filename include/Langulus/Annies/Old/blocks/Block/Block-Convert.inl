@@ -11,7 +11,7 @@
 #include "../BlockSet.hpp"
 #include "../../text/Text.hpp"
 #include "../../many/Bytes.hpp"
-#include "../../many/Trait.hpp"
+#include "../../many/Tag.hpp"
 
 
 namespace Langulus::Annies
@@ -191,10 +191,10 @@ namespace Langulus::Annies
                   OUT::SerializationRules::Separate(*this, to);
             }
          }
-         else if (CastsTo<Trait>()) {
+         else if (CastsTo<Tag>()) {
             // Nest inside traits                                       
             for (size_t i = 0; i < GetCount(); ++i) {
-               As<Trait>(i).Serialize(to);
+               As<Tag>(i).Serialize(to);
 
                if (i < GetCount() - 1)
                   OUT::SerializationRules::Separate(*this, to);
@@ -325,10 +325,10 @@ namespace Langulus::Annies
                   OUT::SerializationRules::Separate(*this, to);
             }
          }
-         else if constexpr (CT::DerivedFrom<TYPE, Trait>) {
+         else if constexpr (CT::DerivedFrom<TYPE, Tag>) {
             // Nest inside traits                                       
             for (size_t i = 0; i < GetCount(); ++i) {
-               As<Trait>(i).Serialize(to);
+               As<Tag>(i).Serialize(to);
 
                if (i < GetCount() - 1)
                   OUT::SerializationRules::Separate(*this, to);
@@ -611,7 +611,7 @@ namespace Langulus::Annies
                to += Bytes {bytes.mCount};
                to += bytes;
             },
-            [&to](const Trait& trait) {
+            [&to](const Tag& trait) {
                to += Bytes {trait.GetTrait()};
                trait.SerializeToBinary<void>(to);
             }
@@ -719,7 +719,7 @@ namespace Langulus::Annies
       read = DeserializeAtom(count, read, header, loader);
       if (count) {
          ReadInner(read, count, loader);
-         const Token token {GetRaw<Letter>() + read, count};
+         Token const token {GetRaw<Letter>() + read, count};
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          using META = Deref<decltype(result)>;
@@ -925,14 +925,14 @@ namespace Langulus::Annies
 
             return read;
          }
-         else if (to.template CastsTo<Trait>()) {
-            // Deserialize a Trait based container                      
+         else if (to.template CastsTo<Tag>()) {
+            // Deserialize a Tag based container                      
             if constexpr (CT::TypeErased<T>)
                to.New(deserializedCount);
 
-            if (to.template IsSimilar<Trait>()) {
+            if (to.template IsSimilar<Tag>()) {
                // Each trait can be different                           
-               to.ForEach([&](Trait& trait) {
+               to.ForEach([&](Tag& trait) {
                   TMeta ttype;
                   read = DeserializeMeta(ttype, read, header, loader);
                   trait.SetTrait(ttype);
@@ -943,7 +943,7 @@ namespace Langulus::Annies
             }
             else {
                // All traits are the same                               
-               to.ForEach([&](Trait& trait) {
+               to.ForEach([&](Tag& trait) {
                   auto& block = static_cast<Block<>&>(trait);
                   read = DeserializeBinary<void>(block, header, read, loader);
                });

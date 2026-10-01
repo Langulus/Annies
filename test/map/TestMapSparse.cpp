@@ -8,12 +8,12 @@
 #include "TestMapCommon.hpp"
 
 #define MAP_TESTS(MANAGED) \
-   (MapTest<TUnorderedMap<Text, Trait*>, Text, Trait*, MANAGED>), \
+   (MapTest<TUnorderedMap<Text, Tag*>, Text, Tag*, MANAGED>), \
    (MapTest<UnorderedMap, Text, RT*, MANAGED>), \
-   (MapTest<TUnorderedMap<Trait*, RT*>, Trait*, RT*, MANAGED>), \
+   (MapTest<TUnorderedMap<Tag*, RT*>, Tag*, RT*, MANAGED>), \
    (MapTest<TUnorderedMap<Text, RT*>, Text, RT*, MANAGED>), \
  \
-   (MapTest<UnorderedMap, Trait*, RT*, MANAGED>), \
+   (MapTest<UnorderedMap, Tag*, RT*, MANAGED>), \
    (MapTest<UnorderedMap, Text, int*, MANAGED>), \
  \
    (MapTest<TUnorderedMap<Text, int*>, Text, int*, MANAGED>), \
@@ -25,17 +25,17 @@
    (MapTest<TUnorderedMap<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
    (MapTest<TOrderedMap<Text, int*>, Text, int*, MANAGED>), \
-   (MapTest<TOrderedMap<Text, Trait*>, Text, Trait*, MANAGED>), \
+   (MapTest<TOrderedMap<Text, Tag*>, Text, Tag*, MANAGED>), \
    (MapTest<TOrderedMap<Text, Traits::Count*>, Text, Traits::Count*, MANAGED>), \
    (MapTest<TOrderedMap<Text, Many*>, Text, Many*, MANAGED>), \
    (MapTest<TOrderedMap<Text, RT*>, Text, RT*, MANAGED>), \
  \
-   (MapTest<TOrderedMap<Trait*, RT*>, Trait*, RT*, MANAGED>), \
+   (MapTest<TOrderedMap<Tag*, RT*>, Tag*, RT*, MANAGED>), \
    (MapTest<TOrderedMap<Traits::Count*, RT*>, Traits::Count*, RT*, MANAGED>), \
    (MapTest<TOrderedMap<Many*, RT*>, Many*, RT*, MANAGED>), \
    (MapTest<TOrderedMap<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
-   (MapTest<UnorderedMap, Text, Trait*, MANAGED>), \
+   (MapTest<UnorderedMap, Text, Tag*, MANAGED>), \
    (MapTest<UnorderedMap, Text, Traits::Count*, MANAGED>), \
    (MapTest<UnorderedMap, Text, Many*, MANAGED>), \
  \
@@ -44,12 +44,12 @@
    (MapTest<UnorderedMap, RT*, RT*, MANAGED>), \
  \
    (MapTest<OrderedMap, Text, int*, MANAGED>), \
-   (MapTest<OrderedMap, Text, Trait*, MANAGED>), \
+   (MapTest<OrderedMap, Text, Tag*, MANAGED>), \
    (MapTest<OrderedMap, Text, Traits::Count*, MANAGED>), \
    (MapTest<OrderedMap, Text, Many*, MANAGED>), \
    (MapTest<OrderedMap, Text, RT*, MANAGED>), \
  \
-   (MapTest<OrderedMap, Trait*, RT*, MANAGED>), \
+   (MapTest<OrderedMap, Tag*, RT*, MANAGED>), \
    (MapTest<OrderedMap, Traits::Count*, RT*, MANAGED>), \
    (MapTest<OrderedMap, Many*, RT*, MANAGED>), \
    (MapTest<OrderedMap, RT*, RT*, MANAGED>)
@@ -445,12 +445,12 @@ TEMPLATE_TEST_CASE(
 
       for (int iii = 0; iii < 10; ++iii) {
       WHEN(std::string("Removing elements by value #") + std::to_string(iii)) {
-         static_assert(CT::Owned<Own<Trait*>>);
-         static_assert(CT::Owned<Ref<Trait>>);
-         static_assert(CT::NotOwned<Trait*>);
-         static_assert(CT::NotOwned<Trait>);
-         static_assert(CT::Comparable<Trait*, Own<Trait*>>);
-         static_assert(CT::Comparable<Trait*, Ref<Trait>>);
+         static_assert(CT::Owned<Own<Tag*>>);
+         static_assert(CT::Owned<Ref<Tag>>);
+         static_assert(CT::NotOwned<Tag*>);
+         static_assert(CT::NotOwned<Tag>);
+         static_assert(CT::Comparable<Tag*, Own<Tag*>>);
+         static_assert(CT::Comparable<Tag*, Ref<Tag>>);
 
          const auto removed2 = map.RemoveValue(darray1[1].GetValue());
          const auto removed4 = map.RemoveValue(darray1[3].GetValue());
@@ -865,15 +865,15 @@ TEMPLATE_TEST_CASE(
 }
 
 TEMPLATE_TEST_CASE("Sparse templated map stress test", "[map]",
-   (MapTest<TUnorderedMap<int*, Trait>, int*, Trait>),
+   (MapTest<TUnorderedMap<int*, Tag>, int*, Tag>),
 
    (MapTest<TUnorderedMap<int, int*>, int, int*>),
-   (MapTest<TUnorderedMap<int, Trait*>, int, Trait*>),
+   (MapTest<TUnorderedMap<int, Tag*>, int, Tag*>),
    (MapTest<TUnorderedMap<int, Traits::Count*>, int, Traits::Count*>),
    (MapTest<TUnorderedMap<int, Many*>, int, Many*>),
 
    (MapTest<TOrderedMap<int, int*>, int, int*>),
-   (MapTest<TOrderedMap<int, Trait*>, int, Trait*>),
+   (MapTest<TOrderedMap<int, Tag*>, int, Tag*>),
    (MapTest<TOrderedMap<int, Traits::Count*>, int, Traits::Count*>),
    (MapTest<TOrderedMap<int, Many*>, int, Many*>),
 
@@ -882,17 +882,17 @@ TEMPLATE_TEST_CASE("Sparse templated map stress test", "[map]",
    (MapTest<TUnorderedMap<int*, Many>, int*, Many>),
 
    (MapTest<TOrderedMap<int*, int>, int*, int>),
-   (MapTest<TOrderedMap<int*, Trait>, int*, Trait>),
+   (MapTest<TOrderedMap<int*, Tag>, int*, Tag>),
    (MapTest<TOrderedMap<int*, Traits::Count>, int*, Traits::Count>),
    (MapTest<TOrderedMap<int*, Many>, int*, Many>),
 
    (MapTest<TUnorderedMap<int*, int*>, int*, int*>),
-   (MapTest<TUnorderedMap<int*, Trait*>, int*, Trait*>),
+   (MapTest<TUnorderedMap<int*, Tag*>, int*, Tag*>),
    (MapTest<TUnorderedMap<int*, Traits::Count*>, int*, Traits::Count*>),
    (MapTest<TUnorderedMap<int*, Many*>, int*, Many*>),
 
    (MapTest<TOrderedMap<int*, int*>, int*, int*>),
-   (MapTest<TOrderedMap<int*, Trait*>, int*, Trait*>),
+   (MapTest<TOrderedMap<int*, Tag*>, int*, Tag*>),
    (MapTest<TOrderedMap<int*, Traits::Count*>, int*, Traits::Count*>),
    (MapTest<TOrderedMap<int*, Many*>, int*, Many*>)
 ) {

@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Block.hpp"
-#include "../../many/Trait.hpp"
+#include "../../many/Tag.hpp"
 #include "../../many/Construct.hpp"
 #include "../../text/Text.hpp"
 
@@ -708,7 +708,7 @@ namespace Langulus::Annies
       // Depending on immediate contents...                             
       bool exe = false;
       ForEach(
-         [&exe](const Trait& trait) noexcept {
+         [&exe](const Tag& trait) noexcept {
             // Scan deeper into traits, because they're not deep,       
             // unless they're being executed                            
             exe = trait.IsExecutable();

@@ -11,28 +11,28 @@
 #define SET_TESTS(MANAGED) \
    (SetTest<TUnorderedSet<Text*>, Text*, MANAGED>), \
    (SetTest<TUnorderedSet<int*>, int*, MANAGED>), \
-   (SetTest<TUnorderedSet<Trait*>, Trait*, MANAGED>), \
+   (SetTest<TUnorderedSet<Tag*>, Tag*, MANAGED>), \
    (SetTest<TUnorderedSet<Traits::Count*>, Traits::Count*, MANAGED>), \
    (SetTest<TUnorderedSet<Many*>, Many*, MANAGED>), \
    (SetTest<TUnorderedSet<RT*>, RT*, MANAGED>), \
  \
    (SetTest<TOrderedSet<Text*>, Text*, MANAGED>), \
    (SetTest<TOrderedSet<int*>, int*, MANAGED>), \
-   (SetTest<TOrderedSet<Trait*>, Trait*, MANAGED>), \
+   (SetTest<TOrderedSet<Tag*>, Tag*, MANAGED>), \
    (SetTest<TOrderedSet<Traits::Count*>, Traits::Count*, MANAGED>), \
    (SetTest<TOrderedSet<Many*>, Many*, MANAGED>), \
    (SetTest<TOrderedSet<RT*>, RT*, MANAGED>), \
  \
    (SetTest<UnorderedSet, Text*, MANAGED>), \
    (SetTest<UnorderedSet, int*, MANAGED>), \
-   (SetTest<UnorderedSet, Trait*, MANAGED>), \
+   (SetTest<UnorderedSet, Tag*, MANAGED>), \
    (SetTest<UnorderedSet, Traits::Count*, MANAGED>), \
    (SetTest<UnorderedSet, Many*, MANAGED>), \
    (SetTest<UnorderedSet, RT*, MANAGED>), \
  \
    (SetTest<OrderedSet, Text*, MANAGED>), \
    (SetTest<OrderedSet, int*, MANAGED>), \
-   (SetTest<OrderedSet, Trait*, MANAGED>), \
+   (SetTest<OrderedSet, Tag*, MANAGED>), \
    (SetTest<OrderedSet, Traits::Count*, MANAGED>), \
    (SetTest<OrderedSet, Many*, MANAGED>), \
    (SetTest<OrderedSet, RT*, MANAGED>)
@@ -270,12 +270,12 @@ TEMPLATE_TEST_CASE(
 
       for (int iii = 0; iii < 10; ++iii) {
       WHEN(std::string("Removing elements by value #") + std::to_string(iii)) {
-         static_assert(CT::Owned<Own<Trait*>>);
-         static_assert(CT::Owned<Ref<Trait>>);
-         static_assert(CT::NotOwned<Trait*>);
-         static_assert(CT::NotOwned<Trait>);
-         static_assert(CT::Comparable<Trait*, Own<Trait*>>);
-         static_assert(CT::Comparable<Trait*, Ref<Trait>>);
+         static_assert(CT::Owned<Own<Tag*>>);
+         static_assert(CT::Owned<Ref<Tag>>);
+         static_assert(CT::NotOwned<Tag*>);
+         static_assert(CT::NotOwned<Tag>);
+         static_assert(CT::Comparable<Tag*, Own<Tag*>>);
+         static_assert(CT::Comparable<Tag*, Ref<Tag>>);
 
          const auto removed2 = set.Remove(darray1[1]);
          const auto removed4 = set.Remove(darray1[3]);

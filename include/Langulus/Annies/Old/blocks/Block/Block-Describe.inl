@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Block.hpp"
-#include "../../many/Trait.hpp"
+#include "../../many/Tag.hpp"
 #include "../../many/Construct.hpp"
 #include "../../many/Neat.hpp"
 #include <Langulus/CT/Vector.hpp>
@@ -21,7 +21,7 @@ namespace Langulus::Annies
    ///   @param value - the value to assign                                   
    template<class TYPE> template<class TRAIT, CT::NotVoid D>
    void Block<TYPE>::SetDefaultTrait(D&& value) {
-      static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
+      static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
       bool satisfied = false;
       ForEachDeep([&](const TRAIT& trait) {
          if (trait) {
@@ -34,7 +34,7 @@ namespace Langulus::Annies
       if (satisfied)
          return;
 
-      // Trait wasn't found - search for a Neat to create it in         
+      // Tag wasn't found - search for a Neat to create it in         
       ForEachDeep([&](Neat& neat) {
          neat.AddTrait(Abandon(TRAIT {Forward<D>(value)}));
          satisfied = true;
@@ -53,7 +53,7 @@ namespace Langulus::Annies
    ///   @return true if value changed                                        
    template<class TYPE> template<class...TRAIT>
    bool Block<TYPE>::ExtractTrait(CT::NotVoid auto&...values) const {
-      static_assert(CT::Trait<TRAIT...>, "TRAIT is not a trait type");
+      static_assert(CT::Tag<TRAIT...>, "TRAIT is not a trait type");
       return (ExtractTraitInner<TRAIT>(values...) or ...);
    }
 
@@ -92,7 +92,7 @@ namespace Langulus::Annies
       using D = Deref<decltype(value)>;
       size_t progress = 0;
 
-      ForEachDeep([&](const Many& group) {
+      ForEachDeep([&](Many const& group) {
          if constexpr (CT::Vector<D> or CT::Array<D>) {
             const auto toscan = ::std::min(CountOf<D> - progress, group.GetCount());
             for (size_t i = 0; i < toscan; ++i) {
@@ -136,7 +136,7 @@ namespace Langulus::Annies
       bool  ambiguous = false;
       DMeta found;
 
-      ForEachDeep([&](const Many& group) noexcept {
+      ForEachDeep([&](Many const& group) noexcept {
          group.ForEach([&](const Construct& c) noexcept {
             if (not c.CastsTo(type))
                return;
@@ -165,7 +165,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<class TYPE> template<class TRAIT>
    bool Block<TYPE>::ExtractTraitInner(CT::NotVoid auto&...values) const {
-      static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
+      static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
       return ExtractTraitInner<TRAIT>(
          Sequence<sizeof...(values)>::Expand, values...
       );
@@ -176,14 +176,14 @@ namespace Langulus::Annies
    bool Block<TYPE>::ExtractTraitInner(
       ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
-      static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
+      static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
       return (ExtractTraitInnerInner<TRAIT, IDX>(values) or ...);
    }
 
    ///                                                                        
    template<class TYPE> template<class TRAIT, size_t IDX>
    bool Block<TYPE>::ExtractTraitInnerInner(CT::NotVoid auto& value) const {
-      static_assert(CT::Trait<TRAIT>, "TRAIT is not a trait type");
+      static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
       using D = Deref<decltype(value)>;
       bool satisfied = false;
       size_t counter = 0;
@@ -196,7 +196,7 @@ namespace Langulus::Annies
          }
 
          if constexpr (CT::Deep<D>) {
-            value = static_cast<const Many&>(trait);
+            value = static_cast<Many const&>(trait);
             satisfied = true;
          }
          else if (trait.ExtractDataAs(value))

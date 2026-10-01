@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "TTrait.hpp"
-#include "Trait.inl"
+#include "Tag.inl"
 
 #define TEMPLATE()   template<class TRAIT>
 #define TME()        TTrait<TRAIT>
@@ -20,17 +20,17 @@ namespace Langulus::Annies
    ///   @param other - the trait to refer to                                 
    TEMPLATE() LANGULUS(INLINED)
    TME()::TTrait(const TTrait& other)
-      : Trait {Refer(static_cast<const Many&>(other))} {}
+      : Tag {Refer(static_cast<Many const&>(other))} {}
 
    /// Move-constructor                                                       
    ///   @param other - the trait to move                                     
    TEMPLATE() LANGULUS(INLINED)
    TME()::TTrait(TTrait&& other)
-      : Trait {Move(Forward<Many>(other))} {}
+      : Tag {Move(Forward<Many>(other))} {}
 
    /// Never absorb different traits, if known at compile-time                
    ///   @param other - the trait to construct with, with or without intent   
-   TEMPLATE() template<class T> requires (CT::Trait<Deint<T>>
+   TEMPLATE() template<class T> requires (CT::Tag<Deint<T>>
    and not CT::Same<typename T::TraitType, TRAIT>) LANGULUS(INLINED)
    TME()::TTrait(T&& other) {
       *this << IntentOf<decltype(other)>::Nest(other);
@@ -40,7 +40,7 @@ namespace Langulus::Annies
    ///   @param rhs - the trait to refer-assign                               
    TEMPLATE() LANGULUS(INLINED)
    TRAIT& TME()::operator = (const TTrait& rhs) {
-      Trait::operator = (Refer(static_cast<const Many&>(rhs)));
+      Tag::operator = (Refer(static_cast<Many const&>(rhs)));
       return static_cast<TRAIT&>(*this);
    }
 
@@ -48,7 +48,7 @@ namespace Langulus::Annies
    ///   @param rhs - the trait to move-assign                                
    TEMPLATE() LANGULUS(INLINED)
    TRAIT& TME()::operator = (TTrait&& rhs) {
-      Trait::operator = (Move(Forward<Many>(rhs)));
+      Tag::operator = (Move(Forward<Many>(rhs)));
       return static_cast<TRAIT&>(*this);
    }
    
@@ -61,9 +61,9 @@ namespace Langulus::Annies
       using S = IntentOf<decltype(rhs)>;
       using T = TypeOf<S>;
 
-      if constexpr (CT::Trait<T>) {
+      if constexpr (CT::Tag<T>) {
          if constexpr (not CT::Same<typename T::TraitType, TRAIT>) {
-            // Never absorb different CT::Trait, insert it instead      
+            // Never absorb different CT::Tag, insert it instead      
             Base::Reset();
             *this << S::Nest(rhs);
          }
@@ -90,14 +90,14 @@ namespace Langulus::Annies
    ///   @return the trait type                                               
    TEMPLATE() LANGULUS(INLINED)
    TMeta TME()::GetTrait() const noexcept {
-      return Trait::GetTrait<TRAIT>();
+      return Tag::GetTrait<TRAIT>();
    }
 
    /// Check if trait is valid, that is, it's typed and has contents          
    ///   @return true if trait is valid                                       
    TEMPLATE() LANGULUS(INLINED)
    constexpr bool TME()::IsTraitValid() const noexcept {
-      return Trait::IsTraitValid<TRAIT>();
+      return Tag::IsTraitValid<TRAIT>();
    }
 
    /// Check if trait and data types match another trait                      
@@ -105,15 +105,15 @@ namespace Langulus::Annies
    ///   @return true if traits are similar                                   
    TEMPLATE() LANGULUS(INLINED)
    constexpr bool TME()::IsTraitSimilar(const CT::TraitBased auto& other) const noexcept {
-      return Trait::IsTraitSimilar<TRAIT>(other);
+      return Tag::IsTraitSimilar<TRAIT>(other);
    }
 
    /// Check if a trait matches one of a set of trait types                   
    ///   @tparam T... - the trait list                                        
    ///   @return true if this trait is one of the given types                 
-   TEMPLATE() template<CT::Trait T1> LANGULUS(INLINED)
+   TEMPLATE() template<CT::Tag T1> LANGULUS(INLINED)
    constexpr bool TME()::IsTrait() const {
-      return Trait::IsTrait<T1, TRAIT>();
+      return Tag::IsTrait<T1, TRAIT>();
    }
 
    /// Check if a trait matches one of a set of trait types                   
@@ -122,15 +122,15 @@ namespace Langulus::Annies
    ///   @return true if this trait is one of the given types                 
    TEMPLATE() LANGULUS(INLINED)
    constexpr bool TME()::IsTrait(TMeta t1, auto...tN) const {
-      return Trait::IsTrait<TRAIT>(t1)
-         or (Trait::IsTrait<TRAIT>(tN) or ...);
+      return Tag::IsTrait<TRAIT>(t1)
+         or (Tag::IsTrait<TRAIT>(tN) or ...);
    }
 
    /// Check if trait has correct data (always true if trait has no filter)   
    ///   @return true if trait definition filter is compatible                
    TEMPLATE() LANGULUS(INLINED)
    constexpr bool TME()::HasCorrectData() const {
-      return Trait::HasCorrectData<TRAIT>();
+      return Tag::HasCorrectData<TRAIT>();
    }
 
    /// Compare traits with anything                                           
@@ -140,7 +140,7 @@ namespace Langulus::Annies
    ///   @return true if things are the same                                  
    TEMPLATE() template<CT::NoIntent T> requires CT::NotOwned<T> LANGULUS(INLINED)
    bool TME()::operator == (const T& rhs) const {
-      return Trait::operator == <TRAIT> (rhs);
+      return Tag::operator == <TRAIT> (rhs);
    }
 
    /// Concatenate with traits/deep types, with or without intent             
@@ -148,7 +148,7 @@ namespace Langulus::Annies
    ///   @return the combined trait                                           
    TEMPLATE() LANGULUS(INLINED)
    TRAIT TME()::operator + (CT::UnfoldInsertable auto&& rhs) const {
-      return Trait::operator + <TRAIT> (rhs);
+      return Tag::operator + <TRAIT> (rhs);
    }
 
    /// Destructively concatenate with traits/deep types                       
@@ -156,13 +156,13 @@ namespace Langulus::Annies
    ///   @return a reference to this modified trait                           
    TEMPLATE() LANGULUS(INLINED)
    TRAIT& TME()::operator += (CT::UnfoldInsertable auto&& rhs) {
-      return Trait::operator += <TRAIT> (rhs);
+      return Tag::operator += <TRAIT> (rhs);
    }
 
    /// Serialize the trait to anything text-based                             
    TEMPLATE() LANGULUS(INLINED)
    size_t TME()::Serialize(CT::Serial auto& to) const {
-      return Trait::Serialize<TRAIT>(to);
+      return Tag::Serialize<TRAIT>(to);
    }
 
 } // namespace Langulus::Annies

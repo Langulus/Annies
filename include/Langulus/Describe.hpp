@@ -22,7 +22,7 @@ namespace Langulus
    /// used in Describe constructors to set member variables and stuff.       
    struct Describe {
       using Many = Annies::Many;
-      const Many& what;
+      Many const& what;
 
       using CTTI_ReflectAs     = void;
       using CTTI_Abstract      = Yup;
@@ -33,7 +33,7 @@ namespace Langulus
       constexpr Describe(const Describe&) noexcept = default;
       explicit constexpr Describe(Describe&&) noexcept = default;
 
-      explicit constexpr Describe(const Many& descriptor) noexcept
+      explicit constexpr Describe(Many const& descriptor) noexcept
          : what {descriptor} {}
 
       auto& operator *  () const noexcept { return  what; }
@@ -53,6 +53,18 @@ namespace Langulus
 
       template<class TYPE>
       auto FindType(RTTI::DMeta) const -> RTTI::DMeta;
+
+      /// Get a reflected member variable inside the first element by index   
+      ///   @param index the member index to search for                       
+      ///   @return type-erased container to the reflected member(s)          
+      auto GetMember(CT::Index auto&& index) -> Many {
+         if (what.IsEmpty())
+            return {};
+
+         auto& members = what.GetType().GetMembers();
+         //TODO special indices
+         return GetMemberInner(members[index]);
+      }
 
    private:
       ///                                                                     
@@ -93,6 +105,20 @@ namespace Langulus
          return ExtractTagInner<TAG>( 
             Sequence<sizeof...(values)>::Expand, values...
          );
+      }
+
+      /// Get handle to a reflected member variable inside the first element  
+      ///   @attention assumes block is not empty                             
+      ///   @param member the member reflection to search for                 
+      ///   @return type-erased container to the reflected member(s)          
+      auto GetMemberInner(RTTI::DefinitionData::Member const& member) -> Many {
+         LglsAssumeDev(not what.IsEmpty(), "Getting member from an empty descriptor");
+         return {Annies::Stackwise, Many::StateType{0},
+            member.type(), member.member(const_cast<void*>(what.GetRaw())),
+            member.extent, member.extent, what.GetAllocation(), Hash {0}
+         };
+         //result.EnableTypeConstrained();
+         //return result;
       }
    };
 
@@ -168,7 +194,7 @@ namespace Langulus
       using D = Deref<decltype(value)>;
       size_t progress = 0;
 
-      what.ForEachDeep([&](const Many& group) {
+      what.ForEachDeep([&](Many const& group) {
          if constexpr (CT::Array<D>) {
             const auto count  = group.GetCount();
             const auto remain = ExtentOf<D> - progress;
@@ -216,7 +242,7 @@ namespace Langulus
       bool ambiguous = false;
       RTTI::DMeta found;
 
-      what.ForEachDeep([&](const Many& group) noexcept {
+      what.ForEachDeep([&](Many const& group) noexcept {
          group.ForEach([&](const Recipe& recipe) noexcept {
             if (not recipe.CastsTo(type))
                return;

@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Trait.hpp"
+#include "Tag.hpp"
 
 
 namespace Langulus::Annies
@@ -17,20 +17,20 @@ namespace Langulus::Annies
    /// using it as a CRTP                                                     
    ///                                                                        
    template<class TRAIT>
-   struct TTrait : Trait {
+   struct TTrait : Tag {
       using CTTI_Tags = TRAIT;
-      using CTTI_Bases = Trait;
+      using CTTI_Bases = Tag;
       using TraitType = TRAIT;
 
       //template<class T>
       //using Tag = RTTI::Tag<T, TRAIT>;
 
    public:
-      using Trait::Trait;
+      using Tag::Tag;
       TTrait(const TTrait&);
       TTrait(TTrait&&);
 
-      template<class T> requires (CT::Trait<Deint<T>> and not Akin<typename T::TraitType, TRAIT>)
+      template<class T> requires (CT::Tag<Deint<T>> and not Akin<typename T::TraitType, TRAIT>)
       TTrait(T&&);
 
       template<CT::NotVoid>
@@ -42,7 +42,7 @@ namespace Langulus::Annies
       TRAIT& operator = (CT::UnfoldInsertable auto&&);
 
    public:
-      template<CT::Trait>
+      template<CT::Tag>
       constexpr bool IsTrait() const;
       constexpr bool IsTrait(TMeta, auto...) const;
 
@@ -70,9 +70,9 @@ namespace Langulus::Annies
       size_t Serialize(CT::Serial auto&) const;
 
    private:
-      using Trait::From;
-      using Trait::FromMeta;
-      using Trait::SetTrait;
+      using Tag::From;
+      using Tag::FromMeta;
+      using Tag::SetTrait;
    };
 
 } // namespace Langulus::Annies
@@ -134,7 +134,7 @@ LANGULUS_DEFINE_TRAIT(Index,
    "Index trait, used to access the index of elements, or other similar properties");
 LANGULUS_DEFINE_TRAIT(Context,
    "Context trait, used to access verb source, the current environment, or other similar properties");
-LANGULUS_DEFINE_TRAIT(Trait, 
+LANGULUS_DEFINE_TRAIT(Tag, 
    "Accesses traits (static or dynamic variables) of an instantiated object of any kind");
 LANGULUS_DEFINE_TRAIT(State, 
    "State trait, used to access the state of an object");

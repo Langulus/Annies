@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Trait.hpp"
+#include "Tag.hpp"
 
 
 namespace Langulus::Annies
@@ -15,14 +15,14 @@ namespace Langulus::Annies
    /// Refer constructor                                                      
    ///   @param other - the trait to refer to                                 
    LANGULUS(INLINED)
-   Trait::Trait(const Trait& other)
-      : Trait {Refer(other)} {}
+   Tag::Tag(const Tag& other)
+      : Tag {Refer(other)} {}
 
    /// Move constructor                                                       
    ///   @param other - the trait to move                                     
    LANGULUS(INLINED)
-   Trait::Trait(Trait&& other) noexcept
-      : Trait {Move(other)} {}
+   Tag::Tag(Tag&& other) noexcept
+      : Tag {Move(other)} {}
 
    /// Unfold constructor, with or without intents                            
    /// If there's only one argument that is deep or a trait, it will be       
@@ -31,7 +31,7 @@ namespace Langulus::Annies
    ///   @param tn - the rest of the arguments (optional)                     
    template<class T1, class...TN>
    /*requires CT::UnfoldInsertable<T1, TN...>*/ LANGULUS(INLINED)
-   Trait::Trait(T1&& t1, TN&&...tn) {
+   Tag::Tag(T1&& t1, TN&&...tn) {
       if constexpr (sizeof...(TN) == 0 and not CT::Array<T1>) {
          using S = IntentOf(t1);
          using T = Deint<S>;
@@ -52,9 +52,9 @@ namespace Langulus::Annies
    ///   @tparam T - type of trait                                            
    ///   @tparam D - type of data                                             
    ///   @return a trait preconfigured with the provided types                
-   template<CT::Trait T, CT::NotVoid D> LANGULUS(INLINED)
-   Trait Trait::From() {
-      Trait temp {Block<D> {}};
+   template<CT::Tag T, CT::NotVoid D> LANGULUS(INLINED)
+   Tag Tag::From() {
+      Tag temp {Block<D> {}};
       temp.SetTrait<T>();
       return Abandon(temp);
    }
@@ -63,10 +63,10 @@ namespace Langulus::Annies
    ///   @tparam T - type of trait                                            
    ///   @param stuff - the data to initialize trait with                     
    ///   @return a trait preconfigured with the provided types and contents   
-   template<CT::Trait T> LANGULUS(INLINED)
-   Trait Trait::From(auto&& stuff) {
+   template<CT::Tag T> LANGULUS(INLINED)
+   Tag Tag::From(auto&& stuff) {
       using S = IntentOf(stuff);
-      Trait temp {S {stuff}};
+      Tag temp {S {stuff}};
       temp.SetTrait<T>();
       return Abandon(temp);
    }
@@ -76,40 +76,40 @@ namespace Langulus::Annies
    ///   @param stuff - the data to initialize trait with                     
    ///   @return the trait                                                    
    LANGULUS(INLINED)
-   Trait Trait::From(TMeta meta, auto&& stuff) {
+   Tag Tag::From(TMeta meta, auto&& stuff) {
       using S = IntentOf(stuff);
-      Trait temp {S {stuff}};
+      Tag temp {S {stuff}};
       temp.SetTrait(meta);
       return Abandon(temp);
    }
 
    /// Create a trait from a runtime trait definition and data type           
    LANGULUS(INLINED)
-   Trait Trait::FromMeta(TMeta tmeta, DMeta dmeta) {
-      Trait temp {Block(DataState::Default, dmeta)};
+   Tag Tag::FromMeta(TMeta tmeta, DMeta dmeta) {
+      Tag temp {Block(DataState::Default, dmeta)};
       temp.SetTrait(tmeta);
       return Abandon(temp);
    }
 
    /// Set the trait type statically                                          
    ///   @tparam T - the trait                                                
-   template<CT::Trait T> LANGULUS(INLINED)
-   void Trait::SetTrait() noexcept {
+   template<CT::Tag T> LANGULUS(INLINED)
+   void Tag::SetTrait() noexcept {
       mTraitType = MetaTraitOf<T>();
    }
 
    /// Set the trait type dynamically                                         
    ///   @param trait - the trait                                             
    LANGULUS(INLINED)
-   void Trait::SetTrait(TMeta trait) noexcept {
+   void Tag::SetTrait(TMeta trait) noexcept {
       mTraitType = trait;
    }
 
    /// Get the trait type                                                     
    ///   @return the trait type                                               
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   TMeta Trait::GetTrait() const noexcept {
-      if constexpr (CT::Trait<THIS>)
+   TMeta Tag::GetTrait() const noexcept {
+      if constexpr (CT::Tag<THIS>)
          return (mTraitType = MetaTraitOf<THIS>());
       else
          return mTraitType;
@@ -118,8 +118,8 @@ namespace Langulus::Annies
    /// Check if trait is valid, that is, it's typed and has contents          
    ///   @return true if trait is valid                                       
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   bool Trait::IsTraitValid() const noexcept {
-      if constexpr (CT::Trait<THIS>)
+   bool Tag::IsTraitValid() const noexcept {
+      if constexpr (CT::Tag<THIS>)
          return not IsEmpty();
       else
          return mTraitType and not IsEmpty();
@@ -129,9 +129,9 @@ namespace Langulus::Annies
    ///   @param other - the trait to test against                             
    ///   @return true if traits are similar                                   
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   bool Trait::IsTraitSimilar(const CT::TraitBased auto& other) const noexcept {
+   bool Tag::IsTraitSimilar(const CT::TraitBased auto& other) const noexcept {
       using OTHER = Deref<decltype(other)>;
-      if constexpr (CT::Trait<THIS, OTHER>) {
+      if constexpr (CT::Tag<THIS, OTHER>) {
          return Exact<typename THIS::TraitType, typename OTHER::TraitType>
             and other.CastsToMeta(GetType());
       }
@@ -144,9 +144,9 @@ namespace Langulus::Annies
    /// Check if a trait matches the given trait type                          
    ///   @tparam T1 - the trait to compare against                            
    ///   @return true trait matches                                           
-   template<CT::Trait T1, CT::TraitBased THIS> LANGULUS(INLINED)
-   constexpr bool Trait::IsTrait() const {
-      if constexpr (CT::Trait<THIS>)
+   template<CT::Tag T1, CT::TraitBased THIS> LANGULUS(INLINED)
+   constexpr bool Tag::IsTrait() const {
+      if constexpr (CT::Tag<THIS>)
          return SameAsOneOf<THIS, T1>;
       else
          return IsTrait(MetaTraitOf<T1>());
@@ -158,8 +158,8 @@ namespace Langulus::Annies
    ///   @return true if this trait is one of the given types                 
    template<CT::TraitBased THIS, class...TN>
    requires Exact<TMeta, TMeta, TN...> LANGULUS(INLINED)
-   bool Trait::IsTrait(TMeta t1, TN...tN) const {
-      if constexpr (CT::Trait<THIS>)
+   bool Tag::IsTrait(TMeta t1, TN...tN) const {
+      if constexpr (CT::Tag<THIS>)
          (void) GetTrait<THIS>();
 
       return mTraitType == t1 or ((mTraitType == tN) or ...);
@@ -168,8 +168,8 @@ namespace Langulus::Annies
    /// Check if trait has correct data (always true if trait has no filter)   
    ///   @return true if trait definition filter is compatible                
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   bool Trait::HasCorrectData() const {
-      //if constexpr (CT::Trait<THIS>)
+   bool Tag::HasCorrectData() const {
+      //if constexpr (CT::Tag<THIS>)
       //   (void) GetTrait<THIS>();
 
       //if (not mTraitType)
@@ -182,12 +182,12 @@ namespace Langulus::Annies
    ///   @param count - number of elements                                    
    ///   @return the container                                                
    LANGULUS(INLINED)
-   Trait Trait::Select(size_t start, size_t count) const IF_UNSAFE(noexcept) {
+   Tag Tag::Select(size_t start, size_t count) const IF_UNSAFE(noexcept) {
       return {Base::Select(start, count)};
    }
    
    LANGULUS(INLINED)
-   Trait Trait::Select(size_t start, size_t count) IF_UNSAFE(noexcept) {
+   Tag Tag::Select(size_t start, size_t count) IF_UNSAFE(noexcept) {
       return {Base::Select(start, count)};
    }
 
@@ -197,14 +197,14 @@ namespace Langulus::Annies
    ///   @param other - the thing to compare with                             
    ///   @return true if things are the same                                  
    template<CT::TraitBased THIS, CT::NoIntent T> requires CT::NotOwned<T>
-   LANGULUS(INLINED) bool Trait::operator == (const T& rhs) const {
-      if constexpr (CT::Trait<THIS, T>) {
+   LANGULUS(INLINED) bool Tag::operator == (const T& rhs) const {
+      if constexpr (CT::Tag<THIS, T>) {
          return Exact<typename THIS::TraitType, typename T::TraitType>
-            and Many::operator == (static_cast<const Many&>(rhs));
+            and Many::operator == (static_cast<Many const&>(rhs));
       }
       else if constexpr (CT::TraitBased<T>) {
          return IsTrait<THIS>(rhs.GetTrait())
-            and Many::operator == (static_cast<const Many&>(rhs));
+            and Many::operator == (static_cast<Many const&>(rhs));
       }
       else return Many::operator == (rhs);
    }
@@ -213,7 +213,7 @@ namespace Langulus::Annies
    ///   @param other - the trait to refer to                                 
    ///   @return a reference to this trait                                    
    LANGULUS(INLINED)
-   Trait& Trait::operator = (const Trait& rhs) {
+   Tag& Tag::operator = (const Tag& rhs) {
       return operator = (Refer(rhs));
    }
 
@@ -221,7 +221,7 @@ namespace Langulus::Annies
    ///   @param other - the trait to move                                     
    ///   @return a reference to this trait                                    
    LANGULUS(INLINED)
-   Trait& Trait::operator = (Trait&& rhs) {
+   Tag& Tag::operator = (Tag&& rhs) {
       return operator = (Move(rhs));
    }
 
@@ -230,7 +230,7 @@ namespace Langulus::Annies
    ///   @param rhs - right hand side and intent                              
    ///   @return a reference to this trait                                    
    LANGULUS(INLINED)
-   Trait& Trait::operator = (CT::Intent auto&& rhs) {
+   Tag& Tag::operator = (CT::Intent auto&& rhs) {
       using S = IntentOf(rhs);
       using T = Deint<S>;
 
@@ -250,17 +250,17 @@ namespace Langulus::Annies
    ///   @param rhs - the right operand                                       
    ///   @return the combined container                                       
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   THIS Trait::operator + (CT::UnfoldInsertable auto&& rhs) const {
+   THIS Tag::operator + (CT::UnfoldInsertable auto&& rhs) const {
       using S = IntentOf<decltype(rhs)>;
       using T = TypeOf<S>;
 
       if constexpr (CT::TraitBased<T>) {
          auto result = Many::operator + (S::Nest(rhs).template Forward<Many>());
 
-         if constexpr (CT::Trait<THIS>)
+         if constexpr (CT::Tag<THIS>)
             return THIS {Abandon(result)};
          else {
-            return Trait::From(
+            return Tag::From(
                GetTrait<THIS>() ? mTraitType : DeintCast(rhs).GetTrait(),
                Abandon(result)
             );
@@ -269,10 +269,10 @@ namespace Langulus::Annies
       else {
          auto result = Many::operator + (S::Nest(rhs).Forward());
 
-         if constexpr (CT::Trait<THIS>)
+         if constexpr (CT::Tag<THIS>)
             return THIS {Abandon(result)};
          else
-            return Trait::From(GetTrait<THIS>(), Abandon(result));
+            return Tag::From(GetTrait<THIS>(), Abandon(result));
       }
    }
 
@@ -281,14 +281,14 @@ namespace Langulus::Annies
    ///   @param rhs - the right operand and intent                            
    ///   @return a reference to this modified container                       
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   THIS& Trait::operator += (CT::UnfoldInsertable auto&& rhs) {
+   THIS& Tag::operator += (CT::UnfoldInsertable auto&& rhs) {
       using S = IntentOf<decltype(rhs)>;
       using T = TypeOf<S>;
 
       if constexpr (CT::TraitBased<T>) {
          Many::operator += (S::Nest(rhs).template Forward<Many>());
 
-         if constexpr (not CT::Trait<THIS>) {
+         if constexpr (not CT::Tag<THIS>) {
             if (not mTraitType)
                mTraitType = DeintCast(rhs).GetTrait();
          }
@@ -299,7 +299,7 @@ namespace Langulus::Annies
    
    /// Serialize the trait to anything text-based                             
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   size_t Trait::Serialize(CT::Serial auto& to) const {
+   size_t Tag::Serialize(CT::Serial auto& to) const {
       const auto initial = to.GetCount();
       using OUT = Deref<decltype(to)>;
       to += GetTrait<THIS>();

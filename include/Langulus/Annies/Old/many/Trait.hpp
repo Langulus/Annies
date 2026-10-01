@@ -16,13 +16,13 @@ namespace Langulus
    {
 
       ///                                                                     
-      /// An abstract Trait structure                                         
-      /// It defines the size for CT::Trait and CT::TraitBased concepts       
+      /// An abstract Tag structure                                         
+      /// It defines the size for CT::Tag and CT::TraitBased concepts       
       ///                                                                     
-      struct Trait : Annies::Many {
+      struct Tag : Annies::Many {
          using CTTI_Abstract = Yup;
          using CTTI_Deep = No;
-         using CTTI_ReflectAs = A::Trait;
+         using CTTI_ReflectAs = A::Tag;
          using CTTI_Bases = Annies::Many;
 
       protected:
@@ -38,15 +38,15 @@ namespace Langulus
    namespace CT
    {
 
-      /// A TraitBased type is any type that inherits A::Trait                
+      /// A TraitBased type is any type that inherits A::Tag                
       template<class...T>
-      concept TraitBased = (DerivedFrom<T, A::Trait> and ...);
+      concept TraitBased = (DerivedFrom<T, A::Tag> and ...);
 
-      /// A reflected trait type is any type that inherits Trait, is not      
-      /// Trait itself, and is binary compatible to a Trait                   
+      /// A reflected trait type is any type that inherits Tag, is not      
+      /// Tag itself, and is binary compatible to a Tag                   
       template<class...T>
-      concept Trait = TraitBased<T...> and ((
-            sizeof(T) == sizeof(A::Trait)
+      concept Tag = TraitBased<T...> and ((
+            sizeof(T) == sizeof(A::Tag)
             and requires { {Decay<T>::CTTI_Trait} -> Same<Token>; }
          ) and ...);
 
@@ -58,7 +58,7 @@ namespace Langulus::Annies
 {
 
    ///                                                                        
-   ///   Trait                                                                
+   ///   Tag                                                                
    ///                                                                        
    ///   A named container, used to give containers a standard intent of use  
    ///   A count is a count, no matter how you call it. So when your type     
@@ -66,84 +66,84 @@ namespace Langulus::Annies
    ///   Traits are used to access members of objects at runtime, or access   
    /// global objects, or supply paremeters                                   
    ///                                                                        
-   struct Trait : A::Trait {
-      using CTTI_Named = Yes<"Trait">;
+   struct Tag : A::Tag {
+      using CTTI_Named = Yes<"Tag">;
       using CTTI_Abstract = No;
-      using CTTI_ReflectAs = Trait;
-      using CTTI_Bases = A::Trait;
+      using CTTI_ReflectAs = Tag;
+      using CTTI_Bases = A::Tag;
 
       ///                                                                     
       ///   Construction & Assignment                                         
       ///                                                                     
-      constexpr Trait() noexcept = default;
-      Trait(const Trait&);
-      Trait(Trait&&) noexcept;
+      constexpr Tag() noexcept = default;
+      Tag(const Tag&);
+      Tag(Tag&&) noexcept;
 
       template<class T1, class...TN> //requires CT::UnfoldInsertable<T1, TN...>
-      Trait(T1&&, TN&&...);
+      Tag(T1&&, TN&&...);
 
-      Trait& operator = (const Trait&);
-      Trait& operator = (Trait&&);
-      Trait& operator = (CT::Intent auto&&);
+      Tag& operator = (const Tag&);
+      Tag& operator = (Tag&&);
+      Tag& operator = (CT::Intent auto&&);
 
-      template<CT::Trait, CT::NotVoid>
-      static Trait From();
-      static Trait FromMeta(TMeta, DMeta);
+      template<CT::Tag, CT::NotVoid>
+      static Tag From();
+      static Tag FromMeta(TMeta, DMeta);
 
-      template<CT::Trait>
-      static Trait From(auto&&);
-      static Trait From(TMeta, auto&&);
+      template<CT::Tag>
+      static Tag From(auto&&);
+      static Tag From(TMeta, auto&&);
 
       ///                                                                     
       ///   Capsulation                                                       
       ///                                                                     
-      template<CT::Trait>
+      template<CT::Tag>
       void SetTrait() noexcept;
       void SetTrait(TMeta) noexcept;
 
-      template<CT::Trait, CT::TraitBased = Trait>
+      template<CT::Tag, CT::TraitBased = Tag>
       constexpr bool IsTrait() const;
 
-      template<CT::TraitBased = Trait, class...TN> requires Exact<TMeta, TMeta, TN...>
+      template<CT::TraitBased = Tag, class...TN> requires Exact<TMeta, TMeta, TN...>
       bool IsTrait(TMeta, TN...) const;
 
-      template<CT::TraitBased = Trait>
+      template<CT::TraitBased = Tag>
       TMeta GetTrait() const noexcept;
 
-      template<CT::TraitBased = Trait>
+      template<CT::TraitBased = Tag>
       bool IsTraitValid() const noexcept;
 
-      template<CT::TraitBased = Trait>
+      template<CT::TraitBased = Tag>
       bool IsTraitSimilar(const CT::TraitBased auto&) const noexcept;
 
-      template<CT::TraitBased = Trait>
+      template<CT::TraitBased = Tag>
       bool HasCorrectData() const;
 
       ///                                                                     
       ///   Indexing                                                          
       ///                                                                     
-      Trait Select(size_t, size_t)       IF_UNSAFE(noexcept);
-      Trait Select(size_t, size_t) const IF_UNSAFE(noexcept);
+      Tag Select(size_t, size_t)       IF_UNSAFE(noexcept);
+      Tag Select(size_t, size_t) const IF_UNSAFE(noexcept);
 
       ///                                                                     
       ///   Compare                                                           
       ///                                                                     
-      template<CT::TraitBased = Trait, CT::NoIntent T> requires CT::NotOwned<T>
+      template<CT::TraitBased = Tag, CT::NoIntent T> requires CT::NotOwned<T>
       bool operator == (const T&) const;
 
       ///                                                                     
       ///   Concatenation                                                     
       ///                                                                     
-      template<CT::TraitBased THIS = Trait>
+      template<CT::TraitBased THIS = Tag>
       THIS operator + (CT::UnfoldInsertable auto&&) const;
 
-      template<CT::TraitBased THIS = Trait>
+      template<CT::TraitBased THIS = Tag>
       THIS& operator += (CT::UnfoldInsertable auto&&);
 
       ///                                                                     
       ///   Conversion                                                        
       ///                                                                     
-      template<CT::TraitBased = Trait>
+      template<CT::TraitBased = Tag>
       size_t Serialize(CT::Serial auto&) const;
    };
 

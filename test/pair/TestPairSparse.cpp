@@ -8,9 +8,9 @@
 #include "TestPairCommon.hpp"
 
 #define PAIR_TESTS(MANAGED) \
-   (MapTest<Pair, Trait*, RT*, MANAGED>), \
+   (MapTest<Pair, Tag*, RT*, MANAGED>), \
  \
-   (MapTest<TPair<Trait*, RT*>, Trait*, RT*, MANAGED>), \
+   (MapTest<TPair<Tag*, RT*>, Tag*, RT*, MANAGED>), \
    (MapTest<TPair<Traits::Count*, RT*>, Traits::Count*, RT*, MANAGED>), \
    (MapTest<TPair<Many*, RT*>, Many*, RT*, MANAGED>), \
    (MapTest<TPair<RT*, RT*>, RT*, RT*, MANAGED>), \

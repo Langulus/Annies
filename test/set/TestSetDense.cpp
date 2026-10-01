@@ -15,25 +15,25 @@ TEMPLATE_TEST_CASE(
    "Dense TOrderedSet/TUnorderedSet/OrderedSet/UnorderedSet", "[set]",
    //(SetTest<TUnorderedSet<Text>, Text>),
    (SetTest<TUnorderedSet<int>, int>),
-   (SetTest<TUnorderedSet<Trait>, Trait>),
+   (SetTest<TUnorderedSet<Tag>, Tag>),
    (SetTest<TUnorderedSet<Traits::Count>, Traits::Count>),
    (SetTest<TUnorderedSet<Many>, Many>),
 
    //(SetTest<TOrderedSet<Text>, Text>),
    (SetTest<TOrderedSet<int>, int>),
-   (SetTest<TOrderedSet<Trait>, Trait>),
+   (SetTest<TOrderedSet<Tag>, Tag>),
    (SetTest<TOrderedSet<Traits::Count>, Traits::Count>),
    (SetTest<TOrderedSet<Many>, Many>),
 
    //(SetTest<UnorderedSet, Text>),
    (SetTest<UnorderedSet, int>),
-   (SetTest<UnorderedSet, Trait>),
+   (SetTest<UnorderedSet, Tag>),
    (SetTest<UnorderedSet, Traits::Count>),
    (SetTest<UnorderedSet, Many>),
 
    //(SetTest<OrderedSet, Text>),
    (SetTest<OrderedSet, int>),
-   (SetTest<OrderedSet, Trait>),
+   (SetTest<OrderedSet, Tag>),
    (SetTest<OrderedSet, Traits::Count>),
    (SetTest<OrderedSet, Many>)
 ) {

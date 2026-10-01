@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "TMany.hpp"
-#include "Trait.hpp"
+#include "Tag.hpp"
 #include "Construct.hpp"
 #include "../maps/TMap.hpp"
 //#include <Langulus/Core/Sequences.hpp>
@@ -32,7 +32,7 @@ namespace Langulus::Annies
       template<class TYPE>
       friend struct Block;
 
-      using TraitList     = TMany<Trait>;
+      using TagList     = TMany<Tag>;
       using ConstructList = TMany<Construct>;
       using TailList      = TMany<Messy>;
 
@@ -42,8 +42,8 @@ namespace Langulus::Annies
 
       // Traits are ordered first by their trait type, then by their    
       // order of appearance. Duplicate trait types are allowed         
-      // Trait contents may or may not also be normalized               
-      TUnorderedMap<TMeta, TraitList> mTraits;
+      // Tag contents may or may not also be normalized               
+      TUnorderedMap<TMeta, TagList> mTraits;
 
       // Subconstructs are sorted first by the construct type, and then 
       // by their order of appearance. Their contents may or may not    
@@ -100,13 +100,13 @@ namespace Langulus::Annies
 
       explicit operator bool() const noexcept;
 
-      template<CT::Trait>
-      auto GetTraits() -> TraitList*;
+      template<CT::Tag>
+      auto GetTraits() -> TagList*;
 
-      template<CT::Trait>
-      auto GetTraits()      const -> const TraitList*;
-      auto GetTraits(TMeta)       ->       TraitList*;
-      auto GetTraits(TMeta) const -> const TraitList*;
+      template<CT::Tag>
+      auto GetTraits()      const -> const TagList*;
+      auto GetTraits(TMeta)       ->       TagList*;
+      auto GetTraits(TMeta) const -> const TagList*;
 
       template<CT::Data>
       auto GetData() -> TailList*;
@@ -128,25 +128,25 @@ namespace Langulus::Annies
       auto GetConstructs(DMeta)       ->       ConstructList*;
       auto GetConstructs(DMeta) const -> const ConstructList*;
 
-      template<CT::Trait>
+      template<CT::Tag>
       void SetDefaultTrait(CT::NotVoid auto&&);
 
-      template<CT::Trait...>
+      template<CT::Tag...>
       bool ExtractTrait(CT::NotVoid auto&...) const;
       auto ExtractData(CT::NotVoid auto&) const -> size_t;
       auto ExtractDataAs(CT::NotVoid auto&) const -> size_t;
 
-      template<CT::Trait>
-      auto GetTrait(size_t = 0)        const -> const Trait*;
-      auto GetTrait(TMeta, size_t = 0) const -> const Trait*;
+      template<CT::Tag>
+      auto GetTrait(size_t = 0)        const -> const Tag*;
+      auto GetTrait(TMeta, size_t = 0) const -> const Tag*;
 
    protected:
-      template<CT::Trait>
+      template<CT::Tag>
       bool ExtractTraitInner(CT::NotVoid auto&...) const;
       template<size_t...IDX>
-      bool ExtractTraitInner(const TraitList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
+      bool ExtractTraitInner(const TagList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
       template<size_t>
-      bool ExtractTraitInnerInner(const TraitList&, CT::NotVoid auto&) const;
+      bool ExtractTraitInnerInner(const TagList&, CT::NotVoid auto&) const;
 
    public:
       ///                                                                     
@@ -205,7 +205,7 @@ namespace Langulus::Annies
       size_t RemoveData();
       template<CT::Data>
       size_t RemoveConstructs();
-      template<CT::Trait, bool EMPTY_TOO = false>
+      template<CT::Tag, bool EMPTY_TOO = false>
       size_t RemoveTrait();
 
       ///                                                                     

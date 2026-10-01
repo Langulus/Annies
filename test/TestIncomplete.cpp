@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include <Langulus/Annies/Text.hpp>
-#include <Langulus/Annies/Trait.hpp>
+#include <Langulus/Annies/Tag.hpp>
 #include <Langulus/Annies/Own.hpp>
 #include <Langulus/Annies/Ref.hpp>
 #include <Langulus/Annies/TMap.hpp>
@@ -18,10 +18,10 @@ struct Resolvable {
    DMeta mMeta {};
 };
 
-class Unit;
+class Part;
 
-using UnitMap = TUnorderedMap<DMeta, TMany<Unit*>>;
-using TraitMap = TUnorderedMap<TMeta, TMany<Trait>>;
+using UnitMap = TUnorderedMap<DMeta, TMany<Part*>>;
+using TraitMap = TUnorderedMap<TMeta, TMany<Tag>>;
 
 struct Thing final : Resolvable {
    LANGULUS(ABSTRACT) false;

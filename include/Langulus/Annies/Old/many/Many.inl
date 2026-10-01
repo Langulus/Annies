@@ -28,7 +28,7 @@ namespace Langulus::Annies
    /// Refer constructor                                                      
    ///   @param other - the container to refer to                             
    LANGULUS(INLINED)
-   Many::Many(const Many& other)
+   Many::Many(Many const& other)
       : Many {Refer(other)} {}
 
    /// Move constructor                                                       
@@ -180,7 +180,7 @@ namespace Langulus::Annies
    ///   @param rhs - the container to refer to                               
    ///   @return a reference to this container                                
    LANGULUS(INLINED)
-   Many& Many::operator = (const Many& rhs) {
+   Many& Many::operator = (Many const& rhs) {
       static_assert(CT::DeepAssignable<void, Referred<Many>>);
       return operator = (Refer(rhs));
    }

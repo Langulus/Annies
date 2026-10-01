@@ -269,7 +269,7 @@ namespace Langulus::A
    /// Get verb source (constant)                                             
    ///   @return the verb source                                              
    LANGULUS(INLINED)
-   auto Verb::GetSource() const noexcept -> const Many& {
+   auto Verb::GetSource() const noexcept -> Many const& {
       return mSource;
    }
 
@@ -283,8 +283,8 @@ namespace Langulus::A
    /// Get verb argument (constant)                                           
    ///   @return the verb argument                                            
    LANGULUS(INLINED)
-   auto Verb::GetArgument() const noexcept -> const Many& {
-      return static_cast<const Many&>(*this);
+   auto Verb::GetArgument() const noexcept -> Many const& {
+      return static_cast<Many const&>(*this);
    }
 
    /// Get verb output                                                        
@@ -297,14 +297,14 @@ namespace Langulus::A
    /// Get verb output (constant)                                             
    ///   @return the verb output                                              
    LANGULUS(INLINED)
-   auto Verb::GetOutput() const noexcept -> const Many& {
+   auto Verb::GetOutput() const noexcept -> Many const& {
       return mOutput;
    }
 
    /// Convenience operator for accessing the output container inside verb    
    ///   @return the verb output                                              
    LANGULUS(INLINED)
-   auto Verb::operator -> () const noexcept -> const Many* {
+   auto Verb::operator -> () const noexcept -> Many const* {
       return &mOutput;
    }
 

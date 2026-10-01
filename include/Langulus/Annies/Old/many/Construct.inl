@@ -60,7 +60,7 @@ namespace Langulus::Annies
    /// Construct from a type token                                            
    ///   @param token - the type name of the content                          
    LANGULUS(INLINED)
-   Construct::Construct(const Token& token)
+   Construct::Construct(Token const& token)
       : mType        {RTTI::GetMetaData(token)->mOrigin} {}
 
    LANGULUS(INLINED)
@@ -68,7 +68,7 @@ namespace Langulus::Annies
    ///   @param token - the type name of the content                          
    ///   @param args - the arguments for construction, with or without intent 
    ///   @param charge - the charge for the construction                      
-   Construct::Construct(const Token& token, auto&& args, const Charge& charge)
+   Construct::Construct(Token const& token, auto&& args, const Charge& charge)
       : Construct {
          RTTI::GetMetaData(token),
          Forward<Deref<decltype(args)>>(args),
@@ -139,7 +139,7 @@ namespace Langulus::Annies
    ///   @param t1, tn  - the constructor arguments                           
    ///   @return the request                                                  
    template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
-   Construct Construct::FromToken(const Token& token, T1&& t1, TN&&...tn) {
+   Construct Construct::FromToken(Token const& token, T1&& t1, TN&&...tn) {
       return {
          RTTI::DisambiguateMeta(token),
          Many {Forward<T1>(t1), Forward<TN>(tn)...}
@@ -150,7 +150,7 @@ namespace Langulus::Annies
    ///   @param token - type of the construct                                 
    ///   @return the request                                                  
    LANGULUS(INLINED)
-   Construct Construct::FromToken(const Token& token) {
+   Construct Construct::FromToken(Token const& token) {
       return Construct {RTTI::DisambiguateMeta(token)};
    }
 #endif
@@ -268,12 +268,12 @@ namespace Langulus::Annies
    /// Get the argument for the construct                                     
    ///   @return the constant arguments container                             
    LANGULUS(INLINED)
-   auto Construct::GetDescriptor() const noexcept -> const Many& {
+   auto Construct::GetDescriptor() const noexcept -> Many const& {
       return mDescriptor;
    }
 
    LANGULUS(INLINED)
-   auto Construct::operator -> () const -> const Many* {
+   auto Construct::operator -> () const -> Many const* {
       return &mDescriptor;
    }
 

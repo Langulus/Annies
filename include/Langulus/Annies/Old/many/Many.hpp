@@ -57,7 +57,7 @@ namespace Langulus::Annies
       ///   Construction                                                      
       ///                                                                     
       constexpr Many() noexcept = default;
-      Many(const Many&);
+      Many(Many const&);
       Many(Many&&) noexcept;
 
       template<class T1, class...TN> requires CT::UnfoldInsertable<T1, TN...>
@@ -91,7 +91,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Assignment                                                        
       ///                                                                     
-      Many& operator = (const Many&);
+      Many& operator = (Many const&);
       Many& operator = (Many&&) noexcept;
       Many& operator = (CT::UnfoldInsertable auto&&);
 

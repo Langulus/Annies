@@ -245,7 +245,7 @@ namespace Langulus::Annies
          }
          else return Loop::NextLoop;
       }
-      else if constexpr (not CT::Trait<DA>) {
+      else if constexpr (not CT::Tag<DA>) {
          // Container is type-erased                                    
          // And we're NOT iterating using a trait                       
          if ((CT::Deep<DA> and IsDeep()) or (not CT::Deep<DA> and CastsTo<A, true>())) {
@@ -280,7 +280,7 @@ namespace Langulus::Annies
       else {
          // Container is type-erased                                    
          // And we're iterating using a trait                           
-         if (not CastsTo<Trait, true>())
+         if (not CastsTo<Tag, true>())
             return Loop::NextLoop;
 
          // Container is type-erased and full of traits, iterator is    
@@ -289,7 +289,7 @@ namespace Langulus::Annies
          if (mType->mIsSparse) {
             // Iterate sparse container                                 
             loop = IterateInner<MUTABLE, REVERSE>(mCount,
-               [&index, &f](Trait*& element) noexcept(NOE) -> R {
+               [&index, &f](Tag*& element) noexcept(NOE) -> R {
                   if constexpr (CT::Void<R>) {
                      if (not element->template IsTrait<DA>())
                         return;
@@ -309,7 +309,7 @@ namespace Langulus::Annies
          else {
             // Iterate dense container                                  
             loop = IterateInner<MUTABLE, REVERSE>(mCount,
-               [&index, &f](Trait& element) noexcept(NOE) -> R {
+               [&index, &f](Tag& element) noexcept(NOE) -> R {
                   if constexpr (CT::Void<R>) {
                      if (not element.template IsTrait<DA>())
                         return;

@@ -168,8 +168,8 @@ namespace Langulus::Annies
    ///   @return the trait list, or nullptr if no such list exists            
    ///   @attention the list can be empty, if trait was provided with no      
    ///              contents                                                  
-   template<CT::Trait T> LANGULUS(INLINED)
-   auto Neat::GetTraits() -> TraitList* {
+   template<CT::Tag T> LANGULUS(INLINED)
+   auto Neat::GetTraits() -> TagList* {
       return GetTraits(MetaTraitOf<T>());
    }
 
@@ -178,8 +178,8 @@ namespace Langulus::Annies
    ///   @return the trait list, or nullptr if no such list exists            
    ///   @attention the list can be empty, if trait was provided with no      
    ///              contents                                                  
-   template<CT::Trait T> LANGULUS(INLINED)
-   auto Neat::GetTraits() const -> const TraitList* {
+   template<CT::Tag T> LANGULUS(INLINED)
+   auto Neat::GetTraits() const -> const TagList* {
       return GetTraits(MetaTraitOf<T>());
    }
    
@@ -189,7 +189,7 @@ namespace Langulus::Annies
    ///   @attention the list can be empty, if trait was provided with no      
    ///              contents                                                  
    LANGULUS(INLINED)
-   auto Neat::GetTraits(TMeta t) -> TraitList* {
+   auto Neat::GetTraits(TMeta t) -> TagList* {
       LglsAssumeUser(t, "Can't get invalid trait");
       auto found = mTraits.Find(t);
       return found ? &mTraits.GetValue(found) : nullptr;
@@ -201,7 +201,7 @@ namespace Langulus::Annies
    ///   @attention the list can be empty, if trait was provided with no      
    ///              contents                                                  
    LANGULUS(INLINED)
-   auto Neat::GetTraits(TMeta t) const -> const TraitList* {
+   auto Neat::GetTraits(TMeta t) const -> const TagList* {
       return const_cast<Neat*>(this)->GetTraits(t);
    }
    
@@ -320,7 +320,7 @@ namespace Langulus::Annies
    //TODO isn't this like simply merge?? also make merge test only by trait id when merging traits!
    ///   @tparam T - trait to set                                             
    ///   @param value - the value to assign                                   
-   template<CT::Trait T> LANGULUS(INLINED)
+   template<CT::Tag T> LANGULUS(INLINED)
    void Neat::SetDefaultTrait(CT::NotVoid auto&& value) {
       auto found = GetTraits<T>();
       if (found and *found)
@@ -333,7 +333,7 @@ namespace Langulus::Annies
    ///   @tparam T... - trait(s) we're searching for                          
    ///   @param values - [out] where to save the value, if found              
    ///   @return true if value changed                                        
-   template<CT::Trait...T> LANGULUS(INLINED)
+   template<CT::Tag...T> LANGULUS(INLINED)
    bool Neat::ExtractTrait(CT::NotVoid auto&...values) const {
       return (ExtractTraitInner<T>(values...) or ...);
    }
@@ -342,7 +342,7 @@ namespace Langulus::Annies
    ///   @tparam T - trait we're searching for                                
    ///   @param values - [out] where to save the value, if found              
    ///   @return true if value changed                                        
-   template<CT::Trait T> LANGULUS(INLINED)
+   template<CT::Tag T> LANGULUS(INLINED)
    bool Neat::ExtractTraitInner(CT::NotVoid auto&...values) const {
       auto found = GetTraits<T>();
       if (found) {
@@ -356,14 +356,14 @@ namespace Langulus::Annies
    ///                                                                        
    template<size_t...IDX>
    bool Neat::ExtractTraitInner(
-      const TraitList& found, ExpandedSequence<IDX...>, CT::NotVoid auto&...values
+      const TagList& found, ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
       return (ExtractTraitInnerInner<IDX>(found, values) or ...);
    }
    
    ///                                                                        
    template<size_t IDX>
-   bool Neat::ExtractTraitInnerInner(const TraitList& found, CT::NotVoid auto& value) const {
+   bool Neat::ExtractTraitInnerInner(const TagList& found, CT::NotVoid auto& value) const {
       if (IDX >= found.GetCount())
          return false;
 
@@ -548,7 +548,7 @@ namespace Langulus::Annies
          // Insert Neat, by inserting each element from it              
          size_t inserted = 0;
 
-         DeintCast(item).ForEach([&](const Many& subitem) {
+         DeintCast(item).ForEach([&](Many const& subitem) {
             inserted += UnfoldInsert(
                S::Nest(const_cast<Many&>(subitem)));
          });
@@ -564,7 +564,7 @@ namespace Langulus::Annies
          else if (DeintCast(item).IsDeep()) {
             // Item is deep, flatten it                                 
             size_t inserted = 0;
-            DeintCast(item).ForEach([&](const Many& subitem) {
+            DeintCast(item).ForEach([&](Many const& subitem) {
                inserted += UnfoldInsert(
                   S::Nest(const_cast<Many&>(subitem)));
             });
@@ -579,8 +579,8 @@ namespace Langulus::Annies
                [&](const Neat& neat) {
                   UnfoldInsert(S::Nest(const_cast<Neat&>(neat)));
                },
-               [&](const Trait& trait) {
-                  InsertInner(S::Nest(const_cast<Trait&>(trait)));
+               [&](const Tag& trait) {
+                  InsertInner(S::Nest(const_cast<Tag&>(trait)));
                },
                [&](const A::Verb& verb) {
                   InsertInner(S::Nest(const_cast<A::Verb&>(verb)));
@@ -662,7 +662,7 @@ namespace Langulus::Annies
          if (rhsd.GetUnsconstrainedState())
             return operator << (S::Nest(rhs));
 
-         rhsd.ForEach([&](const Many& group) {
+         rhsd.ForEach([&](Many const& group) {
             if (not GetData(group.GetType()))
                operator << (S::Nest(const_cast<Many&>(group)));
          });
@@ -689,13 +689,13 @@ namespace Langulus::Annies
          // A group of similar traits was found                         
          auto& group = found->mValue;
          if (group.GetCount() > index)
-            group[index] = Forward<Trait>(trait);
+            group[index] = Forward<Tag>(trait);
          else
-            group << Forward<Trait>(trait);
+            group << Forward<Tag>(trait);
       }
       else {
          // If reached, a new trait group to be inserted                
-         mTraits.Insert(meta, Forward<Trait>(trait));
+         mTraits.Insert(meta, Forward<Tag>(trait));
       }
 
       mHash = {};
@@ -724,9 +724,9 @@ namespace Langulus::Annies
          const auto trait = *messy;
          auto found = mTraits.BranchOut().FindIt(trait);
          if (found)
-            found.GetValue() << Trait::FromMeta(trait);
+            found.GetValue() << Tag::FromMeta(trait);
          else
-            mTraits.Insert(trait, Trait::FromMeta(trait));
+            mTraits.Insert(trait, Tag::FromMeta(trait));
       }
       else static_assert(false, "Can't insert trait");
    }
@@ -780,7 +780,7 @@ namespace Langulus::Annies
    ///   @param index - the index we're interested in, if repeated            
    ///   @return selected data or nullptr if none was found                   
    ///   @attention if not nullptr, returned Many might contain a Neat        
-   inline auto Neat::GetTrait(TMeta meta, size_t index) const -> const Trait* {
+   inline auto Neat::GetTrait(TMeta meta, size_t index) const -> const Tag* {
       const auto found = mTraits.FindIt(meta);
       if (found and found.GetValue().GetCount() > index)
          return &(found.GetValue()[index]);
@@ -791,8 +791,8 @@ namespace Langulus::Annies
    ///   @tparam T - the type of trait to search for                          
    ///   @return selected data or nullptr if none was found                   
    ///   @attention if not nullptr, returned Many might contain a Neat        
-   template<CT::Trait T> LANGULUS(INLINED)
-   auto Neat::GetTrait(size_t index) const -> const Trait* {
+   template<CT::Tag T> LANGULUS(INLINED)
+   auto Neat::GetTrait(size_t index) const -> const Tag* {
       return Get(MetaTraitOf<T>(), index);
    }
 
@@ -887,7 +887,7 @@ namespace Langulus::Annies
    }
 
    /// Iterate all traits                                                     
-   /// You can provide a static Trait iterator, to filter based on trait type 
+   /// You can provide a static Tag iterator, to filter based on trait type 
    ///   @attention if F's argument is a generic Block/Many type, the trait   
    ///      will be wrapped in it                                             
    ///   @tparam MUTABLE - whether changes inside container are allowed       
@@ -906,7 +906,7 @@ namespace Langulus::Annies
          "Non constant iterator for constant Neat block");
 
       size_t index = 0;
-      if constexpr (CT::Trait<A>) {
+      if constexpr (CT::Tag<A>) {
          // Static trait provided, extract filter                       
          using TraitType = Decay<A>;
          const auto filter = MetaTraitOf<TraitType>();
@@ -1170,7 +1170,7 @@ namespace Langulus::Annies
    ///   @tparam EMPTY_TOO - use true, to remove all empty trait entries,     
    ///      that are usually made by pushing a TMeta (disabled by default)    
    ///   @return the number of removed trait entries                          
-   template<CT::Trait T, bool EMPTY_TOO>
+   template<CT::Tag T, bool EMPTY_TOO>
    size_t Neat::RemoveTrait() {
       const auto filter = MetaTraitOf<T>();
       const auto found = mTraits.FindIt(filter);

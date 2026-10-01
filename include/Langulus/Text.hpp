@@ -375,7 +375,7 @@ namespace Langulus::Annies
       }
 
       /// Generate hexadecimal string from a given value                      
-      ///   @param from - the argument                                        
+      ///   @param from the argument                                          
       ///   @return the resulting text                                        
       template<bool REVERSE = false, class T> requires CT::NoIntent<T>
       static Text Hex(T const& from) {
@@ -391,6 +391,30 @@ namespace Langulus::Annies
          }
          result.SetCountInner(sizeof(T) * 2);
          return result;
+      }
+
+      /// Get a string representing an instance in memory.                    
+      /// Used all across framework to stringify short instance IDs.          
+      ///   @param token custom token to wrap pointer in                      
+      ///   @param instance the instance to stringify                         
+      ///   @return text containing the generated name                        
+      template<class T>
+      static Text Mention(Token const& token, T const& instance) {
+         Text result = token;
+         result += token;
+         result += '(';
+         //TODO pack the pointer before hexing it - it will result in much more compact and 
+         //TODO safer representation
+         result += Hex(&DenseCast(instance));
+         result += ')';
+         return result;
+      }
+      
+      /// Same as above, but generates token from reflected T                 
+      template<class T>
+      static Text Mention(T const& instance) {
+         auto token = MetaOf<Decay<T>>().GetShortestUnambiguousToken();
+         return Mention(token, instance);
       }
 
       /// Interpret text container as a std::string_view                      

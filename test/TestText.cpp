@@ -7,7 +7,7 @@
 ///                                                                           
 #include <Langulus/Annies/Text.hpp>
 #include <Langulus/Annies/Path.hpp>
-#include <Langulus/Annies/Trait.hpp>
+#include <Langulus/Annies/Tag.hpp>
 #include "Common.hpp"
 
 
@@ -555,7 +555,7 @@ TEMPLATE_TEST_CASE("Text container conversion at runtime", "[text]",
 }
 
 TEMPLATE_TEST_CASE("Containing literals", "[text]",
-   Many, Trait
+   Many, Tag
 ) {
    static Allocator::State memoryState;
 

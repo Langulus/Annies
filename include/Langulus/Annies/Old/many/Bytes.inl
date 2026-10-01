@@ -346,7 +346,7 @@ namespace Langulus::Annies
    Bytes::operator Many& () const noexcept {
       // Just make sure that type member has been populated             
       (void) Base::GetType();
-      return const_cast<Many&>(reinterpret_cast<const Many&>(*this));
+      return const_cast<Many&>(reinterpret_cast<Many const&>(*this));
    }
 
 } // namespace Langulus::Annies

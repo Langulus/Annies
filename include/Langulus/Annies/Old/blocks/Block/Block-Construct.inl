@@ -416,7 +416,7 @@ namespace Langulus::Annies
          if (mType->mCopyConstructor) {
             const auto backup = *this;
             const_cast<Allocation*>(mEntry)->Free();
-            new (this) Many {Copy(reinterpret_cast<const Many&>(backup))};
+            new (this) Many {Copy(reinterpret_cast<Many const&>(backup))};
          }
          else LANGULUS_THROW(Construct,
             "Block needs to branch out, but type doesn't support Intent::Copy"

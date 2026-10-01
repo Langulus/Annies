@@ -9,7 +9,7 @@
 /// INTENTIONALLY NOT GUARDED                                                 
 /// Include this file once in each cpp file, after all other headers          
 #include <Langulus/Annies/Text.hpp>
-#include <Langulus/Annies/Trait.hpp>
+#include <Langulus/Annies/Tag.hpp>
 #include <Langulus/Annies/TMap.hpp>
 #include <Langulus/Annies/Map.hpp>
 #include <unordered_map>

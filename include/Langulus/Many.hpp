@@ -81,7 +81,7 @@ namespace Langulus::Annies
       using CTTI_Deep      = Yup;
       using Base           = Inner::ManyBase;
       using DeepType       = Many;
-
+      
       constexpr Many() noexcept {
          this->ConstructDefault();
       }
@@ -180,7 +180,11 @@ namespace Langulus::Annies
             this->Insert(LglsFwd(a1), LglsFwd(an)...);
          }
       }
-      
+
+      /// Construction that manually initializes the container                
+      constexpr Many(Inner::Stackwise, auto&&...arguments)
+         : Base {Stackwise, LglsFwd(arguments)...} {}
+
       /// Assignment                                                          
       constexpr Many& operator = (Many const& other) {
          return this->AssignAbsorb(Refer(other));

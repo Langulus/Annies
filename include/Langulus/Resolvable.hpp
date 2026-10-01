@@ -13,12 +13,18 @@
 namespace Langulus
 {
    ///                                                                        
-   ///   An abstract instance that is capable of converting to its most       
-   /// concrete type using RTTI.                                              
+   /// Gives derived types the ability to be resolved to their derived type   
+   /// at runtime through RTTI.                                               
    ///                                                                        
    struct Resolvable {
-      using CTTI_Abstract   = Yup;
       using CTTI_Resolvable = Yup;
+
+      template<class T> requires (not ::std::is_same_v<T, Resolvable>)
+      auto GetResolved(this T&& self) noexcept -> Annies::HandleDisowned {
+         return {Annies::Stackwise, MetaDataOf<T>(), &self};
+      }
+
+      /*using CTTI_Abstract   = Yup;
 
    private:
       // Concrete type of the resolvable                                
@@ -40,7 +46,7 @@ namespace Langulus
 
       auto GetResolved() const noexcept -> Annies::HandleDisowned {
          return {Annies::Stackwise, mClassType, mClassPointer};
-      }
+      }*/
 
       //virtual ~Resolvable() = default;
 
@@ -61,7 +67,7 @@ namespace Langulus
       auto& Run(CT::VerbBased auto&&);
 
       Many Run(const Code&);
-      Many Run(const Many&);
+      Many Run(Many const&);
       Many Run(const Temporal&);
 
       Block<> GetMember(TMeta) noexcept;
@@ -71,18 +77,18 @@ namespace Langulus
       Block<> GetMember(TMeta, CT::Index auto) const noexcept;
 
       #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         Block<> GetMember(const Token&) noexcept;
-         Block<> GetMember(const Token&) const noexcept;
+         Block<> GetMember(Token const&) noexcept;
+         Block<> GetMember(Token const&) const noexcept;
 
-         Block<> GetMember(const Token&, CT::Index auto) noexcept;
-         Block<> GetMember(const Token&, CT::Index auto) const noexcept;
+         Block<> GetMember(Token const&, CT::Index auto) noexcept;
+         Block<> GetMember(Token const&, CT::Index auto) const noexcept;
       #endif
 
-      template<CT::Trait>
+      template<CT::Tag>
       bool GetTrait(CT::NotVoid auto&) const;
       bool GetValue(CT::NotVoid auto&) const;
 
-      template<CT::Trait, bool DIRECT = false>
+      template<CT::Tag, bool DIRECT = false>
       bool SetTrait(CT::NotVoid auto&&);
       template<bool DIRECT = false>
       bool SetValue(CT::NotVoid auto&&);
@@ -99,6 +105,6 @@ namespace Langulus
 /*namespace Langulus
 {
    Annies::Text IdentityOf(const auto&);
-   Annies::Text IdentityOf(const Token&, const auto&);
+   Annies::Text IdentityOf(Token const&, const auto&);
 }
 */

@@ -50,8 +50,8 @@ namespace Langulus::Annies
       Construct(DMeta, auto&&, const Charge& = {});
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-         Construct(const Token&);
-         Construct(const Token&, auto&&, const Charge& = {});
+         Construct(Token const&);
+         Construct(Token const&, auto&&, const Charge& = {});
       #endif
 
       Construct& operator = (const Construct&) noexcept;
@@ -69,8 +69,8 @@ namespace Langulus::Annies
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          template<CT::NotVoid T1, CT::NotVoid...TN>
-         static Construct FromToken(const Token&, T1&&, TN&&...);
-         static Construct FromToken(const Token&);
+         static Construct FromToken(Token const&, T1&&, TN&&...);
+         static Construct FromToken(Token const&);
       #endif
 
       // Intentionally undefined, because it requires Langulus::Flow    
@@ -108,7 +108,7 @@ namespace Langulus::Annies
       void Reset();
       void ResetCharge() noexcept;
 
-      auto operator -> () const -> const Many*;
+      auto operator -> () const -> Many const*;
       auto operator -> ()       ->       Many*;
 
       Construct& operator <<  (auto&&);
