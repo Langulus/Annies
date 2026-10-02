@@ -282,10 +282,15 @@ namespace Langulus::Annies
 
    template<class...T>
    concept Disambiguate = ((not requires { typename Decay<T>::CTTI_Disambiguator; }) and ...);
+}
 
-   
-   namespace Component
-   {
+namespace Langulus::Annies::Component
+{
+   template<class L>
+   using MakeCompactTuple = typename decltype(Expand(L{}, []<class...T> {
+      return ::std::type_identity<CompactTuple<T...>>{};
+   }))::type;
+
    /// MARK: Container                                                        
    ///                                                                        
    /// A container definition using composition                               
@@ -322,8 +327,9 @@ namespace Langulus::Annies
 
       // Here lies the stack. It is an optimized tuple that is filled   
       // with StackRequest(s) from components.                          
-      // Needs to be public, so that containers can be used in unions!  
-      compact_tuple_from_typelist<decltype(Inner::DefineStack(ComponentList{}))> mStack;
+      /// @attention needs to be public, so that containers can be used 
+      /// in unions!                                                    
+      MakeCompactTuple<decltype(Inner::DefineStack(ComponentList{}))> mStack;
 
    protected:
       LglsComIterationOperators(friend);
@@ -370,7 +376,8 @@ namespace Langulus::Annies
       /// A tag-dispatch constructor that forwards arguments to mStack.       
       /// Used in some niche container cases, like TOwn.                      
       /*explicit*/ constexpr Container(Inner::Stackwise, auto&&...arguments)
-         : mStack({LglsFwd(arguments)}...) {}
+         : mStack {LglsFwd(arguments)...} {}
+      //   : mStack({LglsFwd(arguments)}...) {}
 
       /// Default destructor does nothing. Each container has to implement    
       /// it, most likely by calling this->Destroy(). This is needed, because 
@@ -773,7 +780,8 @@ namespace Langulus::Annies
       template<class PICK, class SELF>
       constexpr auto& AccessStack(this SELF&& self) noexcept {
          constexpr size_t IDX = GetStackOffset<PICK>();
-         auto& result = ::Langulus::get<IDX>(self.mStack).value;
+         //auto& result = ::Langulus::get<IDX>(self.mStack).value;
+         auto& result = TupleGet<IDX>(self.mStack);
          using RC = LglsMutIf(SELF, decltype(result));
          return const_cast<RC>(result);
       }
@@ -1131,7 +1139,6 @@ namespace Langulus::Annies
          return self;
       }
    };
-   }
 }
 
 namespace Langulus

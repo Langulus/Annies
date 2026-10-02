@@ -792,7 +792,8 @@ namespace Langulus::Annies
 
       /// std::tuple default-initializes variables to zero, so I use this     
       /// wrapper to get back to the biblically accurate behavior             
-      template<class T>
+      //TODO no longer required with the custom tuple implementation :) delete this after tests pass
+      /*template<class T>
       struct StackVariable {
          T value;
 
@@ -814,7 +815,7 @@ namespace Langulus::Annies
          constexpr StackVariable(auto&& v) noexcept
          requires (not requires { T{LglsFwd(v)}; } and CT::NotReference<T>)
             : value {LglsFwd(DeintCast(v))} {}
-      };
+      };*/
       
       /// Go through all components and accumulate their stack requests into  
       /// a type list                                                         
@@ -828,7 +829,8 @@ namespace Langulus::Annies
                static_assert(not Com::IsRequestModifier<R>,
                   "Stack requests can't have modifiers");
 
-               Types<StackVariable<R>> first;
+               //Types<StackVariable<R>> first;
+               Types<R> first;
                if constexpr (sizeof...(CN))
                   return first + DefineStack(Types<CN...>{});
                else
