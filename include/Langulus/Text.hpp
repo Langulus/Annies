@@ -13,7 +13,6 @@
 #include <Langulus/Utils/Byte.hpp>
 
 #include "Handle.hpp"
-//#include "Langulus/Typenav.hpp"
 #include "Annies/Components/Heap-Movable.hpp"
 #include "Annies/Components/Ownership-Stack.hpp"
 #include "Annies/Components/IndexedLinear.hpp"
@@ -35,9 +34,6 @@
 #include "Annies/States/Disowned.hpp"
 #include "Annies/States/Compressed.hpp"
 #include "Annies/States/Encrypted.hpp"
-//#include <type_traits>
-//#include <string_view>
-//#include <type_traits>
 
 
 namespace Langulus::Annies
