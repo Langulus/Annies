@@ -8,6 +8,7 @@
 #pragma once
 #include "Text.hpp"
 #include <Langulus/CT/Serializer.hpp>
+#include <Langulus/CT/Derived.hpp>
 //#include <Langulus/HashOf.hpp>
 
 /*#include "Text.hpp"
@@ -299,8 +300,7 @@ namespace Langulus::CTTI
 namespace fmt
 {
    /// MARK: {fmt}                                                            
-   /// Extend FMT to be capable of logging any Annies container that is       
-   /// serializable to Annies::Text.                                          
+   /// Extend FMT to be capable of logging any Annies container.              
    template<::Langulus::CT::Container T>
    struct formatter<T> {
       template<class CONTEXT>
@@ -320,7 +320,6 @@ namespace fmt
       }
    };
 
-   /// MARK: {fmt}                                                            
    /// Extend FMT to be capable of logging anything with Text operator        
    template<class T> requires requires (T const& cast) { cast.operator ::Langulus::Annies::Text(); }
    struct formatter<T> {
@@ -331,6 +330,25 @@ namespace fmt
       auto format(T const& e, CONTEXT& ctx) const {
          try {
             auto result = e.operator ::Langulus::Annies::Text();
+            return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(result));
+         }
+         catch(...) {
+            // Don't allow any exceptions to leak out of here           
+            return format_to(ctx.out(), "<error while serializing to text>");
+         }
+      }
+   };
+
+   /// Extend FMT to be capable of logging anything based on Text             
+   template<class T> requires ::Langulus::CT::DerivedFrom<T, ::Langulus::Annies::Text>
+   struct formatter<T> {
+      template<class CONTEXT>
+      constexpr auto parse(CONTEXT& ctx) { return ctx.begin(); }
+
+      template<class CONTEXT>
+      auto format(T const& e, CONTEXT& ctx) const {
+         auto& result = static_cast<::Langulus::Annies::Text const&>(e);
+         try {
             return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(result));
          }
          catch(...) {

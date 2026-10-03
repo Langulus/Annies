@@ -59,7 +59,8 @@ namespace Langulus::Annies
    using Verb = TVerb<void>;
 
    template<CT::NotVoid, class...> struct TOwn;
-   template<class>       struct TRef;
+   template<class, class...>       struct TRef;
+   template<CT::NotVoid, class...> struct TPin;
    template<CT::NotVoid> struct TAny;
    template<CT::NotVoid> struct THive;
    template<CT::NotVoid> struct TMany;

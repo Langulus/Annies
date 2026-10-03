@@ -119,7 +119,7 @@ namespace Langulus::Annies
       ///   @attention this is a non-owning constructor, often used as a      
       ///      temporary                                                      
       explicit constexpr Text(Serial::Operator const& o)
-         : Text {o.mToken} {}
+         : Text {o.token} {}
 
       /// Construction from any kind of text that is an Annies container     
       template<CT::Text T> requires CT::Container<T>

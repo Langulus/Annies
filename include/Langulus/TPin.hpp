@@ -38,10 +38,12 @@ namespace Langulus::Annies
    /// Allows for pinning, which disables overwrite on assignment.            
    /// Especially useful for members that are part of a hierarchy and can     
    /// be overridden by things from upper in the hierarchy.                   
-   template<CT::NotVoid T>
+   /// You can optionally add tags to it.                                     
+   template<CT::NotVoid T, class...TAGS>
    struct TPin : Inner::TPinBase<T> {
-      using CTTI_Deep      = Yup;
-      using Base           = Inner::TPinBase<T>;
+      using CTTI_Deep   = Yup;
+      using Base        = Inner::TPinBase<T>;
+      using CTTI_Tagged = Types<TAGS...>;
 
       constexpr  TPin() noexcept {
          this->ConstructDefault();

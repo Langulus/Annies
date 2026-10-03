@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -42,12 +42,14 @@ namespace Langulus::Annies
    /// Works fine with packed pointers as well. Has deep ownership, but no    
    /// states are applied. You can use TAny instead if you want states.       
    /// This container is similar in functionality to ::std::shared_ptr.       
-   template<class T>
+   /// You can optionally add tags to it.                                     
+   template<class T, class...TAGS>
    struct TRef : Inner::TRefBase<T> {
-      using CTTI_Deep     = Yup;
-      using Base          = Inner::TRefBase<T>;
-      using Pick          = ConstAll<T>;
-      using PickMut       = T;
+      using CTTI_Deep   = Yup;
+      using CTTI_Tagged = Types<TAGS...>;
+      using Base        = Inner::TRefBase<T>;
+      using Pick        = ConstAll<T>;
+      using PickMut     = T;
       
       #if not LANGULUS(FORCE_TYPE_ERASURE)
          using HandleType    = THandle<ConstAll<T> const&>;
