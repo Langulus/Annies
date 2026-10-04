@@ -28,15 +28,15 @@ namespace Langulus::Annies
       using Text::operator +=;
       using Text::operator ==;
 
-      Path(const Text&);
+      Path(Text const&);
       Path(Text&&);
 
       auto GetExtension() const -> Text;
       auto GetDirectory() const -> Path;
       auto GetFilename()  const -> Path;
 
-      auto operator /  (const Text&) const -> Path;
-      auto operator /= (const Text&) -> Path&;
+      auto operator /  (Text const&) const -> Path;
+      auto operator /= (Text const&) -> Path&;
 
    private:
       using Text::SerializationRules;

@@ -47,7 +47,7 @@ namespace Langulus::Annies
    class THive : public A::Hive {
    public:
       LANGULUS(TYPED) T;
-      LANGULUS(ABSTRACT) false;
+      using CTTI_Abstract = No;
 
       static constexpr size_t DefaultFrameSize = 8;
       static constexpr bool Ownership = true;
@@ -178,7 +178,7 @@ namespace Langulus::Annies
    struct THive<T>::Iterator {
       static constexpr bool Mutable = MUTABLE;
 
-      LANGULUS(ABSTRACT) false;
+      using CTTI_Abstract = No;
       LANGULUS(TYPED) T;
 
    protected:

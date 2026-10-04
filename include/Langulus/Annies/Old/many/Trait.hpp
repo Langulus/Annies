@@ -108,7 +108,7 @@ namespace Langulus::Annies
       bool IsTrait(TMeta, TN...) const;
 
       template<CT::TraitBased = Tag>
-      TMeta GetTrait() const noexcept;
+      TMeta GetTag() const noexcept;
 
       template<CT::TraitBased = Tag>
       bool IsTraitValid() const noexcept;

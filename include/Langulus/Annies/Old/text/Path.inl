@@ -16,7 +16,7 @@ namespace Langulus::Annies
    /// Construct by copying a text container                                  
    ///   @param other - the container to copy                                 
    LANGULUS(INLINED)
-   Path::Path(const Text& other)
+   Path::Path(Text const& other)
       : Text {other} {}
 
    /// Construct by moving a text container                                   
@@ -52,7 +52,7 @@ namespace Langulus::Annies
    /// Append a subdirectory or filename                                      
    ///   @param rhs - the text to append                                      
    ///   @return the combined directory name                                  
-   inline auto Path::operator / (const Text& rhs) const -> Path {
+   inline auto Path::operator / (Text const& rhs) const -> Path {
       if (IsEmpty())
          return rhs;
 
@@ -76,7 +76,7 @@ namespace Langulus::Annies
    /// Append a subdirectory or filename                                      
    ///   @param rhs - the text to append                                      
    ///   @return the combined directory name                                  
-   inline auto Path::operator /= (const Text& rhs) -> Path& {
+   inline auto Path::operator /= (Text const& rhs) -> Path& {
       if (IsEmpty())
          return operator = (rhs);
 

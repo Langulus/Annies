@@ -137,8 +137,8 @@ namespace Langulus::Annies
       auto ExtractDataAs(CT::NotVoid auto&) const -> size_t;
 
       template<CT::Tag>
-      auto GetTrait(size_t = 0)        const -> const Tag*;
-      auto GetTrait(TMeta, size_t = 0) const -> const Tag*;
+      auto GetTag(size_t = 0)        const -> const Tag*;
+      auto GetTag(TMeta, size_t = 0) const -> const Tag*;
 
    protected:
       template<CT::Tag>

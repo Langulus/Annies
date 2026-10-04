@@ -101,7 +101,7 @@ namespace Langulus::Annies::Component
       template<CT::DefineVerb T, Cid SID = ID>
       constexpr bool IsVerb(this auto const& self) noexcept {
          if constexpr (VerbErased)
-            return ThisCom::GetVerbInner().Is(MetaVerbOf<T>());
+            return ThisCom::GetVerbInner().IsExact(MetaVerbOf<T>());
          else
             return Exact<TYPE, T>;
       }

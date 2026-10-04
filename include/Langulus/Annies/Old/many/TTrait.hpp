@@ -46,7 +46,7 @@ namespace Langulus::Annies
       constexpr bool IsTrait() const;
       constexpr bool IsTrait(TMeta, auto...) const;
 
-      TMeta GetTrait() const noexcept;
+      TMeta GetTag() const noexcept;
 
       constexpr bool IsTraitValid() const noexcept;
       constexpr bool IsTraitSimilar(const CT::TraitBased auto&) const noexcept;

@@ -89,8 +89,8 @@ namespace Langulus::Annies
    /// Get the trait type                                                     
    ///   @return the trait type                                               
    TEMPLATE() LANGULUS(INLINED)
-   TMeta TME()::GetTrait() const noexcept {
-      return Tag::GetTrait<TRAIT>();
+   TMeta TME()::GetTag() const noexcept {
+      return Tag::GetTag<TRAIT>();
    }
 
    /// Check if trait is valid, that is, it's typed and has contents          

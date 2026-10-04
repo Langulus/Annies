@@ -83,7 +83,7 @@ namespace Langulus::Annies
    /// lightweight intermediate structure for iteration, etc.                 
    ///                                                                        
    struct BlockSet : A::BlockSet {
-      LANGULUS(ABSTRACT) false;
+      using CTTI_Abstract = No;
       LANGULUS(TYPED) void;
 
       static constexpr bool Ownership = false;
@@ -400,7 +400,7 @@ namespace Langulus::Annies
       using T = Conditional<TypeErased, void,
          Conditional<Mutable, TypeOf<SET>, const TypeOf<SET>>>;
 
-      LANGULUS(ABSTRACT) false;
+      using CTTI_Abstract = No;
       LANGULUS(TYPED)    T;
 
    protected:

@@ -38,7 +38,7 @@ namespace Langulus::Annies
 
          if constexpr (CT::TraitBased<T>) {
             Base::BlockTransfer(S::Nest(t1).template Forward<Base>());
-            mTraitType = DeintCast(t1).GetTrait();
+            mTraitType = DeintCast(t1).GetTag();
          }
          else if constexpr (CT::Deep<T>)
             Base::BlockTransfer(S::Nest(t1));
@@ -108,7 +108,7 @@ namespace Langulus::Annies
    /// Get the trait type                                                     
    ///   @return the trait type                                               
    template<CT::TraitBased THIS> LANGULUS(INLINED)
-   TMeta Tag::GetTrait() const noexcept {
+   TMeta Tag::GetTag() const noexcept {
       if constexpr (CT::Tag<THIS>)
          return (mTraitType = MetaTraitOf<THIS>());
       else
@@ -136,7 +136,7 @@ namespace Langulus::Annies
             and other.CastsToMeta(GetType());
       }
       else {
-         return GetTrait<THIS>() == other.GetTrait()
+         return GetTag<THIS>() == other.GetTag()
             and other.CastsToMeta(GetType());
       }
    }
@@ -160,7 +160,7 @@ namespace Langulus::Annies
    requires Exact<TMeta, TMeta, TN...> LANGULUS(INLINED)
    bool Tag::IsTrait(TMeta t1, TN...tN) const {
       if constexpr (CT::Tag<THIS>)
-         (void) GetTrait<THIS>();
+         (void) GetTag<THIS>();
 
       return mTraitType == t1 or ((mTraitType == tN) or ...);
    }
@@ -170,7 +170,7 @@ namespace Langulus::Annies
    template<CT::TraitBased THIS> LANGULUS(INLINED)
    bool Tag::HasCorrectData() const {
       //if constexpr (CT::Tag<THIS>)
-      //   (void) GetTrait<THIS>();
+      //   (void) GetTag<THIS>();
 
       //if (not mTraitType)
       return true;
@@ -203,7 +203,7 @@ namespace Langulus::Annies
             and Many::operator == (static_cast<Many const&>(rhs));
       }
       else if constexpr (CT::TraitBased<T>) {
-         return IsTrait<THIS>(rhs.GetTrait())
+         return IsTrait<THIS>(rhs.GetTag())
             and Many::operator == (static_cast<Many const&>(rhs));
       }
       else return Many::operator == (rhs);
@@ -236,7 +236,7 @@ namespace Langulus::Annies
 
       if constexpr (CT::TraitBased<T>) {
          Base::operator = (S::Nest(rhs).template Forward<Base>());
-         mTraitType = DeintCast(rhs).GetTrait();
+         mTraitType = DeintCast(rhs).GetTag();
       }
       else if constexpr (CT::Deep<T>)
          Base::operator = (S::Nest(rhs).template Forward<Base>());
@@ -261,7 +261,7 @@ namespace Langulus::Annies
             return THIS {Abandon(result)};
          else {
             return Tag::From(
-               GetTrait<THIS>() ? mTraitType : DeintCast(rhs).GetTrait(),
+               GetTag<THIS>() ? mTraitType : DeintCast(rhs).GetTag(),
                Abandon(result)
             );
          }
@@ -272,7 +272,7 @@ namespace Langulus::Annies
          if constexpr (CT::Tag<THIS>)
             return THIS {Abandon(result)};
          else
-            return Tag::From(GetTrait<THIS>(), Abandon(result));
+            return Tag::From(GetTag<THIS>(), Abandon(result));
       }
    }
 
@@ -290,7 +290,7 @@ namespace Langulus::Annies
 
          if constexpr (not CT::Tag<THIS>) {
             if (not mTraitType)
-               mTraitType = DeintCast(rhs).GetTrait();
+               mTraitType = DeintCast(rhs).GetTag();
          }
       }
       else Many::operator += (S::Nest(rhs).Forward());
@@ -302,7 +302,7 @@ namespace Langulus::Annies
    size_t Tag::Serialize(CT::Serial auto& to) const {
       const auto initial = to.GetCount();
       using OUT = Deref<decltype(to)>;
-      to += GetTrait<THIS>();
+      to += GetTag<THIS>();
       to += OUT::Operator::OpenScope;
       Base::SerializeToText<void>(to);
       to += OUT::Operator::CloseScope;

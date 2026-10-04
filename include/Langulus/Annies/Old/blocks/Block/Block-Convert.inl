@@ -603,7 +603,7 @@ namespace Langulus::Annies
       and not  mType->mProducerRetriever) {
          // Serialize specialized containers here                       
          const auto satisfied = ForEach(
-            [&to](const Text& text) {
+            [&to](Text const& text) {
                to += Bytes {text.GetCount()};
                to += Bytes::From(Disown(text.mRaw), text.mCount);
             },
@@ -612,7 +612,7 @@ namespace Langulus::Annies
                to += bytes;
             },
             [&to](const Tag& trait) {
-               to += Bytes {trait.GetTrait()};
+               to += Bytes {trait.GetTag()};
                trait.SerializeToBinary<void>(to);
             }
          );

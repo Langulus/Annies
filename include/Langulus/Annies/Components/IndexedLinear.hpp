@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -9,11 +9,14 @@
 #include "Indexed-Common.hpp"
 #include <Langulus/CT/Signed.hpp>
 #include <Langulus/CT/Contiguous.hpp>
-#include <limits>
 
 
 namespace Langulus::Annies::Component
 {
+   /// Refers back to this particular component instance through the deduced  
+   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
+   #define ThisCom self.IndexedLinear<ID, SHARED...>
+
    ///                                                                        
    /// Provides random element access based on a linear index, that is        
    /// mapped directly onto contiguous memory.                                
@@ -28,15 +31,6 @@ namespace Langulus::Annies::Component
 
    protected:
       LglsComIndexedCommon(friend);
-
-      template<CT::Container C>
-      using Count = typename Deref<C>::CountType;
-
-      template<CT::Container C>
-      using PickRange = Tmut<C, typename Deref<C>::PickRangeMut, typename Deref<C>::PickRange>;
-
-      //template<CT::Container C>
-      //static constexpr auto CountMax = ::std::numeric_limits<Count<C>>::max();
       
       /// Convert an index to an offset.                                      
       /// Special indices will be contextualized.                             
@@ -44,7 +38,7 @@ namespace Langulus::Annies::Component
       ///   @param index the index to simplify                                
       ///   @return a simple element offset into contiguous memory            
       template<CT::Container C, CT::Index INDEX>
-      constexpr auto SimplifyIndex(this C const& self, INDEX index) -> Count<C> {
+      constexpr auto SimplifyIndex(this C const& self, INDEX index) -> size_t {
          //LglsAssumeDev(not self.IsEmpty(), "Container can't be empty");
          /*if (self.IsEmpty())
             return 0;*/
@@ -98,7 +92,7 @@ namespace Langulus::Annies::Component
             // Unsafe, works only on assumptions.                       
             // Using an integer index explicitly makes a statement,     
             // that you know what you're doing.                         
-            LglsAssert(static_cast<Count<C>>(index) <= self.GetCount(),
+            LglsAssert(static_cast<size_t>(index) <= self.GetCount(),
                "Integer index out of range");
 
             if constexpr (CT::Signed<INDEX>) {
@@ -119,8 +113,7 @@ namespace Langulus::Annies::Component
       ///   @param count number of sequential elements                        
       ///   @return the selected disowned contiguous range                    
       template<CT::Container C>
-      auto SelectInner(this C&& self, Count<C> start, Count<C> count)
-      assumptious -> Decay<C> {
+      auto SelectInner(this C&& self, size_t start, size_t count) assumptious -> Decay<C> {
          LglsAssumeDev(self.GetRaw(),  "Block is not allocated");
          LglsAssumeDev(self.IsTyped(), "Block is not typed");
          LglsAssumeDev(count,          "Invalid count");
@@ -138,18 +131,40 @@ namespace Langulus::Annies::Component
       ///   @param start starting element index (included)                    
       ///   @return the selected disowned contiguous range                    
       template<CT::Container C>
-      auto SelectInner(this C&& self, Count<C> start) assumptious -> Decay<C> {
-         return self.SelectInner(start, self.GetCount() - start);
+      auto SelectInner(this C&& self, size_t start) assumptious -> Decay<C> {
+         return ThisCom::SelectInner(start, self.GetCount() - start);
       }
 
    public:
       template<CT::Container C>
-      auto GetIndexMode(this C const&, Count<C>&) assumptious -> Count<C>;
+      auto GetFirstMostOccuring(this C const&, size_t&) assumptious -> size_t;
 
       template<CT::Container C>
-      auto Select(this C&&, CT::Index auto&&, Count<C>) assumptious -> PickRange<C>;
+      auto Select(this C&& self, CT::Index auto&& start, CT::Index auto&& count) assumptious -> Decay<C> {
+         const size_t begin = ThisCom::SimplifyIndex(LglsFwd(start));
+         const size_t size  = ThisCom::SimplifyIndex(LglsFwd(count));
+         return ThisCom::SelectInner(begin, size);
+      }
 
       template<CT::Container C>
-      void SwapContentsAt(this C&, CT::Index auto&&, CT::Index auto) assumptious;
+      void SwapContentsAt(this C&, CT::Index auto&&, CT::Index auto&&) assumptious;
+   
+      /// Remove elements from the left side of an offset                     
+      ///   @param offset the number of elements to discard from the front    
+      ///   @return the selected disowned contiguous range                    
+      template<CT::Container C>
+      auto RightOf(this C&& self, CT::Index auto&& offset) assumptious -> Decay<C> {
+         return ThisCom::Select(LglsFwd(offset));
+      }
+
+      /// Remove elements from the right side of an offset. Trim.             
+      ///   @param offset the number of elements to discard from the back     
+      ///   @return the selected disowned contiguous range                    
+      template<CT::Container C>
+      auto LeftOf(this C&& self, CT::Index auto&& offset) assumptious -> Decay<C> {
+         return ThisCom::Select(Index::Front, LglsFwd(offset));
+      }
    };
 }
+
+#undef ThisCom

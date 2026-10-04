@@ -559,10 +559,10 @@ SCENARIO("Test BlockCast", "[block]") {
    const Block<> fromc {};
 
    static_assert(CT::Exact<decltype(BlockCast<Text>(from)), Text&>);
-   static_assert(CT::Exact<decltype(BlockCast<Text>(fromc)), const Text&>);
+   static_assert(CT::Exact<decltype(BlockCast<Text>(fromc)), Text const&>);
    static_assert(CT::Exact<decltype(BlockCast<Text>(Block<> {})), Text&>);
 
    static_assert(CT::Exact<decltype(BlockCast<const Text>(from)), Text&>);
-   static_assert(CT::Exact<decltype(BlockCast<const Text>(fromc)), const Text&>);
+   static_assert(CT::Exact<decltype(BlockCast<const Text>(fromc)), Text const&>);
    static_assert(CT::Exact<decltype(BlockCast<const Text>(Block<> {})), Text&>);
 }

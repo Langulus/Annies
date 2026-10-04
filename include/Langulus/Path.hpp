@@ -21,15 +21,15 @@ namespace Langulus::Annies
 
       using Text::Text;
 
-      Path(const Text&);
+      Path(Text const&);
       Path(Text&&);
 
       auto GetExtension() const -> Text;
       auto GetDirectory() const -> Path;
       auto GetFilename()  const -> Path;
 
-      auto operator /  (const Text&) const -> Path;
-      auto operator /= (const Text&) -> Path&;
+      auto operator /  (Text const&) const -> Path;
+      auto operator /= (Text const&) -> Path&;
    };
 }
 

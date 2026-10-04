@@ -33,21 +33,21 @@ struct StringifiableConst {
 /// Possible states:                                                          
 ///   - uninitialized                                                         
 ///   - default                                                               
-void Text_CheckState_Default(const Text&);
+void Text_CheckState_Default(Text const&);
 ///   - invariant                                                             
-void Text_CheckState_Invariant(const Text&);
+void Text_CheckState_Invariant(Text const&);
 ///   - owned-full                                                            
-void Text_CheckState_OwnedFull(const Text&);
+void Text_CheckState_OwnedFull(Text const&);
 ///   - owned-full-const                                                      
-void Text_CheckState_OwnedFullConst(const Text&);
+void Text_CheckState_OwnedFullConst(Text const&);
 ///   - owned-empty                                                           
-void Text_CheckState_OwnedEmpty(const Text&);
+void Text_CheckState_OwnedEmpty(Text const&);
 ///   - disowned-full                                                         
-void Text_CheckState_DisownedFull(const Text&);
+void Text_CheckState_DisownedFull(Text const&);
 ///   - disowned-full-const                                                   
-void Text_CheckState_DisownedFullConst(const Text&);
+void Text_CheckState_DisownedFullConst(Text const&);
 ///   - abandoned                                                             
-void Text_CheckState_Abandoned(const Text&);
+void Text_CheckState_Abandoned(Text const&);
 
 ///                                                                           
 /// Possible actions for each state:                                          
@@ -610,7 +610,7 @@ TEMPLATE_TEST_CASE("Containing literals", "[text]",
    REQUIRE_FALSE(Allocator::CollectGarbage());
 }
 
-void Text_CheckState_Default(const Text& text) {
+void Text_CheckState_Default(Text const& text) {
    REQUIRE_FALSE(text.IsCompressed());
    REQUIRE_FALSE(text.IsConstant());
    REQUIRE_FALSE(text.IsDeep());
@@ -648,7 +648,7 @@ void Text_CheckState_Default(const Text& text) {
    REQUIRE_FALSE(text == "no match");
 }
 
-void Text_CheckState_OwnedEmpty(const Text& text) {
+void Text_CheckState_OwnedEmpty(Text const& text) {
    REQUIRE_FALSE(text.IsCompressed());
    REQUIRE_FALSE(text.IsConstant());
    REQUIRE_FALSE(text.IsDeep());
@@ -686,7 +686,7 @@ void Text_CheckState_OwnedEmpty(const Text& text) {
    REQUIRE_FALSE(text == "no match");
 }
 
-void Text_CheckState_OwnedFull(const Text& text) {
+void Text_CheckState_OwnedFull(Text const& text) {
    REQUIRE_FALSE(text.IsCompressed());
    REQUIRE_FALSE(text.IsConstant());
    REQUIRE_FALSE(text.IsDeep());
@@ -724,7 +724,7 @@ void Text_CheckState_OwnedFull(const Text& text) {
    REQUIRE_FALSE(text == "no match");
 }
 
-void Text_CheckState_DisownedFullConst(const Text& text) {
+void Text_CheckState_DisownedFullConst(Text const& text) {
    REQUIRE_FALSE(text.IsCompressed());
    REQUIRE      (text.IsConstant());
    REQUIRE_FALSE(text.IsDeep());

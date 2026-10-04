@@ -66,7 +66,7 @@ namespace Langulus
       template<bool DISPATCH = true, bool DEFAULT = true>
       auto& Run(CT::VerbBased auto&&);
 
-      Many Run(const Code&);
+      Many Run(Code const&);
       Many Run(Many const&);
       Many Run(const Temporal&);
 
@@ -85,7 +85,7 @@ namespace Langulus
       #endif
 
       template<CT::Tag>
-      bool GetTrait(CT::NotVoid auto&) const;
+      bool GetTag(CT::NotVoid auto&) const;
       bool GetValue(CT::NotVoid auto&) const;
 
       template<CT::Tag, bool DIRECT = false>

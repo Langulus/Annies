@@ -639,7 +639,7 @@ namespace Langulus::Annies
 
       if constexpr (CT::TraitBased<T>) {
          // Check if the trait already exists, before pushing it        
-         if (not GetTraits(rhsd.GetTrait()))
+         if (not GetTraits(rhsd.GetTag()))
             return operator << (S::Nest(rhs));
       }
       else if constexpr (CT::Same<T, TMeta>) {
@@ -682,7 +682,7 @@ namespace Langulus::Annies
    ///   @param index - the index we're interested with if repeated           
    ///   @return a reference to this construct for chaining                   
    Neat& Neat::SetTrait(CT::TraitBased auto&& trait, size_t index) {
-      const auto meta = trait.GetTrait();
+      const auto meta = trait.GetTag();
       auto found = mTraits.BranchOut().FindIt(meta);
 
       if (found) {
@@ -712,7 +712,7 @@ namespace Langulus::Annies
 
       if constexpr (CT::TraitBased<T>) {
          // Insert a trait with contents                                
-         const auto meta = messy->GetTrait();
+         const auto meta = messy->GetTag();
          auto found = mTraits.BranchOut().FindIt(meta);
          if (found)
             found.GetValue() << messy.Forward();
@@ -780,7 +780,7 @@ namespace Langulus::Annies
    ///   @param index - the index we're interested in, if repeated            
    ///   @return selected data or nullptr if none was found                   
    ///   @attention if not nullptr, returned Many might contain a Neat        
-   inline auto Neat::GetTrait(TMeta meta, size_t index) const -> const Tag* {
+   inline auto Neat::GetTag(TMeta meta, size_t index) const -> const Tag* {
       const auto found = mTraits.FindIt(meta);
       if (found and found.GetValue().GetCount() > index)
          return &(found.GetValue()[index]);
@@ -792,7 +792,7 @@ namespace Langulus::Annies
    ///   @return selected data or nullptr if none was found                   
    ///   @attention if not nullptr, returned Many might contain a Neat        
    template<CT::Tag T> LANGULUS(INLINED)
-   auto Neat::GetTrait(size_t index) const -> const Tag* {
+   auto Neat::GetTag(size_t index) const -> const Tag* {
       return Get(MetaTraitOf<T>(), index);
    }
 

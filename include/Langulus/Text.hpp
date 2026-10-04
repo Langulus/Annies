@@ -114,8 +114,8 @@ namespace Langulus::Annies
       /// Construction from Serial::Operator                                  
       ///   @attention this is a non-owning constructor, often used as a      
       ///      temporary                                                      
-      explicit constexpr Text(Serial::Operator const& o)
-         : Text {o.token} {}
+      /*explicit constexpr Text(Serial::Operator const& o)
+         : Text {o.token} {}*/
 
       /// Construction from any kind of text that is an Annies container     
       template<CT::Text T> requires CT::Container<T>
@@ -455,9 +455,72 @@ namespace Langulus::Annies
 
       template<Cid> void GetResolved()         = delete;
       template<Cid> void GetDense(size_t = -1) = delete;
-   };
 
-   //struct Code : Text {};
+      /// Check if text begins with a particular character sequence           
+      constexpr bool StartsWith(Token const& token) const noexcept {
+         return Matches(Text {token}) == token.size();
+      }
+
+      /// Replace every occurence of 'what' with the provided string          
+      ///   @param what characters/strings to search for                      
+      ///   @param with characters/strings to replace with                    
+      ///   @return a new container with the text replaced                    
+      template<class C>
+      C Replace(this C const& self, CT::Text auto const& what, CT::Text auto const& with) {
+         const Text pattern     {Disown(what)};
+         const Text replacement {Disown(with)};
+         if (self.IsEmpty() or pattern.IsEmpty())
+            return self;
+
+         Text result;
+         result.Reserve(self.GetCount()); // Not exact, but a good heuristic 
+
+         size_t copyStart = 0, copyEnd = 0;
+         for (size_t i = 0; i <= self.GetCount() - pattern.GetCount(); ++i) {
+            const auto matches = self.SelectInner(i, self.GetCount() - i).Matches(pattern);
+            if (matches == pattern.GetCount()) {
+               // Found a match, replace it                             
+               const auto copy = copyEnd - copyStart;
+               const auto newr = result.GetCount() + copy + replacement.GetCount();
+               if (result.GetReserved() < newr)
+                  result.Reserve(newr);
+
+               auto segment = result.GetRaw() + result.GetCount();
+               if (copy) {
+                  memcpy(
+                     segment,
+                     self.GetRaw() + copyStart,
+                     copy
+                  );
+                  segment += copy;
+               }
+
+               memcpy(
+                  segment,
+                  replacement.GetRaw(),
+                  replacement.GetCount()
+               );
+
+               result.GetCountInner() = newr;
+               copyStart = copyEnd = i + matches;
+               i += matches - 1;
+            }
+            else ++copyEnd;
+         }
+
+         // Account for any leftover                                    
+         const auto copy = copyEnd - copyStart;
+         if (copy) {
+            memcpy(
+               result.GetRaw() + result.GetCount(),
+               self.GetRaw() + copyStart,
+               copy
+            );
+            result.GetCountInner() += copy;
+         }
+         return result;
+      }
+   };
    
    inline Text operator ""_text(const char* token, size_t size) noexcept {
       return Text::FromText(token, size);
@@ -493,7 +556,7 @@ namespace Langulus::CT
 LANGULUS_MORPHISM(std::string_view, Langulus::Annies::Text);
 
 /// Convert Serial::Operator -> Text                                          
-LANGULUS_MORPHISM(Langulus::Serial::Operator, Langulus::Annies::Text);
+//LANGULUS_MORPHISM(Langulus::Serial::Operator, Langulus::Annies::Text);
 
 /// Convert bool -> Text                                                      
 LANGULUS_MORPHISM_CUSTOM(bool, { return from ? "yes" : "no"; }, 

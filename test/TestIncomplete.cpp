@@ -24,8 +24,8 @@ using UnitMap = TUnorderedMap<DMeta, TMany<Part*>>;
 using TraitMap = TUnorderedMap<TMeta, TMany<Tag>>;
 
 struct Thing final : Resolvable {
-   LANGULUS(ABSTRACT) false;
-   LANGULUS(PRODUCER) Thing;
+   using CTTI_Abstract = No;
+   using CTTI_Producer = Thing;
    LANGULUS_BASES(Resolvable);
 
    Thing();
