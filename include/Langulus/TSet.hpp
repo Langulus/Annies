@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -15,6 +15,9 @@ namespace Langulus::Annies::Inner
    requires (CT::NotHandle<T> and CT::NotReference<T>)
    using TSetBase = Com::Container<
       Com::State::Disowned<>,          // Allows disownment             
+      Com::State::Sorted<SORT>,        // Toggle ordered set            
+      Com::State::Compressed<>,        // Toggle compression            
+      Com::State::Encrypted<>,         // Toggle encryption             
       Com::TypedStack<DMeta, T>,       // Type-constrained              
       Com::HeapMovable<8, 2, HeapEntry<0, T*>>,
       Com::CountStack<>,               // Dynamically sized             
@@ -30,10 +33,7 @@ namespace Langulus::Annies::Inner
       Com::Conversion<>,               // Allows conversions            
       Com::Comparison<>,               // Allows comparisons            
       Com::IterationForEach<>,         // ForEach iteration             
-      Com::IterationRange<>,           // Ranged iteration              
-      Com::State::Sorted<SORT>,        // Toggle ordered set            
-      Com::State::Compressed<>,        // Toggle compression            
-      Com::State::Encrypted<>          // Toggle encryption             
+      Com::IterationRange<>            // Ranged iteration              
    >;
 }
 

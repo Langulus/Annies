@@ -17,6 +17,9 @@ namespace Langulus::Annies::Inner
    requires (/*CT::NotHandle<K, V> and*/ CT::NotReference<K, V>)
    using TMapBase = Com::Container<
       Com::State::Disowned<>,             // Allows disownment          
+      Com::State::Sorted<SORT>,           // Toggle ordered map         
+      Com::State::Compressed<>,           // Toggle compression         
+      Com::State::Encrypted<>,            // Toggle encryption          
       Com::Multitype<Com::TypedStack<DMeta, K, true, 0>,
                      Com::TypedStack<DMeta, V, true, 1>>,
       Com::HeapMovable<8, 2, HeapEntry<0, K*>, HeapEntry<1, V*>>,
@@ -32,10 +35,7 @@ namespace Langulus::Annies::Inner
       Com::Conversion<0, 1>,              // Allows conversions of K/V  
       Com::Comparison<false, true, 0, 1>, // Allows comparisons of K/V  
       Com::IterationForEach<0, 1>,        // ForEach iteration of K/V   
-      Com::IterationRange<0, 1>,          // Ranged iteration of K/V    
-      Com::State::Sorted<SORT>,           // Toggle ordered map         
-      Com::State::Compressed<>,           // Toggle compression         
-      Com::State::Encrypted<>             // Toggle encryption          
+      Com::IterationRange<0, 1>           // Ranged iteration of K/V    
    >;
 }
 

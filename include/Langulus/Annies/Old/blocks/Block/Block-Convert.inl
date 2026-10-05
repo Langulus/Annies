@@ -611,7 +611,7 @@ namespace Langulus::Annies
                to += Bytes {bytes.mCount};
                to += bytes;
             },
-            [&to](const Tag& trait) {
+            [&to](Tag const& trait) {
                to += Bytes {trait.GetTag()};
                trait.SerializeToBinary<void>(to);
             }

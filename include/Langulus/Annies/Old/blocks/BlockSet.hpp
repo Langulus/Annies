@@ -20,7 +20,7 @@ namespace Langulus
       ///                                                                     
       struct BlockSet {
          LANGULUS(ABSTRACT) true;
-         LANGULUS(POD) true;
+         using CTTI_POD = true;
 
          using InfoType = ::std::uint8_t;
          using OrderType = size_t;
@@ -84,7 +84,7 @@ namespace Langulus::Annies
    ///                                                                        
    struct BlockSet : A::BlockSet {
       using CTTI_Abstract = No;
-      LANGULUS(TYPED) void;
+      using CTTI_Typed = void;
 
       static constexpr bool Ownership = false;
       static constexpr bool Ordered = false;
@@ -401,7 +401,7 @@ namespace Langulus::Annies
          Conditional<Mutable, TypeOf<SET>, const TypeOf<SET>>>;
 
       using CTTI_Abstract = No;
-      LANGULUS(TYPED)    T;
+      using CTTI_Typed =    T;
 
    protected:
       friend struct BlockSet;

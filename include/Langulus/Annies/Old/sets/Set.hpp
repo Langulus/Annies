@@ -17,7 +17,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<bool ORDERED = false>
    struct Set : BlockSet {
-      LANGULUS(POD) false;
+      using CTTI_POD = false;
       LANGULUS(ACT_AS) Set;
       LANGULUS_BASES(BlockSet);
 

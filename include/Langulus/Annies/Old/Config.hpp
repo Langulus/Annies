@@ -141,7 +141,7 @@ namespace Langulus
       template<class>
       class Ref;*/
 
-      //class Construct;
+      //class Recipe;
       //class Neat;
 
    }

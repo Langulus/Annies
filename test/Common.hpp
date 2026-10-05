@@ -268,7 +268,7 @@ public:
 
 /// Default-constructible, but only privately                                 
 class PrivatelyConstructible {
-   LANGULUS(POD) false;
+   using CTTI_POD = false;
 private:
    PrivatelyConstructible() = default;
    PrivatelyConstructible(const PrivatelyConstructible&) = default;
@@ -278,7 +278,7 @@ private:
 /// Has no explicit intent constructors and assigners                         
 /// Has only implicit refer & move constructors and assigners                 
 class NonIntentConstructible {
-   LANGULUS(POD) false;
+   using CTTI_POD = false;
 public:
    NonIntentConstructible(CT::NoIntent auto&&) {}
 };
@@ -298,7 +298,7 @@ public:
 /// happens                                                                   
 class AllIntentConstructible {
 public:
-   LANGULUS(POD) false;
+   using CTTI_POD = false;
    explicit AllIntentConstructible(CT::Intent auto&&) {}
 };
 
@@ -307,14 +307,14 @@ public:
 /// Making constructor implicit also allows for intent assignments            
 class AllIntentConstructibleImplicit {
 public:
-   LANGULUS(POD) false;
+   using CTTI_POD = false;
    AllIntentConstructibleImplicit(CT::Intent auto&&) {}
 };
 
 /// Has all intnet constructors and assigners + implicit refer & move ones    
 class AllIntentConstructibleAndAssignable {
 public:
-   LANGULUS(POD) false;
+   using CTTI_POD = false;
    AllIntentConstructibleAndAssignable(CT::Intent auto&&) {}
    AllIntentConstructibleAndAssignable& operator = (CT::Intent auto&&) { return *this; }
 };
@@ -416,12 +416,12 @@ namespace Verbs
 }
 
 struct ImplicitlyReflectedData {
-   LANGULUS(POD) true;
+   using CTTI_POD = true;
    LANGULUS(FILES) "ASE";
 
    enum Named {One, Two, Three};
    LANGULUS_NAMED_VALUES(One, Two, Three);
-   LANGULUS(TYPED) Named;
+   using CTTI_Typed = Named;
 
    Named v = One;
 
@@ -457,8 +457,8 @@ public:
    LANGULUS(VERSION_MAJOR) 2;
    LANGULUS(VERSION_MINOR) 1;
    LANGULUS(DEEP) true;
-   LANGULUS(POD) true;
-   LANGULUS(NULLIFIABLE) true;
+   using CTTI_POD = true;
+   using CTTI_Nullable = true;
    LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Size;
    LANGULUS(CONCRETE) ImplicitlyReflectedData;
    LANGULUS(ACT_AS) void;
@@ -550,14 +550,14 @@ struct AggregateThatCanBeConfusedWithDescriptorMakable {
 };
 
 class ForcefullyPod {
-   LANGULUS(POD) true;
+   using CTTI_POD = true;
    Complex mData;
 };
 
 struct Type {};
 
 struct TypeErasedContainer {
-   LANGULUS(TYPED) void;
+   using CTTI_Typed = void;
 };
 
 namespace N1 {

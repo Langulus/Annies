@@ -894,7 +894,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       WHEN("ForEach flat dense element (immutable)") {
          const auto foreachit = const_cast<const T&>(pack).ForEach(
             [&](const int&)    {FAIL();},
-            [&](const Tag&)  {FAIL();},
+            [&](Tag const&)  {FAIL();},
             [&](Many const&)   {FAIL();}
          );
 
@@ -934,7 +934,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       WHEN("ForEachRev flat dense element (immutable)") {
          const auto foreachit = const_cast<const T&>(pack).ForEachRev(
             [&](const int&)   {FAIL(); },
-            [&](const Tag&) {FAIL(); },
+            [&](Tag const&) {FAIL(); },
             [&](Many const&)  {FAIL(); }
          );
 
@@ -944,7 +944,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       WHEN("ForEachRev flat dense element (mutable)") {
          const auto foreachit = pack.ForEachRev(
             [&](const int&)   {FAIL(); },
-            [&](const Tag&) {FAIL(); },
+            [&](Tag const&) {FAIL(); },
             [&](Many const&)  {FAIL(); }
          );
 
@@ -2485,7 +2485,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
                REQUIRE(i == it + 1);
                ++it;
             },
-            [&](const Tag& i) {
+            [&](Tag const& i) {
                REQUIRE(i == it + 1);
                ++it;
             },
@@ -2510,7 +2510,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
                REQUIRE(i == it + 1);
                ++it;
             },
-            [&](const Tag& i) {
+            [&](Tag const& i) {
                REQUIRE(i == it + 1);
                ++it;
             },
@@ -2536,7 +2536,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
                REQUIRE(i == 5 - it);
                ++it;
             },
-            [&](const Tag& i) {
+            [&](Tag const& i) {
                REQUIRE(i == 5 - it);
                ++it;
             },
@@ -2562,7 +2562,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
                REQUIRE(i == 5 - it);
                ++it;
             },
-            [&](const Tag& i) {
+            [&](Tag const& i) {
                REQUIRE(i == 5 - it);
                ++it;
             },

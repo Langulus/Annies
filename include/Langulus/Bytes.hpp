@@ -108,6 +108,8 @@ namespace Langulus::Annies
 
       using BytesBase = Com::Container<
          Com::State::Disowned<>,             // Allows disownment       
+         Com::State::Compressed<>,           // Toggle compression      
+         Com::State::Encrypted<>,            // Toggle encryption       
          Com::TypedStatic<DMeta, Byte>,      // Type-constrained        
          Com::HeapMovable<0, 0, HeapEntry<0, Byte*>>,
          Com::CountStack<>,                  // Variable count          
@@ -124,9 +126,7 @@ namespace Langulus::Annies
          Com::Comparison<true>,              // Allows for comparison   
          Com::Conversion<>,                  // Allows conversion       
          Com::IterationForEach<>,            // ForEach iteration       
-         Com::IterationRange<>,              // Range iteration       😊
-         Com::State::Compressed<>,           // Toggle compression      
-         Com::State::Encrypted<>             // Toggle encryption       
+         Com::IterationRange<>               // Range iteration       😊
       >;
    }
    
@@ -285,8 +285,8 @@ namespace Langulus::Annies
          return result;
       }
 
-      template<Cid> void GetResolved()         = delete;
-      template<Cid> void GetDense(size_t = -1) = delete;
+      template<Cid> void GetResolved()         = delete("Nothing to resolve");
+      template<Cid> void GetDense(size_t = -1) = delete("Nothing to dereference");
    };
    #pragma pack(pop)
 }

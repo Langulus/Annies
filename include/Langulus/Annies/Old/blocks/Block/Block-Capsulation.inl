@@ -417,7 +417,7 @@ namespace Langulus::Annies
    /// raw memory from container. Note, that this doesn't only consider the   
    /// standard c++ type traits, like trivially_constructible.                
    /// Want a non-trivial type to be handled as POD in these containers?      
-   /// - You can explicitly reflect any type with `LANGULUS(POD) true`        
+   /// - You can explicitly reflect any type with `using CTTI_POD = true`        
    ///   @return true if contained data is plain old data                     
    template<class TYPE> LANGULUS(INLINED)
    constexpr bool Block<TYPE>::IsPOD() const noexcept {
@@ -708,7 +708,7 @@ namespace Langulus::Annies
       // Depending on immediate contents...                             
       bool exe = false;
       ForEach(
-         [&exe](const Tag& trait) noexcept {
+         [&exe](Tag const& trait) noexcept {
             // Scan deeper into traits, because they're not deep,       
             // unless they're being executed                            
             exe = trait.IsExecutable();

@@ -38,8 +38,9 @@ namespace Langulus::Annies
    /// 6) create*2 Recipe(Thing, name("test"))                                
    /// After execution all these are replaced by the two created Things       
    struct Recipe : Inner::RecipeBase {
-      using Base     = Inner::RecipeBase;
-      using DeepType = Many;
+      using CTTI_ReflectAs = Recipe;
+      using Base           = Inner::RecipeBase;
+      using DeepType       = Many;
 
       constexpr Recipe() noexcept {
          this->ConstructDefault();
@@ -90,7 +91,7 @@ namespace Langulus::Annies
    
       /// Get the descriptor for the recipe                                   
       Many GetDescriptor() const noexcept {
-         return Many {Inner::Absorb{}, *this};
+         return Many {Annies::Absorb, *this};
       }
    
       /// Construction that either absorbs the provided containers, or        

@@ -45,6 +45,8 @@ namespace Langulus::Annies
    {
       using TextBase = Com::Container<
          Com::State::Disowned<>,          // Allows disownment          
+         Com::State::Compressed<>,        // Toggle compression         
+         Com::State::Encrypted<>,         // Toggle encryption          
          Com::TypedStatic<DMeta, char>,   // Type-constrained           
          Com::HeapMovable<0, 0, HeapEntry<0, char*>>,
          Com::CountStack<>,               // Variable count             
@@ -62,9 +64,7 @@ namespace Langulus::Annies
          Com::Comparison<true>,           // Allows for comparison      
          Com::Conversion<>,               // Allows conversion          
          Com::IterationForEach<>,         // ForEach iteration          
-         Com::IterationRange<>,           // Range iteration            
-         Com::State::Compressed<>,        // Toggle compression         
-         Com::State::Encrypted<>          // Toggle encryption          
+         Com::IterationRange<>            // Range iteration            
       >;
    }
 
@@ -73,8 +73,9 @@ namespace Langulus::Annies
    /// A continuous text container of variable size                           
    ///                                                                        
    struct Text : Inner::TextBase {
-      using CTTI_Text = Yup;
-      using CountType = Base::CountType;
+      using CTTI_ReflectAs = Text;
+      using CTTI_Text      = Yup;
+      using CountType      = Base::CountType;
 
       constexpr Text() noexcept {
          this->ConstructDefault();
@@ -453,8 +454,8 @@ namespace Langulus::Annies
          return {this->GetRaw(), this->GetCount()};
       }
 
-      template<Cid> void GetResolved()         = delete;
-      template<Cid> void GetDense(size_t = -1) = delete;
+      template<Cid> void GetResolved()         = delete("Nothing to resolve");
+      template<Cid> void GetDense(size_t = -1) = delete("Nothing to dereference");
 
       /// Check if text begins with a particular character sequence           
       constexpr bool StartsWith(Token const& token) const noexcept {
@@ -522,6 +523,8 @@ namespace Langulus::Annies
       }
    };
    
+   static_assert(CT::NotVoid<CT::ReflectedAs<Text>>);
+
    inline Text operator ""_text(const char* token, size_t size) noexcept {
       return Text::FromText(token, size);
    }
@@ -574,7 +577,7 @@ LANGULUS_MORPHISM_CUSTOM(Langulus::Hash, { return Annies::Text::Hex(from.value);
 );
 
 /// Convert Number -> Text                                                    
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Number, {
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::NumberUnambiguously, {
       return Annies::Text::FromNumber(from);
    },
    Langulus::Annies::Text
@@ -603,6 +606,9 @@ LANGULUS_MORPHISM_CUSTOM(Langulus::RTTI::VMeta, { return from.GetCppName(); },
 /// Convert Literal -> Text                                                   
 LANGULUS_MORPHISM_CONCEPT(Langulus::CT::Literal, Langulus::Annies::Text);
 
+/// Convert Character -> Text                                                 
+LANGULUS_MORPHISM_CONCEPT(Langulus::CT::Character, Langulus::Annies::Text);
+
 /// Map all pointers as convertible to text                                   
 LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
       if constexpr (CT::Complete<Deptr<T>>) {
@@ -616,7 +622,7 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
    Langulus::Annies::Text
 );
 
-/// Map all bounded arrays as convertible to text                             
+/// Map all arrays as convertible to text                                     
 LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Array, {
       if constexpr (CT::Character<Deext<T>>)
          return {from};

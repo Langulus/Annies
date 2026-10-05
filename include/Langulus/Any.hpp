@@ -27,11 +27,15 @@
 #include "Annies/States/Tracked.hpp"
 #include "Annies/States/Disowned.hpp"
 
+#include <Langulus/RTTI/MetaConst.hpp>
+
 
 namespace Langulus::Annies::Inner
 {
    using AnyBase = Com::Container<
       Com::State::Disowned<>,          // Allows disownment             
+      Com::State::Future<>,            // Allows future linking         
+      Com::State::Past<>,              // Allows past linking           
       Com::TypedStack<DMeta>,          // Type-erased                   
       Com::HeapMovable<>,              // Pointer to heap memory        
       Com::CountStatic<1u>,            // Statically sized to 1         
@@ -43,9 +47,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
       Com::Conversion<>,               // Allows conversion             
-      Com::Comparison<>,               // Allows comparisons            
-      Com::State::Future<>,            // Allows future linking         
-      Com::State::Past<>               // Allows past linking           
+      Com::Comparison<>                // Allows comparisons            
    >;
 }
 
@@ -131,6 +133,14 @@ namespace Langulus::Annies
 
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
+
+      static Any FromConstant(RTTI::CMeta c) {
+         Any result;
+         result.SetType(c.GetType());
+         result.AllocateFresh(1);
+         c.GetFiller()(result.GetRaw());
+         return result;
+      }
    };
 }
 

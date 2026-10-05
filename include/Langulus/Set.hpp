@@ -38,6 +38,9 @@ namespace Langulus::Annies::Inner
    template<StateValue SORT>
    using SetBase = Com::Container<
       Com::State::Disowned<>,          // Allows disownment             
+      Com::State::Sorted<SORT>,        // Toggle ordering               
+      Com::State::Compressed<>,        // Toggle compression            
+      Com::State::Encrypted<>,         // Toggle encryption             
       Com::TypedStack<DMeta>,          // Type-erased                   
       Com::HeapMovable<8, 2>,          // Pointer to heap memory        
       Com::CountStack<>,               // Dynamically sized             
@@ -53,10 +56,7 @@ namespace Langulus::Annies::Inner
       Com::Conversion<>,               // Allows conversions            
       Com::Comparison<>,               // Allows comparisons            
       Com::IterationForEach<>,         // ForEach iteration             
-      Com::IterationRange<>,           // Ranged iteration              
-      Com::State::Sorted<SORT>,        // Toggle ordering               
-      Com::State::Compressed<>,        // Toggle compression            
-      Com::State::Encrypted<>          // Toggle encryption             
+      Com::IterationRange<>            // Ranged iteration              
    >;
 
    /// MARK: Set                                                              

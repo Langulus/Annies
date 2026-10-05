@@ -29,6 +29,7 @@ namespace Langulus::Annies::Inner
    /// Type-erased heap-based pair container                                  
    using PairBase = Com::Container<
       Com::State::Disowned<>,             // Allows disownment          
+      Com::State::Encrypted<>,            // Toggle encryption          
       Com::Multitype<Com::TypedStack<DMeta, void, false, 0>,
                      Com::TypedStack<DMeta, void, false, 1>>,
       Com::HeapMovable<0, 0, HeapEntry<0>, HeapEntry<1>>,
@@ -41,8 +42,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<false, 0, 1>,       // Allows assignment          
       Com::Removal<0, 1>,                 // Allows clear/reset         
       Com::Conversion<0, 1>,              // Allows conversion          
-      Com::Comparison<false, true, 0, 1>, // Allows comparisons         
-      Com::State::Encrypted<>             // Toggle encryption          
+      Com::Comparison<false, true, 0, 1>  // Allows comparisons         
    >;
 }
 

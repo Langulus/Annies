@@ -46,7 +46,7 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    class THive : public A::Hive {
    public:
-      LANGULUS(TYPED) T;
+      using CTTI_Typed = T;
       using CTTI_Abstract = No;
 
       static constexpr size_t DefaultFrameSize = 8;
@@ -179,7 +179,7 @@ namespace Langulus::Annies
       static constexpr bool Mutable = MUTABLE;
 
       using CTTI_Abstract = No;
-      LANGULUS(TYPED) T;
+      using CTTI_Typed = T;
 
    protected:
       friend class THive<T>;

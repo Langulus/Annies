@@ -14,6 +14,11 @@ namespace Langulus::Annies::Inner
    template<CT::NotVoid T> requires (CT::NotHandle<T> and CT::NotReference<T>)
    using TManyBase = Com::Container<
       Com::State::Disowned<>,          // Allows disownment             
+      Com::State::Future<>,            // Toggle future linking         
+      Com::State::Past<>,              // Toggle past linking           
+      Com::State::Or<>,                // Toggle disjunction            
+      Com::State::Compressed<>,        // Toggle compression            
+      Com::State::Encrypted<>,         // Toggle encrypted              
       Com::TypedStack<DMeta, T>,       // Type-constrained              
       Com::HeapMovable<0, 0, HeapEntry<0, T*>>,
       Com::CountStack<>,               // Dynamically sized             
@@ -32,12 +37,7 @@ namespace Langulus::Annies::Inner
       Com::Conversion<>,               // Allows conversions            
       Com::Comparison<>,               // Allows comparisons            
       Com::IterationForEach<>,         // ForEach iteration             
-      Com::IterationRange<>,           // Ranged iteration              
-      Com::State::Future<>,            // Toggle future linking         
-      Com::State::Past<>,              // Toggle past linking           
-      Com::State::Or<>,                // Toggle disjunction            
-      Com::State::Compressed<>,        // Toggle compression            
-      Com::State::Encrypted<>          // Toggle encrypted              
+      Com::IterationRange<>            // Ranged iteration              
    >;
 }
 

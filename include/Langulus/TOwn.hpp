@@ -17,7 +17,7 @@
 
 namespace Langulus::Annies::Inner
 {
-   template<CT::NotVoid T> requires (CT::NotHandle<T> and CT::NotReference<T>)
+   template<CT::NotVoid T> requires CT::NotReference<T>
    using TOwnBase = Com::Container<
       Com::TypedStatic<DMeta, T>,         // Statically typed           
       Com::Stack<T>,                      // Element on the stack       
@@ -36,9 +36,10 @@ namespace Langulus::Annies
    /// You can optionally add tags to it.                                     
    template<CT::NotVoid T, class...TAGS>
    struct TOwn : Inner::TOwnBase<T> {
-      using CTTI_Deep   = Yup;
-      using Base        = Inner::TOwnBase<T>;
-      using CTTI_Tagged = Types<TAGS...>;
+      using CTTI_ReflectAs = TOwn;
+      using CTTI_Deep      = Yup;
+      using CTTI_Tagged    = Types<TAGS...>;
+      using Base           = Inner::TOwnBase<T>;
 
       constexpr  TOwn() noexcept {
          this->ConstructDefault();
@@ -78,8 +79,7 @@ namespace Langulus::Annies
          return lhs == rhs.GetStackInner();
       }
 
-      /// Boolean conversion not allowed here, too error prone                
-      operator bool() = delete;
+      operator bool() = delete("Boolean conversion not allowed here - too error prone");
    };
 
    template<CT::NotVoid T, class...TAGS>

@@ -19,7 +19,7 @@
 
 namespace Langulus::Annies::Inner
 {
-   template<class T> requires (CT::NotHandle<T> and CT::NotReference<T>)
+   template<class T> requires CT::NotReference<T>
    using TRefBase = Com::Container<
       Com::TypedStatic<DMeta, T>,         // Statically typed          
       Com::HeapMovable<0, 0, HeapEntry<0, T*>>,
@@ -45,11 +45,12 @@ namespace Langulus::Annies
    /// You can optionally add tags to it.                                     
    template<class T, class...TAGS>
    struct TRef : Inner::TRefBase<T> {
-      using CTTI_Deep   = Yup;
-      using CTTI_Tagged = Types<TAGS...>;
-      using Base        = Inner::TRefBase<T>;
-      using Pick        = ConstAll<T>;
-      using PickMut     = T;
+      using CTTI_ReflectAs = TRef;
+      using CTTI_Deep      = Yup;
+      using CTTI_Tagged    = Types<TAGS...>;
+      using Base           = Inner::TRefBase<T>;
+      using Pick           = ConstAll<T>;
+      using PickMut        = T;
       
       #if not LANGULUS(FORCE_TYPE_ERASURE)
          using HandleType    = THandle<ConstAll<T> const&>;

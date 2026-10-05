@@ -33,7 +33,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<DenseTypedBlock T>
    class Edit {
-      LANGULUS(TYPED) TypeOf<T>;
+      using CTTI_Typed = TypeOf<T>;
       LANGULUS(ACT_AS) void;
 
       // What are we editing?                                           

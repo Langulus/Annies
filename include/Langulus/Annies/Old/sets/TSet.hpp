@@ -44,8 +44,8 @@ namespace Langulus::Annies
       using Self = TSet<T, ORDERED>;
       using BlockType = TMany<T>;
 
-      LANGULUS(POD) false;
-      LANGULUS(TYPED) T;
+      using CTTI_POD = false;
+      using CTTI_Typed = T;
       LANGULUS_BASES(Set<ORDERED>);
 
    protected:

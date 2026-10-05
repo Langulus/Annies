@@ -57,7 +57,7 @@ namespace Langulus::A
       ///   Construction & Assignment                                         
       ///                                                                     
       constexpr Verb() noexcept = default;
-      Verb(const Verb&);
+      Verb(Verb const&);
       Verb(Verb&&);
 
       template<template<class> class S> requires CT::Intent<S<Verb>>
@@ -65,7 +65,7 @@ namespace Langulus::A
 
       ~Verb() = default;
 
-      Verb& operator = (const Verb&);
+      Verb& operator = (Verb const&);
       Verb& operator = (Verb&&);
 
       template<template<class> class S> requires CT::Intent<S<Verb>>
@@ -121,14 +121,14 @@ namespace Langulus::A
       ///                                                                     
       ///   Comparison                                                        
       ///                                                                     
-      bool operator == (const Verb&) const;
+      bool operator == (Verb const&) const;
       bool operator == (VMeta) const noexcept;
 
-      bool operator <  (const Verb&) const noexcept;
-      bool operator >  (const Verb&) const noexcept;
+      bool operator <  (Verb const&) const noexcept;
+      bool operator >  (Verb const&) const noexcept;
 
-      bool operator <= (const Verb&) const noexcept;
-      bool operator >= (const Verb&) const noexcept;
+      bool operator <= (Verb const&) const noexcept;
+      bool operator >= (Verb const&) const noexcept;
 
       ///                                                                     
       ///   Removal                                                           

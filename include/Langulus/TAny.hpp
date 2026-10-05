@@ -14,6 +14,8 @@ namespace Langulus::Annies::Inner
    template<CT::NotVoid T> requires (CT::NotHandle<T> and CT::NotReference<T>)
    using TAnyBase = Com::Container<
       Com::State::Disowned<>,          // Allows disownment             
+      Com::State::Future<>,            // Allows future linking         
+      Com::State::Past<>,              // Allows past linking           
       Com::TypedStack<DMeta, T>,       // Type-constrained              
       Com::HeapMovable<0, 0, HeapEntry<0, T*>>,
       Com::CountStatic<1u>,            // Statically sized to 1         
@@ -25,9 +27,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
       Com::Conversion<>,               // Allows conversion             
-      Com::Comparison<>,               // Allows comparisons            
-      Com::State::Future<>,            // Allows future linking         
-      Com::State::Past<>               // Allows past linking           
+      Com::Comparison<>                // Allows comparisons            
    >;
 }
 

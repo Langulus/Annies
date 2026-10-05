@@ -18,7 +18,7 @@
 
 namespace Langulus::Annies::Inner
 {
-   template<CT::NotVoid T> requires (CT::NotHandle<T> and CT::NotReference<T>)
+   template<CT::NotVoid T>
    using TPinBase = Com::Container<
       Com::State::Pinned<>,               // Allows pinning             
       Com::TypedStatic<DMeta, T>,         // Statically typed           
@@ -41,9 +41,10 @@ namespace Langulus::Annies
    /// You can optionally add tags to it.                                     
    template<CT::NotVoid T, class...TAGS>
    struct TPin : Inner::TPinBase<T> {
-      using CTTI_Deep   = Yup;
-      using Base        = Inner::TPinBase<T>;
-      using CTTI_Tagged = Types<TAGS...>;
+      using CTTI_ReflectAs = TPin;
+      using CTTI_Deep      = Yup;
+      using CTTI_Tagged    = Types<TAGS...>;
+      using Base           = Inner::TPinBase<T>;
 
       constexpr  TPin() noexcept {
          this->ConstructDefault();
@@ -83,8 +84,7 @@ namespace Langulus::Annies
          return lhs == rhs.GetStackInner();
       }
 
-      /// Boolean conversion not allowed here, too error prone                
-      operator bool() = delete;
+      operator bool() = delete("Boolean conversion not allowed here - too error prone");
    };
 
    template<CT::NotVoid T>

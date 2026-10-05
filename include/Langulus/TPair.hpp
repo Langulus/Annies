@@ -56,6 +56,7 @@ namespace Langulus::Annies::Inner
    requires (CT::NotHandle<K, V> and CT::NotReference<K, V>)
    using TPairHeapBase = Com::Container<
       Com::State::Disowned<>,             // Allows disownment          
+      Com::State::Encrypted<>,            // Toggle encryption          
       Com::Multitype<Com::TypedStack<DMeta, K, true, 0>,
                      Com::TypedStack<DMeta, V, true, 1>>,
       Com::HeapMovable<0, 0, HeapEntry<0, K*>, HeapEntry<1, V*>>,
@@ -69,8 +70,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<false, 0, 1>,       // Allows assignment          
       Com::Removal<0, 1>,                 // Allows clear/reset         
       Com::Conversion<0, 1>,              // Allows conversion          
-      Com::Comparison<false, true, 0, 1>, // Allows comparisons         
-      Com::State::Encrypted<>             // Toggle encryption          
+      Com::Comparison<false, true, 0, 1>  // Allows comparisons         
    >;
 
    template<CT::NotVoid K, CT::NotVoid V> requires CT::NotHandle<K, V>

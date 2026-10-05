@@ -40,6 +40,11 @@ namespace Langulus::Annies::Inner
 {
    using ManyBase = Com::Container<
       Com::State::Disowned<>,          // Allows disownment             
+      Com::State::Future<>,            // Toggle future linking         
+      Com::State::Past<>,              // Toggle past linking           
+      Com::State::Or<>,                // Toggle disjunction            
+      Com::State::Compressed<>,        // Toggle compression            
+      Com::State::Encrypted<>,         // Toggle encryption             
       Com::TypedStack<DMeta>,          // Type-erased                   
       Com::HeapMovable<>,              // Pointer to heap memory        
       Com::CountStack<>,               // Dynamically sized             
@@ -58,12 +63,7 @@ namespace Langulus::Annies::Inner
       Com::Conversion<>,               // Allows conversions            
       Com::Comparison<>,               // Allows comparisons            
       Com::IterationForEach<>,         // ForEach iteration             
-      Com::IterationRange<>,           // Ranged iteration              
-      Com::State::Future<>,            // Toggle future linking         
-      Com::State::Past<>,              // Toggle past linking           
-      Com::State::Or<>,                // Toggle disjunction            
-      Com::State::Compressed<>,        // Toggle compression            
-      Com::State::Encrypted<>          // Toggle encryption             
+      Com::IterationRange<>            // Ranged iteration              
    >;
 }
 

@@ -129,7 +129,7 @@ namespace Langulus::Annies
 
       /// Get the data part of the tag                                        
       Many GetData() const {
-         return Many {Absorb, *this};
+         return Many {Annies::Absorb, *this};
       }
    };
 }

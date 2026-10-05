@@ -28,6 +28,7 @@ namespace Langulus::Annies
    ///   Elements that are marked missing are never considered part of the    
    /// recipe and are filled by the context (i.e. Tags::Parent(?)).           
    struct Neat {
+      using CTTI_ReflectAs = Neat;
       using RecipeList = TMany<Recipe>;
       using TailList   = TMany<Messy>;
       using TagList    = TMany<Tag>;
@@ -129,14 +130,14 @@ namespace Langulus::Annies
    public:
       ///                                                                     
       ///   Iteration                                                         
-      size_t ForEach          (auto&&...);
-      size_t ForEachTag       (auto&&);
-      size_t ForEachDeep      (auto&&...);
-      size_t ForEachConstruct (auto&&);
-      size_t ForEachTail      (auto&&);
+      size_t ForEach      (auto&&...);
+      size_t ForEachTag   (auto&&);
+      size_t ForEachDeep  (auto&&...);
+      size_t ForEachRecipe(auto&&);
+      size_t ForEachTail  (auto&&);
 
    protected:
-      size_t ForEachInner     (auto&&);
+      size_t ForEachInner (auto&&);
 
    public:
       ///                                                                     
@@ -153,9 +154,9 @@ namespace Langulus::Annies
       auto UnfoldInsert (auto&&) -> size_t;
       void InsertInner  (auto&&);
 
-      void AddTag       (CT::Intent auto&&);
-      void AddConstruct (CT::Intent auto&&);
-      void AddVerb      (CT::Intent auto&&);
+      void AddTag   (CT::Intent auto&&);
+      void AddRecipe(CT::Intent auto&&);
+      void AddVerb  (CT::Intent auto&&);
 
    public:
       ///                                                                     
@@ -163,7 +164,7 @@ namespace Langulus::Annies
       template<CT::NotVoid, bool EMPTY_TOO = false>
       size_t RemoveData();
       template<CT::NotVoid>
-      size_t RemoveConstructs();
+      size_t RemoveRecipes();
       template<CT::DefineTag, bool EMPTY_TOO = false>
       size_t RemoveTag();
    };

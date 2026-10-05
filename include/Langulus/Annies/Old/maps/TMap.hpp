@@ -48,8 +48,8 @@ namespace Langulus::Annies
       using PairRef = TPair<const K&, V&>;
       using PairConstRef = TPair<const K&, const V&>;
 
-      LANGULUS(POD)       false;
-      LANGULUS(TYPED)     Pair;
+      using CTTI_POD =       false;
+      using CTTI_Typed =     Pair;
       LANGULUS_BASES(Map<ORDERED>);
 
    protected:

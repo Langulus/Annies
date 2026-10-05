@@ -562,7 +562,7 @@ namespace Langulus::Annies
       using VA = std::conditional_t<CT::TypeErased<Value>, Block<>, Value*>;
 
       using CTTI_Abstract = No;
-      LANGULUS(TYPED)    Pair;
+      using CTTI_Typed =    Pair;
 
    protected:
       KA mKey;

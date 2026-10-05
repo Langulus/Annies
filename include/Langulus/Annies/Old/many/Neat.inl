@@ -579,7 +579,7 @@ namespace Langulus::Annies
                [&](const Neat& neat) {
                   UnfoldInsert(S::Nest(const_cast<Neat&>(neat)));
                },
-               [&](const Tag& trait) {
+               [&](Tag const& trait) {
                   InsertInner(S::Nest(const_cast<Tag&>(trait)));
                },
                [&](const A::Verb& verb) {

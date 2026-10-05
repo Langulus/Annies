@@ -18,7 +18,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<bool ORDERED = false>
    struct Map : BlockMap {
-      LANGULUS(POD) false;
+      using CTTI_POD = false;
       LANGULUS(ACT_AS) Map;
       LANGULUS_BASES(BlockMap);
 

@@ -35,8 +35,9 @@ namespace Langulus::Annies
       Com::CountStack<>,               // Variable count                
       Com::ReserveHeap<>               // Variable capacity             
    > {
-      using PickDenseMut  = T&;
-      using PickDense     = T const&;
+      using CTTI_ReflectAs = THive;
+      using PickDenseMut   = T&;
+      using PickDense      = T const&;
       
       #if not LANGULUS(FORCE_TYPE_ERASURE)
          using HandleTypeMut = THandle<T&>;

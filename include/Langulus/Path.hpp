@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -15,7 +15,8 @@ namespace Langulus::Annies
    /// File path                                                              
    ///                                                                        
    struct Path : Text {
-      using CTTI_Bases    = Text;
+      using CTTI_ReflectAs = Path;
+      using CTTI_Bases     = Text;
 
       static constexpr char Separator = '/';
 

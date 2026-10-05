@@ -8,7 +8,6 @@
 #pragma once
 #include "Component.hpp"
 #include "Components/State-Stack.hpp"
-//#include "Langulus/Annies/Components/Multiprovider.hpp"
 #include <Langulus/IntentOf.hpp>
 #include <Langulus/Utils/Sequence.hpp>
 #include <Langulus/HashOf.hpp>
@@ -45,7 +44,7 @@ namespace Langulus::Annies
 
    struct Any;
    struct Bytes;
-   struct Construct;
+   struct Recipe;
    struct Many;
    struct Neat;
    struct Pair;
@@ -1155,7 +1154,7 @@ namespace Langulus
          NextLoop = 4   // Skip to next function in the ForEach         
       } mControl;
 
-      LoopControl() = delete;
+      LoopControl() = delete("Command has to be specified");
 
       constexpr LoopControl(bool a) noexcept
          : mControl {static_cast<Command>(a)} {}

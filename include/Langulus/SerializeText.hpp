@@ -9,20 +9,8 @@
 #include "Text.hpp"
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/Derived.hpp>
-//#include <Langulus/HashOf.hpp>
+#include <Langulus/CT/Charged.hpp>
 
-/*#include "Text.hpp"
-#include "Bytes.hpp"
-#include "Any.hpp"
-#include "TAny.hpp"
-#include "Many.hpp"
-#include "TMany.hpp"
-#include "Set.hpp"
-#include "TSet.hpp"
-#include "Pair.hpp"
-#include "TPair.hpp"
-#include "Map.hpp"
-#include "TMap.hpp"*/
 
 namespace Langulus::Flow
 {
@@ -52,54 +40,58 @@ namespace Langulus::CTTI
       static constexpr bool CriticalFailure = false;
       static constexpr bool SkipElements = true;
 
-      static void BeginScope(const CT::Container auto& from, T& to, Context*) {
+      static bool BeginScope(const CT::Container auto& from, T& to, Context* = nullptr) {
          //TODO multidimensional containers like maps have multiple types
          const bool scoped = from.GetCount() > 1 or not from.IsValid() or from.IsExecutable(); //TODO could carry in context and check verb precedence to avoid scoping in some cases
          if (scoped)
             to += Serial::OpenScope;
+         return scoped;
       }
       
-      static void EndScope(const CT::Container auto& from, T& to, Context*) {
+      static bool EndScope(const CT::Container auto& from, T& to, Context* = nullptr) {
          //TODO multidimensional containers like maps have multiple types
          const bool scoped = from.GetCount() > 1 or not from.IsValid() or from.IsExecutable(); //TODO could carry in context and check verb precedence to avoid scoping in some cases
          if (scoped)
             to += Serial::CloseScope;
+         return scoped;
       }
       
-      static void Separate(const CT::Container auto& from, T& to, Context*) {
+      static void Separate(const CT::Container auto& from, T& to, Context* = nullptr) {
          if constexpr (requires { from.IsOrdered(); }) {
             if constexpr (requires { from.IsOr(); })
-               to += (from.IsOr() ? " or " : (from.IsOrdered() ? ", " : "; "));
+               to += (from.IsOr() ? Serial::Or.Token : (from.IsOrdered() ? Serial::And.Token : Serial::AndUnordered.Token));
             else
-               to += (from.IsOrdered() ? ", " : "; ");
+               to += (from.IsOrdered() ? Serial::And.Token : Serial::AndUnordered.Token);
          }
          else if constexpr (requires { from.IsOr(); })
-            to += (from.IsOr() ? " or " : ", ");
+            to += (from.IsOr() ? Serial::Or.Token : Serial::And.Token);
          else 
-            to += ", ";
+            to += Serial::And.Token;
       }
       
-      static void Empty(RTTI::DMeta type, size_t i, T& to, Context*) {
+      static void Empty(RTTI::DMeta type, size_t i, T& to, Context* = nullptr) {
          if constexpr (CriticalFailure) {
             LglsError("Item #", i, " of type `", type.GetName(),
                "` was serialized to an empty `Text`");
          }
          else {
-            to += "/*";
+            to += Serial::OpenComment.Token;
             to += type.GetName();
-            to += " -> empty Text*/";
+            to += " -> empty Text";
+            to += Serial::CloseComment.Token;
          }
       }
       
-      static void Error(RTTI::DMeta type, size_t i, T& to, Context*) {
+      static void Error(RTTI::DMeta type, size_t i, T& to, Context* = nullptr) {
          if constexpr (CriticalFailure) {
             LglsError("Item #", i, " of type `", type.GetName(),
                "` failed to convert to `Text`");
          }
          else {
-            to += "/*";
+            to += Serial::OpenComment.Token;
             to += type.GetName();
-            to += " -> Text failed*/";
+            to += " -> Text failed";
+            to += Serial::CloseComment.Token;
          }
       }
    };
@@ -320,8 +312,30 @@ namespace fmt
       }
    };
 
+   /// Extend FMT to be capable of logging anything convertible to Text, that 
+   /// isn't a container, and isn't already implemented in {fmt} itself.      
+   template<class T> requires (::Langulus::CT::Convertible<T, ::Langulus::Annies::Text>
+                       and not ::Langulus::CT::Container<T>
+                       and not ::std::is_fundamental_v<T>)
+   struct formatter<T> {
+      template<class CONTEXT>
+      constexpr auto parse(CONTEXT& ctx) { return ctx.begin(); }
+
+      template<class CONTEXT>
+      auto format(T const& e, CONTEXT& ctx) const {
+         try {
+            auto result = ::Langulus::Convert<::Langulus::Annies::Text>(e);
+            return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(result));
+         }
+         catch(...) {
+            // Don't allow any exceptions to leak out of here           
+            return format_to(ctx.out(), "<error while serializing to text>");
+         }
+      }
+   };
+
    /// Extend FMT to be capable of logging anything with Text operator        
-   template<class T> requires requires (T const& cast) { cast.operator ::Langulus::Annies::Text(); }
+   /*template<class T> requires requires (T const& cast) { cast.operator ::Langulus::Annies::Text(); }
    struct formatter<T> {
       template<class CONTEXT>
       constexpr auto parse(CONTEXT& ctx) { return ctx.begin(); }
@@ -356,6 +370,34 @@ namespace fmt
             return format_to(ctx.out(), "<error while serializing to text>");
          }
       }
-   };
+   };*/
 }
 #endif
+
+/// Convert Charge -> Text                                                    
+LANGULUS_MORPHISM_CUSTOM(Langulus::Charge, { 
+      Langulus::Annies::Text text;
+      if (from.mass != Charge::DefaultMass) {
+         text += Serial::Mass.Token; 
+         text += from.mass;
+      }
+
+      if (from.rate != Charge::DefaultRate) {
+         text += Serial::Rate.Token; 
+         text += from.rate;
+      }
+
+      if (from.time != Charge::DefaultTime) {
+         text += Serial::Time.Token; 
+         text += from.time;
+      }
+
+      if (from.precedence != Charge::DefaultPrecedence) {
+         text += Serial::Precedence.Token; 
+         text += from.precedence;
+      }
+      
+      return text;
+   }, 
+   Langulus::Annies::Text
+);

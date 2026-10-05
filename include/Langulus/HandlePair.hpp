@@ -43,9 +43,6 @@ namespace Langulus::Annies
       using KeyHandle = Handle;
       using ValHandle = Handle;
 
-      /// Handles can't be piecewise-initialized                              
-      //THandlePair(Inner::Piecewise, auto&&) = delete;
-
       constexpr THandlePair() noexcept {
          this->ConstructDefault();
       }
@@ -131,9 +128,6 @@ namespace Langulus::Annies
       using KeyHandle = HandleMut;
       using ValHandle = HandleMut;
 
-      /// Handles can't be piecewise-initialized                              
-      //THandlePair(Inner::Piecewise, auto&&) = delete;
-
       constexpr THandlePair() noexcept {
          this->ConstructDefault();
       }
@@ -215,9 +209,6 @@ namespace Langulus::Annies
       using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = Handle;
       using ValHandle = HandleMut;
-
-      /// Handles can't be piecewise-initialized                              
-      //THandlePair(Inner::Piecewise, auto&&) = delete;
 
       constexpr THandlePair() noexcept {
          this->ConstructDefault();
@@ -313,9 +304,6 @@ namespace Langulus::Annies
       using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = THandleEmergent<K>;
       using ValHandle = THandleEmergent<V>;
-
-      /// Handles can't be piecewise-initialized                              
-      //THandlePair(Inner::Piecewise, auto&&) = delete;
 
       constexpr THandlePair() noexcept {
          this->ConstructDefault();
@@ -414,9 +402,6 @@ namespace Langulus::Annies
       using ValHandle = THandle<V>;
 
       static constexpr bool ReferenceElements = true;
-
-      /// Handles can't be piecewise-initialized                              
-      //THandlePair(Inner::Piecewise, auto&&) = delete;
 
       constexpr THandlePair() noexcept {
          this->ConstructDefault();

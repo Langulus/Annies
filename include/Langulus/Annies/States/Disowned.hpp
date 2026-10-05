@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -21,7 +21,7 @@ namespace Langulus::Annies::Component::State
    /// Enabled when a container is absorbed using the Disown intent. Useful   
    /// for creating data views, temporary containers, or handles.             
    ///   @tparam V decides whether state is dynamic or static                 
-   ///   @tparam ID, SHARED - affected dimensions                             
+   ///   @tparam ID, SHARED affected dimensions                               
    template<StateValue V, Cid ID, Cid...SHARED>
    struct Disowned {
       using CTTI_Component = Yup;
@@ -29,7 +29,7 @@ namespace Langulus::Annies::Component::State
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;
 
-      static constexpr int  ComponentPrecedence = -4000;
+      static constexpr int  ComponentPrecedence = -4001;
       static constexpr bool Static  = V != StateValue::Variable;
       static constexpr bool Dynamic = not Static;
       static constexpr bool Enable  = V == StateValue::Enabled;
@@ -63,6 +63,11 @@ namespace Langulus::Annies::Component::State
       }
       
       /// Enable the state when transferring using Disown intent              
+      ///   @attention this should be the first ConstructFrom to be called    
+      ///      in the container, so that all subsequent components are aware  
+      ///      of the state. Hence all states have the lowest precedence, and 
+      ///      need to be specified as the first components, when declaring   
+      ///      a container.                                                   
       template<class SELF, CT::Disowned I> requires CT::Container<I>
       constexpr void ConstructFrom(this SELF& self, I&&) noexcept {
          ThisCom::EnableDisowned();

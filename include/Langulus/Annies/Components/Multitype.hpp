@@ -268,6 +268,22 @@ namespace Langulus::Annies::Component
          return self.C::IsSame(type);
       }
       
+      /// Returns a reference to the second dimension, a.k.a get the value    
+      /// from a pair. Works only for pairs.                                  
+      template<class C> requires (not CT::TypeErased<C> and Id::Count == 2)
+      constexpr auto& operator * (this C&& self) assumptious {
+         LglsAssumeDev(not self.IsEmpty(), "Container is empty");
+         return *self.template GetRaw<Id::Second>();
+      }
+
+      /// Returns a pointer to the second dimension, a.k.a get the value      
+      /// from a pair. Works only for pairs.                                  
+      template<class C> requires (not CT::TypeErased<C> and Id::Count == 2)
+      constexpr auto* operator -> (this C&& self) assumptious {
+         LglsAssumeDev(not self.IsEmpty(), "Container is empty");
+         return *self.template GetRaw<Id::Second>();
+      }
+
       /// Assert if any of the types aren't Same                              
       ///   @attention ignores cv-qualifiers only                             
       ///   @param other the container to compare with                        

@@ -1029,6 +1029,8 @@ namespace Langulus::Annies::Component
       return {};
    }
 
+LglsDisableWarningPush
+LglsDisableWarning_UnusedLocalTypedef
 
    /// A safe way to get the first sparse entry after being resolved to       
    /// the most concrete type. Available only if container has DeepType.      
@@ -1036,8 +1038,8 @@ namespace Langulus::Annies::Component
    template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
    template<Cid SID>
    auto Multiprovider<TN...>::GetResolved(this auto&& self) -> HandleDisowned {
-      using COM = typename Subcomponents::template At<SID>;
-      return self.COM::template GetResolved<SID>();
+      using C = typename Subcomponents::template At<SID>;
+      return self.C::template GetResolved<SID>();
    }
 
    /// Get first element, removing 'count' indirections                       
@@ -1050,7 +1052,9 @@ namespace Langulus::Annies::Component
    template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
    template<Cid SID>
    auto Multiprovider<TN...>::GetDense(this auto&& self, size_t count) -> HandleDisowned {
-      using COM = typename Subcomponents::template At<SID>;
-      return self.COM::template GetDense<SID>(count);
+      using C = typename Subcomponents::template At<SID>;
+      return self.C::template GetDense<SID>(count);
    }
+
+LglsDisableWarningPop
 }

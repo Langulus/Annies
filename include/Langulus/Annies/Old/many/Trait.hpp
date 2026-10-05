@@ -76,13 +76,13 @@ namespace Langulus::Annies
       ///   Construction & Assignment                                         
       ///                                                                     
       constexpr Tag() noexcept = default;
-      Tag(const Tag&);
+      Tag(Tag const&);
       Tag(Tag&&) noexcept;
 
       template<class T1, class...TN> //requires CT::UnfoldInsertable<T1, TN...>
       Tag(T1&&, TN&&...);
 
-      Tag& operator = (const Tag&);
+      Tag& operator = (Tag const&);
       Tag& operator = (Tag&&);
       Tag& operator = (CT::Intent auto&&);
 

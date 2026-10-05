@@ -18,7 +18,7 @@ namespace Langulus::A
    /// Refer constructor                                                      
    ///   @param other - the verb to refer to                                  
    LANGULUS(INLINED)
-   Verb::Verb(const Verb& other)
+   Verb::Verb(Verb const& other)
       : Verb {Refer(other)} {}
 
    /// Move constructor                                                       
@@ -44,7 +44,7 @@ namespace Langulus::A
    ///   @param rhs - the verb to refer to                                    
    ///   @return a reference to this verb                                     
    LANGULUS(INLINED)
-   Verb& Verb::operator = (const Verb& rhs) {
+   Verb& Verb::operator = (Verb const& rhs) {
       return operator = (Refer(rhs));
    }
 
@@ -181,7 +181,7 @@ namespace Langulus::A
    ///   @param rhs - the verb to compare against                             
    ///   @return true if rhs has larger or equal priority                     
    LANGULUS(INLINED)
-   bool Verb::operator < (const Verb& ext) const noexcept {
+   bool Verb::operator < (Verb const& ext) const noexcept {
       return mPriority < ext.mPriority;
    }
 
@@ -189,7 +189,7 @@ namespace Langulus::A
    ///   @param rhs - the verb to compare against                             
    ///   @return true if rhs has smaller or equal priority                    
    LANGULUS(INLINED)
-   bool Verb::operator > (const Verb& ext) const noexcept {
+   bool Verb::operator > (Verb const& ext) const noexcept {
       return mPriority > ext.mPriority;
    }
 
@@ -197,7 +197,7 @@ namespace Langulus::A
    ///   @param rhs - the verb to compare against                             
    ///   @return true if rhs has smaller priority                             
    LANGULUS(INLINED)
-   bool Verb::operator >= (const Verb& ext) const noexcept {
+   bool Verb::operator >= (Verb const& ext) const noexcept {
       return mPriority >= ext.mPriority;
    }
 
@@ -205,7 +205,7 @@ namespace Langulus::A
    ///   @param rhs - the verb to compare against                             
    ///   @return true if rhs has larger priority                              
    LANGULUS(INLINED)
-   bool Verb::operator <= (const Verb& rhs) const noexcept {
+   bool Verb::operator <= (Verb const& rhs) const noexcept {
       return mPriority <= rhs.mPriority;
    }
    
@@ -365,7 +365,7 @@ namespace Langulus::A
    ///   @param rhs - the verb to compare against                             
    ///   @return true if verbs match                                          
    LANGULUS(INLINED)
-   bool Verb::operator == (const Verb& rhs) const {
+   bool Verb::operator == (Verb const& rhs) const {
       return mVerb == rhs.mVerb
          and mSource == rhs.mSource
          and Many::operator == (rhs.GetArgument())

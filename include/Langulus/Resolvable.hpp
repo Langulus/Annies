@@ -68,7 +68,7 @@ namespace Langulus
 
       Many Run(Code const&);
       Many Run(Many const&);
-      Many Run(const Temporal&);
+      Many Run(Temporal const&);
 
       Block<> GetMember(TMeta) noexcept;
       Block<> GetMember(TMeta) const noexcept;

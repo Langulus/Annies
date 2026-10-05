@@ -15,7 +15,7 @@ namespace Langulus::Annies
    /// Refer constructor                                                      
    ///   @param other - the trait to refer to                                 
    LANGULUS(INLINED)
-   Tag::Tag(const Tag& other)
+   Tag::Tag(Tag const& other)
       : Tag {Refer(other)} {}
 
    /// Move constructor                                                       
@@ -213,7 +213,7 @@ namespace Langulus::Annies
    ///   @param other - the trait to refer to                                 
    ///   @return a reference to this trait                                    
    LANGULUS(INLINED)
-   Tag& Tag::operator = (const Tag& rhs) {
+   Tag& Tag::operator = (Tag const& rhs) {
       return operator = (Refer(rhs));
    }
 

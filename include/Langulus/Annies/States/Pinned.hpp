@@ -21,7 +21,7 @@ namespace Langulus::Annies::Component::State
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;
 
-      static constexpr int  ComponentPrecedence = 3000;
+      static constexpr int  ComponentPrecedence = -4000;
       static constexpr bool Static  = V != StateValue::Variable;
       static constexpr bool Dynamic = not Static;
       static constexpr bool Enable  = V == StateValue::Enabled;

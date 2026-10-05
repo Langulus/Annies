@@ -29,7 +29,7 @@ namespace Langulus
       using CTTI_Allocatable   = No;
       using CTTI_Intent        = Yup;
 
-      Describe() = delete;
+      Describe() = delete("Contained reference needs to be specified");
       constexpr Describe(const Describe&) noexcept = default;
       explicit constexpr Describe(Describe&&) noexcept = default;
 
@@ -243,7 +243,7 @@ namespace Langulus
       RTTI::DMeta found;
 
       what.ForEachDeep([&](Many const& group) noexcept {
-         group.ForEach([&](const Recipe& recipe) noexcept {
+         group.ForEach([&](Recipe const& recipe) noexcept {
             if (not recipe.CastsTo(type))
                return;
 
