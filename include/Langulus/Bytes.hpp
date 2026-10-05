@@ -6,31 +6,31 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-//#include "Handle.hpp"
-//#include "Langulus/IntentOf.hpp"
-#include <source/components/Typed-Static.hpp>
-#include <source/components/Heap-Movable.hpp>
-#include <source/components/Count-Stack.hpp>
-#include <source/components/Reserve-Emergent.hpp>
-#include <source/components/Ownership-Stack.hpp>
-#include <source/components/Hash-Stack.hpp>
-#include <source/components/Dictionary-Heap.hpp>
-#include <source/components/Insertion.hpp>
-#include <source/components/InsertionOperators.hpp>
-#include <source/components/InsertionOperatorsConcat.hpp>
-#include <source/components/Removal.hpp>
-#include <source/components/Assignment.hpp>
-#include <source/components/Comparison.hpp>
-#include <source/components/Conversion.hpp>
-#include <source/components/IndexedLinear.hpp>
-#include <source/components/Iteration-ForEach.hpp>
-#include <source/components/Iteration-Range.hpp>
-#include <source/states/Disowned.hpp>
-#include <source/states/Compressed.hpp>
-#include <source/states/Encrypted.hpp>
 #include <Langulus/CT/POD.hpp>
 #include <Langulus/CT/Convertible.hpp>
 #include <Langulus/Utils/Byte.hpp>
+
+#include "Handle.hpp"
+#include "Annies/Components/Typed-Static.hpp"
+#include "Annies/Components/Heap-Movable.hpp"
+#include "Annies/Components/Count-Stack.hpp"
+#include "Annies/Components/Reserve-Emergent.hpp"
+#include "Annies/Components/Ownership-Stack.hpp"
+#include "Annies/Components/Hash-Stack.hpp"
+#include "Annies/Components/Dictionary-Heap.hpp"
+#include "Annies/Components/Insertion.hpp"
+#include "Annies/Components/InsertionOperators.hpp"
+#include "Annies/Components/InsertionOperatorsConcat.hpp"
+#include "Annies/Components/Removal.hpp"
+#include "Annies/Components/Assignment.hpp"
+#include "Annies/Components/Comparison.hpp"
+#include "Annies/Components/Conversion.hpp"
+#include "Annies/Components/IndexedLinear.hpp"
+#include "Annies/Components/Iteration-ForEach.hpp"
+#include "Annies/Components/Iteration-Range.hpp"
+#include "Annies/States/Disowned.hpp"
+#include "Annies/States/Compressed.hpp"
+#include "Annies/States/Encrypted.hpp"
 
 
 namespace Langulus::Annies

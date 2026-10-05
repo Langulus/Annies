@@ -140,7 +140,7 @@ namespace Langulus::Annies::Component
       ///   @note When entries are stored on the heap, it is assumed that     
       ///      SetAllocationInner has been called in a previous component.    
       ///   @param intent The intent and container to transfer from           
-      ///   @important Notice that Copy and Clone intents are not handled     
+      ///   @attention Notice that Copy and Clone intents are not handled     
       ///      here. They're handled in heap components instead, in case      
       ///      something throws an exception while constructing.              
       template<class SELF, CT::Intent I>

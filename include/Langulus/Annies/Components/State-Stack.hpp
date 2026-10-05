@@ -247,6 +247,11 @@ namespace Langulus::Annies::Component
             return true;
       }
 
+      /// Clear the state to the default values                               
+      constexpr void ResetState(this auto&& self) noexcept requires HasStates {
+         self.SetStateInner(GetDefaultState());
+      }
+
    protected:
       /// MARK: Protected                                                     
       LglsComEmplacement(friend);
@@ -285,11 +290,6 @@ namespace Langulus::Annies::Component
             ++i;
          });
          return {accumulator};
-      }
-
-      /// Clear the state to the default value                                
-      constexpr void ResetState(this auto&& self) noexcept requires HasStates {
-         self.SetStateInner(GetDefaultState());
       }
 
       /// Get the contained state (inner)                                     

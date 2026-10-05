@@ -112,7 +112,7 @@ namespace Langulus::Annies
       }
       
       /// Create a verb by manually specifying the verb ID and arguments      
-      static TVerb From(TVerb verb, auto&&...arguments) {
+      static TVerb From(VMeta verb, auto&&...arguments) {
          TVerb result {LglsFwd(arguments)...};
          result.SetVerb(verb);
          return result;
