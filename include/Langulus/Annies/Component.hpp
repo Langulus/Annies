@@ -65,7 +65,7 @@ namespace Langulus::Annies
    namespace Component
    {
       /// Used to disable components at compile-time                          
-      template<class>
+      template<class...>
       struct DisabledComponent {
          using CTTI_Component = Yup;
          static constexpr bool SkipThisComponent = true;
@@ -598,10 +598,18 @@ namespace Langulus::Annies
       namespace StateInner
       {
          /// Go through all components and accumulate their state requests    
-         /// into a StateStack component                                      
+         /// into a StateStack component. Unless there's already at least one 
+         /// such state component, in which case this does nothing.           
          template<CT::Component C1, CT::Component...CN>
          consteval auto DefineStates() {
-            if constexpr (requires { typename C1::Subcomponents; }) {
+            if constexpr (requires { typename C1::StateWrapper; }
+            or           (requires { typename CN::StateWrapper; } or ...)) {
+               // An explicit state component already exists.           
+               // Never overwrite! Handles avoid having states at all,  
+               // by simply adding an empty state component.            
+               return No {};
+            }
+            else if constexpr (requires { typename C1::Subcomponents; }) {
                constexpr auto first = Expand(typename C1::Subcomponents{}, []<class...InnerC1> {
                   return DefineStates<InnerC1...>();
                });
@@ -633,7 +641,8 @@ namespace Langulus::Annies
          }
 
          template<CT::State...STATES>
-         consteval auto DecideStateComponent(Types<STATES...>) -> StateStack<STATES...>;
+         consteval auto DecideStateComponent(Types<STATES...>&&) -> StateStack<STATES...>;
+         consteval auto DecideStateComponent(No&&)               -> DisabledComponent<>;
       }
 
       template<CT::Component...COMPONENTS>
@@ -775,9 +784,9 @@ namespace Langulus::Annies
       consteval bool ValidateComponentOrder() {
          static_assert(CT::Component<CN...>,
             "All elements must be components");
-         static_assert(((not requires { typename CN::StateList; }) and ...),
+         /*static_assert(((not requires { typename CN::StateList; }) and ...),
             "The state component will be added automatically - remove it, and just "
-            "rely on StateRequest(s) in other components.");
+            "rely on StateRequest(s) in other components.");*/
          static_assert((::std::is_standard_layout_v<CN> and ...),
             "All components must have standard layouts");
          static_assert((sizeof(CN) * ...) == 1,

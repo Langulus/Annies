@@ -37,7 +37,7 @@ namespace Langulus::Annies::Component
       /// Convert block's first element into another block of size 1.         
       ///   @param out What are we converting to?                             
       ///   @return 1 on success                                              
-      template<CT::Container C, CT::ContainsOne OUT>
+      template<CT::Container C, CT::ContainsOne OUT> requires CT::NoIntent<OUT>
       auto ConvertTo(this C const& self, OUT& out) -> size_t {
          if (self.IsEmpty())
             return 0;
@@ -101,7 +101,7 @@ namespace Langulus::Annies::Component
       ///   @param out what are we converting to?                             
       ///   @return the number of converted elements inserted in 'out'.       
       ///      this will be smaller than self.GetCount() on partial success   
-      template<CT::Container C, CT::ContainsMany OUT>
+      template<CT::Container C, CT::ContainsMany OUT> requires CT::NoIntent<OUT>
       auto ConvertTo(this C const& self, OUT& out) -> size_t {
          if (self.IsEmpty())
             return 0;

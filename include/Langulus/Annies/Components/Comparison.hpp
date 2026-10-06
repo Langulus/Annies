@@ -69,7 +69,8 @@ namespace Langulus::Annies::Component
       ///   @param lhs left container                                         
       ///   @param rhs right container                                        
       ///   @return true if the two containers are identical                  
-      template<Cid SID = ID, CT::Container LHS, CT::Container RHS> requires Relevant<SID>
+      template<Cid SID = ID, CT::Container LHS, CT::Container RHS>
+      requires (Relevant<SID> and CT::NoIntent<RHS>)
       constexpr bool CompareEqual(this const LHS& lhs, const RHS& rhs) {
          if consteval {
             // Heap should be empty at compile-time                     
@@ -288,7 +289,7 @@ namespace Langulus::Annies::Component
       ///   @attention this doesn't benefit from hashing and will three-way   
       ///      compare all elements until short-circuited                     
       ///   @return the ordering result                                       
-      template<CT::Container LHS, CT::Container RHS>
+      template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
       constexpr auto Compare(this const LHS& lhs, const RHS& rhs) /*-> Ordering<LHS>*/ {
          LglsVerboseScoped("Comparing ",
             Logger::White, lhs.GetCount(), "x of ", lhs.GetName(),
@@ -474,7 +475,7 @@ namespace Langulus::Annies::Component
       ///   @attention compares only the main dimension                       
       ///   @param rhs the value to compare against                           
       ///   @return true if elements are the same                             
-      template<CT::Container C, CT::NoIntent RT> requires CT::ContainsOne<RT>
+      template<CT::Container C, CT::ContainsOne RT> requires CT::NoIntent<RT>
       constexpr bool CompareOneEqualEx(this C const& self, const RT& rhs) {
          if consteval {
             // Heap should be empty at compile-time                     
@@ -505,7 +506,7 @@ namespace Langulus::Annies::Component
       ///   @attention this doesn't benefit from hashing                      
       ///   @param rhs the value to compare against                           
       ///   @return true if elements are the same                             
-      template<CT::Container C, CT::NoIntent RT> requires CT::ContainsOne<RT>
+      template<CT::Container C, CT::ContainsOne RT> requires CT::NoIntent<RT>
       constexpr auto CompareOneEx(this C const& self, const RT& rhs) {
          using RELEVANT = typename Id::template Intersect<typename RT::Dimensions>;
 
@@ -549,20 +550,23 @@ namespace Langulus::Annies::Component
       /// HashRecompute every time this comparison happens.                   
       ///   @attention compares all shared dimensions at once                 
       ///   @return true if hashes are the same                               
-      template<CT::Container LHS, CT::Container RHS>
+      template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
       constexpr bool CompareHashes(this LHS const& lhs, RHS const& rhs)
       requires (HASH and requires { lhs.GetHash(); rhs.GetHash(); }) {
          return lhs.GetHash() == rhs.GetHash();
       }
       
-      template<CT::Container C1, CT::Container C2>
-      auto Matches(this const C1&, const C2&) noexcept -> Count<C1>;
+      template<CT::Container C1, CT::Container C2> requires CT::NoIntent<C2>
+      auto Matches(this const C1&, const C2&) noexcept -> size_t;
 
-      template<CT::Container C1, CT::Container C2> requires CT::Character<TypeOf<C1>, TypeOf<C2>>
+      template<CT::Container C1, CT::Container C2>
+      requires (CT::NoIntent<C2> and CT::Character<TypeOf<C1>, TypeOf<C2>>)
+      auto MatchesLoose(this const C1&, const C2&) noexcept -> size_t;
+
+      template<CT::Container C1, CT::Container C2>
+      requires (CT::NoIntent<C2> and CT::Character<TypeOf<C1>, TypeOf<C2>>)
       bool CompareLoose(this const C1&, const C2&) noexcept;
-      template<CT::Container C1, CT::Container C2> requires CT::Character<TypeOf<C1>, TypeOf<C2>>
-      auto MatchesLoose(this const C1&, const C2&) noexcept -> Count<C1>;
-      
+
       /// MARK: Find                                                          
       /// Get a handle to a matching item                                     
       ///   @attention compares only the chosen dimension                     
@@ -781,7 +785,7 @@ namespace Langulus::Annies::Component
       ///   @attention compares only the main dimension                       
       ///   @param A1 the sequence of items to search for                     
       ///   @return true if item was found in the main dimension              
-      template<CT::ContainsMany C, /*CT::ContainsMany*/class A1> requires CT::NoIntent<A1>
+      template<CT::ContainsMany C, CT::NoIntent A1>
       bool ContainsRange(this C const& self, A1 const& a1) {
          if constexpr (CONVERT) {
             if constexpr (CT::Serializer<C>) {

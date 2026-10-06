@@ -152,7 +152,17 @@ namespace Langulus::Annies::Component
          using IT = Decvq<Deref<Deint<I>>>;
          decltype(auto) from = LglsFwd(intent.what);
 
-         if constexpr (CT::Referred<I> or (IT::OwnedDeep & OnCreateAndDestroy) == 0) {
+         constexpr bool forceRefer = [] {
+            // Checks if argument has already been referenced upon      
+            // its creation, and whether it will be dereferenced upon   
+            // its destruction. If not, we need to reference it here.   
+            if constexpr (requires { IT::OwnedDeep & OnCreateAndDestroy; } )
+               return (IT::OwnedDeep & OnCreateAndDestroy) == 0;
+            else
+               return true;
+         }();
+
+         if constexpr (CT::Referred<I> or forceRefer) {
             // Refer                                                    
             ThisCom::Keep();
          }

@@ -295,17 +295,17 @@ namespace Langulus::Annies::Component
       }
 
       /// Dereference the first element inside the container                  
-      constexpr auto& operator * (this auto&& self) assumptious
+      constexpr decltype(auto) operator * (this auto&& self) assumptious
       requires requires { *self.template GetRawAs<TYPE>(); } {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
          return *self.template GetRawAs<TYPE>();
       }
 
       /// Access the first element inside the container                       
-      constexpr auto* operator -> (this auto&& self) assumptious
-      requires requires { self.template GetRawAs<TYPE>(); } {
+      constexpr decltype(auto) operator -> (this auto&& self) assumptious
+      requires requires { *self.template GetRawAs<TYPE>(); } {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
-         return self.template GetRawAs<TYPE>();
+         return *self.template GetRawAs<TYPE>();
       }
       
       /// This is still used if statically-typed - checks if types are        

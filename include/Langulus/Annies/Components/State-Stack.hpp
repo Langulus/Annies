@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -41,7 +41,8 @@ namespace Langulus::Annies::Component
       using  StackRequest = Tif<HasStates, StateWrapper, void>;
 
       ///                                                                     
-      /// The bitfield capable of containing all variable states              
+      /// The bitfield capable of containing all variable states.             
+      /// Note: also used to detect if there's a state component added!       
       struct StateWrapper {
          StateType mState;
 
@@ -83,8 +84,8 @@ namespace Langulus::Annies::Component
          return ToAbsoluteState(self.GetStateInner());
       }
 
-      /// Set the current state of the container. Allowed only while container
-      /// is empty.                                                           
+      /// Set the current state of the container. Allowed only while          
+      /// container is empty.                                                 
       constexpr void SetState(this auto& self, int state) requires HasStates {
          LglsAssert(self.GetAllocation() == nullptr,
             "Changing state of an allocated container is not permitted in this way. "
@@ -160,8 +161,11 @@ namespace Langulus::Annies::Component
       }
 
    public:
-      static constexpr bool CanBeMissing  = CheckStateSupport<Annies::State::Past, Annies::State::Future>();
-      static constexpr bool CanBeDisowned = CheckStateSupport<Annies::State::Disowned>();
+      static constexpr bool CanBeMissing
+         = CheckStateSupport<Annies::State::Past, Annies::State::Future>();
+         
+      static constexpr bool CanBeDisowned
+         = CheckStateSupport<Annies::State::Disowned>();
 
       /// Check if container is marked as missing past/future                 
       ///   @return true if this container is marked as missing               
@@ -265,6 +269,9 @@ namespace Langulus::Annies::Component
       LglsStateSorted(friend);
       LglsStateTracked(friend);
       LglsStateTyped(friend);
+      LglsStateTagged(friend);
+      LglsStateVerbed(friend);
+      LglsStatePinned(friend);
       LglsStateDisowned(friend);
 
       /// Get the value of a specific state                                   

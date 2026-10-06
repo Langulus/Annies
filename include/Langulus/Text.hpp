@@ -135,7 +135,12 @@ namespace Langulus::Annies
 
          this->ResetState();
 
-         if constexpr (CT::TextLiteral<IT>) {
+         if constexpr (CT::Character<IT>) {
+            this->AllocateFresh(1);
+            *this->GetRaw() = DeintCast(source);
+            this->SetCountInner(1);
+         }
+         else if constexpr (CT::TextLiteral<IT>) {
             // Create from a text literal/bounded array                 
             using CHAR = TypeOf<IT>;
             static_assert(Same<CHAR, char>, "Type mismatch");
@@ -214,21 +219,23 @@ namespace Langulus::Annies
 
          this->ResetHash();
 
-         // Take ownership if the intent requires it                    
-         if constexpr (CT::Copied<I> or CT::Cloned<I>)
+         // Take ownership if the intent requires it.                   
+         // Character construction always has ownership either way.     
+         if constexpr (not CT::Character<IT>
+         and (CT::Copied<I> or CT::Cloned<I>))
             this->TakeOwnership();
       }
 
       /// Construction from all kinds of characters                           
       ///   @attention this is an owning constructor                          
-      template<CT::Character T>
+      /*template<CT::Character T>
       constexpr Text(T&& ch) {
          this->ResetState();
          this->AllocateFresh(1);
          *this->GetRawAs<char>() = DeintCast(ch);
          this->SetCountInner(1);
          this->ResetHash();
-      }
+      }*/
       
       /// MARK: =                                                             
       constexpr Text& operator = (Text const& other) {
@@ -642,3 +649,4 @@ namespace Langulus
 {
    using Annies::Text;
 }
+

@@ -234,9 +234,10 @@ namespace Langulus::Annies::Component
 
       /// Transfer from any kind of container, respecting intents             
       ///   @param intent the intent and container to transfer from           
-      template<class SELF, CT::Intent I> requires CT::Container<I>
-      void ConstructFrom(this SELF& self, I&& intent) {
-         ThisCom::AbsorbVerb(LglsFwd(intent));
+      template<class SELF, CT::Intent I>
+      void ConstructFrom(this SELF& self, I&& intent)
+      requires (CT::Container<I> and requires { intent->GetVerb(); }) {
+         ThisCom::AbsorbVerb(DeintCast(intent));
 
          if constexpr (VerbErased) { //TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated. so what about verb constraints?
             // While we are interfacing external memory, we have to     

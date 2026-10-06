@@ -16,62 +16,6 @@
 #include "Langulus/CT/Contiguous.hpp"
 
 
-/*namespace Langulus::CT
-{
-   /// Check if container's elements are unfold-assignable                    
-   ///   @attention type-erased elements are always assignable, and will fail 
-   ///      at runtime if not reflected as such                               
-   ///   @attention we allow a fallback for elements that are not assignable, 
-   ///      but constructible - this is detected by the container, and we can 
-   ///      just destroy and reconstruct the element in its place.            
-   template<class C, class A>
-   concept RangeAssignable = Container<C> and (
-      Untyped<C> or UnfoldAssignable<TypeOf<C>, A>
-                 or UnfoldConstructible<TypeOf<C>, A>
-   );
-
-   namespace Inner
-   {
-      /// Test whether a container is assignable with the given argument      
-      ///   @tparam C the container                                           
-      ///   @tparam A the argument to test                                    
-      ///   @return true if you can assign A to the container                 
-      template<Container C, class A>
-      consteval bool DeepAssignable() noexcept {
-         using SA = IntentOfT<A>;
-         using T  = TypeOf<C>;
-
-         if constexpr (Untyped<C>) {
-            // Type-erased containers accept almost any type - they     
-            // will report errors at runtime instead, if any            
-            return Reflectable<Deint<A>>;
-         }
-         else if constexpr (Container<A>) {
-            if constexpr (SA::Shallow) {
-               // Generally, shallow intents are always supported, but  
-               // copying will call element assigners, so we have to    
-               // check if the contained type supports it               
-               if constexpr (Copied<SA>)
-                  return ReferAssignable<T>;
-               else
-                  return true;
-            }
-            else {
-               // Cloning always calls element assigners, and we have   
-               // to check whether contained elements can do it         
-               return IntentAssignable<Langulus::Clone, T>;
-            }
-         }
-         else return UnfoldAssignable<T, A>;
-      };
-   }
-
-   /// Concept for recognizing argument with which a statically typed         
-   /// container can be assigned                                              
-   template<class C, class A>
-   concept DeepAssignable = Inner::DeepAssignable<C, A>();
-}*/
-
 namespace Langulus::Annies::Component
 {
    /// Refers back to this particular component instance through the deduced  
@@ -369,7 +313,7 @@ namespace Langulus::Annies::Component
          static_assert(CT::Contiguous<C>,
             "Can be used only for contiguous containers");
             
-         using IT = Decvq<Deref<TypeOf<I>>>;
+         using IT = Decvq<Deref<Deint<I>>>;
          LglsAssumeDev(self.template GetRaw<SID>(),  "Invalid heap");
          LglsAssumeDev(self.template IsTyped<SID>(), "Invalid type");
          decltype(auto) rhs = LglsFwd(intent.what);

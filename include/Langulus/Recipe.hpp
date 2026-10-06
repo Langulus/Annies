@@ -55,7 +55,7 @@ namespace Langulus::Annies
          this->Destroy();
       }
 
-      /// Create an empty recipe for a particular target type                 
+      /// Create a recipe for a particular target type                        
       ///   @param type what is the recipe for?                               
       ///   @param arguments... arguments for the descriptor                  
       ///   @return the new recipe instance                                   
@@ -65,6 +65,23 @@ namespace Langulus::Annies
          return Abandon(result);
       }
    
+   #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+      /// Create a recipe for a particular target type from its name (RTTI)   
+      ///   @param type what is the recipe for?                               
+      ///   @param arguments... arguments for the descriptor                  
+      ///   @return the new recipe instance                                   
+      static Recipe Of(Token type, auto&&...arguments) {
+         Recipe result {LglsFwd(arguments)...};
+         result.SetTarget(RTTI::Registry::GetMetaDataByToken(type));
+         return Abandon(result);
+      }
+   #endif
+   
+      /// Create a recipe for a particular target type, by extracting that    
+      /// type from any kind of container.                                    
+      ///   @param typed container to copy type from                          
+      ///   @param arguments... arguments for the descriptor                  
+      ///   @return the new recipe instance                                   
       static Recipe Of(CT::Container auto const& typed, auto&&...arguments) {
          Recipe result {LglsFwd(arguments)...};
          result.SetTarget(typed.GetType());
@@ -72,6 +89,9 @@ namespace Langulus::Annies
       }
 
       /// Copy target and charge from another recipe                          
+      ///   @param target_and_charge copy target type and charge from here    
+      ///   @param arguments... arguments for the descriptor                  
+      ///   @return the new recipe instance                                   
       static Recipe From(Recipe const& target_and_charge, auto&&...arguments) {
          Recipe result {LglsFwd(arguments)...};
          result.SetTarget(target_and_charge.GetTarget());

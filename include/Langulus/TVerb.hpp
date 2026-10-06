@@ -129,9 +129,7 @@ namespace Langulus::Annies
       /// Create a verb by extracting verb ID, charge and argument from verb. 
       /// Source and output remain empty.                                     
       static TVerb Like(CT::Executable auto const& source) {
-         TVerb result = From(source.GetVerb(), source.GetArgument());
-         result.SetCharge(source.GetCharge());
-         return result;
+         return From(source, source.GetArgument());
       }
 
       /// Assignment                                                          

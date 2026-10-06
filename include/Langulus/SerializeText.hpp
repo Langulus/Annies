@@ -44,7 +44,7 @@ namespace Langulus::CTTI
          //TODO multidimensional containers like maps have multiple types
          const bool scoped = from.GetCount() > 1 or not from.IsValid() or from.IsExecutable(); //TODO could carry in context and check verb precedence to avoid scoping in some cases
          if (scoped)
-            to += Serial::OpenScope;
+            to += Serial::OpenScope.Token;
          return scoped;
       }
       
@@ -52,7 +52,7 @@ namespace Langulus::CTTI
          //TODO multidimensional containers like maps have multiple types
          const bool scoped = from.GetCount() > 1 or not from.IsValid() or from.IsExecutable(); //TODO could carry in context and check verb precedence to avoid scoping in some cases
          if (scoped)
-            to += Serial::CloseScope;
+            to += Serial::CloseScope.Token;
          return scoped;
       }
       
@@ -158,9 +158,9 @@ namespace Langulus::CTTI
 
       if constexpr (requires { self.IsPast(); }) {
          if (self.IsPast())
-            out += Serial::Past;
+            out += Serial::Past.Token;
          else if (self.IsFuture())
-            out += Serial::Future;
+            out += Serial::Future.Token;
       }
    }
 
@@ -206,9 +206,9 @@ namespace Langulus::CTTI
                // as Any and is binary compatible as well.              
                auto* item = self.template Get<Annies::Any, ID>();
                if (item->IsPast())
-                  out += Serial::Past;
+                  out += Serial::Past.Token;
                else if (item->IsFuture())
-                  out += Serial::Future;
+                  out += Serial::Future.Token;
             }
          }
          else {
@@ -228,9 +228,9 @@ namespace Langulus::CTTI
             if constexpr (CT::Deep<T> and CT::ContainsOne<T> and requires { item->IsPast(); }) {
                static_assert(CT::NotHandle<T>);
                if (item->IsPast())
-                  out += Serial::Past;
+                  out += Serial::Past.Token;
                else if (item->IsFuture())
-                  out += Serial::Future;
+                  out += Serial::Future.Token;
             }
          }
       });
@@ -243,17 +243,17 @@ namespace Langulus::CTTI
       ConstAll<C&> item, Annies::Text& out, [[maybe_unused]] Context* context
    ) {
       if constexpr (Same<C, Flow::Code>) {
-         out += Serial::OpenCode;
+         out += Serial::OpenCode.Token;
          out += item;
-         out += Serial::CloseCode;
+         out += Serial::CloseCode.Token;
       }
       else if constexpr (Same<C, Annies::Text>) {
-         out += Serial::OpenString;
+         out += Serial::OpenString.Token;
          out += item;
-         out += Serial::CloseString;
+         out += Serial::CloseString.Token;
       }
       else if constexpr (Same<C, Annies::Bytes>) {
-         out += Serial::OpenByte;
+         out += Serial::OpenByte.Token;
          out.Reserve(item.GetCount()*2);
          ::std::array<char, sizeof(Byte) * 2> temp;
          auto from = item.GetRaw();
@@ -263,7 +263,7 @@ namespace Langulus::CTTI
             out += Annies::Text(temp);
             ++from;
          }
-         out += Serial::CloseByte;   
+         out += Serial::CloseByte.Token;   
       }
       else {
          static_assert(false, "Unhandled non-deep container");
@@ -282,9 +282,9 @@ namespace Langulus::CTTI
    void SerializationRule<Annies::Text, C>::Serialize(
       C const& item, Annies::Text& out, Context*
    ) {
-      out += Serial::OpenCharacter;
+      out += Serial::OpenCharacter.Token;
       out += item;
-      out += Serial::CloseCharacter;
+      out += Serial::CloseCharacter.Token;
    }
 }
 

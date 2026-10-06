@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,19 +13,6 @@
 #include <Langulus/Allocator.hpp>
 #include <Langulus/MetaOf.hpp>
 
-
-/*namespace Langulus::CT
-{
-   /// Check if container's elements are emplaceable using the provided       
-   /// argument list. Use empty list to test if default-constructible.        
-   ///   @attention type-erased elements are always emplaceable, because      
-   ///      all arguments will be encapsulated in a descriptor, and will fail 
-   ///      at runtime if not reflected as descriptor-constructible           
-   template<class C, class...A>
-   concept RangeEmplaceable = Container<C> and (
-      Untyped<C> or ::std::constructible_from<TypeOf<C>, A...>
-   );
-}*/
 
 namespace Langulus::Annies
 {
@@ -503,7 +490,7 @@ namespace Langulus::Annies::Component
             "Emplacing only first element in a container with many. "
             "GetHandle() first?"
          );*/
-         using IT = Decvq<Deref<TypeOf<I>>>;
+         using IT = Decvq<Deref<Deint<I>>>;
          LglsAssumeDev(self.template GetRaw<SID>(), "Invalid heap");
          LglsAssumeDev(self.template IsTyped<SID>(), "Invalid type");
          decltype(auto) rhs = LglsFwd(intent.what);

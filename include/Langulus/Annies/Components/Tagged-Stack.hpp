@@ -138,7 +138,7 @@ namespace Langulus::Annies::Component
       /// Set all contained tags by copying them from another container.      
       /// This is still used if statically tagged - checks if tags are        
       /// compatible in constructors and assigners.                           
-      ///   @param other the container to copy types from                     
+      ///   @param other the container to copy tags from                      
       template<Cid SID = ID, CT::Container I, class SELF> requires CT::NoIntent<I>
       void AbsorbTag(this SELF& self, I const& other) {
          if constexpr (TagErased or CT::TagErased<I>) {
@@ -224,9 +224,10 @@ namespace Langulus::Annies::Component
 
       /// Transfer from any kind of container, respecting intents             
       ///   @param intent the intent and container to transfer from           
-      template<class SELF, CT::Intent I> requires CT::Container<I>
-      void ConstructFrom(this SELF& self, I&& intent) {
-         ThisCom::AbsorbTag(LglsFwd(intent));
+      template<class SELF, CT::Intent I>
+      void ConstructFrom(this SELF& self, I&& intent)
+      requires (CT::Container<I> and requires { intent->GetTag(); }) {
+         ThisCom::AbsorbTag(DeintCast(intent));
 
          if constexpr (TagErased) { //TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated. so what about tag constraints?
             // While we are interfacing external memory, we have to     

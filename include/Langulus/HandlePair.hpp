@@ -22,6 +22,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<>
    struct THandlePair<Handle, Handle> : Com::Container<
+      Com::StateStack<>,
       Com::Multitype<Com::TypedStack<DMeta, void, false, 0>,
                      Com::TypedStack<DMeta, void, false, 1>>,
       Com::Multiprovider<Com::HeapReference<HeapEntry<0>>,
@@ -105,6 +106,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<>
    struct THandlePair<HandleMut, HandleMut> : Com::Container<
+      Com::StateStack<>,
       Com::Multitype<Com::TypedStack<DMeta, void, false, 0>,
                      Com::TypedStack<DMeta, void, false, 1>>,
       Com::Multiprovider<Com::HeapReference<HeapEntry<0>>,
@@ -187,6 +189,7 @@ namespace Langulus::Annies
    /// Often used for mutable access in maps, where keys can't be modified.   
    template<>
    struct THandlePair<Handle, HandleMut> : Com::Container<
+      Com::StateStack<>,
       Com::Multitype<Com::TypedStack<DMeta, void, false, 0>,
                      Com::TypedStack<DMeta, void, false, 1>>,
       Com::Multiprovider<Com::HeapReference<HeapEntry<0>>,
@@ -281,6 +284,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<CT::Reference K, CT::Reference V> requires CT::NotSheddable<K, V>
    struct THandlePair<THandleEmergent<K>, THandleEmergent<V>> : Com::Container<
+      Com::StateStack<>,
       Com::Multitype<Com::TypedStatic<DMeta, Deref<K>, 0>,
                      Com::TypedStatic<DMeta, Deref<V>, 1>>,
       Com::Multiprovider<Com::HeapReference<HeapEntry<0, Deref<K>*>>,
@@ -375,6 +379,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<CT::Reference K, CT::Reference V> requires CT::NotSheddable<K, V>
    struct THandlePair<THandle<K>, THandle<V>> : Com::Container<
+      Com::StateStack<>,
       Com::Multitype<Com::TypedStatic<DMeta, Deref<K>, 0>,
                      Com::TypedStatic<DMeta, Deref<V>, 1>>,
       Com::Multiprovider<Com::HeapReference<HeapEntry<0, Deref<K>*>>,
@@ -479,6 +484,7 @@ namespace Langulus::Annies
    ///                                                                        
    template<CT::NotReference K, CT::NotReference V> requires (CT::NotSheddable<K, V> and CT::NotHandle<K, V>)
    struct THandlePair<THandle<K>, THandle<V>> : Com::Container<
+      Com::StateStack<>,
       Com::Multitype<Com::TypedStatic<DMeta, Deref<K>, 0>,
                      Com::TypedStatic<DMeta, Deref<V>, 1>>,
       Com::Multiprovider<EnableComponentIf<CT::Dense<K>,  Com::Stack<K, 0>>,

@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Annies/Container.hpp"
+#include "Annies/Components/State-Stack.hpp"
 #include "Annies/Components/Typed-Stack.hpp"
 #include "Annies/Components/Heap-Reference.hpp"
 #include "Annies/Components/Count-Static.hpp"
@@ -21,6 +22,7 @@
 namespace Langulus::Annies::Inner
 {
    using TypeErasedHandleMut = Com::Container<
+      Com::StateStack<>,
       Com::TypedStack<DMeta, void, true>,
       Com::HeapReference<>,
       Com::CountStatic<1u>,
@@ -33,6 +35,7 @@ namespace Langulus::Annies::Inner
    >;
 
    using TypeErasedHandle = Com::Container<
+      Com::StateStack<>,
       Com::TypedStack<DMeta, void, true>,
       Com::HeapReference<>,
       Com::CountStatic<1u>,
@@ -43,6 +46,7 @@ namespace Langulus::Annies::Inner
    >;
 
    using TypeErasedHandleMutDisowned = Com::Container<
+      Com::StateStack<>,
       Com::TypedStack<DMeta, void, true>,
       Com::HeapReference<>,
       Com::CountStatic<1u>,
@@ -54,6 +58,7 @@ namespace Langulus::Annies::Inner
    >;
 
    using TypeErasedHandleDisowned = Com::Container<
+      Com::StateStack<>,
       Com::TypedStack<DMeta, void, true>,
       Com::HeapReference<>,
       Com::CountStatic<1u>,
@@ -79,6 +84,7 @@ namespace Langulus::Annies::Inner
    /// Statically typed handle to a dense element held inside a container     
    template<CT::Reference T> requires (CT::Dense<T> and CT::NotSheddable<T> and CT::NotHandle<T>)
    using THandleEmbeddedDense = Com::Container<
+      Com::StateStack<>,
       Com::TypedStatic<DMeta, Deref<T>>,
       Com::HeapReference<HeapEntry<0, Deref<T>*>>,
       Com::CountStatic<1u>,
@@ -94,6 +100,7 @@ namespace Langulus::Annies::Inner
    /// Statically typed handle to a sparse element held inside a container    
    template<CT::Reference T> requires (CT::Sparse<T> and CT::NotSheddable<T> and CT::NotHandle<T>)
    using THandleEmbeddedSparse = Com::Container<
+      Com::StateStack<>,
       Com::TypedStatic<DMeta, Deref<T>>,
       Com::HeapReference<HeapEntry<0, Deref<T>*>>,
       Com::CountStatic<1u>,
@@ -108,6 +115,7 @@ namespace Langulus::Annies::Inner
    /// Statically typed handle to a dense element held inside a container     
    template<CT::Reference T> requires (CT::Dense<T> and CT::NotSheddable<T> and CT::NotHandle<T>)
    using THandleEmbeddedDenseEmergent = Com::Container<
+      Com::StateStack<>,
       Com::TypedStatic<DMeta, Deref<T>>,
       Com::HeapReference<HeapEntry<0, Deref<T>*>>,
       Com::CountStatic<1u>,
@@ -124,6 +132,7 @@ namespace Langulus::Annies::Inner
    /// (with emergent deep ownership)                                         
    template<CT::Reference T> requires (CT::Sparse<T> and CT::NotSheddable<T> and CT::NotHandle<T>)
    using THandleEmbeddedSparseEmergent = Com::Container<
+      Com::StateStack<>,
       Com::TypedStatic<DMeta, Deref<T>>,
       Com::HeapReference<HeapEntry<0, Deref<T>*>>,
       Com::CountStatic<1u>,
@@ -138,6 +147,7 @@ namespace Langulus::Annies::Inner
    /// Statically typed handle to a disowned element held inside container    
    template<CT::Reference T> requires (CT::NotSheddable<T> and CT::NotHandle<T>)
    using THandleDisownedEmbedded = Com::Container<
+      Com::StateStack<>,
       Com::TypedStatic<DMeta, Deref<T>>,
       Com::HeapReference<HeapEntry<0, Deref<T>*>>,
       Com::CountStatic<1u>,
@@ -153,6 +163,7 @@ namespace Langulus::Annies::Inner
    //TODO inherit TOwn from this?
    template</*CT::NotReference*/class T> requires (CT::Dense<T> and CT::NotSheddable<T> and CT::NotHandle<T>)
    using THandleLocalDense = Com::Container<
+      Com::StateStack<>,
       Com::TypedStatic<DMeta, Deref<T>>,
       Com::Stack<T>,
       Com::CountStatic<1u>,
@@ -166,6 +177,7 @@ namespace Langulus::Annies::Inner
    ///   @attention this handle is local and has strong ownership!            
    template<CT::NotReference T> requires (CT::Sparse<T> and CT::NotSheddable<T> and CT::NotHandle<T>)
    using THandleLocalSparse = Com::Container<
+      Com::StateStack<>,
       Com::TypedStatic<DMeta, T>,
       Com::HeapMovable<0, 0, HeapEntry<0, T*>>,
       Com::CountStatic<1u>,

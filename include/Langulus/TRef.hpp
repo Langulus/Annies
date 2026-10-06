@@ -124,6 +124,18 @@ namespace Langulus::Annies
          return *this;
       }
 
+      /// Access the pointer                                                  
+      constexpr auto* operator * (this auto&& self) assumptious {
+         LglsAssumeDev(not self.IsEmpty(), "Container is empty");
+         return self.Get();
+      }
+
+      /// Access the pointer                                                  
+      constexpr auto* operator -> (this auto&& self) assumptious {
+         LglsAssumeDev(not self.IsEmpty(), "Container is empty");
+         return self.Get();
+      }
+
       /// Three-way comparison                                                
       constexpr auto operator <=> (const TRef& rhs) const noexcept {
          return Base::GetHeapInner() <=> rhs.GetHeapInner();
