@@ -24,7 +24,7 @@ namespace Langulus::Annies::Component
 {
    /// Refers back to this particular component instance through the deduced  
    /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.VerbedStack<META, TYPE, CONSTRAIN, ID>
+   #define ThisCom self.VerbedStack<META, VERB, CONSTRAIN, ID>
 
    ///                                                                        
    /// Defines the contained verb as a member variable, allowing the use of   
@@ -33,20 +33,20 @@ namespace Langulus::Annies::Component
    ///      for padding so that containers are binary-compatible, but not     
    ///      really red or written to.                                         
    ///   @tparam META the type of the meta                                    
-   ///   @tparam TYPE optionally static verb, use void for verb-erasure       
+   ///   @tparam VERB optionally static verb, use void for verb-erasure       
    ///   @tparam CONSTRAIN override verb-constraint                           
    ///   @tparam ID data provider that gets verbed                            
-   template<class META, class TYPE, bool CONSTRAIN, Cid ID>
-   struct VerbedStack : State::Verbed<StateValueIf(CONSTRAIN or not ::std::is_void_v<TYPE>), ID> {
+   template<class META, class VERB, bool CONSTRAIN, Cid ID>
+   struct VerbedStack : State::Verbed<StateValueIf(CONSTRAIN or not ::std::is_void_v<VERB>), ID> {
       using CTTI_Component  = Yup;
       using CTTI_Executable = Yup;
       using CTTI_ReflectAs  = void;
-      using CTTI_Verbed     = TYPE;
+      using CTTI_Verbed     = VERB;
       using StackRequest    = META;
       using Id              = Values<ID>;
 
       static constexpr int  ComponentPrecedence = -2800;
-      static constexpr bool VerbErased = CT::Void<TYPE>;
+      static constexpr bool VerbErased = CT::Void<VERB>;
 
       /// MARK: Public                                                        
       /// Get the contained verb                                              
@@ -57,7 +57,7 @@ namespace Langulus::Annies::Component
             if constexpr (VerbErased)
                return ThisCom::GetVerbInner();
             else
-               return MetaVerbOf<TYPE>();
+               return MetaVerbOf<VERB>();
          }
       }
 
@@ -78,10 +78,10 @@ namespace Langulus::Annies::Component
          else {
             if constexpr (CT::Charged<C>) {
                if (self.GetMass() < 0)
-                  return NegativeNameOfVerb<TYPE>;
+                  return NegativeNameOfVerb<VERB>;
             }
 
-            return PositiveNameOfVerb<TYPE>;
+            return PositiveNameOfVerb<VERB>;
          }
       }
 
@@ -103,7 +103,7 @@ namespace Langulus::Annies::Component
          if constexpr (VerbErased)
             return ThisCom::GetVerbInner() == MetaVerbOf<T>();
          else
-            return Exact<TYPE, T>;
+            return Exact<VERB, T>;
       }
       
       /// Set the contained verb if possible.                                 
@@ -112,7 +112,7 @@ namespace Langulus::Annies::Component
       ///   @tparam T the new verb                                            
       template<CT::DefineVerb T, Cid SID = ID, CT::Container C>
       void SetVerb(this C& self) {
-         static_assert(VerbErased or Exact<T, TYPE>, "Verb mismatch");
+         static_assert(VerbErased or Exact<T, VERB>, "Verb mismatch");
          if constexpr (VerbErased)
             ThisCom::SetVerb(MetaVerbOf<T>());
       }
@@ -121,32 +121,32 @@ namespace Langulus::Annies::Component
       /// This is still used if statically verbed - checks if verbs are       
       /// compatible in constructors and assigners.                           
       /// This particular override doesn't benefit from compile-time checks.  
-      ///   @param type the new verb                                          
+      ///   @param verb the new verb                                          
       template<Cid SID = ID, CT::Container C>
-      void SetVerb(this C& self, META type) {
+      void SetVerb(this C& self, META verb) {
          if constexpr (VerbErased) {
             // This container is verb-erased                            
-            auto& t = ThisCom::GetVerbInner();
-            if (t == type)
+            auto& v = ThisCom::GetVerbInner();
+            if (v == verb)
                return;
          
-            if (not t) {
-               t = type;
+            if (not v) {
+               v = verb;
                return;
             }
 
             LglsAssert(not ThisCom::IsVerbConstrained(),
                "Attempting to mutate verb-locked container"
-               " of verb ", t, " to verb ", type
+               " of verb ", v, " to verb ", verb
             );
             
-            t = type;
+            v = verb;
          }
          else {
             // This container is statically verbed                      
-            auto local = MetaVerbOf<TYPE>();
-            LglsAssert(local.Is(type), "Verb mismatch", ": ", local,
-               " is not ", type);
+            auto local = MetaVerbOf<VERB>();
+            LglsAssert(local == verb, "Verb mismatch", ": ", local,
+               " is not ", verb);
          }
       }
       
@@ -157,12 +157,12 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID, CT::Container I, class SELF> requires CT::NoIntent<I>
       void AbsorbVerb(this SELF& self, I const& other) {
          if constexpr (VerbErased or CT::VerbErased<I>) {
-            auto T = other.template GetVerb<SID>();
-            ThisCom::SetVerb(T);
+            auto V = other.template GetVerb<SID>();
+            ThisCom::SetVerb(V);
          }
          else {
-            using T = VerbOf<I, SID>;
-            ThisCom::template SetVerb<T>();
+            using V = VerbOf<I, SID>;
+            ThisCom::template SetVerb<V>();
          }
       }
 
@@ -195,7 +195,7 @@ namespace Langulus::Annies::Component
             // Statically verbed containers generally don't use the     
             // stack member - it's there only for binary compatiblity.  
             // Set the member only if really, REALLY need by reference. 
-            DecvqAllCast(member) = MetaVerbOf<TYPE>();
+            DecvqAllCast(member) = MetaVerbOf<VERB>();
          }
          return (member);
       }
@@ -203,9 +203,9 @@ namespace Langulus::Annies::Component
       /// Set the contained verb (inner)                                      
       ///   @attention noop if verb-erased                                    
       template<Cid SID = ID>
-      constexpr void SetVerbInner(this auto& self, const META& type) noexcept {
+      constexpr void SetVerbInner(this auto& self, const META& verb) noexcept {
          if constexpr (VerbErased)
-            ThisCom::GetVerbInner() = type;
+            ThisCom::GetVerbInner() = verb;
       }
 
       /// Transfer from any kind of container, respecting intents.            

@@ -139,7 +139,7 @@ namespace Langulus::Annies
    ///   @param other - the thing to compare with                             
    ///   @return true if things are the same                                  
    TEMPLATE() template<CT::NoIntent T> requires CT::NotOwned<T> LANGULUS(INLINED)
-   bool TME()::operator == (const T& rhs) const {
+   bool TME()::operator == (T const& rhs) const {
       return Tag::operator == <TRAIT> (rhs);
    }
 

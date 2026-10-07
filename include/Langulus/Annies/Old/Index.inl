@@ -15,7 +15,7 @@ namespace Langulus::Annies
    /// Constructor from signed integer                                        
    ///   @param value - integer to set                                        
    template<CT::BuiltinSignedInteger T> LANGULUS(INLINED)
-   constexpr Index::Index(const T& value) noexcept (sizeof(T) < sizeof(Type))
+   constexpr Index::Index(T const& value) noexcept (sizeof(T) < sizeof(Type))
       : mIndex {value} {
       if constexpr (sizeof(T) >= sizeof(Type))
          LANGULUS_ASSERT(IsArithmetic(), Access, "Index is not arithmetic");
@@ -28,7 +28,7 @@ namespace Langulus::Annies
    /// Constructor from unsigned integer                                      
    ///   @param value - integer to set                                        
    template<CT::BuiltinUnsignedInteger T> LANGULUS(INLINED)
-   constexpr Index::Index(const T& value) noexcept (sizeof(T) <= sizeof(Type) / 2)
+   constexpr Index::Index(T const& value) noexcept (sizeof(T) <= sizeof(Type) / 2)
       : mIndex {static_cast<Type>(value)} {
       if constexpr (sizeof(T) > sizeof(Type) / 2) {
          constexpr T limit = static_cast<T>(MaxIndex);

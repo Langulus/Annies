@@ -892,7 +892,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("ForEach flat dense element (immutable)") {
-         const auto foreachit = const_cast<const T&>(pack).ForEach(
+         const auto foreachit = const_cast<T const&>(pack).ForEach(
             [&](const int&)    {FAIL();},
             [&](Tag const&)  {FAIL();},
             [&](Many const&)   {FAIL();}
@@ -912,7 +912,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("ForEach flat sparse element (immutable)") {
-         const auto foreachit = const_cast<const T&>(pack).ForEach(
+         const auto foreachit = const_cast<T const&>(pack).ForEach(
             [&](const int*)   {FAIL(); },
             [&](const Tag*) {FAIL(); },
             [&](Many const*)  {FAIL(); }
@@ -932,7 +932,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("ForEachRev flat dense element (immutable)") {
-         const auto foreachit = const_cast<const T&>(pack).ForEachRev(
+         const auto foreachit = const_cast<T const&>(pack).ForEachRev(
             [&](const int&)   {FAIL(); },
             [&](Tag const&) {FAIL(); },
             [&](Many const&)  {FAIL(); }
@@ -952,7 +952,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("ForEachRev flat sparse element (immutable)") {
-         const auto foreachit = const_cast<const T&>(pack).ForEachRev(
+         const auto foreachit = const_cast<T const&>(pack).ForEachRev(
             [&](const int*)   {FAIL(); },
             [&](const Tag*) {FAIL(); },
             [&](Many const*)  {FAIL(); }
@@ -2480,7 +2480,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
 
       WHEN("ForEach flat dense element (immutable)") {
          int it = 0;
-         const auto foreachit = const_cast<const T&>(pack).ForEach(
+         const auto foreachit = const_cast<T const&>(pack).ForEach(
             [&](const int& i) {
                REQUIRE(i == it + 1);
                ++it;
@@ -2531,7 +2531,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
 
       WHEN("ForEachRev flat dense element (immutable)") {
          int it = 0;
-         const auto foreachit = const_cast<const T&>(pack).template ForEach<true>(
+         const auto foreachit = const_cast<T const&>(pack).template ForEach<true>(
             [&](const int& i) {
                REQUIRE(i == 5 - it);
                ++it;

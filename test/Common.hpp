@@ -460,10 +460,10 @@ public:
    using CTTI_POD = true;
    using CTTI_Nullable = true;
    LANGULUS(POOL_TACTIC) RTTI::PoolTactic::Size;
-   LANGULUS(CONCRETE) ImplicitlyReflectedData;
+   using CTTI_Concrete = ImplicitlyReflectedData;
    LANGULUS(ACT_AS) void;
    LANGULUS(ALLOCATION_PAGE) 250;
-   LANGULUS(ABSTRACT) true;
+   using CTTI_Abstract = Yup;
    LANGULUS_BASES(ImplicitlyReflectedData);
    LANGULUS_VERBS(Verbs::Create);
    LANGULUS_CONVERTS_TO(int);

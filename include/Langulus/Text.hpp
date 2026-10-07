@@ -544,13 +544,13 @@ namespace Langulus::CT
       /// Do types have an explicit/implicit cast operator to Text            
       template<class...T>
       concept StringifiableByOperator = (std::is_object_v<T> and ...)
-          and requires (const T&...a) {
+          and requires (T const&...a) {
             ((a.operator ::Langulus::Annies::Text()), ...);
           };
 
       /// Does Text has an explicit/implicit constructor that accepts T       
       template<class...T>
-      concept StringifiableByConstructor = requires (const T&...a) {
+      concept StringifiableByConstructor = requires (T const&...a) {
          ((::Langulus::Annies::Text {a}), ...); };
    }
 

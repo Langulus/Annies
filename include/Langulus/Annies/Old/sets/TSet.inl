@@ -274,7 +274,7 @@ namespace Langulus::Annies
    ///   @param index - the index to use                                      
    ///   @return the element, wrapped in a Block                              
    TEMPLATE() LANGULUS(INLINED)
-   const T& TABLE()::Get(const CT::Index auto index) const {
+   T const& TABLE()::Get(const CT::Index auto index) const {
       return BlockSet::Get<TSet>(index);
    }
    
@@ -283,7 +283,7 @@ namespace Langulus::Annies
    ///   @param idx - the index to access                                     
    ///   @return a reference to the value, or a block if set is type-erased   
    TEMPLATE() LANGULUS(INLINED)
-   const T& TABLE()::operator[] (const CT::Index auto index) const {
+   T const& TABLE()::operator[] (const CT::Index auto index) const {
       return BlockSet::operator[]<TSet>(index);
    }
 
@@ -370,7 +370,7 @@ namespace Langulus::Annies
    ///   @param match - the key to search for                                 
    ///   @return the number of removed pairs                                  
    TEMPLATE() LANGULUS(INLINED)
-   size_t TABLE()::Remove(const T& match) {
+   size_t TABLE()::Remove(T const& match) {
       return BlockSet::template Remove<TABLE(), T>(match);
    }
 

@@ -129,7 +129,7 @@ namespace Langulus::Annies
       ///   Compare                                                           
       ///                                                                     
       template<CT::TraitBased = Tag, CT::NoIntent T> requires CT::NotOwned<T>
-      bool operator == (const T&) const;
+      bool operator == (T const&) const;
 
       ///                                                                     
       ///   Concatenation                                                     

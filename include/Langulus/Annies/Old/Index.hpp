@@ -100,9 +100,9 @@ namespace Langulus::Annies
       constexpr Index(const SpecialIndices& value) noexcept
          : mIndex {value} { }
       template<CT::Integer T> requires CT::Signed<T>
-      constexpr Index(const T&) noexcept (sizeof(T) < sizeof(Type));
+      constexpr Index(T const&) noexcept (sizeof(T) < sizeof(Type));
       template<CT::Integer T> requires CT::Unsigned<T>
-      constexpr Index(const T&) noexcept (sizeof(T) <= sizeof(Type)/2);
+      constexpr Index(T const&) noexcept (sizeof(T) <= sizeof(Type)/2);
       constexpr Index(const CT::Real auto&);
 
       constexpr Index& operator = (const Index&) noexcept = default;

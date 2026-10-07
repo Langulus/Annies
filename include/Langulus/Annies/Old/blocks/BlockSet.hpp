@@ -19,7 +19,7 @@ namespace Langulus
       /// It defines the size for CT::Set concept                             
       ///                                                                     
       struct BlockSet {
-         LANGULUS(ABSTRACT) true;
+         using CTTI_Abstract = Yup;
          using CTTI_POD = true;
 
          using InfoType = ::std::uint8_t;

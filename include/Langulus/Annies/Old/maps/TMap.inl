@@ -723,7 +723,7 @@ namespace Langulus::Annies
    }
 
    TEMPLATE() LANGULUS(INLINED)
-   auto TABLE()::GetValue(CT::Index auto index) const -> const V& {
+   auto TABLE()::GetValue(CT::Index auto index) const -> V const& {
       return BlockMap::GetValue<TMap>(index);
    }
 

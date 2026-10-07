@@ -33,7 +33,7 @@ namespace Langulus::Annies
    ///   @param pattern - the pattern to select                               
    ///   @return a reference to this editor                                   
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::Select(const T& pattern) -> Edit& {
+   auto TME()::Select(T const& pattern) -> Edit& {
       if (mSource.IsEmpty() or pattern.IsEmpty())
          return *this;
 
@@ -94,7 +94,7 @@ namespace Langulus::Annies
    /// Get the container we're editing                                        
    ///   @return a constant reference to the source container                 
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::GetSource() const noexcept -> const T& {
+   auto TME()::GetSource() const noexcept -> T const& {
       return mSource;
    }
 
@@ -139,7 +139,7 @@ namespace Langulus::Annies
    ///   @param other - the container to concatenate                          
    ///   @return a reference to the editor for chaining                       
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::operator << (const T& other) -> Edit& {
+   auto TME()::operator << (T const& other) -> Edit& {
       mSource.InsertBlock(mEnd, other);
       return *this;
    }
@@ -148,7 +148,7 @@ namespace Langulus::Annies
    ///   @param other - the container to concatenate                          
    ///   @return a reference to the editor for chaining                       
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::operator >> (const T& other) -> Edit& {
+   auto TME()::operator >> (T const& other) -> Edit& {
       const auto concatenated = mSource.InsertBlock(mStart, other);
       mStart += concatenated;
       mEnd += concatenated;
@@ -160,7 +160,7 @@ namespace Langulus::Annies
    /// replacement                                                            
    ///   @param other - the container to use for replacement                  
    TEMPLATE() LANGULUS(INLINED)
-   auto TME()::Replace(const T& other) -> Edit& {
+   auto TME()::Replace(T const& other) -> Edit& {
       if constexpr (CT::POD<CTTI_InnerType> or CT::Sparse<CTTI_InnerType>) {
          const auto offset = mStart * mSource.GetStride();
 

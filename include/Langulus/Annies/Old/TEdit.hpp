@@ -50,11 +50,11 @@ namespace Langulus::Annies
       Edit(T*, size_t = 0, size_t = 0) noexcept;
       Edit(T&, size_t = 0, size_t = 0) noexcept;
 
-      Edit& Select(const T&);
+      Edit& Select(T const&);
       Edit& Select(size_t, size_t);
       Edit& Select(size_t);
 
-      auto GetSource() const noexcept -> const T&;
+      auto GetSource() const noexcept -> T const&;
       auto GetStart()  const noexcept -> size_t;
       auto GetEnd()    const noexcept -> size_t;
       auto GetLength() const noexcept -> size_t;
@@ -62,9 +62,9 @@ namespace Langulus::Annies
       auto& operator[] (size_t) const noexcept;
       auto& operator[] (size_t) noexcept;
 
-      Edit& operator << (const T&);
-      Edit& operator >> (const T&);
-      Edit& Replace(const T&);
+      Edit& operator << (T const&);
+      Edit& operator >> (T const&);
+      Edit& Replace(T const&);
 
       Edit& operator << (const TypeOf<T>&);
       Edit& operator >> (const TypeOf<T>&);

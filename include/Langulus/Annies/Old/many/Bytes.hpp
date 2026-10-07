@@ -25,7 +25,7 @@ namespace Langulus::CT
       /// Hopefully it will be resolved by them one day                       
       template<class T>
       consteval bool BinableByOperator_AvoidMSVC_ICE() {
-         return std::is_object_v<T> and requires (const T& a) {
+         return std::is_object_v<T> and requires (T const& a) {
             a.operator ::Langulus::Annies::Bytes();
          };
       }
@@ -37,7 +37,7 @@ namespace Langulus::CT
 
       /// Does Bytes has an explicit/implicit constructor that accepts T      
       template<class...T>
-      concept BinableByConstructor = requires (const T&...a) {
+      concept BinableByConstructor = requires (T const&...a) {
          ((::Langulus::Annies::Bytes {a}), ...); };
 
       /// Used internally in Bytes, to sum up all types a variadic Bytes      

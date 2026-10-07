@@ -112,7 +112,7 @@ namespace Langulus::Annies
    /// Get a reference to the contained value                                 
    ///   @return the contained value reference                                
    TEMPLATE() LANGULUS(INLINED)
-   constexpr auto TME()::Get() const noexcept -> const T& {
+   constexpr auto TME()::Get() const noexcept -> T const& {
       return mValue;
    }
    

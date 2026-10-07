@@ -50,7 +50,7 @@ namespace Langulus::Annies
          this->ConstructDefault();
       }
 
-      constexpr  TPin(const T& source)
+      constexpr  TPin(T const& source)
          : Base {Stackwise, source} {}
 
       constexpr  TPin(T&& source) noexcept

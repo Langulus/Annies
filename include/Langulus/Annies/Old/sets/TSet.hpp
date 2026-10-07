@@ -212,7 +212,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Removal                                                           
       ///                                                                     
-      auto Remove(const T&) -> size_t;
+      auto Remove(T const&) -> size_t;
       auto RemoveIt(const Iterator&) -> Iterator;
 
       void Clear();

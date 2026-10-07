@@ -197,7 +197,7 @@ namespace Langulus::Annies
    ///   @param other - the thing to compare with                             
    ///   @return true if things are the same                                  
    template<CT::TraitBased THIS, CT::NoIntent T> requires CT::NotOwned<T>
-   LANGULUS(INLINED) bool Tag::operator == (const T& rhs) const {
+   LANGULUS(INLINED) bool Tag::operator == (T const& rhs) const {
       if constexpr (CT::Tag<THIS, T>) {
          return Exact<typename THIS::TraitType, typename T::TraitType>
             and Many::operator == (static_cast<Many const&>(rhs));

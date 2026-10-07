@@ -45,7 +45,7 @@ namespace Langulus::Annies
          this->ConstructDefault();
       }
 
-      constexpr  TOwn(const T& source)
+      constexpr  TOwn(T const& source)
          : Base {Stackwise, source} {}
 
       constexpr  TOwn(T&& source) noexcept

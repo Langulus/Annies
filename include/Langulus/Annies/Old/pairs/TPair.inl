@@ -128,7 +128,7 @@ namespace Langulus::Annies
    }
 
    TEMPLATE() LANGULUS(ALWAYS_INLINED)
-   auto PAIR()::GetValue() const noexcept -> const V& {
+   auto PAIR()::GetValue() const noexcept -> V const& {
       return mValue;
    }
 

@@ -16,7 +16,7 @@ namespace Langulus
 
       /// An abstract hive                                                    
       struct Hive {
-         LANGULUS(ABSTRACT) true;
+         using CTTI_Abstract = Yup;
       };
 
    } // namespace Langulus::A

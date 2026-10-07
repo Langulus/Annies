@@ -46,7 +46,7 @@ namespace Langulus::Annies
       using Self = TMap<K, V, ORDERED>;
       using Pair = TPair<K, V>;
       using PairRef = TPair<const K&, V&>;
-      using PairConstRef = TPair<const K&, const V&>;
+      using PairConstRef = TPair<const K&, V const&>;
 
       using CTTI_POD =       false;
       using CTTI_Typed =     Pair;
