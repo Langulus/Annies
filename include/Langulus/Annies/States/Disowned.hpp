@@ -50,14 +50,16 @@ namespace Langulus::Annies::Component::State
 
       /// Enable the dynamic disowned state                                   
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr auto EnableDisowned(this C&& self) noexcept -> C&& requires Dynamic {
+      constexpr auto EnableDisowned(this C&& self) noexcept -> C&& 
+      requires (Dynamic and Deref<C>::HasStates) {
          self.GetStateInner() += Disowned<V, ID, SHARED...> {};
          return LglsFwd(self);
       }
 
       /// Disable the dynamic disowned state                                  
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr auto DisableDisowned(this C&& self) noexcept -> C&& requires Dynamic {
+      constexpr auto DisableDisowned(this C&& self) noexcept -> C&& 
+      requires (Dynamic and Deref<C>::HasStates) {
          self.GetStateInner() -= Disowned<V, ID, SHARED...> {};
          return LglsFwd(self);
       }
@@ -68,7 +70,8 @@ namespace Langulus::Annies::Component::State
       ///      of the state. Hence all states have the lowest precedence, and 
       ///      need to be specified as the first components, when declaring   
       ///      a container.                                                   
-      template<class SELF, CT::Disowned I> requires CT::Container<I>
+      template<class SELF, CT::Disowned I>
+      requires (CT::Container<I> and Dynamic and SELF::HasStates)
       constexpr void ConstructFrom(this SELF& self, I&&) noexcept {
          ThisCom::EnableDisowned();
       }

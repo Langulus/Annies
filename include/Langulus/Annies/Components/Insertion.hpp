@@ -465,7 +465,7 @@ namespace Langulus::Annies::Component
       auto Compose(this C& self, auto&& value) -> size_t {
          using I = IntentOf(value);
          using T = Deint<I>;
-         auto& other = DeintCast(value);
+         decltype(auto) other = DeintCast(value);
          const bool stateCompliant = ThisCom::CheckState(other);
    
          if constexpr (CT::DeepDense<T>) {

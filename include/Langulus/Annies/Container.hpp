@@ -934,7 +934,7 @@ namespace Langulus::Annies::Component
       /// MARK: Swap                                                          
       /// Swaps the immediate contents of two compatible containers           
       constexpr void Swap(Container& other) noexcept {
-         mStack.swap(other.mStack);
+         mStack.Swap(other.mStack);
       }
 
       /// MARK: Destroy                                                       

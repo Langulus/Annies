@@ -595,19 +595,19 @@ namespace Langulus::Annies::Component
       void ConstructFrom(this SELF& self, I&& intent) {
          ThisCom::AbsorbType(LglsFwd(intent));
 
-         if constexpr (TypeErased) { //TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated
-            // While we are interfacing external memory, we have to     
-            // keep the type-constrained state, otherwise we risk       
-            // interpreting static memory the wrong way.                
-            if constexpr (not CONSTRAIN) {
-               if constexpr (not CT::TypeErased<I>)
-                  // From statically-typed to dynamically-typed         
-                  ThisCom::EnableTypeConstrained();
-               else if (intent->template IsTypeConstrained<ID>())
-                  // From dynamically-typed to dynamically-typed        
-                  ThisCom::EnableTypeConstrained();
-            }
+         //if constexpr (TypeErased) { 
+         // While we are interfacing external memory, we have to     
+         // keep the type-constrained state, otherwise we risk       
+         // interpreting static memory the wrong way.                
+         if constexpr (TypeErased and not CONSTRAIN and SELF::HasStates) {//TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated
+            if constexpr (not CT::TypeErased<I>)
+               // From statically-typed to dynamically-typed         
+               ThisCom::EnableTypeConstrained();
+            else if (intent->template IsTypeConstrained<ID>())
+               // From dynamically-typed to dynamically-typed        
+               ThisCom::EnableTypeConstrained();
          }
+         //}
 
          if constexpr (CT::Moved<I> and CT::TypeErased<I>)
             intent->template SetTypeInner<ID>(META{});

@@ -40,18 +40,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsPinned(this const C& self) noexcept requires Dynamic {
+      constexpr bool IsPinned(this const C& self) noexcept 
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Pinned<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto Pin(this C& self) noexcept -> C& requires Dynamic {
+      auto Pin(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Pinned<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto Unpin(this C& self) noexcept -> C& requires Dynamic {
+      auto Unpin(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Pinned<V, ID, SHARED...> {};
          return self;
       }

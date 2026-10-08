@@ -40,18 +40,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsCompressed(this C const& self) noexcept requires Dynamic {
+      constexpr bool IsCompressed(this C const& self) noexcept 
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Compressed<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto EnableCompressed(this C& self) noexcept -> C& requires Dynamic {
+      auto EnableCompressed(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Compressed<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto DisableCompressed(this C& self) noexcept -> C& requires Dynamic {
+      auto DisableCompressed(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Compressed<V, ID, SHARED...> {};
          return self;
       }

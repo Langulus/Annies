@@ -43,20 +43,20 @@ namespace Langulus::Annies::Component::State
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
       constexpr bool IsTypeConstrained(this const C& self) noexcept
-      requires (Dynamic and requires { self.GetStateInner(); }) {
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Typed<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
       auto EnableTypeConstrained(this C& self) noexcept -> C&
-      requires (Dynamic and requires { self.GetStateInner(); }) {
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Typed<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
       auto DisableTypeConstrained(this C& self) noexcept -> C& 
-      requires (Dynamic and requires { self.GetStateInner(); }) {
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Typed<V, ID, SHARED...> {};
          return self;
       }

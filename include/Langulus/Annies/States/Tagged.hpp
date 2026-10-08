@@ -41,18 +41,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsTagConstrained(this const C& self) noexcept requires Dynamic {
+      constexpr bool IsTagConstrained(this const C& self) noexcept
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Tagged<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto EnableTagConstrained(this C& self) noexcept -> C& requires Dynamic {
+      auto EnableTagConstrained(this C& self) noexcept -> C&
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Tagged<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto DisableTagConstrained(this C& self) noexcept -> C& requires Dynamic {
+      auto DisableTagConstrained(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Tagged<V, ID, SHARED...> {};
          return self;
       }

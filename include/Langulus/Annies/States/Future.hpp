@@ -44,18 +44,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsFuture(this C const& self) noexcept requires Dynamic {
+      constexpr bool IsFuture(this C const& self) noexcept 
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Future<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto EnableFuture(this C& self) noexcept -> C& requires Dynamic {
+      auto EnableFuture(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Future<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto DisableFuture(this C& self) noexcept -> C& requires Dynamic {
+      auto DisableFuture(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Future<V, ID, SHARED...> {};
          return self;
       }

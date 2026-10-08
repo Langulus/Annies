@@ -40,18 +40,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsTracked(this const C& self) noexcept requires Dynamic {
+      constexpr bool IsTracked(this const C& self) noexcept 
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Tracked<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto EnableTracking(this C& self) noexcept -> C& requires Dynamic {
+      auto EnableTracking(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Tracked<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto DisableTracking(this C& self) noexcept -> C& requires Dynamic {
+      auto DisableTracking(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Tracked<V, ID, SHARED...> {};
          return self;
       }

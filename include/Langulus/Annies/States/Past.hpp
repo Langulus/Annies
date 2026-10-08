@@ -44,18 +44,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsPast(this C const& self) noexcept requires Dynamic {
+      constexpr bool IsPast(this C const& self) noexcept 
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Past<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto EnablePast(this C& self) noexcept -> C& requires Dynamic {
+      auto EnablePast(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Past<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto DisablePast(this C& self) noexcept -> C& requires Dynamic {
+      auto DisablePast(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Past<V, ID, SHARED...> {};
          return self;
       }

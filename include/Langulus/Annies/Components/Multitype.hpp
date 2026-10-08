@@ -556,17 +556,19 @@ namespace Langulus::Annies::Component
       }
 
       /// Check if type is mutable when the container is empty                
-      template<Cid SID = 0>
-      constexpr bool IsTypeConstrained(this auto const& self) noexcept {
-         using C = typename Subcomponents::template At<SID>;
+      template<Cid SID = 0, class C = typename Subcomponents::template At<SID>>
+      constexpr bool IsTypeConstrained(this auto const& self) noexcept
+      requires (requires { self.C::IsTypeConstrained(); }) {
          return self.C::IsTypeConstrained();
       }
-      constexpr bool IsKeyTypeConstrained(this auto const& self) noexcept {
-         using C = typename Subcomponents::First;
+      template<class C = typename Subcomponents::First>
+      constexpr bool IsKeyTypeConstrained(this auto const& self) noexcept
+      requires (requires { self.C::IsTypeConstrained(); }) {
          return self.C::IsTypeConstrained();
       }
-      constexpr bool IsValTypeConstrained(this auto const& self) noexcept {
-         using C = typename Subcomponents::Second;
+      template<class C = typename Subcomponents::Second>
+      constexpr bool IsValTypeConstrained(this auto const& self) noexcept
+      requires (requires { self.C::IsTypeConstrained(); }) {
          return self.C::IsTypeConstrained();
       }
 

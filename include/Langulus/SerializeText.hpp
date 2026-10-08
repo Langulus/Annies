@@ -136,6 +136,7 @@ namespace Langulus::CTTI
    /// This includes Many, Map, Set, Neat etc...                              
    /// as well as their templated equivalents. It basically places scopes,    
    /// separators and state decorators, depending on the kind of container.   
+   ///   @attention applies to pointers to deep containers, too!              
    template<CT::Deep C>
    void SerializationRule<Annies::Text, C>::Serialize(
       ConstAll<C&> may_be_sparse, Annies::Text& out, Context* context
@@ -169,6 +170,7 @@ namespace Langulus::CTTI
    /// This includes Any, Handle, Own, Ref, Pair and their templated          
    /// equivalents. Notice that Pair technically contains one item, but with  
    /// two dimensions.                                                        
+   ///   @attention applies to pointers to deep containers, too!              
    template<CT::Deep C>
    void SerializationRule<Annies::Text, C>::Serialize(
       ConstAll<C&> may_be_sparse, Annies::Text& out, Context* context
@@ -199,16 +201,15 @@ namespace Langulus::CTTI
                S::Error(T, ID, out, context);
             }
 
-            if (T.Is(MetaDataOf<Annies::Any>())) {
-               // Annies::Any is the only container that matches       
-               // the requirements: CT::Deep<T> and CT::ContainsOne<T>  
-               // and having past/future state. Note: TAny is reflected 
-               // as Any and is binary compatible as well.              
-               auto* item = self.template Get<Annies::Any, ID>();
-               if (item->IsPast())
-                  out += Serial::Past.Token;
-               else if (item->IsFuture())
-                  out += Serial::Future.Token;
+            using DeepDC = typename DC::DeepType;
+            if constexpr (requires (DeepDC test) { test.IsPast(); }) {
+               if (T.Is(MetaDataOf<DeepDC>())) {
+                  auto* item = self.template Get<DeepDC, ID>();
+                  if (item->IsPast())
+                     out += Serial::Past.Token;
+                  else if (item->IsFuture())
+                     out += Serial::Future.Token;
+               }
             }
          }
          else {
@@ -225,7 +226,7 @@ namespace Langulus::CTTI
                S::Error(MetaDataOf<T>(), ID, out, context);
             }
 
-            if constexpr (CT::Deep<T> and CT::ContainsOne<T> and requires { item->IsPast(); }) {
+            if constexpr (CT::Deep<T> and requires { item->IsPast(); }) {
                static_assert(CT::NotHandle<T>);
                if (item->IsPast())
                   out += Serial::Past.Token;

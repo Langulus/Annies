@@ -40,18 +40,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsSorted(this const C& self) noexcept requires Dynamic {
+      constexpr bool IsSorted(this const C& self) noexcept 
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Sorted<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto EnableSorting(this C& self) noexcept -> C& requires Dynamic {
+      auto EnableSorting(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Sorted<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto DisableSorting(this C& self) noexcept -> C& requires Dynamic {
+      auto DisableSorting(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Sorted<V, ID, SHARED...> {};
          return self;
       }

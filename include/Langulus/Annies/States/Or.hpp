@@ -42,18 +42,21 @@ namespace Langulus::Annies::Component::State
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      constexpr bool IsOr(this const C& self) noexcept requires Dynamic {
+      constexpr bool IsOr(this const C& self) noexcept 
+      requires (Dynamic and C::HasStates) {
          return self.GetStateInner() & Or<V, ID, SHARED...> {};
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto EnableOr(this C& self) noexcept -> C& requires Dynamic {
+      auto EnableOr(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() += Or<V, ID, SHARED...> {};
          return self;
       }
 
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
-      auto DisableOr(this C& self) noexcept -> C& requires Dynamic {
+      auto DisableOr(this C& self) noexcept -> C& 
+      requires (Dynamic and C::HasStates) {
          self.GetStateInner() -= Or<V, ID, SHARED...> {};
          return self;
       }
