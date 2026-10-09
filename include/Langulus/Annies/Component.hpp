@@ -395,9 +395,9 @@ namespace Langulus::Annies
       #define LglsComTypedStack(modifier) \
          template<class, class, bool, Cid> modifier struct TypedStack
 
-      template<class META, CT::NotVoid TYPE, Cid = 0> struct TypedStatic;
+      template<class META, class TYPE, Cid = 0> struct TypedStatic;
       #define LglsComTypedStatic(modifier) \
-         template<class, CT::NotVoid, Cid> modifier struct TypedStatic
+         template<class, class, Cid> modifier struct TypedStatic
 
       /// Tag providers                                                       
       template<class META, class TYPE = void, bool CONSTRAIN = not ::std::is_void_v<TYPE>, Cid = 0> struct TaggedStack;

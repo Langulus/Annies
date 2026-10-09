@@ -21,17 +21,16 @@ namespace Langulus::Annies::Inner
 {
    template<class T> requires (not ::std::is_reference_v<T>)
    using TRefBase = Com::Container<
-      Com::TypedStatic<DMeta, T>,         // Statically typed          
+      Com::TypedStatic<DMeta, T>,         // Statically typed           
       Com::HeapMovable<0, 0, HeapEntry<0, T*>>,
-      Com::CountStatic<1u>,               // Statically sized          
-      Com::ReserveEmergent<>,             // Reserve derived from alloc
-      Com::OwnershipStack<>,              // Allocation is referenced  
-      Com::OwnershipDeepHeap<>,
-      //EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,  //TODO CT::Sparse requires T to be complete, which is an issue if you have a pointer to an incomplete in a circular scenario
-      Com::Emplacement<>,                 // Can be emplaced           
-      Com::Assignment<>,                  // Can be reassigned         
-      Com::Comparison<>,                  // Can be compared           
-      Com::Removal<>                      // Can be cleared/reset      
+      Com::CountStatic<1u>,               // Statically sized           
+      Com::ReserveEmergent<>,             // Reserve derived from alloc 
+      Com::OwnershipStack<>,              // Allocation is referenced   
+      Com::OwnershipDeepHeap<>,           // Individual references      
+      Com::Emplacement<>,                 // Can be emplaced            
+      Com::Assignment<>,                  // Can be reassigned          
+      Com::Comparison<>,                  // Can be compared            
+      Com::Removal<>                      // Can be cleared/reset       
    >;
 }
 

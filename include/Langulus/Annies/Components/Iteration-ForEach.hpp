@@ -250,7 +250,7 @@ namespace Langulus::Annies::Component
             if (not (CT::Deep<A>       and T.IsDeep())
             and not (CT::DefineTag<A>  and T.Is(MetaDataOf<Decay<A>>()))
             and not (CT::DefineVerb<A> and T.Is(MetaDataOf<Decay<A>>()))
-            and not (not CT::Deep<A>   and self.template CastsTo<A, true>()))
+            and not (not CT::Deep<A>   and self.template CastsTo<A>(1, true)))
                return Loop::NextLoop;
 
             // Iterate container where A is binary-compatible to the    
