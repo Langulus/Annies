@@ -86,9 +86,17 @@ namespace Langulus::Annies::Component
       template<CT::DefineTag T, Cid SID = ID>
       constexpr bool IsTag(this auto const& self) noexcept {
          if constexpr (TagErased)
-            return ThisCom::GetTagInner().Is(MetaTagOf<T>());
+            return ThisCom::GetTagInner() == MetaTagOf<T>();
          else
             return Exact<TYPE, T>;
+      }
+      
+      /// Check if tag is the provided type at runtime                        
+      ///   @param type the tag to compare against                            
+      ///   @return true if tags match                                        
+      template<Cid SID = ID>
+      constexpr bool IsTag(this auto const& self, META tag) noexcept {
+         return ThisCom::GetTagInner() == tag;
       }
       
       /// Set the contained tag if possible.                                  

@@ -261,13 +261,13 @@ namespace Langulus::Annies::Component
                if constexpr (CT::DefineTag<A>) {
                   // We're iterating using a statically defined tag.    
                   // We don't execute in tags that don't match.         
-                  if (not DenseCast(element).GetTagInner().template Is<Decay<A>>())
+                  if (DenseCast(element).GetTagInner() != MetaTagOf<Decay<A>>())
                      continue;
                }
                if constexpr (CT::DefineVerb<A>) {
                   // We're iterating using a statically defined verb.   
                   // We don't execute in verbs that don't match.        
-                  if (not DenseCast(element).GetVerbInner().template Is<Decay<A>>())
+                  if (DenseCast(element).GetVerbInner() != MetaVerbOf<Decay<A>>())
                      continue;
                }
 

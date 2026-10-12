@@ -17,7 +17,7 @@
 template<class T, class E>
 decltype(auto) FromHelper() {
    if constexpr (not CT::Typed<T>) {
-      if constexpr (CT::TraitBased<T>) {
+      if constexpr (CT::DefineTag<T>) {
          if constexpr (CT::Tag<T>)
             return T::template OfType<E>();
          else

@@ -215,7 +215,7 @@ namespace Langulus::Annies
    void Block<TYPE>::SetTrait(TRAIT&& trait, size_t index) {
       using S = IntentOf<TRAIT>;
       using T = TypeOf<S>;
-      static_assert(CT::TraitBased<T>, "T is not trait-based");
+      static_assert(CT::DefineTag<T>, "T is not trait-based");
 
       // First attempt setting an already existing trait at given index 
       bool satisfied = false;

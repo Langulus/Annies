@@ -17,7 +17,7 @@ namespace Langulus
 
       ///                                                                     
       /// An abstract Tag structure                                         
-      /// It defines the size for CT::Tag and CT::TraitBased concepts       
+      /// It defines the size for CT::Tag and CT::DefineTag concepts       
       ///                                                                     
       struct Tag : Annies::Many {
          using CTTI_Abstract = Yup;
@@ -101,22 +101,22 @@ namespace Langulus::Annies
       void SetTrait() noexcept;
       void SetTrait(TMeta) noexcept;
 
-      template<CT::Tag, CT::TraitBased = Tag>
+      template<CT::Tag, CT::DefineTag = Tag>
       constexpr bool IsTrait() const;
 
-      template<CT::TraitBased = Tag, class...TN> requires Exact<TMeta, TMeta, TN...>
+      template<CT::DefineTag = Tag, class...TN> requires Exact<TMeta, TMeta, TN...>
       bool IsTrait(TMeta, TN...) const;
 
-      template<CT::TraitBased = Tag>
+      template<CT::DefineTag = Tag>
       TMeta GetTag() const noexcept;
 
-      template<CT::TraitBased = Tag>
+      template<CT::DefineTag = Tag>
       bool IsTraitValid() const noexcept;
 
-      template<CT::TraitBased = Tag>
-      bool IsTraitSimilar(const CT::TraitBased auto&) const noexcept;
+      template<CT::DefineTag = Tag>
+      bool IsTraitSimilar(const CT::DefineTag auto&) const noexcept;
 
-      template<CT::TraitBased = Tag>
+      template<CT::DefineTag = Tag>
       bool HasCorrectData() const;
 
       ///                                                                     
@@ -128,22 +128,22 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Compare                                                           
       ///                                                                     
-      template<CT::TraitBased = Tag, CT::NoIntent T> requires CT::NotOwned<T>
+      template<CT::DefineTag = Tag, CT::NoIntent T> requires CT::NotOwned<T>
       bool operator == (T const&) const;
 
       ///                                                                     
       ///   Concatenation                                                     
       ///                                                                     
-      template<CT::TraitBased THIS = Tag>
+      template<CT::DefineTag THIS = Tag>
       THIS operator + (CT::UnfoldInsertable auto&&) const;
 
-      template<CT::TraitBased THIS = Tag>
+      template<CT::DefineTag THIS = Tag>
       THIS& operator += (CT::UnfoldInsertable auto&&);
 
       ///                                                                     
       ///   Conversion                                                        
       ///                                                                     
-      template<CT::TraitBased = Tag>
+      template<CT::DefineTag = Tag>
       size_t Serialize(CT::Serial auto&) const;
    };
 

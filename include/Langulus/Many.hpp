@@ -96,8 +96,8 @@ namespace Langulus::Annies
       }
 
       /// Create an empty container from a dynamic type and state             
-      ///   @param type - type of the container                               
-      ///   @param states - optional states of the container                  
+      ///   @param type type of the container                                 
+      ///   @param states optional states of the container                    
       ///   @return the new container instance                                
       static Many Typed(DMeta type, int states = 0) {
          Many result;
@@ -115,14 +115,52 @@ namespace Langulus::Annies
    
       /// Create an empty container by copying another container's state      
       ///   @attention only the unconstrained state is copied                 
-      ///   @param states - states of the container                           
-      ///   @param additional - additional states of the container            
+      ///   @param states states of the container                             
+      ///   @param additional additional states of the container              
       ///   @return the new container instance                                
       static Many CopyStates(CT::Container auto const& states, int additional = 0) {
          Many result;
          result.SetState(states.GetState() | additional);
          return result;
       }
+
+      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+         /// Make a container with a missing past state and optional filter   
+         /// at runtime, using reflected tokens                               
+         ///   @param tokens... reflected tokens                              
+         ///   @return a container marked as missing past with chosen filters 
+         template<CT::Text...T>
+         static Many Past(T&&...tokens) {
+            Many result;
+            result.EnablePast();
+            if constexpr (sizeof...(tokens)) {
+               auto push = [&result](RTTI::DefinitionData const* meta) {
+                  LglsAssert(meta, "Missing meta for past filter");
+                  result << DMeta {meta};
+               };
+               (push(RTTI::Registry::GetMetaDataByToken(tokens)), ...);
+            }
+            return result;
+         }
+
+         /// Make a container with a missing future state and optional filter 
+         /// at runtime, using reflected tokens                               
+         ///   @param tokens... reflected tokens                              
+         ///   @return container marked as missing future with chosen filters 
+         template<CT::Text...T>
+         static Many Future(T&&...tokens) {
+            Many result;
+            result.EnableFuture();
+            if constexpr (sizeof...(tokens)) {
+               auto push = [&result](RTTI::DefinitionData const* meta) {
+                  LglsAssert(meta, "Missing meta for future filter");
+                  result << DMeta {meta};
+               };
+               (push(RTTI::Registry::GetMetaDataByToken(tokens)), ...);
+            }
+            return result;
+         }
+      #endif
 
       template<CT::Container AS>
       auto ReinterpretAs() const -> AS const& {

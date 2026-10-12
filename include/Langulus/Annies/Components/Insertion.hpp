@@ -785,7 +785,7 @@ namespace Langulus::Annies::Component
       ///   @return the number of gathered elements                           
       template<bool REVERSE, class D, CT::Container C, CT::Container SRC> requires CT::Intent<SRC>
       size_t GatherPolarInner(this C& self, SRC&& source, auto&& condition) {
-         if (not condition(*source)) {
+         if (not condition(DeintCast(source))) {
             if constexpr (not ::std::is_void_v<D>) {
                static_assert(CT::Deep<D> and CT::Decayed<D>, "D is not deep");  
                if (source->IsNow() and source->template Is<D>()) {

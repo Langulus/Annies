@@ -69,7 +69,7 @@ namespace Langulus::Annies
          }
          else Base::operator = (S::Nest(rhs).template Forward<Base>());
       }
-      else if constexpr (CT::TraitBased<T>)
+      else if constexpr (CT::DefineTag<T>)
          Base::operator = (S::Nest(rhs).template Forward<Base>());
       else
          Base::operator = (S::Nest(rhs));
@@ -104,7 +104,7 @@ namespace Langulus::Annies
    ///   @param other - the trait to test against                             
    ///   @return true if traits are similar                                   
    TEMPLATE() LANGULUS(INLINED)
-   constexpr bool TME()::IsTraitSimilar(const CT::TraitBased auto& other) const noexcept {
+   constexpr bool TME()::IsTraitSimilar(const CT::DefineTag auto& other) const noexcept {
       return Tag::IsTraitSimilar<TRAIT>(other);
    }
 

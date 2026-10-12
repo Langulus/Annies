@@ -49,7 +49,7 @@ namespace Langulus::Annies
       TMeta GetTag() const noexcept;
 
       constexpr bool IsTraitValid() const noexcept;
-      constexpr bool IsTraitSimilar(const CT::TraitBased auto&) const noexcept;
+      constexpr bool IsTraitSimilar(const CT::DefineTag auto&) const noexcept;
       constexpr bool HasCorrectData() const;
 
       ///                                                                     

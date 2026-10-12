@@ -240,6 +240,8 @@ namespace Langulus
    using Annies::Verb;
 }
 
+LANGULUS_MORPHISM(Annies::Verb, Annies::Text);
+
 /// Define a verb                                                             
 ///   @param P positive verb name, as it exists in namespace Langulus::Verbs  
 ///   @param N negative verb name (optional, same as positive if "")          
@@ -263,3 +265,21 @@ namespace Langulus
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
    namespace Langulus::CTTI  { template<> struct DefineVerbOp<::Langulus::Verbs::P> : NamedOperator<OP,ON> {}; } \
    namespace Langulus::Verbs { struct P : Annies::TVerb<P> { using CTTI_Info = Yes<INFOSTRING>; }; }
+
+
+/*#include "Text.hpp"
+
+namespace Langulus::CTTI
+{
+   /// Rule for serializing Verb to Text. Splits it up depending on length.   
+   /// Made to look pretty.                                                   
+   template<CT::Executable V>
+   struct SerializationRule<Annies::Text, V> {
+      using S = Serializer<Annies::Text>;
+      using Context = typename S::Context;
+
+      static void Serialize(Annies::Text const&, Annies::Text&, Context*) {
+
+      }
+   };
+}*/

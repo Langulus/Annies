@@ -470,7 +470,7 @@ namespace Langulus::Annies
       using S = IntentOf<decltype(item)>;
       using T = TypeOf<S>;
 
-      if constexpr (CT::TraitBased<T>) {
+      if constexpr (CT::DefineTag<T>) {
          // Insert trait to its bucket                                  
          AddTrait(S::Nest(item));
       }
@@ -637,7 +637,7 @@ namespace Langulus::Annies
       using T = TypeOf<S>;
       decltype(auto) rhsd = DeintCast(rhs);
 
-      if constexpr (CT::TraitBased<T>) {
+      if constexpr (CT::DefineTag<T>) {
          // Check if the trait already exists, before pushing it        
          if (not GetTraits(rhsd.GetTag()))
             return operator << (S::Nest(rhs));
@@ -681,7 +681,7 @@ namespace Langulus::Annies
    ///   @param trait - trait to set                                          
    ///   @param index - the index we're interested with if repeated           
    ///   @return a reference to this construct for chaining                   
-   Neat& Neat::SetTrait(CT::TraitBased auto&& trait, size_t index) {
+   Neat& Neat::SetTrait(CT::DefineTag auto&& trait, size_t index) {
       const auto meta = trait.GetTag();
       auto found = mTraits.BranchOut().FindIt(meta);
 
@@ -710,7 +710,7 @@ namespace Langulus::Annies
       using S = IntentOf<decltype(messy)>;
       using T = TypeOf<S>;
 
-      if constexpr (CT::TraitBased<T>) {
+      if constexpr (CT::DefineTag<T>) {
          // Insert a trait with contents                                
          const auto meta = messy->GetTag();
          auto found = mTraits.BranchOut().FindIt(meta);
@@ -865,7 +865,7 @@ namespace Langulus::Annies
          counter += ForEachTail<MUTABLE>(call);
          return counter;
       }
-      else if constexpr (CT::TraitBased<A>) {
+      else if constexpr (CT::DefineTag<A>) {
          // Iterate traits only                                         
          return ForEachTrait<MUTABLE>(Forward<F>(call));
       }
@@ -900,7 +900,7 @@ namespace Langulus::Annies
       using A = ArgumentOf<F>;
       using R = ReturnOf<F>;
 
-      static_assert(CT::TraitBased<A> or CT::Deep<A>,
+      static_assert(CT::DefineTag<A> or CT::Deep<A>,
          "Iterator must be either trait-based or deep");
       static_assert(CT::Slab<A> or CT::Constant<A> or MUTABLE,
          "Non constant iterator for constant Neat block");

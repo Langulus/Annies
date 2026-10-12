@@ -184,7 +184,7 @@ namespace Langulus::Annies
       template<class T1, class...TN>
       size_t Insert(T1&&, TN&&...);
       void  Merge(const Neat&);
-      Neat& SetTrait(CT::TraitBased auto&&, size_t = 0);
+      Neat& SetTrait(CT::DefineTag auto&&, size_t = 0);
 
       Neat& operator <<  (auto&&);
       Neat& operator <<= (auto&&);

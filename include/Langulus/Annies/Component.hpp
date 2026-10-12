@@ -27,6 +27,8 @@ namespace Langulus::CTTI
    template<class T> struct Set;
    template<class T> struct Tag;
    template<class T> struct Pair;
+   template<class T> struct Neat;
+   template<class T> struct Recipe;
    template<class T> struct Handle;
    template<class T> struct Iterator;
 }
@@ -38,6 +40,8 @@ LANGULUS_CTTI_CONCEPT_DECVQ(Map);
 LANGULUS_CTTI_CONCEPT_DECVQ(Set);
 LANGULUS_CTTI_CONCEPT_DECVQ(Tag);
 LANGULUS_CTTI_CONCEPT_DECVQ(Pair);
+LANGULUS_CTTI_CONCEPT_DECVQ(Neat);
+LANGULUS_CTTI_CONCEPT_DECVQ(Recipe);
 LANGULUS_CTTI_CONCEPT_DECVQ(Handle);
 LANGULUS_CTTI_CONCEPT_DECVQ(Iterator);
 

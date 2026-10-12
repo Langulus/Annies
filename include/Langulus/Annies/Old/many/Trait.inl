@@ -36,7 +36,7 @@ namespace Langulus::Annies
          using S = IntentOf(t1);
          using T = Deint<S>;
 
-         if constexpr (CT::TraitBased<T>) {
+         if constexpr (CT::DefineTag<T>) {
             Base::BlockTransfer(S::Nest(t1).template Forward<Base>());
             mTraitType = DeintCast(t1).GetTag();
          }
@@ -107,7 +107,7 @@ namespace Langulus::Annies
 
    /// Get the trait type                                                     
    ///   @return the trait type                                               
-   template<CT::TraitBased THIS> LANGULUS(INLINED)
+   template<CT::DefineTag THIS> LANGULUS(INLINED)
    TMeta Tag::GetTag() const noexcept {
       if constexpr (CT::Tag<THIS>)
          return (mTraitType = MetaTraitOf<THIS>());
@@ -117,7 +117,7 @@ namespace Langulus::Annies
 
    /// Check if trait is valid, that is, it's typed and has contents          
    ///   @return true if trait is valid                                       
-   template<CT::TraitBased THIS> LANGULUS(INLINED)
+   template<CT::DefineTag THIS> LANGULUS(INLINED)
    bool Tag::IsTraitValid() const noexcept {
       if constexpr (CT::Tag<THIS>)
          return not IsEmpty();
@@ -128,8 +128,8 @@ namespace Langulus::Annies
    /// Check if trait and data types match another trait                      
    ///   @param other - the trait to test against                             
    ///   @return true if traits are similar                                   
-   template<CT::TraitBased THIS> LANGULUS(INLINED)
-   bool Tag::IsTraitSimilar(const CT::TraitBased auto& other) const noexcept {
+   template<CT::DefineTag THIS> LANGULUS(INLINED)
+   bool Tag::IsTraitSimilar(const CT::DefineTag auto& other) const noexcept {
       using OTHER = Deref<decltype(other)>;
       if constexpr (CT::Tag<THIS, OTHER>) {
          return Exact<typename THIS::TraitType, typename OTHER::TraitType>
@@ -144,7 +144,7 @@ namespace Langulus::Annies
    /// Check if a trait matches the given trait type                          
    ///   @tparam T1 - the trait to compare against                            
    ///   @return true trait matches                                           
-   template<CT::Tag T1, CT::TraitBased THIS> LANGULUS(INLINED)
+   template<CT::Tag T1, CT::DefineTag THIS> LANGULUS(INLINED)
    constexpr bool Tag::IsTrait() const {
       if constexpr (CT::Tag<THIS>)
          return SameAsOneOf<THIS, T1>;
@@ -156,7 +156,7 @@ namespace Langulus::Annies
    ///   @param t1 - the first trait to compare against                       
    ///   @param tN - the rest of trait to compare against (optional)          
    ///   @return true if this trait is one of the given types                 
-   template<CT::TraitBased THIS, class...TN>
+   template<CT::DefineTag THIS, class...TN>
    requires Exact<TMeta, TMeta, TN...> LANGULUS(INLINED)
    bool Tag::IsTrait(TMeta t1, TN...tN) const {
       if constexpr (CT::Tag<THIS>)
@@ -167,7 +167,7 @@ namespace Langulus::Annies
 
    /// Check if trait has correct data (always true if trait has no filter)   
    ///   @return true if trait definition filter is compatible                
-   template<CT::TraitBased THIS> LANGULUS(INLINED)
+   template<CT::DefineTag THIS> LANGULUS(INLINED)
    bool Tag::HasCorrectData() const {
       //if constexpr (CT::Tag<THIS>)
       //   (void) GetTag<THIS>();
@@ -196,13 +196,13 @@ namespace Langulus::Annies
    ///      otherwise function resolution doesn't work properly on MSVC       
    ///   @param other - the thing to compare with                             
    ///   @return true if things are the same                                  
-   template<CT::TraitBased THIS, CT::NoIntent T> requires CT::NotOwned<T>
+   template<CT::DefineTag THIS, CT::NoIntent T> requires CT::NotOwned<T>
    LANGULUS(INLINED) bool Tag::operator == (T const& rhs) const {
       if constexpr (CT::Tag<THIS, T>) {
          return Exact<typename THIS::TraitType, typename T::TraitType>
             and Many::operator == (static_cast<Many const&>(rhs));
       }
-      else if constexpr (CT::TraitBased<T>) {
+      else if constexpr (CT::DefineTag<T>) {
          return IsTrait<THIS>(rhs.GetTag())
             and Many::operator == (static_cast<Many const&>(rhs));
       }
@@ -234,7 +234,7 @@ namespace Langulus::Annies
       using S = IntentOf(rhs);
       using T = Deint<S>;
 
-      if constexpr (CT::TraitBased<T>) {
+      if constexpr (CT::DefineTag<T>) {
          Base::operator = (S::Nest(rhs).template Forward<Base>());
          mTraitType = DeintCast(rhs).GetTag();
       }
@@ -249,12 +249,12 @@ namespace Langulus::Annies
    ///   @attention trait type will be set, if not set yet, and rhs is trait  
    ///   @param rhs - the right operand                                       
    ///   @return the combined container                                       
-   template<CT::TraitBased THIS> LANGULUS(INLINED)
+   template<CT::DefineTag THIS> LANGULUS(INLINED)
    THIS Tag::operator + (CT::UnfoldInsertable auto&& rhs) const {
       using S = IntentOf<decltype(rhs)>;
       using T = TypeOf<S>;
 
-      if constexpr (CT::TraitBased<T>) {
+      if constexpr (CT::DefineTag<T>) {
          auto result = Many::operator + (S::Nest(rhs).template Forward<Many>());
 
          if constexpr (CT::Tag<THIS>)
@@ -280,12 +280,12 @@ namespace Langulus::Annies
    ///   @attention trait type will be set, if not set yet and rhs is a trait 
    ///   @param rhs - the right operand and intent                            
    ///   @return a reference to this modified container                       
-   template<CT::TraitBased THIS> LANGULUS(INLINED)
+   template<CT::DefineTag THIS> LANGULUS(INLINED)
    THIS& Tag::operator += (CT::UnfoldInsertable auto&& rhs) {
       using S = IntentOf<decltype(rhs)>;
       using T = TypeOf<S>;
 
-      if constexpr (CT::TraitBased<T>) {
+      if constexpr (CT::DefineTag<T>) {
          Many::operator += (S::Nest(rhs).template Forward<Many>());
 
          if constexpr (not CT::Tag<THIS>) {
@@ -298,7 +298,7 @@ namespace Langulus::Annies
    }
    
    /// Serialize the trait to anything text-based                             
-   template<CT::TraitBased THIS> LANGULUS(INLINED)
+   template<CT::DefineTag THIS> LANGULUS(INLINED)
    size_t Tag::Serialize(CT::Serial auto& to) const {
       const auto initial = to.GetCount();
       using OUT = Deref<decltype(to)>;

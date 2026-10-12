@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Text.hpp"
+#include "Bytes.hpp"
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/Derived.hpp>
 #include <Langulus/CT/Charged.hpp>
@@ -111,14 +112,23 @@ namespace Langulus::CTTI
       static void Serialize(ConstAll<C&>, Annies::Text&, Context*) requires CT::ContainsMany<Decay<C>>;
       static void Serialize(ConstAll<C&>, Annies::Text&, Context*) requires CT::ContainsOne<Decay<C>>;
    };
-
-   /// Rule for serializing Code to Text. Wraps it in {} symbols.             
-   template<CT::Container C> requires (not CT::Deep<C>)
-   struct SerializationRule<Annies::Text, C> {
+   
+   /// Rule for serializing Text to Text. Wraps it in "" symbols.             
+   template<>
+   struct SerializationRule<Annies::Text, Annies::Text> {
       using S = Serializer<Annies::Text>;
       using Context = typename S::Context;
 
-      static void Serialize(ConstAll<C&>, Annies::Text&, Context*);
+      static void Serialize(Annies::Text const&, Annies::Text&, Context*);
+   };
+   
+   /// Rule for serializing Bytes to Text. Prefixes 0x.                       
+   template<>
+   struct SerializationRule<Annies::Text, Annies::Bytes> {
+      using S = Serializer<Annies::Text>;
+      using Context = typename S::Context;
+
+      static void Serialize(Annies::Bytes const&, Annies::Text&, Context*);
    };
    
    /// Rule for serializing characters to Text. Wraps them in ''.             
@@ -237,46 +247,44 @@ namespace Langulus::CTTI
       });
    }
 
-   /// MARK: Code                                                             
-   /// Rule for serializing Code to Text. Wraps it in {} symbols.             
-   template<CT::Container C> requires (not CT::Deep<C>)
-   void SerializationRule<Annies::Text, C>::Serialize(
-      ConstAll<C&> item, Annies::Text& out, [[maybe_unused]] Context* context
+   /// MARK: Text                                                             
+   /// Rule for serializing characters to Text. Wraps it in "".               
+   void SerializationRule<Annies::Text, Annies::Text>::Serialize(
+      Annies::Text const& item, Annies::Text& out, Context*
    ) {
-      if constexpr (Same<C, Flow::Code>) {
-         out += Serial::OpenCode.Token;
-         out += item;
-         out += Serial::CloseCode.Token;
-      }
-      else if constexpr (Same<C, Annies::Text>) {
-         out += Serial::OpenString.Token;
-         out += item;
-         out += Serial::CloseString.Token;
-      }
-      else if constexpr (Same<C, Annies::Bytes>) {
-         out += Serial::OpenByte.Token;
-         out.Reserve(item.GetCount()*2);
-         ::std::array<char, sizeof(Byte) * 2> temp;
-         auto from = item.GetRaw();
-         const auto fromEnd = item.GetRawEnd();
-         while (from != fromEnd) {
-            ::fmt::format_to_n(temp.data(), 2, "{:02X}", from->value);
-            out += Annies::Text(temp);
-            ++from;
-         }
-         out += Serial::CloseByte.Token;   
-      }
-      else {
-         static_assert(false, "Unhandled non-deep container");
-         /*if (item.IsEmpty()) // risk of infinite recursion
-            return;
-
-         Annies::Text result;
-         Serialize(item, result, context);
-         out += result;*/
-      }
+      out += Serial::OpenString.Token;
+      out += item;
+      out += Serial::CloseString.Token;
    }
-   
+
+   /// MARK: Code                                                             
+   /// Rule for serializing code to Text. Wraps them it in {}.                
+   /*void SerializationRule<Annies::Text, Flow::Code>::Serialize(
+      Flow::Code const& item, Annies::Text& out, Context*
+   ) {
+      out += Serial::OpenCode.Token;
+      out += item;
+      out += Serial::CloseCode.Token;
+   }*/
+
+   /// MARK: Bytes                                                            
+   /// Rule for serializing bytes to Text. Prepends 0x.                       
+   void SerializationRule<Annies::Text, Annies::Bytes>::Serialize(
+      Annies::Bytes const& item, Annies::Text& out, Context*
+   ) {
+      out += Serial::OpenByte.Token;
+      out.Reserve(item.GetCount()*2);
+      ::std::array<char, sizeof(Byte) * 2> temp;
+      auto from = item.GetRaw();
+      const auto fromEnd = item.GetRawEnd();
+      while (from != fromEnd) {
+         ::fmt::format_to_n(temp.data(), 2, "{:02X}", from->value);
+         out += Annies::Text(temp);
+         ++from;
+      }
+      out += Serial::CloseByte.Token;
+   }
+
    /// MARK: Characters                                                       
    /// Rule for serializing characters to Text. Wraps them in ''.             
    template<CT::Character C>
@@ -294,6 +302,8 @@ namespace fmt
 {
    /// MARK: {fmt}                                                            
    /// Extend FMT to be capable of logging any Annies container.              
+   //TODO i want tags and verbs to be decorated with colors when logged. See Temporal-Logging.cpp
+   //TODO i want metas inside containers to be colored differently
    template<::Langulus::CT::Container T>
    struct formatter<T> {
       template<class CONTEXT>
