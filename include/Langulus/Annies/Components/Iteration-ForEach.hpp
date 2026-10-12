@@ -405,7 +405,7 @@ namespace Langulus::Annies::Component
                   intermediateCounterSink
                );
             }
-            else if (self.template Is<Neat>()) {
+            /*else if (self.template Is<Neat>()) {
                // Nest inside normalized subblocks                      
                using SubNeat = LglsMutIf(C, Neat&);
 
@@ -416,7 +416,7 @@ namespace Langulus::Annies::Component
                   counter
                );
             }
-            else if constexpr (not CT::Deep<A>) {
+            else*/ if constexpr (not CT::Deep<A>) {
                // Equivalent to non-deep iteration                      
                loop = self.template ForEachInner<REVERSE>(LglsMov(f), counter);
             }
@@ -485,7 +485,7 @@ namespace Langulus::Annies::Component
                   intermediateCounterSink
                );
             }
-            else if constexpr (Akin<T, Neat>) {
+            /*else if constexpr (Akin<T, Neat>) {
                // Iterate normalized subblocks                          
                using SubNeat = LglsMutIf(C, Neat&);
 
@@ -496,7 +496,7 @@ namespace Langulus::Annies::Component
                   counter
                );
             }
-            else if constexpr (not CT::Deep<A>) {
+            else*/ if constexpr (not CT::Deep<A>) {
                // Equivalent to non-deep iteration                      
                loop = self.template ForEachInner<REVERSE>(LglsMov(f), counter);
             }
@@ -526,7 +526,7 @@ namespace Langulus::Annies::Component
             "` compared against `", MetaDataOf<A>(), "`)");
 
          if constexpr (CT::Dense<A>) {
-            LglsAssumeDev((self.template CastsTo<A, true>()),
+            LglsAssumeDev((self.template CastsTo<A>(1, true)),
                "Incompatible iterator type", " `", MetaDataOf<A>(), 
                "` (iterating block of type `", self.GetType(), "`)");
          }

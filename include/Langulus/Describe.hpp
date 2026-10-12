@@ -69,7 +69,7 @@ namespace Langulus
    private:
       ///                                                                     
       template<CT::DefineTag TAG, size_t IDX, class D>
-      bool ExtractTagInnerInner(D& value) {
+      bool ExtractTagInnerInner(D& value) const {
          bool satisfied = false;
          size_t counter = 0;
 
@@ -84,7 +84,7 @@ namespace Langulus
                value = tag.GetData();
                satisfied = true;
             }
-            else if (tag.ExtractDataAs(value))
+            else if (Describe{tag.GetData()}.ExtractDataAs(value))
                satisfied = true;
 
             return Loop::Break;
@@ -95,13 +95,13 @@ namespace Langulus
 
       ///                                                                     
       template<CT::DefineTag TAG, size_t...IDX>
-      bool ExtractTagInner(ExpandedSequence<IDX...>, auto&...values) {
+      bool ExtractTagInner(ExpandedSequence<IDX...>, auto&...values) const {
          return (ExtractTagInnerInner<TAG, IDX>(values) or ...);
       }
 
       ///                                                                     
       template<CT::DefineTag TAG>
-      bool ExtractTagInner(auto&...values) {
+      bool ExtractTagInner(auto&...values) const {
          return ExtractTagInner<TAG>( 
             Sequence<sizeof...(values)>::Expand, values...
          );
@@ -244,18 +244,22 @@ namespace Langulus
 
       what.ForEachDeep([&](Many const& group) noexcept {
          group.ForEach([&](Recipe const& recipe) noexcept {
-            if (not recipe.CastsTo(type))
+            if (not recipe.GetTarget().CastsTo(type))
                return;
 
-            if (not found) found = recipe.GetType();
-            else ambiguous = true;
+            if (not found)
+               found = recipe.GetTarget();
+            else
+               ambiguous = true;
          });
 
          if (not group.CastsTo(type))
             return;
 
-         if (not found) found = group.GetType();
-         else ambiguous = true;
+         if (not found)
+            found = group.GetType();
+         else
+            ambiguous = true;
       });
 
       if (ambiguous) {
