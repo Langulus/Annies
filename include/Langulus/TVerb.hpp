@@ -190,12 +190,12 @@ namespace Langulus::Annies
       /// Useful for instantiating constants, unary operations, etc.          
       /// Implemented in Langulus::Flow, as it requires some prime verbs      
       /// being defined, such as Verbs::Do.                                   
-      bool RunStateless() const;
+      bool RunStateless();
 
       /// Execute the verb.                                                   
       /// Implemented in Langulus::Flow, as it requires some prime verbs      
       /// being defined, such as Verbs::Do.                                   
-      bool Run() const;
+      bool Run();
 
       /// MARK: Access                                                        
       auto GetHash() const -> Hash;

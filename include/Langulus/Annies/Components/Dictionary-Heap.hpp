@@ -33,7 +33,7 @@ namespace Langulus::Annies::Component
 
       /// Get the start of the hash table                                     
       template<Cid SID = ID, class C> requires Relevant<SID>
-      constexpr auto GetDictionary(this C&& self) noexcept -> Tmut<C, T*, T const*>{
+      constexpr auto GetDictionary(this C&& self) noexcept -> LglsMutIf(C, T*) {
          if (self.template GetAllocationInner<SID>())
             return ThisCom::GetDictionaryInner();
          return nullptr;

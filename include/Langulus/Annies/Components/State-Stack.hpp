@@ -190,6 +190,12 @@ namespace Langulus::Annies::Component
          return r;
       }
 
+      /// Removes any enabled past/future missing states                      
+      constexpr void ResetMissing(this auto& self) noexcept requires CanBeMissing { //TODO dimensions?
+         if_available(self.DisablePast());
+         if_available(self.DisableFuture());
+      }
+
       /// Check if container is marked as disowned                            
       ///   @attention this is triggered mainly by Disown intent. A container 
       ///      can still be disowned, even if the state itself isn't enabled. 
@@ -276,7 +282,7 @@ namespace Langulus::Annies::Component
 
       /// Get the value of a specific state                                   
       template<CT::State B>
-      static consteval StateType GetStateBit() requires HasStates {
+      static consteval auto GetStateBit() -> StateType requires HasStates {
          StateType i = 0;
          StateType accumulator = 0;
          ForEach(StateList{}, [&]<class S>{

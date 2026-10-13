@@ -36,7 +36,7 @@ namespace Langulus::Annies
 
       // Tag wasn't found - search for a Neat to create it in         
       ForEachDeep([&](Neat& neat) {
-         neat.AddTrait(Abandon(TRAIT {Forward<D>(value)}));
+         neat.AddTag(Abandon(TRAIT {Forward<D>(value)}));
          satisfied = true;
       });
 

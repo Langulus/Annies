@@ -153,7 +153,7 @@ namespace Langulus::Annies
             );
 
             using T     = TypeOf<C>;
-            using Inner = Tmut<C, T&, ConstAll<T&>>;
+            using Inner = LglsMutIf(C, T&);
             if constexpr (CT::Owned<C>)
                return Types<THandle        <Inner>> {};
             else
@@ -189,7 +189,7 @@ namespace Langulus::Annies
             if constexpr (CT::Owned<C> and CT::Sparse<T> and CT::Mutable<C>)
                return DecideHandleType<C>();
             else
-               return Types<Tmut<C, T&, ConstAll<T&>>> {};
+               return Types<LglsMutIf(C, T&)> {};
          }
          #endif
       }

@@ -743,8 +743,10 @@ namespace Langulus::Annies::Component
                // Gather from each subcontainer, regardless if sparse   
                // or not                                                
                size_t count = 0;
-               source.Apply([&](auto& i) {//TODO reverse?
-                  count += ThisCom::template GatherInner<REVERSE>(NestIntentOf(source, *i.GetDense().template Get<D>()));
+               source->Apply([&](auto& i) {//TODO reverse?
+                  count += ThisCom::template GatherInner<REVERSE>(
+                     NestIntentOf(source, *i.GetDense().template Get<D>())
+                  );
                });
                return count;
             }
@@ -788,17 +790,20 @@ namespace Langulus::Annies::Component
          if (not condition(DeintCast(source))) {
             if constexpr (not ::std::is_void_v<D>) {
                static_assert(CT::Deep<D> and CT::Decayed<D>, "D is not deep");  
-               if (source->IsNow() and source->template Is<D>()) {
+               if (not source->IsMissing() and source->template Is<D>()) {
                   // States don't match, but we can dig deeper if Deep  
                   // and Now, since Now state is permissive, regardless 
                   // if sparse or not.                                  
                   C localOutput;
                   localOutput.SetType(self.GetType());
                   localOutput.SetState(source->GetUnconstrainedState());
-                  source.Apply([&](auto& i) {//TODO reverse?
-                     localOutput.template GatherPolarInner<REVERSE, D>(NestIntentOf(source, *i.GetDense().template Get<D>()), condition);
+                  source->Apply([&](auto& i) {//TODO reverse?
+                     localOutput.template GatherPolarInner<REVERSE, D>(
+                        NestIntentOf(source, *i.GetDense().template Get<D>()), 
+                        condition
+                     );
                   });
-                  localOutput.MakeNow();
+                  localOutput.ResetMissing();
                   return ThisCom::Compose(Abandon(localOutput));
                }
             }
@@ -819,7 +824,7 @@ namespace Langulus::Annies::Component
          localOutput.SetType(self.GetType());
          localOutput.SetState(source->GetState());
          localOutput.template GatherInner<REVERSE, D>(LglsFwd(source));
-         localOutput.MakeNow();
+         localOutput.ResetMissing();
          return ThisCom::Concat(Abandon(localOutput));
       }
 

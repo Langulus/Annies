@@ -91,8 +91,8 @@ namespace Langulus::Annies::Component
       template<bool CUSTOM_POINTERS, CT::Container C>
       static void FindEntry(
          AllocationPtr const* entries, CT::Sparse auto ptr,
-         [[maybe_unused]] const DMeta& T = {},
-         [[maybe_unused]] const DMeta& nextT = {}
+         [[maybe_unused]] DMeta const& T = {},
+         [[maybe_unused]] DMeta const& nextT = {}
       ) assumptious {
          if (*entries)
             return;

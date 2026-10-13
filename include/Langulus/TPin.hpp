@@ -50,11 +50,13 @@ namespace Langulus::Annies
          this->ConstructDefault();
       }
 
-      constexpr  TPin(TPin const& other) noexcept
-         : Base {Absorb, Refer {other}} {}
+      constexpr  TPin(TPin const& other) {
+         this->Absorb(Refer(other));
+      }
 
-      constexpr  TPin(TPin&& other) noexcept
-         : Base {Absorb, Move {other}} {}
+      constexpr  TPin(TPin&& other) noexcept {
+         this->Absorb(Move(other));
+      }
 
       constexpr  TPin(T const& source)
          : Base {Stackwise, source} {}

@@ -37,7 +37,7 @@ namespace Langulus::Annies
    requires CT::Intent<S<Neat>> LANGULUS(INLINED)
    Neat::Neat(S<Neat>&& other)
       : mHash         {other->mHash}
-      , mTraits       {other.Nest(other->mTraits)}
+      , mTags       {other.Nest(other->mTags)}
       , mConstructs   {other.Nest(other->mConstructs)}
       , mAnythingElse {other.Nest(other->mAnythingElse)} {
       // Reset remote hash if moving                                    
@@ -61,7 +61,7 @@ namespace Langulus::Annies
    template<template<class> class S>
    requires CT::Intent<S<Neat>> LANGULUS(INLINED)
    Neat& Neat::operator = (S<Neat>&& other) {
-      mTraits       = other.Nest(other->mTraits);
+      mTags       = other.Nest(other->mTags);
       mConstructs   = other.Nest(other->mConstructs);
       mAnythingElse = other.Nest(other->mAnythingElse);
       mHash         = other->mHash;
@@ -75,7 +75,7 @@ namespace Langulus::Annies
    /// Clear the container without deallocating                               
    LANGULUS(INLINED) void Neat::Clear() {
       mHash = {};
-      mTraits.Clear();
+      mTags.Clear();
       mConstructs.Clear();
       mAnythingElse.Clear();
    }
@@ -83,7 +83,7 @@ namespace Langulus::Annies
    /// Clear and deallocate the container                                     
    LANGULUS(INLINED) void Neat::Reset() {
       mHash = {};
-      mTraits.Reset();
+      mTags.Reset();
       mConstructs.Reset();
       mAnythingElse.Reset();
    }
@@ -99,7 +99,7 @@ namespace Langulus::Annies
       if (IsEmpty())
          mHash = {};
       else
-         mHash = HashOf(mTraits, mConstructs, mAnythingElse);
+         mHash = HashOf(mTags, mConstructs, mAnythingElse);
       return mHash;
    }
 
@@ -107,7 +107,7 @@ namespace Langulus::Annies
    ///   @return true if empty                                                
    LANGULUS(INLINED)
    bool Neat::IsEmpty() const noexcept {
-      return mTraits.IsEmpty()
+      return mTags.IsEmpty()
          and mConstructs.IsEmpty()
          and mAnythingElse.IsEmpty();
    }
@@ -116,7 +116,7 @@ namespace Langulus::Annies
    ///   @return true if there's at least one missing entry                   
    LANGULUS(INLINED)
    bool Neat::IsMissingDeep() const {
-      return mTraits.IsKeyMissingDeep() or mTraits.IsValueMissingDeep()
+      return mTags.IsKeyMissingDeep() or mTags.IsValueMissingDeep()
           or mConstructs.IsKeyMissingDeep() or mConstructs.IsValueMissingDeep()
           or mAnythingElse.IsKeyMissingDeep() or mAnythingElse.IsValueMissingDeep();
    }
@@ -125,7 +125,7 @@ namespace Langulus::Annies
    ///   @return true if there's at least one executable entry                
    LANGULUS(INLINED)
    bool Neat::IsExecutable() const noexcept {
-      return mTraits.IsKeyExecutableDeep() or mTraits.IsValueExecutableDeep()
+      return mTags.IsKeyExecutableDeep() or mTags.IsValueExecutableDeep()
           or mConstructs.IsKeyExecutableDeep() or mConstructs.IsValueExecutableDeep()
           or mAnythingElse.IsKeyExecutableDeep() or mAnythingElse.IsValueExecutableDeep();
    }
@@ -145,7 +145,7 @@ namespace Langulus::Annies
       if (GetHash() != rhs.GetHash())
          return false;
 
-      return mTraits == rhs.mTraits
+      return mTags == rhs.mTags
          and mConstructs == rhs.mConstructs
          and mAnythingElse == rhs.mAnythingElse;
    }
@@ -157,7 +157,7 @@ namespace Langulus::Annies
       if (not rhs)
          return;
 
-      mTraits       += rhs.mTraits;
+      mTags       += rhs.mTags;
       mConstructs   += rhs.mConstructs;
       mAnythingElse += rhs.mAnythingElse;
       mHash = {};
@@ -191,8 +191,8 @@ namespace Langulus::Annies
    LANGULUS(INLINED)
    auto Neat::GetTraits(TMeta t) -> TagList* {
       LglsAssumeUser(t, "Can't get invalid trait");
-      auto found = mTraits.Find(t);
-      return found ? &mTraits.GetValue(found) : nullptr;
+      auto found = mTags.Find(t);
+      return found ? &mTags.GetValue(found) : nullptr;
    }
 
    /// Get list of traits, corresponding to a type (const)                    
@@ -326,7 +326,7 @@ namespace Langulus::Annies
       if (found and *found)
          return;
 
-      AddTrait(Abandon(T {Forward<Deref<decltype(value)>>(value)}));
+      AddTag(Abandon(T {Forward<Deref<decltype(value)>>(value)}));
    }
 
    /// Extract a trait from the descriptor                                    
@@ -472,7 +472,7 @@ namespace Langulus::Annies
 
       if constexpr (CT::DefineTag<T>) {
          // Insert trait to its bucket                                  
-         AddTrait(S::Nest(item));
+         AddTag(S::Nest(item));
       }
       else if constexpr (CT::Same<T, CMeta>) {
          // Expand the constant, and push it                            
@@ -585,8 +585,8 @@ namespace Langulus::Annies
                [&](const A::Verb& verb) {
                   InsertInner(S::Nest(const_cast<A::Verb&>(verb)));
                },
-               [&](const DMeta& meta) { InsertInner(meta); },
-               [&](const TMeta& meta) { InsertInner(meta); },
+               [&](DMeta const& meta) { InsertInner(meta); },
+               [&](TMeta const& meta) { InsertInner(meta); },
                [&](const CMeta& meta) { InsertInner(meta); }
             );
 
@@ -683,7 +683,7 @@ namespace Langulus::Annies
    ///   @return a reference to this construct for chaining                   
    Neat& Neat::SetTrait(CT::DefineTag auto&& trait, size_t index) {
       const auto meta = trait.GetTag();
-      auto found = mTraits.BranchOut().FindIt(meta);
+      auto found = mTags.BranchOut().FindIt(meta);
 
       if (found) {
          // A group of similar traits was found                         
@@ -695,7 +695,7 @@ namespace Langulus::Annies
       }
       else {
          // If reached, a new trait group to be inserted                
-         mTraits.Insert(meta, Forward<Tag>(trait));
+         mTags.Insert(meta, Forward<Tag>(trait));
       }
 
       mHash = {};
@@ -706,27 +706,27 @@ namespace Langulus::Annies
    ///   @attention this is an inner function that doesn't affect the hash    
    ///   @param messy - the trait and intent to insert                        
    LANGULUS(INLINED)
-   void Neat::AddTrait(CT::Intent auto&& messy) {
+   void Neat::AddTag(CT::Intent auto&& messy) {
       using S = IntentOf<decltype(messy)>;
       using T = TypeOf<S>;
 
       if constexpr (CT::DefineTag<T>) {
          // Insert a trait with contents                                
          const auto meta = messy->GetTag();
-         auto found = mTraits.BranchOut().FindIt(meta);
+         auto found = mTags.BranchOut().FindIt(meta);
          if (found)
             found.GetValue() << messy.Forward();
          else
-            mTraits.Insert(meta, messy.Forward());
+            mTags.Insert(meta, messy.Forward());
       }
       else if constexpr (CT::Exact<T, TMeta>) {
          // Insert trait without contents                               
          const auto trait = *messy;
-         auto found = mTraits.BranchOut().FindIt(trait);
+         auto found = mTags.BranchOut().FindIt(trait);
          if (found)
             found.GetValue() << Tag::FromMeta(trait);
          else
-            mTraits.Insert(trait, Tag::FromMeta(trait));
+            mTags.Insert(trait, Tag::FromMeta(trait));
       }
       else static_assert(false, "Can't insert trait");
    }
@@ -781,7 +781,7 @@ namespace Langulus::Annies
    ///   @return selected data or nullptr if none was found                   
    ///   @attention if not nullptr, returned Many might contain a Neat        
    inline auto Neat::GetTag(TMeta meta, size_t index) const -> const Tag* {
-      const auto found = mTraits.FindIt(meta);
+      const auto found = mTags.FindIt(meta);
       if (found and found.GetValue().GetCount() > index)
          return &(found.GetValue()[index]);
       return nullptr;
@@ -910,7 +910,7 @@ namespace Langulus::Annies
          // Static trait provided, extract filter                       
          using TraitType = Decay<A>;
          const auto filter = MetaTraitOf<TraitType>();
-         const auto found = mTraits.FindIt(filter);
+         const auto found = mTags.FindIt(filter);
          if (not found)
             return index;
 
@@ -927,7 +927,7 @@ namespace Langulus::Annies
       }
       else {
          // Iterate all traits, either using type-erased trait, or deep 
-         for (auto group : mTraits) {
+         for (auto group : mTags) {
             for (auto& data : group.GetValue()) {
                if constexpr (CT::Deep<A>) {
                   auto wrapper = MakeBlock<Decay<A>>(data);
@@ -1173,22 +1173,22 @@ namespace Langulus::Annies
    template<CT::Tag T, bool EMPTY_TOO>
    size_t Neat::RemoveTrait() {
       const auto filter = MetaTraitOf<T>();
-      const auto found = mTraits.FindIt(filter);
+      const auto found = mTags.FindIt(filter);
       if (not found)
          return 0;
 
       if constexpr (EMPTY_TOO) {
          // Remove everything                                           
          const auto count = found.mValue->GetCount();
-         mTraits.RemoveIt(found);
+         mTags.RemoveIt(found);
          return count;
       }
 
-      if (mTraits.GetKeys().GetUses() > 1
-      or  mTraits.GetVals().GetUses() > 1) {
-         // mTraits is used from multiple locations, and we must        
+      if (mTags.GetKeys().GetUses() > 1
+      or  mTags.GetVals().GetUses() > 1) {
+         // mTags is used from multiple locations, and we must        
          // branch out this particular instance before modifying it     
-         found = mTraits.BranchOut().FindIt(filter);
+         found = mTags.BranchOut().FindIt(filter);
       }
 
       size_t count = 0;
@@ -1202,7 +1202,7 @@ namespace Langulus::Annies
       }
 
       if (not *found.mValue)
-         mTraits.RemoveIt(found);
+         mTags.RemoveIt(found);
       return count;
    }
    
@@ -1228,7 +1228,7 @@ namespace Langulus::Annies
          }
       }
 
-      for (auto pair : mTraits) {
+      for (auto pair : mTags) {
          for (auto& trait : pair.GetValue()) {
             if (separator)
                to += ", ";

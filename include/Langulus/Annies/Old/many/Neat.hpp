@@ -43,7 +43,7 @@ namespace Langulus::Annies
       // Tags are ordered first by their trait type, then by their    
       // order of appearance. Duplicate trait types are allowed         
       // Tag contents may or may not also be normalized               
-      TUnorderedMap<TMeta, TagList> mTraits;
+      TUnorderedMap<TMeta, TagList> mTags;
 
       // Subconstructs are sorted first by the construct type, and then 
       // by their order of appearance. Their contents may or may not    
@@ -193,7 +193,7 @@ namespace Langulus::Annies
       size_t UnfoldInsert(auto&&);
       void InsertInner(auto&&);
 
-      void AddTrait(CT::Intent auto&&);
+      void AddTag(CT::Intent auto&&);
       void AddConstruct(CT::Intent auto&&);
       void AddVerb(CT::Intent auto&&);
 

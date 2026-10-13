@@ -10,6 +10,7 @@
 #include <Langulus/CT/Number.hpp>
 #include <Langulus/CT/Convertible.hpp>
 #include <Langulus/CT/Serializer.hpp>
+#include <Langulus/CT/DefineConst.hpp>
 #include <Langulus/Utils/Byte.hpp>
 
 #include "Handle.hpp"
@@ -419,6 +420,21 @@ namespace Langulus::Annies
       static Text Mention(T const& instance) {
          auto token = MetaOf<Decay<T>>().GetShortestUnambiguousToken();
          return Mention(token, instance);
+      }
+
+      /// Generates token from named constant                                 
+      template<CT::HasNamedValues T>
+      static Text Named(T const& constant) {
+         constexpr auto named_values = GetNamedValueList<T>();
+         Text result;
+         ForEachOr(named_values, [&result, &constant]<class V> {
+            if (V::Constant == constant) {
+               result = V::Token;
+               return true;
+            }
+            else return false;
+         });
+         return result;
       }
 
       /// Interpret text container as a std::string_view                      

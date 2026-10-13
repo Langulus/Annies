@@ -34,7 +34,7 @@ struct Thing final : Resolvable {
    Ref<Thing> mOwner;
    TMany<Thing*> mChildren;
    UnitMap mUnits;
-   TraitMap mTraits;
+   TraitMap mTags;
 };
 
 Thing::Thing() : Resolvable {MetaOf<Thing>()} {}
