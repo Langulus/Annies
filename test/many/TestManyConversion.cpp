@@ -9,7 +9,7 @@
 
 
 TEMPLATE_TEST_CASE("Converting to text", "[many]",
-   Traits::Name, TMany<DMeta>, Many
+   Tags::Name, TMany<DMeta>, Many
 ) {
    static Allocator::State memoryState;
 

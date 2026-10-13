@@ -21,7 +21,7 @@ decltype(auto) FromHelper() {
          if constexpr (CT::Tag<T>)
             return T::template OfType<E>();
          else
-            return T::template From<Traits::Count, E>();
+            return T::template From<Tags::Count, E>();
       }
       else return T::template From<E>();
    }

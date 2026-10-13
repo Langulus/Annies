@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -253,7 +253,8 @@ namespace Langulus::CTTI
    };
 
    /// Rule for serializing any container that isn't deep.                    
-   template<class C> requires CT::Container<Decay<C>>
+   template<class C> requires (CT::Container<Decay<C>> 
+                      and not ::std::is_same_v<Decay<C>, Annies::Neat>)
    struct SerializationRule<Annies::Bytes, C> {
       static_assert(Exact<DecvqAll<C>, C>,
          "Strip all decorations on all indirections first");
@@ -358,7 +359,8 @@ namespace Langulus::CTTI
    }*/
 
    /// Rule for serializing any container to bytes, deep or sparse            
-   template<class C> requires CT::Container<Decay<C>>
+   template<class C> requires (CT::Container<Decay<C>> 
+                      and not ::std::is_same_v<Decay<C>, Annies::Neat>)
    void SerializationRule<Annies::Bytes, C>::Serialize(
       ConstAll<C&> may_be_sparse, Annies::Bytes& out, Context* context
    ) {

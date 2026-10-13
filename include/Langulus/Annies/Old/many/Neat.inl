@@ -334,7 +334,7 @@ namespace Langulus::Annies
    ///   @param values - [out] where to save the value, if found              
    ///   @return true if value changed                                        
    template<CT::Tag...T> LANGULUS(INLINED)
-   bool Neat::ExtractTrait(CT::NotVoid auto&...values) const {
+   bool Neat::ExtractTag(CT::NotVoid auto&...values) const {
       return (ExtractTraitInner<T>(values...) or ...);
    }
    

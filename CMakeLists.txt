@@ -16,7 +16,6 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
    if(LANGULUS_OPTION_MANAGED_MEMORY)
       fetch_langulus_module(Fractalloc GIT_TAG wip)
    endif()
-   fetch_langulus_module(SIMD GIT_TAG wip)
 endif()
 
 # Build and install Annies library												
@@ -37,7 +36,6 @@ target_include_directories(LangulusAnnies
 
 target_link_libraries(LangulusAnnies
    PUBLIC   LangulusCore
-            LangulusSIMD
             $<TARGET_PROPERTY:LangulusLogger,INTERFACE_LINK_LIBRARIES>
 )
 

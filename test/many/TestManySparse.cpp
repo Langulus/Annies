@@ -14,14 +14,14 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
    (TypePair<Tag, RT*>),
 
    (TypePair<TMany<Tag*>, Tag*>),
-   (TypePair<Many, Traits::size_t*>),
+   (TypePair<Many, Tags::size_t*>),
    (TypePair<Tag, Text*>),
 
-   (TypePair<Traits::Name, Text*>),
-   (TypePair<Traits::Name, RT*>),
+   (TypePair<Tags::Name, Text*>),
+   (TypePair<Tags::Name, RT*>),
 
    (TypePair<TMany<int*>, int*>),
-   (TypePair<TMany<Traits::size_t*>, Traits::size_t*>),
+   (TypePair<TMany<Tags::size_t*>, Tags::size_t*>),
    (TypePair<TMany<Many*>, Many*>),
    (TypePair<TMany<Text*>, Text*>),
    (TypePair<TMany<RT*>, RT*>),
@@ -686,7 +686,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       }
 
       WHEN("Empty pack with state is shallow-copied") {
-         pack.MakeOr();
+         pack.EnableOr();
          auto copy = pack;
 
          Any_Helper_TestSame(copy, pack);
@@ -696,7 +696,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
 
       if constexpr (CT::CloneMakable<T>) {
          WHEN("Empty pack with state is cloned") {
-            pack.MakeOr();
+            pack.EnableOr();
             T clone = Clone(pack);
 
             Any_Helper_TestSame(clone, pack);
@@ -706,7 +706,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       }
 
       WHEN("Empty pack with state is moved") {
-         pack.MakeOr();
+         pack.EnableOr();
          T movable = pack;
          const T moved = ::std::move(movable);
 
@@ -2124,7 +2124,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       #endif
 
       WHEN("Empty pack with state is shallow-copied") {
-         pack.MakeOr();
+         pack.EnableOr();
          auto copy = pack;
 
          REQUIRE(copy.GetRaw() == pack.GetRaw());
@@ -2136,7 +2136,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       }
 
       WHEN("Pack is cloned") {
-         pack.MakeOr();
+         pack.EnableOr();
 
          if constexpr (CT::CloneMakable<E>) {
             T clone = Clone(pack);
@@ -2163,7 +2163,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
 
       WHEN("Pack is moved") {
          T movable = pack;
-         movable.MakeOr();
+         movable.EnableOr();
          const T moved = ::std::move(movable);
 
          REQUIRE(movable.GetRaw() == nullptr);

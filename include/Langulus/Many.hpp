@@ -27,6 +27,7 @@
 #include "Annies/Components/Iteration-ForEach.hpp"
 #include "Annies/Components/Iteration-Range.hpp"
 #include "Annies/Components/State-Stack.hpp"
+#include "Annies/Components/Descriptor.hpp"
 #include "Annies/States/Disowned.hpp"
 #include "Annies/States/Future.hpp"
 #include "Annies/States/Past.hpp"
@@ -63,7 +64,8 @@ namespace Langulus::Annies::Inner
       Com::Conversion<>,               // Allows conversions            
       Com::Comparison<>,               // Allows comparisons            
       Com::IterationForEach<>,         // ForEach iteration             
-      Com::IterationRange<>            // Ranged iteration              
+      Com::IterationRange<>,           // Ranged iteration              
+      Com::Descriptor<>                // Add descriptor interface      
    >;
 }
 

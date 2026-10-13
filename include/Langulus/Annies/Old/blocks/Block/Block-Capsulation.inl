@@ -626,7 +626,7 @@ namespace Langulus::Annies
    /// OR blocks are handled differently by Langulus::Flow, when executing    
    /// verbs in them, or when used as arguments for verbs.                    
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   constexpr void Block<TYPE>::MakeOr() noexcept {
+   constexpr void Block<TYPE>::EnableOr() noexcept {
       mState += DataState::Or;
    }
 
@@ -664,7 +664,7 @@ namespace Langulus::Annies
    /// Mark the block as missing. It will no longer participate in hashing    
    /// and comparisons                                                        
    template<class TYPE> LANGULUS(ALWAYS_INLINED)
-   constexpr void Block<TYPE>::MakeMissing() noexcept {
+   constexpr void Block<TYPE>::EnableMissing() noexcept {
       mState += DataState::Missing;
    }
 

@@ -521,12 +521,12 @@ namespace Langulus::Annies
 
       constexpr void MakeConst(bool enable = true) noexcept;
       constexpr void MakeTypeConstrained(bool enable = true) noexcept;
-      constexpr void MakeOr() noexcept;
+      constexpr void EnableOr() noexcept;
       constexpr void MakeAnd() noexcept;
       constexpr void MakePast() noexcept;
       constexpr void MakeFuture() noexcept;
       constexpr void MakeNow() noexcept;
-      constexpr void MakeMissing() noexcept;
+      constexpr void EnableMissing() noexcept;
       constexpr void ResetState() noexcept;
 	  
       template<class T = TYPE>
@@ -546,7 +546,7 @@ namespace Langulus::Annies
       void SetDefaultTrait(D&&);
 
       template<class...>
-      bool ExtractTrait(CT::NotVoid auto&...) const;
+      bool ExtractTag(CT::NotVoid auto&...) const;
       auto ExtractData(CT::NotVoid auto&) const -> size_t;
 
       // Intentionally undefined, because it requires Langulus::Flow    

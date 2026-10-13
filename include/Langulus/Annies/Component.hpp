@@ -715,6 +715,10 @@ namespace Langulus::Annies
       template<class T, Cid = 0, Cid...> struct DictionaryHeap;
       #define LglsComDictionaryHeap(modifier) \
          template<class, Cid, Cid...> modifier struct DictionaryHeap
+
+      template<Cid = 0, Cid...> struct Descriptor;
+      #define LglsComDescriptor(modifier) \
+         template<Cid, Cid...> modifier struct Descriptor
    }
    
    namespace Com = Component;

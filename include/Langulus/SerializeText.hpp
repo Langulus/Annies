@@ -141,6 +141,15 @@ namespace Langulus::CTTI
       static void Serialize(C const&, Annies::Text&, Context*);
    };
 
+   /// Rule for serializing verbs to Text.                                    
+   template<class V>
+   struct SerializationRule<Annies::Text, Annies::TVerb<V>> {
+      using S = Serializer<Annies::Text>;
+      using Context = typename S::Context;
+
+      static void Serialize(Annies::TVerb<V> const&, Annies::Text&, Context*);
+   };
+
    /// MARK: Serialize many                                                   
    /// A rule for serializing any deep container that contains multiple items.
    /// This includes Many, Map, Set, Neat etc...                              
@@ -294,6 +303,48 @@ namespace Langulus::CTTI
       out += Serial::OpenCharacter.Token;
       out += item;
       out += Serial::CloseCharacter.Token;
+   }
+
+   /// MARK: Verbs                                                            
+   /// Rule for serializing verbs to Text.                                    
+   template<class V>
+   void SerializationRule<Annies::Text, Annies::TVerb<V>>::Serialize(
+      Annies::TVerb<V> const& verb, Annies::Text& out, Context* context
+   ) {
+      auto& output = verb.GetOutput();
+      if (verb.IsDone() and output) {
+         // If verb has been executed with output, just dump the output 
+         Langulus::Serialize(output, out, context);
+         return;
+      }
+
+      // If reached, then verb hasn't been executed yet.                
+      // Let's check if there's a source in which verb is executed.     
+      auto& source = verb.GetSource();
+      if (source.IsValid()) {
+         S::BeginScope(source, out, context);
+         Langulus::Serialize(source, out, context);
+         S::EndScope(source, out, context);
+      }
+
+      // After the source, we decide whether to write verb token or     
+      // verb operator, depending on the verb definition, state and     
+      // charge                                                         
+      bool writtenAsToken = false;
+      const auto token = verb.GetOperatorToken(writtenAsToken);
+      if (writtenAsToken and source.IsValid())
+         out += ' ';
+      out += token;
+
+      // Now it's time to take care of the arguments                    
+      auto argument = verb.GetArgument();
+      if (not argument.IsValid())
+         return;
+      
+      if (not S::BeginScope(argument, out, context) and writtenAsToken)
+         out += ' ';
+      Langulus::Serialize(argument, out, context);
+      S::EndScope(argument, out, context);
    }
 }
 

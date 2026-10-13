@@ -15,11 +15,11 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
 
    (MapTest<TPair<Text, int>, Text, int>),
    (MapTest<TPair<Text, Tag>, Text, Tag>),
-   (MapTest<TPair<Text, Traits::Count>, Text, Traits::Count>),
+   (MapTest<TPair<Text, Tags::Count>, Text, Tags::Count>),
    (MapTest<TPair<Text, Many>, Text, Many>),
 
    (MapTest<Pair, Text, Tag>),
-   (MapTest<Pair, Text, Traits::Count>),
+   (MapTest<Pair, Text, Tags::Count>),
    (MapTest<Pair, Text, Many>)
 ) {
    static Allocator::State memoryState;

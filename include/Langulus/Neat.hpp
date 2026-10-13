@@ -28,11 +28,13 @@ namespace Langulus::Annies
    ///   Elements that are marked missing are never considered part of the    
    /// recipe and are filled by the context (i.e. Tags::Parent(?)).           
    struct Neat {
-      using CTTI_ReflectAs = Neat;
+      using CTTI_Container = Yup;
+
       using RecipeList = TMany<Recipe>;
       using TailList   = TMany<Messy>;
       using TagList    = TMany<Tag>;
 
+   private:
       // The hash of the container.                                     
       // Kept as first member, in order to quickly access it.           
       mutable Hash mHash;
@@ -53,8 +55,6 @@ namespace Langulus::Annies
       TMapUnsorted<DMeta, TailList> mAnythingElse;
 
    public:
-      using CTTI_Container = Yup;
-
       ///                                                                     
       ///   Construction                                                      
       constexpr Neat() noexcept = default;

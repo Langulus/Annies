@@ -52,7 +52,7 @@ namespace Langulus::Annies
    ///   @param values - [out] where to save the value, if found              
    ///   @return true if value changed                                        
    template<class TYPE> template<class...TRAIT>
-   bool Block<TYPE>::ExtractTrait(CT::NotVoid auto&...values) const {
+   bool Block<TYPE>::ExtractTag(CT::NotVoid auto&...values) const {
       static_assert(CT::Tag<TRAIT...>, "TRAIT is not a trait type");
       return (ExtractTraitInner<TRAIT>(values...) or ...);
    }

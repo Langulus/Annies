@@ -9,13 +9,13 @@
 
 
 TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
-   (TypePair<Many, Traits::Count>),
+   (TypePair<Many, Tags::Count>),
    (TypePair<Tag, Text>),
-   (TypePair<Traits::Name, Text>),
+   (TypePair<Tags::Name, Text>),
 
    (TypePair<TMany<int>, int>),
    (TypePair<TMany<Tag>, Tag>),
-   (TypePair<TMany<Traits::Count>, Traits::Count>),
+   (TypePair<TMany<Tags::Count>, Tags::Count>),
    (TypePair<TMany<Many>, Many>),
    (TypePair<TMany<Text>, Text>),
 
@@ -688,7 +688,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("Empty pack with state is shallow-copied") {
-         pack.MakeOr();
+         pack.EnableOr();
          auto copy = pack;
 
          Any_Helper_TestSame(copy, pack);
@@ -697,7 +697,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("Empty pack with state is cloned") {
-         pack.MakeOr();
+         pack.EnableOr();
          T clone = Clone(pack);
 
          Any_Helper_TestSame(clone, pack);
@@ -706,7 +706,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("Empty pack with state is moved") {
-         pack.MakeOr();
+         pack.EnableOr();
          T movable = pack;
          const T moved = ::std::move(movable);
 
@@ -2223,7 +2223,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       #endif
 
       WHEN("Pack is shallow-copied") {
-         pack.MakeOr();
+         pack.EnableOr();
          auto copy = pack;
 
          REQUIRE(copy.GetRaw() == pack.GetRaw());
@@ -2235,7 +2235,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       WHEN("Pack is cloned") {
-         pack.MakeOr();
+         pack.EnableOr();
          T clone = Clone(pack);
 
          REQUIRE(clone.GetRaw() != pack.GetRaw());
@@ -2254,7 +2254,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
 
       WHEN("Pack is moved") {
          T movable = pack;
-         movable.MakeOr();
+         movable.EnableOr();
          const T moved = ::std::move(movable);
 
          REQUIRE(movable.GetRaw() == nullptr);

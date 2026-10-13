@@ -12,28 +12,28 @@
    (SetTest<TUnorderedSet<Text*>, Text*, MANAGED>), \
    (SetTest<TUnorderedSet<int*>, int*, MANAGED>), \
    (SetTest<TUnorderedSet<Tag*>, Tag*, MANAGED>), \
-   (SetTest<TUnorderedSet<Traits::Count*>, Traits::Count*, MANAGED>), \
+   (SetTest<TUnorderedSet<Tags::Count*>, Tags::Count*, MANAGED>), \
    (SetTest<TUnorderedSet<Many*>, Many*, MANAGED>), \
    (SetTest<TUnorderedSet<RT*>, RT*, MANAGED>), \
  \
    (SetTest<TOrderedSet<Text*>, Text*, MANAGED>), \
    (SetTest<TOrderedSet<int*>, int*, MANAGED>), \
    (SetTest<TOrderedSet<Tag*>, Tag*, MANAGED>), \
-   (SetTest<TOrderedSet<Traits::Count*>, Traits::Count*, MANAGED>), \
+   (SetTest<TOrderedSet<Tags::Count*>, Tags::Count*, MANAGED>), \
    (SetTest<TOrderedSet<Many*>, Many*, MANAGED>), \
    (SetTest<TOrderedSet<RT*>, RT*, MANAGED>), \
  \
    (SetTest<UnorderedSet, Text*, MANAGED>), \
    (SetTest<UnorderedSet, int*, MANAGED>), \
    (SetTest<UnorderedSet, Tag*, MANAGED>), \
-   (SetTest<UnorderedSet, Traits::Count*, MANAGED>), \
+   (SetTest<UnorderedSet, Tags::Count*, MANAGED>), \
    (SetTest<UnorderedSet, Many*, MANAGED>), \
    (SetTest<UnorderedSet, RT*, MANAGED>), \
  \
    (SetTest<OrderedSet, Text*, MANAGED>), \
    (SetTest<OrderedSet, int*, MANAGED>), \
    (SetTest<OrderedSet, Tag*, MANAGED>), \
-   (SetTest<OrderedSet, Traits::Count*, MANAGED>), \
+   (SetTest<OrderedSet, Tags::Count*, MANAGED>), \
    (SetTest<OrderedSet, Many*, MANAGED>), \
    (SetTest<OrderedSet, RT*, MANAGED>)
 

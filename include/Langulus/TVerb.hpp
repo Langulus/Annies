@@ -6,12 +6,13 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Langulus/CT/Convertible.hpp"
 #include "Many.hpp"
+#include "Text.hpp"
+#include "Langulus/CT/Convertible.hpp"
 #include "Annies/Components/Charged-Stack.hpp"
 #include "Annies/Components/Verbed-Stack.hpp"
-#include "Langulus/CT/Able.hpp"
-#include "Langulus/CT/Akin.hpp"
+//#include "Langulus/CT/Able.hpp"
+//#include "Langulus/CT/Akin.hpp"
 #include "Langulus/CT/Executable.hpp"
 
 
@@ -31,7 +32,7 @@ namespace Langulus::Annies
    ///                                                                        
    /// MARK: TVerb                                                            
    ///   A type-erased container specifically designed for fully capsulating  
-   /// function calls. May be verb-constrained: the verb it contains could    
+   /// function calls. Can be verb-constrained: the verb it contains could    
    /// be known at compile-time.                                              
    ///   This template is used as base for all verb definitions, so that you  
    /// can directly use specific verbs as containers, like so:                
@@ -39,6 +40,10 @@ namespace Langulus::Annies
    ///   Cool, huh?                                                           
    template<class V>
    struct TVerb : Inner::TVerbBase<V> {
+      //TODO hmm, should we just inherit Many, so that we can easily get a reference to it? 
+      //TODO and just keep everything else on the stack?
+      //TODO well, we have composable containers, so we can seamlessly test that out and 
+      //TODO measure compile-time and runtime speed
       using CTTI_ReflectAs = Verb;
       
    private:
@@ -240,7 +245,12 @@ namespace Langulus
    using Annies::Verb;
 }
 
-LANGULUS_MORPHISM(Annies::Verb, Annies::Text);
+/// Converting to text relies on the serializer                               
+LANGULUS_MORPHISM_CUSTOM(Annies::Verb, {
+   Annies::Text text;
+   Langulus::Serialize(from, text);
+   return text;
+}, Annies::Text);
 
 /// Define a verb                                                             
 ///   @param P positive verb name, as it exists in namespace Langulus::Verbs  
@@ -265,21 +275,3 @@ LANGULUS_MORPHISM(Annies::Verb, Annies::Text);
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
    namespace Langulus::CTTI  { template<> struct DefineVerbOp<::Langulus::Verbs::P> : NamedOperator<OP,ON> {}; } \
    namespace Langulus::Verbs { struct P : Annies::TVerb<P> { using CTTI_Info = Yes<INFOSTRING>; }; }
-
-
-/*#include "Text.hpp"
-
-namespace Langulus::CTTI
-{
-   /// Rule for serializing Verb to Text. Splits it up depending on length.   
-   /// Made to look pretty.                                                   
-   template<CT::Executable V>
-   struct SerializationRule<Annies::Text, V> {
-      using S = Serializer<Annies::Text>;
-      using Context = typename S::Context;
-
-      static void Serialize(Annies::Text const&, Annies::Text&, Context*) {
-
-      }
-   };
-}*/

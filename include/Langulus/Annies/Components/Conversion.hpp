@@ -177,11 +177,11 @@ namespace Langulus::Annies::Component
          return self.GetCount();
       }
 
-      template<CT::NotVoid TO, CT::Container C, class OUT = typename C::template Retype<TO>>
+      /*template<CT::NotVoid TO, CT::Container C, class OUT = typename C::template Retype<TO>>
       auto ConvertTo(this C const& self) -> OUT {
          OUT result;
          self.ConvertTo(result);
          return Abandon(result);
-      }
+      }*/
    };
 }

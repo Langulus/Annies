@@ -49,11 +49,11 @@ TEMPLATE_TEST_CASE(
 
    (HashTest<Text, int>),
    (HashTest<Text, Tag>),
-   (HashTest<Text, Traits::Count>),
+   (HashTest<Text, Tags::Count>),
    (HashTest<Text, Many>),
 
    (HashTest<Text, int*>),
-   (HashTest<Text, Traits::Count*>),
+   (HashTest<Text, Tags::Count*>),
    (HashTest<Text, Many*>)
 ) {
    using K = typename TestType::Key;
@@ -100,8 +100,8 @@ TEMPLATE_TEST_CASE(
 /// Cross-container consistency tests                                         
 TEMPLATE_TEST_CASE(
    "Cross-container consistency tests for TOrderedSet/TUnorderedSet/OrderedSet/UnorderedSet", "[set]",
-   int,  Tag,  Traits::Count,  Many,
-   int*, Tag*, Traits::Count*, Many*
+   int,  Tag,  Tags::Count,  Many,
+   int*, Tag*, Tags::Count*, Many*
 ) {
    Allocator::State memoryState;
 

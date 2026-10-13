@@ -11,11 +11,11 @@
    (MapTest<Pair, Tag*, RT*, MANAGED>), \
  \
    (MapTest<TPair<Tag*, RT*>, Tag*, RT*, MANAGED>), \
-   (MapTest<TPair<Traits::Count*, RT*>, Traits::Count*, RT*, MANAGED>), \
+   (MapTest<TPair<Tags::Count*, RT*>, Tags::Count*, RT*, MANAGED>), \
    (MapTest<TPair<Many*, RT*>, Many*, RT*, MANAGED>), \
    (MapTest<TPair<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
-   (MapTest<Pair, Traits::Count*, RT*, MANAGED>), \
+   (MapTest<Pair, Tags::Count*, RT*, MANAGED>), \
    (MapTest<Pair, Many*, RT*, MANAGED>), \
    (MapTest<Pair, RT*, RT*, MANAGED>)
 

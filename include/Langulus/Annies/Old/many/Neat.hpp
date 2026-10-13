@@ -25,7 +25,7 @@ namespace Langulus::Annies
    ///   Neats are extensively used as descriptors in factories, to check     
    /// whether an element with the same signature already exists.             
    ///   Elements that are marked missing are never considered part of the    
-   /// descriptor, and are filled by the context (i.e. Traits::Parent(?))     
+   /// descriptor, and are filled by the context (i.e. Tags::Parent(?))     
    ///                                                                        
    class Neat {
    protected:
@@ -40,7 +40,7 @@ namespace Langulus::Annies
       // Kept as first member, in order to quickly access it            
       mutable Hash mHash;
 
-      // Traits are ordered first by their trait type, then by their    
+      // Tags are ordered first by their trait type, then by their    
       // order of appearance. Duplicate trait types are allowed         
       // Tag contents may or may not also be normalized               
       TUnorderedMap<TMeta, TagList> mTraits;
@@ -132,7 +132,7 @@ namespace Langulus::Annies
       void SetDefaultTrait(CT::NotVoid auto&&);
 
       template<CT::Tag...>
-      bool ExtractTrait(CT::NotVoid auto&...) const;
+      bool ExtractTag(CT::NotVoid auto&...) const;
       auto ExtractData(CT::NotVoid auto&) const -> size_t;
       auto ExtractDataAs(CT::NotVoid auto&) const -> size_t;
 

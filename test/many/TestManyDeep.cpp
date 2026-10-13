@@ -184,8 +184,8 @@ TEMPLATE_TEST_CASE("Deep sequential containers 1", "[any]", RT*, int, RT, int*) 
       }
 
       WHEN("Pack is shallow-copied") {
-         pack.As<Many>(2).As<Many>(1).MakeOr();
-         pack.As<Many>(0).MakeOr();
+         pack.As<Many>(2).As<Many>(1).EnableOr();
+         pack.As<Many>(0).EnableOr();
 
          auto copy = pack;
 
@@ -216,8 +216,8 @@ TEMPLATE_TEST_CASE("Deep sequential containers 1", "[any]", RT*, int, RT, int*) 
       }
 
       WHEN("Pack is cloned") {
-         pack.As<Many>(2).As<Many>(1).MakeOr();
-         pack.As<Many>(0).MakeOr();
+         pack.As<Many>(2).As<Many>(1).EnableOr();
+         pack.As<Many>(0).EnableOr();
 
          Many clone = Clone(pack);
 
@@ -309,7 +309,7 @@ TEMPLATE_TEST_CASE("Deep sequential containers 1", "[any]", RT*, int, RT, int*) 
       WHEN("Smart pushing to a different container with retain enabled") {
          Many pushed;
          pushed << 666;
-         pushed.MakeOr();
+         pushed.EnableOr();
          auto result = pushed.SmartPush(IndexBack, '?');
 
          REQUIRE(result == 1);
@@ -447,7 +447,7 @@ TEMPLATE_TEST_CASE("Deep sequential containers 1", "[any]", RT*, int, RT, int*) 
       subpack1 << darray[0] << darray[1] << darray[2] << darray[3] << darray[4];
       subpack2 << darray[5] << darray[6] << darray[7] << darray[8] << darray[9];
       subpack3 << subpack1;
-      subpack3.MakeOr();
+      subpack3.EnableOr();
       pack << subpack1 << subpack2 << subpack3;
 
       WHEN("The container is optimized") {
@@ -502,7 +502,7 @@ TEMPLATE_TEST_CASE("Deep sequential containers 2", "[any]", int, RT, int*, RT*) 
       subpack1 << darray[0] << darray[1] << darray[2] << darray[3] << darray[4];
       subpack2 << darray[5] << darray[6] << darray[7] << darray[8] << darray[9];
       subpack3 << subpack1;
-      subpack3.MakeOr();
+      subpack3.EnableOr();
       pack << subpack1 << subpack2 << subpack3;
 
       auto baseRange = Many::From<Block<>>();

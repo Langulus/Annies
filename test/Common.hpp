@@ -431,7 +431,7 @@ struct ImplicitlyReflectedData {
 class alignas(128) ImplicitlyReflectedDataWithTraits : public ImplicitlyReflectedData {
 public:
    int member {664};
-   RTTI::Tag<bool, Traits::Name> anotherMember {};
+   RTTI::Tag<bool, Tags::Name> anotherMember {};
    int anotherMemberArray [12] {};
    int* sparseMember {};
 

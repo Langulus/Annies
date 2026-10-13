@@ -17,40 +17,40 @@
    (MapTest<UnorderedMap, Text, int*, MANAGED>), \
  \
    (MapTest<TUnorderedMap<Text, int*>, Text, int*, MANAGED>), \
-   (MapTest<TUnorderedMap<Text, Traits::Count*>, Text, Traits::Count*, MANAGED>), \
+   (MapTest<TUnorderedMap<Text, Tags::Count*>, Text, Tags::Count*, MANAGED>), \
    (MapTest<TUnorderedMap<Text, Many*>, Text, Many*, MANAGED>), \
  \
-   (MapTest<TUnorderedMap<Traits::Count*, RT*>, Traits::Count*, RT*, MANAGED>), \
+   (MapTest<TUnorderedMap<Tags::Count*, RT*>, Tags::Count*, RT*, MANAGED>), \
    (MapTest<TUnorderedMap<Many*, RT*>, Many*, RT*, MANAGED>), \
    (MapTest<TUnorderedMap<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
    (MapTest<TOrderedMap<Text, int*>, Text, int*, MANAGED>), \
    (MapTest<TOrderedMap<Text, Tag*>, Text, Tag*, MANAGED>), \
-   (MapTest<TOrderedMap<Text, Traits::Count*>, Text, Traits::Count*, MANAGED>), \
+   (MapTest<TOrderedMap<Text, Tags::Count*>, Text, Tags::Count*, MANAGED>), \
    (MapTest<TOrderedMap<Text, Many*>, Text, Many*, MANAGED>), \
    (MapTest<TOrderedMap<Text, RT*>, Text, RT*, MANAGED>), \
  \
    (MapTest<TOrderedMap<Tag*, RT*>, Tag*, RT*, MANAGED>), \
-   (MapTest<TOrderedMap<Traits::Count*, RT*>, Traits::Count*, RT*, MANAGED>), \
+   (MapTest<TOrderedMap<Tags::Count*, RT*>, Tags::Count*, RT*, MANAGED>), \
    (MapTest<TOrderedMap<Many*, RT*>, Many*, RT*, MANAGED>), \
    (MapTest<TOrderedMap<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
    (MapTest<UnorderedMap, Text, Tag*, MANAGED>), \
-   (MapTest<UnorderedMap, Text, Traits::Count*, MANAGED>), \
+   (MapTest<UnorderedMap, Text, Tags::Count*, MANAGED>), \
    (MapTest<UnorderedMap, Text, Many*, MANAGED>), \
  \
-   (MapTest<UnorderedMap, Traits::Count*, RT*, MANAGED>), \
+   (MapTest<UnorderedMap, Tags::Count*, RT*, MANAGED>), \
    (MapTest<UnorderedMap, Many*, RT*, MANAGED>), \
    (MapTest<UnorderedMap, RT*, RT*, MANAGED>), \
  \
    (MapTest<OrderedMap, Text, int*, MANAGED>), \
    (MapTest<OrderedMap, Text, Tag*, MANAGED>), \
-   (MapTest<OrderedMap, Text, Traits::Count*, MANAGED>), \
+   (MapTest<OrderedMap, Text, Tags::Count*, MANAGED>), \
    (MapTest<OrderedMap, Text, Many*, MANAGED>), \
    (MapTest<OrderedMap, Text, RT*, MANAGED>), \
  \
    (MapTest<OrderedMap, Tag*, RT*, MANAGED>), \
-   (MapTest<OrderedMap, Traits::Count*, RT*, MANAGED>), \
+   (MapTest<OrderedMap, Tags::Count*, RT*, MANAGED>), \
    (MapTest<OrderedMap, Many*, RT*, MANAGED>), \
    (MapTest<OrderedMap, RT*, RT*, MANAGED>)
 
@@ -869,31 +869,31 @@ TEMPLATE_TEST_CASE("Sparse templated map stress test", "[map]",
 
    (MapTest<TUnorderedMap<int, int*>, int, int*>),
    (MapTest<TUnorderedMap<int, Tag*>, int, Tag*>),
-   (MapTest<TUnorderedMap<int, Traits::Count*>, int, Traits::Count*>),
+   (MapTest<TUnorderedMap<int, Tags::Count*>, int, Tags::Count*>),
    (MapTest<TUnorderedMap<int, Many*>, int, Many*>),
 
    (MapTest<TOrderedMap<int, int*>, int, int*>),
    (MapTest<TOrderedMap<int, Tag*>, int, Tag*>),
-   (MapTest<TOrderedMap<int, Traits::Count*>, int, Traits::Count*>),
+   (MapTest<TOrderedMap<int, Tags::Count*>, int, Tags::Count*>),
    (MapTest<TOrderedMap<int, Many*>, int, Many*>),
 
    (MapTest<TUnorderedMap<int*, int>, int*, int>),
-   (MapTest<TUnorderedMap<int*, Traits::Count>, int*, Traits::Count>),
+   (MapTest<TUnorderedMap<int*, Tags::Count>, int*, Tags::Count>),
    (MapTest<TUnorderedMap<int*, Many>, int*, Many>),
 
    (MapTest<TOrderedMap<int*, int>, int*, int>),
    (MapTest<TOrderedMap<int*, Tag>, int*, Tag>),
-   (MapTest<TOrderedMap<int*, Traits::Count>, int*, Traits::Count>),
+   (MapTest<TOrderedMap<int*, Tags::Count>, int*, Tags::Count>),
    (MapTest<TOrderedMap<int*, Many>, int*, Many>),
 
    (MapTest<TUnorderedMap<int*, int*>, int*, int*>),
    (MapTest<TUnorderedMap<int*, Tag*>, int*, Tag*>),
-   (MapTest<TUnorderedMap<int*, Traits::Count*>, int*, Traits::Count*>),
+   (MapTest<TUnorderedMap<int*, Tags::Count*>, int*, Tags::Count*>),
    (MapTest<TUnorderedMap<int*, Many*>, int*, Many*>),
 
    (MapTest<TOrderedMap<int*, int*>, int*, int*>),
    (MapTest<TOrderedMap<int*, Tag*>, int*, Tag*>),
-   (MapTest<TOrderedMap<int*, Traits::Count*>, int*, Traits::Count*>),
+   (MapTest<TOrderedMap<int*, Tags::Count*>, int*, Tags::Count*>),
    (MapTest<TOrderedMap<int*, Many*>, int*, Many*>)
 ) {
    static Allocator::State memoryState;
