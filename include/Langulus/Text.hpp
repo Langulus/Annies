@@ -280,7 +280,7 @@ namespace Langulus::Annies
       ///      0 for no truncation. Will produce scientific notation for too  
       ///      big or too small numbers                                       
       ///   @return the text                                                  
-      template<CT::Number T> requires CT::NoIntent<T>
+      template<CT::BuiltinNumber T> requires CT::NoIntent<T>
       static Text FromNumber(T&& number, int precision = 0) {
          Text result;
          using DT = Decay<T>;
@@ -373,7 +373,7 @@ namespace Langulus::Annies
             memcpy(result.GetHeapInner(), temp, c);
             result.SetCountInner(c);
          }
-         else static_assert(false, "Unsupported number type");
+         else static_assert(false, "Unsupported number type"); //TODO expand to custom numbers too? not sure if this should be handled here or from outside
 
          result.ResetHash();
          return result;
@@ -600,7 +600,7 @@ LANGULUS_MORPHISM_CUSTOM(Langulus::Hash, { return Annies::Text::Hex(from.value);
 );
 
 /// Convert Number -> Text                                                    
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::NumberUnambiguously, {
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::BuiltinNumberUnambiguously, {
       return Annies::Text::FromNumber(from);
    },
    Langulus::Annies::Text

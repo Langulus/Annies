@@ -230,13 +230,13 @@ namespace Langulus::Annies
 
    /// MARK: CTAD                                                             
    template<CT::Pair P>
-   TPair(P&&) -> TPair<TypeOf<Deint<P>, 0>, TypeOf<Deint<P>, 1>>;
+   TPair(P&&) -> TPair<TypeOf<P, 0>, TypeOf<P, 1>>;
 
    template<CT::NotHandle K, CT::NotHandle V>
    TPair(K&&, V&&) -> TPair<Decvq<Deref<Deint<K>>>, Decvq<Deref<Deint<V>>>>;
 
    template<CT::Handle K, CT::Handle V>
-   TPair(K&&, V&&) -> TPair<TypeOf<Deint<K>>, TypeOf<Deint<V>>>;
+   TPair(K&&, V&&) -> TPair<TypeOf<K>, TypeOf<V>>;
 }
 
 namespace Langulus

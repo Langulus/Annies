@@ -139,8 +139,8 @@ namespace Langulus::Annies
       /// it with a compatible value, by shallow copying it.                  
       template<CT::Pair P>
       constexpr auto CreateSwapper(P&& pair) assumptious {
-         using PK = Decvq<Deref<TypeOf<Deint<P>, 0>>>;
-         using PV = Decvq<Deref<TypeOf<Deint<P>, 1>>>;
+         using PK = Decvq<Deref<TypeOf<P, 0>>>;
+         using PV = Decvq<Deref<TypeOf<P, 1>>>;
          static_assert(Same<PK, K>, "Key type mismatch");
          static_assert(Same<PV, V>, "Val type mismatch");
          return TPair<PK, PV> {Copy {LglsFwd(pair)}}; //TODO Annies::Piecewise, ?

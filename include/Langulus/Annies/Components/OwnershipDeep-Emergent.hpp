@@ -1214,7 +1214,7 @@ namespace Langulus::Annies::Component
       requires (CT::Container<I> and (STYLE & OnCreateAndDestroy) != 0
            and not CT::Copied<I> and not CT::Cloned<I> and not CT::Disowned<I>
            and CT::HeapAllocated<I>
-           and (CT::TypeErased<Deint<I>> or CT::Sparse<TypeOf<Deint<I>, ID>>))
+           and (CT::TypeErased<Deint<I>> or CT::Sparse<TypeOf<I, ID>>))
       void ConstructFrom(this SELF& self, I&& intent) {
          using IT = Decvq<Deref<Deint<I>>>;
          decltype(auto) from = LglsFwd(intent.what);

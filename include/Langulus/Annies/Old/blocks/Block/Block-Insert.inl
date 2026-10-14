@@ -91,7 +91,7 @@ namespace Langulus::Annies
    void Block<TYPE>::InsertBlockInner(CT::Index auto index, T1&& data) {
       // If both sides are void, then we have a type-erased insertion   
       using S = IntentOf<decltype(data)>;
-      using T = Conditional<TypeErased, TypeOf<Deint<T1>>, TYPE>;
+      using T = Conditional<TypeErased, TypeOf<T1>, TYPE>;
 
       if constexpr (CT::CanBeDeepened<FORCE, Block> and MOVE_ASIDE) {
          // Type may mutate                                             

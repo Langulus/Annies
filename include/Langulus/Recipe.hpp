@@ -6,9 +6,10 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus/Many.hpp>
-#include <Langulus/Annies/Components/Stack.hpp>
-#include <Langulus/Annies/Components/Charged-Stack.hpp>
+#include "Many.hpp"
+#include "Text.hpp"
+#include "Annies/Components/Stack.hpp"
+#include "Annies/Components/Charged-Stack.hpp"
 
 
 namespace Langulus::Annies::Inner
@@ -191,3 +192,10 @@ namespace Langulus
 {
    using Annies::Recipe;
 }
+
+/// Converting to text relies on the serializer                               
+LANGULUS_MORPHISM_CUSTOM(Annies::Recipe, {
+   Annies::Text text;
+   Langulus::Serialize(from, text);
+   return text;
+}, Annies::Text);

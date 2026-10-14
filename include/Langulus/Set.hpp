@@ -95,7 +95,7 @@ namespace Langulus::Annies::Inner
       template<class A1, class...AN>
       constexpr Set(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0 and CT::Set<A1>) {
-            LglsAssumeUser((Same<Deint<A1>, Set>),
+            LglsAssumeUser(Same<Deint<A1>, Set>,
                "Ambiguous use of construction "
                "- you should use tag-dispatch with first argument either Absorb "
                "(if you want to overwrite the container itself) or Piecewise "
@@ -142,7 +142,7 @@ namespace Langulus::Annies::Inner
       template<class A>
       constexpr Set& operator = (A&& argument) {
          if constexpr (CT::Set<A>) {
-            LglsAssumeUser((Same<Deint<A>, Set>),
+            LglsAssumeUser(Same<Deint<A>, Set>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -63,7 +63,7 @@ namespace Langulus::Annies
       constexpr TAny(A&&...arguments) {
          if constexpr (sizeof...(A) == 1 and CT::ContainsOne<A...>) {
             LglsAssumeUser(
-               ((Same<Deint<A>, TAny> or Same<TypeOf<Deint<A>>, T>) and ...),
+               ((Same<Deint<A>, TAny> or Same<TypeOf<A>, T>) and ...),
                "Ambiguous use of construction "
                "- you should use tag-dispatch with first argument either Absorb "
                "(if you want to overwrite the container itself) or Piecewise "
@@ -99,7 +99,7 @@ namespace Langulus::Annies
       constexpr TAny& operator = (A&& argument) {
          if constexpr (CT::ContainsOne<A>) {
             LglsAssumeUser(
-               (Same<Deint<A>, TAny> or Same<TypeOf<Deint<A>>, T>),
+               Same<Deint<A>, TAny> or Same<TypeOf<A>, T>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

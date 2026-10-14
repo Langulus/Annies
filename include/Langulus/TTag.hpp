@@ -50,7 +50,7 @@ namespace Langulus::Annies
       constexpr TTag(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (CT::DeepDense<Deint<A1>> or CT::Tag<A1>) {
-               LglsAssumeUser((SameAsOneOf<Deint<A1>, TTag, Tag>),
+               LglsAssumeUser(SameAsOneOf<Deint<A1>, TTag, Tag>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "

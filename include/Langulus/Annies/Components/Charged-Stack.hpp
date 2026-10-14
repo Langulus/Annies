@@ -33,7 +33,7 @@ namespace Langulus::Annies::Component
       
       /// Get the contained charge                                            
       template<Cid SID = ID>
-      constexpr auto GetCharge(this auto const& self) noexcept -> Langulus::Charge const& {
+      constexpr auto& GetCharge(this auto&& self) noexcept {
          return ThisCom::GetChargeInner();
       }
       

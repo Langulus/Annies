@@ -84,7 +84,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr Any(A&& argument) {
          if constexpr (CT::ContainsOne<A>) {
-            LglsAssumeUser((Same<Deint<A>, Any>),
+            LglsAssumeUser(Same<Deint<A>, Any>,
                "Ambiguous use of construction "
                "- you should use tag-dispatch with first argument either Absorb "
                "(if you want to overwrite the container itself) or Piecewise "
@@ -119,7 +119,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr Any& operator = (A&& argument) {
          if constexpr (CT::ContainsOne<A>) {
-            LglsAssumeUser((Same<Deint<A>, Any>),
+            LglsAssumeUser(Same<Deint<A>, Any>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

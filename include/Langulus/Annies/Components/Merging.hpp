@@ -281,7 +281,7 @@ namespace Langulus::Annies::Component
                   }
                }
                else {
-                  if constexpr (CT::Sparse<TypeOf<Deint<A>>>) {
+                  if constexpr (CT::Sparse<TypeOf<A>>) {
                      auto ptr = a->template As<void*>();
                      if (ptr == nullptr and self.Contains(ptr)) {
                         ++counter;

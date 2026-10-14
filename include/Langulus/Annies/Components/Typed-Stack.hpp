@@ -491,7 +491,7 @@ namespace Langulus::Annies::Component
                ThisCom::SetType(T);
          }
          else {
-            using T = Deref<TypeOf<Deint<I>, SID>>;
+            using T = Deref<TypeOf<I, SID>>;
             if constexpr (CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>)
                ThisCom::template SetType<Decvq<T>>();
             else

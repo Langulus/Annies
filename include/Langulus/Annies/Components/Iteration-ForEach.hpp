@@ -248,8 +248,8 @@ namespace Langulus::Annies::Component
             // Container is type-erased. We're NOT iterating with tag.  
             const auto T = self.GetType();
             if (not (CT::Deep<A>       and T.IsDeep())
-            and not (CT::DefineTag<A>  and T.Is(MetaDataOf<Decay<A>>()))
-            and not (CT::DefineVerb<A> and T.Is(MetaDataOf<Decay<A>>()))
+            and not (CT::DefineTag<A>  and T.Is(MetaDataOf<A /*Decay<A>*/>()))
+            and not (CT::DefineVerb<A> and T.Is(MetaDataOf<A /*Decay<A>*/>()))
             and not (not CT::Deep<A>   and self.template CastsTo<A>(1, true)))
                return Loop::NextLoop;
 
@@ -261,13 +261,13 @@ namespace Langulus::Annies::Component
                if constexpr (CT::DefineTag<A>) {
                   // We're iterating using a statically defined tag.    
                   // We don't execute in tags that don't match.         
-                  if (DenseCast(element).GetTagInner() != MetaTagOf<Decay<A>>())
+                  if (DenseCast(element).GetTagInner() != MetaTagOf<A /*Decay<A>*/>())
                      continue;
                }
                if constexpr (CT::DefineVerb<A>) {
                   // We're iterating using a statically defined verb.   
                   // We don't execute in verbs that don't match.        
-                  if (DenseCast(element).GetVerbInner() != MetaVerbOf<Decay<A>>())
+                  if (DenseCast(element).GetVerbInner() != MetaVerbOf<A /*Decay<A>*/>())
                      continue;
                }
 

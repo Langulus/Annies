@@ -116,7 +116,7 @@ namespace Langulus::Annies::Component
       /// Copy the pointer to the entries, and reference if we have to        
       ///   @param intent The intent and container to transfer from.          
       template<class SELF, CT::Intent I>
-      requires (CT::Container<I> and (CT::TypeErased<Deint<I>> or CT::Sparse<TypeOf<Deint<I>, ID>>))
+      requires (CT::Container<I> and (CT::TypeErased<Deint<I>> or CT::Sparse<TypeOf<I, ID>>))
       void ConstructFrom(this SELF& self, I&& intent) noexcept {
          using IT = Decvq<Deref<Deint<I>>>;
          decltype(auto) from = LglsFwd(intent.what);

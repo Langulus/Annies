@@ -744,7 +744,7 @@ namespace Langulus::Annies::Component
                // or not                                                
                size_t count = 0;
                source->Apply([&](auto& i) {//TODO reverse?
-                  count += ThisCom::template GatherInner<REVERSE>(
+                  count += ThisCom::template GatherInner<REVERSE, D>(
                      NestIntentOf(source, *i.GetDense().template Get<D>())
                   );
                });

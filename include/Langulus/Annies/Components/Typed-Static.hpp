@@ -327,7 +327,7 @@ namespace Langulus::Annies::Component
          LglsAssert(GetType().IsExact(type), "Type mismatch");
       }
       
-      /// Set all contained data types by copying them from another container 
+      /// Set all contained data types by copying them from another container.
       /// This is still used if statically typed - checks if types are        
       /// compatible in constructors and assigners.                           
       ///   @attention intents like Clone and Copy will strip constness       
@@ -342,7 +342,8 @@ namespace Langulus::Annies::Component
                self.template SetType<ID>(T);
          }
          else {
-            using T = Deref<TypeOf<Deint<I>, SID>>;
+            using T = Deref<TypeOf<I, SID>>;
+            static_assert(not ::std::is_void_v<T>);
             if constexpr (CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>)
                self.template SetType<Decvq<T>, ID>();
             else

@@ -73,7 +73,7 @@ namespace Langulus::Annies
       constexpr TMany(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (SameAsOneOf<Deint<A1>, TMany, Many>) {
-               LglsAssumeUser((not SameAsOneOf<T, TMany, Many>),
+               LglsAssumeUser(not SameAsOneOf<T, TMany, Many>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "
@@ -123,7 +123,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr TMany& operator = (A&& argument) {
          if constexpr (SameAsOneOf<Deint<A>, TMany, Many>) {
-            LglsAssumeUser((not SameAsOneOf<T, TMany, Many>),
+            LglsAssumeUser(not SameAsOneOf<T, TMany, Many>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

@@ -68,6 +68,29 @@ namespace Langulus::Annies
          this->Destroy();
       }
 
+      /// Assignment                                                          
+      constexpr TPin& operator = (TPin const& other) {
+         return this->AssignAbsorb(Refer(other));
+      }
+      constexpr TPin& operator = (TPin&& other) noexcept {
+         return this->AssignAbsorb(Move(other));
+      }
+
+      template<class A>
+      constexpr TPin& operator = (A&& argument) {
+         if constexpr (CT::ContainsOne<A>) {
+            LglsAssumeUser(Same<Deint<A>, TPin>,
+               "Ambiguous use of assignment "
+               "- you should use either AssignAbsorb (if you want to overwrite "
+               "the container itself) or Assign (if you want to overwrite the "
+               "first item) in order to clearly state your intent. "
+               "AssignAbsorb will be used by default!"
+            );
+            return this->AssignAbsorb(LglsFwd(argument));
+         }
+         else return this->Assign(LglsFwd(argument));
+      }
+
       /// Three-way comparison                                                
       constexpr auto operator <=> (const TPin& rhs) const noexcept {
          return Base::GetStackInner() <=> rhs.GetStackInner();

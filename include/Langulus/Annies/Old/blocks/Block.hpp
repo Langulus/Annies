@@ -192,9 +192,9 @@ namespace Langulus
                   return (Deref<Deint<T>>*) nullptr;
             }
             else if constexpr (CT::Handle<Deint<T>>)
-               return (TypeOf<Deint<T>>*) nullptr;
+               return (TypeOf<T>*) nullptr;
             else if constexpr (::std::ranges::range<Deint<T>>)
-               return Unfold<TypeOf<Deint<T>>>();
+               return Unfold<TypeOf<T>>();
             else
                return (Deref<Deint<T>>*) nullptr;
          }
