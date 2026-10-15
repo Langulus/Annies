@@ -21,32 +21,32 @@
 ///   - uninitialized                                                         
 ///   - default                                                               
 template<class K, class V>
-void Pair_CheckState_Default(const auto&);
+void Pair_CheckState_Default(auto const&);
 ///   - invariant                                                             
 template<class K, class V>
-void Pair_CheckState_Invariant(const auto&);
+void Pair_CheckState_Invariant(auto const&);
 ///   - owned-full                                                            
 template<class K, class V>
-void Pair_CheckState_OwnedFull(const auto&);
+void Pair_CheckState_OwnedFull(auto const&);
 ///   - owned-full-const                                                      
 template<class K, class V>
-void Pair_CheckState_OwnedFullConst(const auto&);
+void Pair_CheckState_OwnedFullConst(auto const&);
 ///   - owned-empty                                                           
 template<class K, class V>
-void Pair_CheckState_OwnedEmpty(const auto&);
+void Pair_CheckState_OwnedEmpty(auto const&);
 ///   - disowned-full                                                         
 template<class K, class V>
-void Pair_CheckState_DisownedFull(const auto&);
+void Pair_CheckState_DisownedFull(auto const&);
 ///   - disowned-full-const                                                   
 template<class K, class V>
-void Pair_CheckState_DisownedFullConst(const auto&);
+void Pair_CheckState_DisownedFullConst(auto const&);
 ///   - abandoned                                                             
 template<class K, class V>
-void Pair_CheckState_Abandoned(const auto&);
+void Pair_CheckState_Abandoned(auto const&);
 
 
 template<class K, class V>
-void Pair_CheckState_Default(const auto& pair) {
+void Pair_CheckState_Default(auto const& pair) {
    if constexpr (CT::Typed<decltype(pair)>) {
       Any_CheckState_DisownedFullConst<K>(pair.GetKeyBlock());
       Any_CheckState_DisownedFullConst<V>(pair.GetValueBlock());
@@ -58,7 +58,7 @@ void Pair_CheckState_Default(const auto& pair) {
 }
 
 template<class K, class V>
-void Pair_CheckState_OwnedFull(const auto& pair) {
+void Pair_CheckState_OwnedFull(auto const& pair) {
    if constexpr (CT::Typed<decltype(pair)>) {
       Any_CheckState_DisownedFullConst<K>(pair.GetKeyBlock());
       Any_CheckState_DisownedFullConst<V>(pair.GetValueBlock());
@@ -70,7 +70,7 @@ void Pair_CheckState_OwnedFull(const auto& pair) {
 }
 
 template<class K, class V>
-void Pair_CheckState_OwnedEmpty(const auto& pair) {
+void Pair_CheckState_OwnedEmpty(auto const& pair) {
    if constexpr (CT::Typed<decltype(pair)>) {
       Any_CheckState_DisownedFullConst<K>(pair.GetKeyBlock());
       Any_CheckState_DisownedFullConst<V>(pair.GetValueBlock());

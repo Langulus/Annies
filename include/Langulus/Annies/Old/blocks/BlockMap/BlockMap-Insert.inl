@@ -102,7 +102,7 @@ namespace Langulus::Annies
          }
          else {
             // Insert the array                                         
-            const auto& firstPair = DeintCast(item)[0];
+            auto const& firstPair = DeintCast(item)[0];
             Mutate<THIS>(
                firstPair.GetKeyBlock().GetType(),
                firstPair.GetValueBlock().GetType()

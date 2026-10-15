@@ -350,7 +350,7 @@ namespace Langulus::CTTI
 }
 
 /// Map all arrays as convertible to text                                     
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Array, {
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Array, {
       if constexpr (CT::Character<Deext<T>>)
          return {from};
       else {
@@ -360,7 +360,7 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Array, {
          return result;
       }
    },
-   Langulus::Annies::Text
+   Annies::Text
 );
 
 /// Converting to text relies on the serializer                               
@@ -386,7 +386,7 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Executable, {
 
 /// Convert Charge -> Text                                                    
 LANGULUS_MORPHISM_CUSTOM(Langulus::Charge, { 
-      Langulus::Annies::Text text;
+      Annies::Text text;
       if (from.mass != Charge::DefaultMass) {
          text += Serial::Mass.Token; 
          text += from.mass;
@@ -409,7 +409,7 @@ LANGULUS_MORPHISM_CUSTOM(Langulus::Charge, {
       
       return text;
    }, 
-   Langulus::Annies::Text
+   Annies::Text
 );
 
 #if LANGULUS_FEATURE(LOGGING)

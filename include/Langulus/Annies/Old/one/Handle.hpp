@@ -108,7 +108,7 @@ namespace Langulus::Annies
       constexpr Handle& operator = (Handle const&) noexcept = default;
       constexpr Handle& operator = (Handle&&)      noexcept = default;
 
-      constexpr bool operator == (const auto&) const noexcept
+      constexpr bool operator == (auto const&) const noexcept
       requires (not TypeErased or Sparse);
 
       auto Get()       noexcept -> Type&;
@@ -121,7 +121,7 @@ namespace Langulus::Annies
       void Assign(const Type&, AllocType = nullptr) noexcept requires (Embedded and Mutable);
       void AssignWithIntent(auto&&, DMeta = {}) requires Mutable;
       void Swap(CT::Handle auto&, DMeta = {}) requires Mutable;
-      bool Compare(const auto&, DMeta = {}) const;
+      bool Compare(auto const&, DMeta = {}) const;
 
       template<bool RESET = false, bool DEALLOCATE = true>
       void FreeInner(DMeta = {}) requires Mutable;

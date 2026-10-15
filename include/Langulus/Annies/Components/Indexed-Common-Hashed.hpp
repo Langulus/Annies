@@ -567,7 +567,7 @@ namespace Langulus::Annies::Component
       /// Locate element handle inside the cascading hash table               
       ///   @attention assumes container is not empty                         
       ///   @attention assumes that container is of the same comparable type  
-      ///   @attention operates on a single dimension at a time               
+      ///   @attention operates only in the first dimension!                  
       ///   @param item the item to search for                                
       ///   @return handle of the found item                                  
       template<Cid SID = ID, class C, CT::NoIntent H> requires Relevant<SID>

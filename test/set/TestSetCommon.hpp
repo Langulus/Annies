@@ -21,33 +21,33 @@
 ///   - uninitialized                                                         
 ///   - default                                                               
 template<class K>
-void Set_CheckState_Default(const auto&);
+void Set_CheckState_Default(auto const&);
 ///   - invariant                                                             
 template<class K>
-void Set_CheckState_Invariant(const auto&);
+void Set_CheckState_Invariant(auto const&);
 ///   - owned-full                                                            
 template<class K>
-void Set_CheckState_OwnedFull(const auto&);
+void Set_CheckState_OwnedFull(auto const&);
 ///   - owned-full-const                                                      
 template<class K>
-void Set_CheckState_OwnedFullConst(const auto&);
+void Set_CheckState_OwnedFullConst(auto const&);
 ///   - owned-empty                                                           
 template<class K>
-void Set_CheckState_OwnedEmpty(const auto&);
+void Set_CheckState_OwnedEmpty(auto const&);
 ///   - disowned-full                                                         
 template<class K>
-void Set_CheckState_DisownedFull(const auto&);
+void Set_CheckState_DisownedFull(auto const&);
 ///   - disowned-full-const                                                   
 template<class K>
-void Set_CheckState_DisownedFullConst(const auto&);
+void Set_CheckState_DisownedFullConst(auto const&);
 ///   - abandoned                                                             
 template<class K>
-void Set_CheckState_Abandoned(const auto&);
+void Set_CheckState_Abandoned(auto const&);
 
 
 
 template<class K>
-void Set_Helper_TestType(const auto& set) {
+void Set_Helper_TestType(auto const& set) {
    REQUIRE      (set.IsTyped());
    REQUIRE_FALSE(set.IsUntyped());
 
@@ -73,7 +73,7 @@ void Set_Helper_TestSame(const LHS& lhs, const RHS& rhs) {
 
 
 template<class K>
-void Set_CheckState_Default(const auto& set) {
+void Set_CheckState_Default(auto const& set) {
    using T = Decay<decltype(set)>;
 
    if constexpr (CT::Typed<T>) {
@@ -110,7 +110,7 @@ void Set_CheckState_Default(const auto& set) {
 }
 
 template<class K>
-void Set_CheckState_OwnedEmpty(const auto& set) {
+void Set_CheckState_OwnedEmpty(auto const& set) {
    using T = Decay<decltype(set)>;
 
    Set_Helper_TestType<K>(set);
@@ -134,7 +134,7 @@ void Set_CheckState_OwnedEmpty(const auto& set) {
 }
 
 template<class K>
-void Set_CheckState_OwnedFull(const auto& set) {
+void Set_CheckState_OwnedFull(auto const& set) {
    using T = Decay<decltype(set)>;
 
    Set_Helper_TestType<K>(set);

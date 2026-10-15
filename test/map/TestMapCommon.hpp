@@ -21,33 +21,33 @@
 ///   - uninitialized                                                         
 ///   - default                                                               
 template<class K, class V>
-void Map_CheckState_Default(const auto&);
+void Map_CheckState_Default(auto const&);
 ///   - invariant                                                             
 template<class K, class V>
-void Map_CheckState_Invariant(const auto&);
+void Map_CheckState_Invariant(auto const&);
 ///   - owned-full                                                            
 template<class K, class V>
-void Map_CheckState_OwnedFull(const auto&);
+void Map_CheckState_OwnedFull(auto const&);
 ///   - owned-full-const                                                      
 template<class K, class V>
-void Map_CheckState_OwnedFullConst(const auto&);
+void Map_CheckState_OwnedFullConst(auto const&);
 ///   - owned-empty                                                           
 template<class K, class V>
-void Map_CheckState_OwnedEmpty(const auto&);
+void Map_CheckState_OwnedEmpty(auto const&);
 ///   - disowned-full                                                         
 template<class K, class V>
-void Map_CheckState_DisownedFull(const auto&);
+void Map_CheckState_DisownedFull(auto const&);
 ///   - disowned-full-const                                                   
 template<class K, class V>
-void Map_CheckState_DisownedFullConst(const auto&);
+void Map_CheckState_DisownedFullConst(auto const&);
 ///   - abandoned                                                             
 template<class K, class V>
-void Map_CheckState_Abandoned(const auto&);
+void Map_CheckState_Abandoned(auto const&);
 
 
 
 template<class K, class V>
-void Map_Helper_TestType(const auto& map) {
+void Map_Helper_TestType(auto const& map) {
    REQUIRE      (map.IsKeyTyped());
    REQUIRE      (map.IsValueTyped());
    REQUIRE_FALSE(map.IsKeyUntyped());
@@ -84,7 +84,7 @@ void Map_Helper_TestSame(const LHS& lhs, const RHS& rhs) {
 
 
 template<class K, class V>
-void Map_CheckState_Default(const auto& map) {
+void Map_CheckState_Default(auto const& map) {
    using T = Decay<decltype(map)>;
 
    if constexpr (CT::Typed<T>) {
@@ -138,7 +138,7 @@ void Map_CheckState_Default(const auto& map) {
 }
 
 template<class K, class V>
-void Map_CheckState_OwnedEmpty(const auto& map) {
+void Map_CheckState_OwnedEmpty(auto const& map) {
    using T = Decay<decltype(map)>;
 
    Map_Helper_TestType<K, V>(map);
@@ -170,7 +170,7 @@ void Map_CheckState_OwnedEmpty(const auto& map) {
 }
 
 template<class K, class V>
-void Map_CheckState_OwnedFull(const auto& map) {
+void Map_CheckState_OwnedFull(auto const& map) {
    using T = Decay<decltype(map)>;
 
    Map_Helper_TestType<K, V>(map);

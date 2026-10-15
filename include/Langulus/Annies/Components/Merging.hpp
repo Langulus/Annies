@@ -180,8 +180,9 @@ namespace Langulus::Annies::Component
       /// if the elements don't exist elsewhere. This usually means at the    
       /// back of a contiguous container. Supports intents and arrays.        
       ///   @param a1, an elements (and their intents) to insert              
+      ///   @attention this is for linearly indexed containers only           
       ///   @return the number of inserted elements (after any conversions)   
-      template<class A1, class...AN, class C>
+      template<class A1, class...AN, class C> requires (C::Dimensions::Count == 1)
       auto Merge(this C& self, A1&& a1, AN&&...an) -> size_t {
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
@@ -234,8 +235,8 @@ namespace Langulus::Annies::Component
             else {
                // Insert in a hash table                                
                try {
-                  ThisCom::MergeInnerTable(it, counter, LglsFwd(a1));
-                 (ThisCom::MergeInnerTable(it, counter, LglsFwd(an)), ...);
+                  ThisCom::MergeInnerTable1D(it, counter, LglsFwd(a1));
+                 (ThisCom::MergeInnerTable1D(it, counter, LglsFwd(an)), ...);
                }
                catch (...) {
                   // Account for throws inside constructors             
@@ -248,6 +249,34 @@ namespace Langulus::Annies::Component
             self.SetCountInner(all_count);
             return reduced.size();
          }
+      }
+
+      /// MARK: Merge inside table                                            
+      /// Insert first argument if the elements don't exist in the table yet. 
+      /// Emplace the rest of the arguments in all shared dimensions. If only 
+      /// first argument is available, default-initialize the rest, or fail.  
+      /// Supports intents.                                                   
+      ///   @param a1, an elements for each dimension, first being the key    
+      ///   @return a multidimensional handle to the inserted/found entry     
+      ///   @attention doesn't support arrays or any kind of unfolding        
+      template<class A1, class...AN, CT::IndexedTable C> requires (C::Dimensions::Count > 1)
+      auto Merge(this C& self, A1&& a1, AN&&...an) -> DecideHandle<C> {
+         static_assert(CT::ContainsMany<C>,
+            "Container should support multiple elements");
+
+         auto found = self.template TableSearch<ID>(a1);
+         if (found)
+            return found;
+         
+         // Reallocate/branch out                                       
+         const size_t lhs_count = self.GetCount();
+         const size_t all_count = lhs_count + 1;
+         self.BranchOut(all_count);
+         
+         // Insert in a hash table                                      
+         found = ThisCom::MergeInnerTableMD(LglsFwd(a1), LglsFwd(an)...);
+         self.SetCountInner(all_count);
+         return found;
       }
 
       template<CT::Container C>
@@ -424,16 +453,16 @@ namespace Langulus::Annies::Component
          }
       }
 
-      /// MARK: MergeInnerTable                                               
-      /// Inserts 'a' into a hash map at the appropriate bucket. Supports T   
+      /// MARK: MergeInnerTable1D                                             
+      /// Inserts 'a' into a hash set at the appropriate bucket. Supports T   
       /// being a bounded array. Does not perform conversion.                 
-      ///   @attention works in all dimensions at once                        
-      template<class C, class T>
-      void MergeInnerTable(this C& self, size_t const*& it, size_t& counter, T&& a) {
+      ///   @attention designed to work in one-dimensional containers         
+      template<class C, class T> requires (C::Dimensions::Count == 1)
+      void MergeInnerTable1D(this C& self, size_t const*& it, size_t& counter, T&& a) {
          using I  = IntentOf(a);
          using IT = DeextAll<Deint<T>>;
          static_assert(not CONVERT or Same<TypeOf<C>, IT>,
-            "Use ConvertMergeInnerTable instead"); //TODO function not implemented yet
+            "Use ConvertMergeInnerTable1D instead"); //TODO function not implemented yet
 
          if constexpr (CT::Array<T>) {
             for (size_t i = 0; i < ExtentOf<T>; ++i) {
@@ -461,6 +490,30 @@ namespace Langulus::Annies::Component
             
             ++counter;
          }
+      }
+
+      /// MARK: MergeInnerTableMD                                             
+      /// Inserts 'd1' into a hash map at the appropriate bucket. Emplaces    
+      /// all 'dn' under the same bucket, in each dimension. Does not perform 
+      /// conversion.                                                         
+      ///   @attention operates on all dimensions at once                     
+      template<class C, class D1, class...DN> requires (C::Dimensions::Count > 1)
+      auto MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C> {
+         static_assert(not CONVERT or (
+                 Same<TypeOf<C, ID>,     DeextAll<Deint<D1>>>
+            and (Same<TypeOf<C, SHARED>, DeextAll<Deint<DN>>> and ...)),
+            "Use ConvertMergeInnerTableMD instead" //TODO function not implemented yet
+         ); 
+
+         size_t offset;
+         if constexpr (CT::Copied<IntentOf(d1)>)
+            offset = self.TableEmplace(Refer(LglsFwd(d1)));
+         else
+            offset = self.TableEmplace(FWDIntent(d1));
+
+         auto h = self.GetHandle() + offset;
+         (h.template EmplaceWithIntent<SHARED>(LglsFwd(dn)), ...);
+         return h;
       }
    };
 

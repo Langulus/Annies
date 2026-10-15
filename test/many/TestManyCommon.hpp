@@ -34,31 +34,31 @@ decltype(auto) FromHelper() {
 ///   - uninitialized                                                         
 ///   - default                                                               
 template<class E>
-void Any_CheckState_Default(const auto&);
+void Any_CheckState_Default(auto const&);
 ///   - invariant                                                             
 template<class E>
-void Any_CheckState_Invariant(const auto&);
+void Any_CheckState_Invariant(auto const&);
 ///   - owned-full                                                            
 template<class E>
-void Any_CheckState_OwnedFull(const auto&);
+void Any_CheckState_OwnedFull(auto const&);
 ///   - owned-full-const                                                      
 template<class E>
-void Any_CheckState_OwnedFullConst(const auto&);
+void Any_CheckState_OwnedFullConst(auto const&);
 ///   - owned-empty                                                           
 template<class E>
-void Any_CheckState_OwnedEmpty(const auto&);
+void Any_CheckState_OwnedEmpty(auto const&);
 ///   - disowned-full                                                         
 template<class E>
-void Any_CheckState_DisownedFull(const auto&);
+void Any_CheckState_DisownedFull(auto const&);
 ///   - disowned-full-const                                                   
 template<class E>
-void Any_CheckState_DisownedFullConst(const auto&);
+void Any_CheckState_DisownedFullConst(auto const&);
 ///   - abandoned                                                             
 template<class E>
-void Any_CheckState_Abandoned(const auto&);
+void Any_CheckState_Abandoned(auto const&);
 
 template<class E>
-void Any_Helper_TestType(const auto& any) {
+void Any_Helper_TestType(auto const& any) {
    REQUIRE      (any.IsTyped());
    REQUIRE_FALSE(any.IsUntyped());
    REQUIRE      (any.GetType() == MetaDataOf<E>());
@@ -92,7 +92,7 @@ void Any_Helper_TestSame(const LHS& lhs, const RHS& rhs) {
 ///      - intent-initialized from dense element bounded array                
 
 template<class E>
-void Any_CheckState_Default(const auto& any) {
+void Any_CheckState_Default(auto const& any) {
    using T = Decay<decltype(any)>;
 
    if constexpr (CT::Typed<T>) {
@@ -134,7 +134,7 @@ void Any_CheckState_Default(const auto& any) {
 }
 
 template<class E>
-void Any_CheckState_OwnedEmpty(const auto& any) {
+void Any_CheckState_OwnedEmpty(auto const& any) {
    using T = Decay<decltype(any)>;
 
    Any_Helper_TestType<E>(any);
@@ -158,7 +158,7 @@ void Any_CheckState_OwnedEmpty(const auto& any) {
 }
 
 template<class E>
-void Any_CheckState_OwnedFull(const auto& any) {
+void Any_CheckState_OwnedFull(auto const& any) {
    using T = Decay<decltype(any)>;
 
    Any_Helper_TestType<E>(any);
@@ -182,7 +182,7 @@ void Any_CheckState_OwnedFull(const auto& any) {
 }
 
 template<class E>
-void Any_CheckState_DisownedFull(const auto& any) {
+void Any_CheckState_DisownedFull(auto const& any) {
    using T = Decay<decltype(any)>;
 
    Any_Helper_TestType<E>(any);
@@ -206,7 +206,7 @@ void Any_CheckState_DisownedFull(const auto& any) {
 }
 
 template<class E>
-void Any_CheckState_DisownedFullConst(const auto& any) {
+void Any_CheckState_DisownedFullConst(auto const& any) {
    using T = Decay<decltype(any)>;
 
    Any_Helper_TestType<E>(any);
@@ -230,12 +230,12 @@ void Any_CheckState_DisownedFullConst(const auto& any) {
 }
 
 template<class E>
-void Any_CheckState_Abandoned(const auto& any) {
+void Any_CheckState_Abandoned(auto const& any) {
    REQUIRE_FALSE(any.GetAllocation());
 }
 
 
-void Any_CheckState_ContainsOne(const auto& pack, const auto& e, Allocation* entry = nullptr) {
+void Any_CheckState_ContainsOne(auto const& pack, auto const& e, Allocation* entry = nullptr) {
    using T = Deref<decltype(pack)>;
    using E = Deref<decltype(e)>;
    (void) entry;
@@ -265,7 +265,7 @@ void Any_CheckState_ContainsOne(const auto& pack, const auto& e, Allocation* ent
    }
 }
 
-void Any_CheckState_ContainsN(size_t n, const auto& pack, const CT::Sparse auto& e, Allocation* entry = nullptr) {
+void Any_CheckState_ContainsN(size_t n, auto const& pack, const CT::Sparse auto& e, Allocation* entry = nullptr) {
    using T = Deref<decltype(pack)>;
    using E = Deref<decltype(e)>;
    (void)entry;
@@ -291,7 +291,7 @@ void Any_CheckState_ContainsN(size_t n, const auto& pack, const CT::Sparse auto&
    }
 }
 
-void Any_CheckState_ContainsArray(const auto& pack, const CT::Array auto& e, Allocation* entry = nullptr) {
+void Any_CheckState_ContainsArray(auto const& pack, const CT::Array auto& e, Allocation* entry = nullptr) {
    using T = Deref<decltype(pack)>;
    using E = Deext<decltype(e)>;
    (void)entry;

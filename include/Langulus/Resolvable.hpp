@@ -104,7 +104,7 @@ namespace Langulus
 
 /*namespace Langulus
 {
-   Annies::Text IdentityOf(const auto&);
-   Annies::Text IdentityOf(Token const&, const auto&);
+   Annies::Text IdentityOf(auto const&);
+   Annies::Text IdentityOf(Token const&, auto const&);
 }
 */

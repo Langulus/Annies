@@ -39,6 +39,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = TOwn;
       using CTTI_Deep      = Yup;
       using CTTI_Tagged    = Types<TAGS...>;
+      using CTTI_POD       = Maybe<CT::POD<T>>;
       using Base           = Inner::TOwnBase<T>;
 
       constexpr  TOwn() noexcept {

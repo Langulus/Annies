@@ -303,6 +303,7 @@ namespace Langulus::Annies::Component
    template<CT::Component...COMPONENTS> requires ValidComponentOrder<COMPONENTS...>
    struct LANGULUS_EBCO Container : DecideStateComponent<COMPONENTS...>, COMPONENTS... {
       using CTTI_Container = Yup;
+      using CTTI_POD       = No;
       using StateComponent = DecideStateComponent<COMPONENTS...>;
       using ComponentList  = Types<StateComponent, COMPONENTS...>;
       using Base           = Container;

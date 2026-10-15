@@ -137,6 +137,7 @@ namespace Langulus::Annies
    #pragma pack(push, 4)
    struct Bytes : Inner::BytesBase {
       using CTTI_ReflectAs  = Bytes;
+      using CTTI_POD        = No; //TODO could be, when we implement SVO
       using CountType       = Base::CountType;
 
       constexpr Bytes() noexcept {
@@ -292,7 +293,7 @@ namespace Langulus::Annies
 }
 
 /// Convert POD -> Bytes (this includes pointers as well)                     
-LANGULUS_MORPHISM_CONCEPT(Langulus::CT::POD, Langulus::Annies::Bytes);
+LANGULUS_MORPHISM_CONCEPT(CT::POD, Annies::Bytes);
 
 #include "SerializeBytes.hpp"
 

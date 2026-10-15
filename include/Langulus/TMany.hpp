@@ -51,6 +51,7 @@ namespace Langulus::Annies
    struct TMany : Inner::TManyBase<T> {
       using CTTI_ReflectAs = Many;
       using CTTI_Deep      = Yup;
+      using CTTI_POD       = No; //TODO could be, when we implement SVO
       using Base           = Inner::TManyBase<T>;
       using DeepType       = Many;//Any;
 

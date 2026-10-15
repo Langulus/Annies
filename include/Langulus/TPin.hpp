@@ -43,6 +43,7 @@ namespace Langulus::Annies
    struct TPin : Inner::TPinBase<T> {
       using CTTI_ReflectAs = TPin;
       using CTTI_Deep      = Yup;
+      using CTTI_POD       = Maybe<CT::POD<T>>;
       using CTTI_Tagged    = Types<TAGS...>;
       using Base           = Inner::TPinBase<T>;
 

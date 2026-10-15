@@ -49,6 +49,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = Set;
       using CTTI_Set       = Yup;
       using CTTI_Deep      = Yup;
+      using CTTI_POD       = No; //TODO could be, when we implement SVO
 
       using Base           = Inner::TSetBase<T, SORT>;
       using DeepType       = Many;//Any;

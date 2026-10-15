@@ -59,7 +59,7 @@ struct HashTest {
 ///   @param e - the data we'll use to initialize an instance of T            
 ///   @return the new instance of T                                           
 /*template<CT::Dense T, bool = false>
-T CreateElement(const auto& e) {
+T CreateElement(auto const& e) {
    T element;
    if constexpr (CT::Same<T, decltype(e)>)
       element = e;
@@ -79,7 +79,7 @@ T CreateElement(const auto& e) {
 ///   @param e - the data we'll use to initialize an instance of T            
 ///   @return pointer to the new instance of T                                
 /*template<CT::Sparse T, bool MANAGED = false>
-T CreateElement(const auto& e) {
+T CreateElement(auto const& e) {
    void* element;
 
    if constexpr (not MANAGED) {
@@ -138,7 +138,7 @@ void DestroyElement(auto e) {
 ///   @param value - the value initialization data                            
 ///   @return the pair                                                        
 template<class P, class K, class V, bool MANAGED = false>
-P CreatePair(const auto& key, const auto& value) {
+P CreatePair(auto const& key, auto const& value) {
    return P {
       CreateElement<K, MANAGED>(key),
       CreateElement<V, MANAGED>(value)

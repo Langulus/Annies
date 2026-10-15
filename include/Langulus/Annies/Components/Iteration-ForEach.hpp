@@ -64,10 +64,10 @@ namespace Langulus::Annies::Component
       using ForEachResult = Inner::ForEachResult<Decay<C>>;
 
    public:
-      template<CT::Container C>
+      /*template<CT::Container C>
       auto ForEachElement(this C&&, auto&&...) -> ForEachResult<C>;
       template<CT::Container C>
-      auto ForEachElementRev(this C&&, auto&&...) -> ForEachResult<C>;
+      auto ForEachElementRev(this C&&, auto&&...) -> ForEachResult<C>;*/ //TODO just use Apply now?
 
       /// Execute functions for each element inside container.                
       /// Each function has a distinct argument type, that is tested against  
@@ -340,7 +340,7 @@ namespace Langulus::Annies::Component
                   // Always execute for intermediate/non-deep *this     
                   ++counter;
 
-                  decltype(auto) argument = self.template ReinterpretCast<A>();
+                  decltype(auto) argument = self.template ReinterpretAs<A>();
 
                   if constexpr (CT::Bool<R>) {
                      if (not f(argument))

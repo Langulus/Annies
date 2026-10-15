@@ -126,7 +126,7 @@ namespace Langulus::Annies
    /// Compare a handle with a comparable value/handle                        
    ///   @attention this compares contents and isn't suitable for iteration   
    TEMPLATE()
-   constexpr bool HAND()::operator == (const auto& rhs) const
+   constexpr bool HAND()::operator == (auto const& rhs) const
    noexcept requires (not TypeErased or Sparse) {
       using RHS = Deref<decltype(rhs)>;
       if constexpr (CT::Handle<RHS> and CT::Comparable<T, TypeOf<RHS>>) {
@@ -499,7 +499,7 @@ namespace Langulus::Annies
    ///      type-erased                                                       
    ///   @return true if contents are equal                                   
    TEMPLATE() LANGULUS(INLINED)
-   bool HAND()::Compare(const auto& rhs, DMeta) const {
+   bool HAND()::Compare(auto const& rhs, DMeta) const {
       using RHS = Deref<decltype(rhs)>;
 
       if constexpr (CT::Handle<RHS>)

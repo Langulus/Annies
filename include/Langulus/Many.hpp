@@ -171,7 +171,7 @@ namespace Langulus::Annies
       }
    
       template<CT::Container AS>
-      auto ReinterpretAs() const -> AS& {
+      auto ReinterpretAs() -> AS& {
          //TODO perform binary compatiblity check between Many and AS by comparing stack requests in components
          return reinterpret_cast<AS&>(*this);
       }

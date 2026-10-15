@@ -76,6 +76,7 @@ namespace Langulus::Annies
    struct Text : Inner::TextBase {
       using CTTI_ReflectAs = Text;
       using CTTI_Text      = Yup;
+      using CTTI_POD       = No; //TODO could be, when we implement SVO
       using CountType      = Base::CountType;
 
       constexpr Text() noexcept {
@@ -425,7 +426,7 @@ namespace Langulus::Annies
       /// Generates token from named constant                                 
       template<CT::HasNamedValues T>
       static Text Named(T const& constant) {
-         constexpr auto named_values = GetNamedValueList<T>();
+         constexpr auto named_values = CT::Inner::GetNamedValueList<T>();
          Text result;
          ForEachOr(named_values, [&result, &constant]<class V> {
             if (V::Constant == constant) {
@@ -633,7 +634,7 @@ LANGULUS_MORPHISM_CONCEPT(Langulus::CT::Literal, Langulus::Annies::Text);
 LANGULUS_MORPHISM_CONCEPT(Langulus::CT::Character, Langulus::Annies::Text);
 
 /// Map all pointers as convertible to text                                   
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
+/*LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
       if constexpr (CT::Complete<Deptr<T>>) {
          if constexpr (CT::Character<Deptr<T>>)
             return {from};
@@ -643,7 +644,8 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
       else return NameOf<T>() + "(" + Annies::Text::Hex<true>(from) + ")";
    },
    Langulus::Annies::Text
-);
+);*/ //TODO nah, this is too aggressive - some types ignore sparness, while others don't
+     //TODO also, shouldn't be that needed when we have the sparse fmt adapter now
 
 namespace Langulus
 {

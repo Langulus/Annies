@@ -53,6 +53,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = Map;
       using CTTI_Map       = Yup;
       using CTTI_Deep      = Yup;
+      using CTTI_POD       = No; //TODO could be, when we implement SVO
 
       using Base           = Inner::TMapBase<K, V, SORT>;
       using DeepType       = Many;//Any;
