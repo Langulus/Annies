@@ -20,8 +20,8 @@ struct Resolvable {
 
 class Part;
 
-using UnitMap = TUnorderedMap<DMeta, TMany<Part*>>;
-using TraitMap = TUnorderedMap<TMeta, TMany<Tag>>;
+using UnitMap = TMapUnsorted<DMeta, TMany<Part*>>;
+using TraitMap = TMapUnsorted<TMeta, TMany<Tag>>;
 
 struct Thing final : Resolvable {
    using CTTI_Abstract = No;

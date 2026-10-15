@@ -571,11 +571,11 @@ namespace Langulus::Annies::Component
 
          ThisCom::template AbsorbType<D>(LglsFwd(intent));
 
-         if constexpr (TypeErased) { //TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated
+         //if constexpr (TypeErased) { //TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated
             // While we are interfacing external memory, we have to     
             // keep the type-constrained state, otherwise we risk       
             // interpreting static memory the wrong way.                
-            if constexpr (not CONSTRAIN) {
+            if constexpr (TypeErased and not CONSTRAIN and SELF::HasStates) {
                if constexpr (not CT::TypeErased<I>)
                   // From statically-typed to dynamically-typed         
                   ThisCom::EnableTypeConstrained();
@@ -583,7 +583,7 @@ namespace Langulus::Annies::Component
                   // From dynamically-typed to dynamically-typed        
                   ThisCom::EnableTypeConstrained();
             }
-         }
+         //}
       }
 
       /// Transfer from any kind of container, respecting intents             

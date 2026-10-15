@@ -8,21 +8,21 @@
 #include "TestMapCommon.hpp"
 
 #define MAP_TESTS(MANAGED) \
-   (MapTest<TUnorderedMap<Text, Tag*>, Text, Tag*, MANAGED>), \
+   (MapTest<TMapUnsorted<Text, Tag*>, Text, Tag*, MANAGED>), \
    (MapTest<UnorderedMap, Text, RT*, MANAGED>), \
-   (MapTest<TUnorderedMap<Tag*, RT*>, Tag*, RT*, MANAGED>), \
-   (MapTest<TUnorderedMap<Text, RT*>, Text, RT*, MANAGED>), \
+   (MapTest<TMapUnsorted<Tag*, RT*>, Tag*, RT*, MANAGED>), \
+   (MapTest<TMapUnsorted<Text, RT*>, Text, RT*, MANAGED>), \
  \
    (MapTest<UnorderedMap, Tag*, RT*, MANAGED>), \
    (MapTest<UnorderedMap, Text, int*, MANAGED>), \
  \
-   (MapTest<TUnorderedMap<Text, int*>, Text, int*, MANAGED>), \
-   (MapTest<TUnorderedMap<Text, Tags::Count*>, Text, Tags::Count*, MANAGED>), \
-   (MapTest<TUnorderedMap<Text, Many*>, Text, Many*, MANAGED>), \
+   (MapTest<TMapUnsorted<Text, int*>, Text, int*, MANAGED>), \
+   (MapTest<TMapUnsorted<Text, Tags::Count*>, Text, Tags::Count*, MANAGED>), \
+   (MapTest<TMapUnsorted<Text, Many*>, Text, Many*, MANAGED>), \
  \
-   (MapTest<TUnorderedMap<Tags::Count*, RT*>, Tags::Count*, RT*, MANAGED>), \
-   (MapTest<TUnorderedMap<Many*, RT*>, Many*, RT*, MANAGED>), \
-   (MapTest<TUnorderedMap<RT*, RT*>, RT*, RT*, MANAGED>), \
+   (MapTest<TMapUnsorted<Tags::Count*, RT*>, Tags::Count*, RT*, MANAGED>), \
+   (MapTest<TMapUnsorted<Many*, RT*>, Many*, RT*, MANAGED>), \
+   (MapTest<TMapUnsorted<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
    (MapTest<TOrderedMap<Text, int*>, Text, int*, MANAGED>), \
    (MapTest<TOrderedMap<Text, Tag*>, Text, Tag*, MANAGED>), \
@@ -55,18 +55,18 @@
    (MapTest<OrderedMap, RT*, RT*, MANAGED>)
 
 
-/// The main test for TOrderedMap/TUnorderedMap/OrderedMap/UnorderedMap       
+/// The main test for TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap       
 /// containers, with all kinds of items, from sparse to dense, from trivial   
 /// to complex, from flat to deep                                             
 #if LANGULUS_FEATURE(MANAGED_MEMORY)
 TEMPLATE_TEST_CASE(
-   "Sparse TOrderedMap/TUnorderedMap/OrderedMap/UnorderedMap", "[map]",
+   "Sparse TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    //TODO MAP_TESTS(true),
    MAP_TESTS(false)
 ) {
 #else
 TEMPLATE_TEST_CASE(
-   "Sparse TOrderedMap/TUnorderedMap/OrderedMap/UnorderedMap", "[map]",
+   "Sparse TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    MAP_TESTS(false)
 ) {
 #endif
@@ -179,7 +179,7 @@ TEMPLATE_TEST_CASE(
          }
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator = (single pair copy)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator = (single pair copy)") (timer meter) {
                some<Pair> source(meter.runs());
                for (auto& i : source)
                   i = CreatePair<Pair, K, V>("five hundred"_text, 555);
@@ -322,7 +322,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetReserved() >= 10);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator << (5 consecutive pair copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator << (5 consecutive pair copies)") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto& i : storage)
                   i << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -352,7 +352,7 @@ TEMPLATE_TEST_CASE(
             };
 
             // Last result: 1:1, slightly slower than STD, can be further improved
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator [] (retrieval by key from a map with 10 pairs)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator [] (retrieval by key from a map with 10 pairs)") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto& i : storage) {
                   i << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -418,7 +418,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetReserved() >= 10);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator << (5 consecutive trivial moves)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator << (5 consecutive trivial moves)") (timer meter) {
                some<MapType> storage(meter.runs());
                meter.measure([&](int i) {
                   return storage[i] 
@@ -528,7 +528,7 @@ TEMPLATE_TEST_CASE(
 
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::RemoveValue") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::RemoveValue") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -593,7 +593,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.ContainsValue(darray1[4].GetValue()));
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::RemoveKey") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::RemoveKey") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -865,31 +865,31 @@ TEMPLATE_TEST_CASE(
 }
 
 TEMPLATE_TEST_CASE("Sparse templated map stress test", "[map]",
-   (MapTest<TUnorderedMap<int*, Tag>, int*, Tag>),
+   (MapTest<TMapUnsorted<int*, Tag>, int*, Tag>),
 
-   (MapTest<TUnorderedMap<int, int*>, int, int*>),
-   (MapTest<TUnorderedMap<int, Tag*>, int, Tag*>),
-   (MapTest<TUnorderedMap<int, Tags::Count*>, int, Tags::Count*>),
-   (MapTest<TUnorderedMap<int, Many*>, int, Many*>),
+   (MapTest<TMapUnsorted<int, int*>, int, int*>),
+   (MapTest<TMapUnsorted<int, Tag*>, int, Tag*>),
+   (MapTest<TMapUnsorted<int, Tags::Count*>, int, Tags::Count*>),
+   (MapTest<TMapUnsorted<int, Many*>, int, Many*>),
 
    (MapTest<TOrderedMap<int, int*>, int, int*>),
    (MapTest<TOrderedMap<int, Tag*>, int, Tag*>),
    (MapTest<TOrderedMap<int, Tags::Count*>, int, Tags::Count*>),
    (MapTest<TOrderedMap<int, Many*>, int, Many*>),
 
-   (MapTest<TUnorderedMap<int*, int>, int*, int>),
-   (MapTest<TUnorderedMap<int*, Tags::Count>, int*, Tags::Count>),
-   (MapTest<TUnorderedMap<int*, Many>, int*, Many>),
+   (MapTest<TMapUnsorted<int*, int>, int*, int>),
+   (MapTest<TMapUnsorted<int*, Tags::Count>, int*, Tags::Count>),
+   (MapTest<TMapUnsorted<int*, Many>, int*, Many>),
 
    (MapTest<TOrderedMap<int*, int>, int*, int>),
    (MapTest<TOrderedMap<int*, Tag>, int*, Tag>),
    (MapTest<TOrderedMap<int*, Tags::Count>, int*, Tags::Count>),
    (MapTest<TOrderedMap<int*, Many>, int*, Many>),
 
-   (MapTest<TUnorderedMap<int*, int*>, int*, int*>),
-   (MapTest<TUnorderedMap<int*, Tag*>, int*, Tag*>),
-   (MapTest<TUnorderedMap<int*, Tags::Count*>, int*, Tags::Count*>),
-   (MapTest<TUnorderedMap<int*, Many*>, int*, Many*>),
+   (MapTest<TMapUnsorted<int*, int*>, int*, int*>),
+   (MapTest<TMapUnsorted<int*, Tag*>, int*, Tag*>),
+   (MapTest<TMapUnsorted<int*, Tags::Count*>, int*, Tags::Count*>),
+   (MapTest<TMapUnsorted<int*, Many*>, int*, Many*>),
 
    (MapTest<TOrderedMap<int*, int*>, int*, int*>),
    (MapTest<TOrderedMap<int*, Tag*>, int*, Tag*>),

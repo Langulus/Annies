@@ -8,17 +8,17 @@
 #include "TestMapCommon.hpp"
 
 
-/// The main test for TOrderedMap/TUnorderedMap/OrderedMap/UnorderedMap       
+/// The main test for TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap       
 /// containers, with all kinds of items, from sparse to dense, from trivial   
 /// to complex, from flat to deep                                             
 TEMPLATE_TEST_CASE(
-   "Dense TOrderedMap/TUnorderedMap/OrderedMap/UnorderedMap", "[map]",
+   "Dense TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    (MapTest<UnorderedMap, Text, int>),
 
-   (MapTest<TUnorderedMap<Text, int>, Text, int>),
-   (MapTest<TUnorderedMap<Text, Tag>, Text, Tag>),
-   (MapTest<TUnorderedMap<Text, Tags::Count>, Text, Tags::Count>),
-   (MapTest<TUnorderedMap<Text, Many>, Text, Many>),
+   (MapTest<TMapUnsorted<Text, int>, Text, int>),
+   (MapTest<TMapUnsorted<Text, Tag>, Text, Tag>),
+   (MapTest<TMapUnsorted<Text, Tags::Count>, Text, Tags::Count>),
+   (MapTest<TMapUnsorted<Text, Many>, Text, Many>),
 
    (MapTest<TOrderedMap<Text, int>, Text, int>),
    (MapTest<TOrderedMap<Text, Tag>, Text, Tag>),
@@ -131,7 +131,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE_THROWS(map["missing"] != pair.GetValue());
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator = (single pair copy)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator = (single pair copy)") (timer meter) {
                some<Pair> source(meter.runs());
                for (auto& i : source)
                   i = CreatePair<Pair, K, V>("five hundred"_text, 555);
@@ -247,7 +247,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetReserved() >= 10);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator << (5 consecutive pair copies)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator << (5 consecutive pair copies)") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto& i : storage)
                   i << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -277,7 +277,7 @@ TEMPLATE_TEST_CASE(
             };
 
             // Last result: 1:1, slightly slower than STD, can be further improved
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator [] (retrieval by key from a map with 10 pairs)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator [] (retrieval by key from a map with 10 pairs)") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto& i : storage) {
                   i << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -340,7 +340,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetReserved() >= 10);
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::operator << (5 consecutive trivial moves)") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::operator << (5 consecutive trivial moves)") (timer meter) {
                some<MapType> storage(meter.runs());
                meter.measure([&](int i) {
                   return storage[i] 
@@ -391,7 +391,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.ContainsValue(darray1[4].GetValue()));
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::RemoveValue") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::RemoveValue") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -453,7 +453,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.ContainsValue(darray1[4].GetValue()));
 
          #ifdef LANGULUS_STD_BENCHMARK
-            BENCHMARK_ADVANCED("Annies::TUnorderedMap::RemoveKey") (timer meter) {
+            BENCHMARK_ADVANCED("Annies::TMapUnsorted::RemoveKey") (timer meter) {
                some<MapType> storage(meter.runs());
                for (auto&& o : storage)
                   o << darray1[0] << darray1[1] << darray1[2] << darray1[3] << darray1[4];
@@ -814,10 +814,10 @@ TEMPLATE_TEST_CASE(
 }
 
 TEMPLATE_TEST_CASE("Dense templated map stress test", "[map]",
-   (MapTest<TUnorderedMap<int, int>, int, int>),
-   (MapTest<TUnorderedMap<int, Tag>, int, Tag>),
-   (MapTest<TUnorderedMap<int, Tags::Count>, int, Tags::Count>),
-   (MapTest<TUnorderedMap<int, Many>, int, Many>),
+   (MapTest<TMapUnsorted<int, int>, int, int>),
+   (MapTest<TMapUnsorted<int, Tag>, int, Tag>),
+   (MapTest<TMapUnsorted<int, Tags::Count>, int, Tags::Count>),
+   (MapTest<TMapUnsorted<int, Many>, int, Many>),
 
    (MapTest<TOrderedMap<int, int>, int, int>),
    (MapTest<TOrderedMap<int, Tag>, int, Tag>),

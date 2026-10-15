@@ -116,7 +116,7 @@ namespace Langulus
       template<CT::NotVoid K, CT::NotVoid V>
       using TOrderedMap = TMap<K, V, true>;
       template<CT::NotVoid K, CT::NotVoid V>
-      using TUnorderedMap = TMap<K, V, false>;*/
+      using TMapUnsorted = TMap<K, V, false>;*/
 
       struct BlockSet;
 

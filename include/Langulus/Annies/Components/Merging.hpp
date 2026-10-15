@@ -494,11 +494,13 @@ namespace Langulus::Annies::Component
 
       /// MARK: MergeInnerTableMD                                             
       /// Inserts 'd1' into a hash map at the appropriate bucket. Emplaces    
-      /// all 'dn' under the same bucket, in each dimension. Does not perform 
-      /// conversion.                                                         
+      /// all 'dn' under the same bucket, in each dimension. Dimensions with  
+      /// missing argument are default-initialized, or error out. Does not    
+      /// perform conversion.                                                 
       ///   @attention operates on all dimensions at once                     
       template<class C, class D1, class...DN> requires (C::Dimensions::Count > 1)
       auto MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C> {
+         static_assert(sizeof...(SHARED) >= sizeof...(DN), "Too many arguments");
          static_assert(not CONVERT or (
                  Same<TypeOf<C, ID>,     DeextAll<Deint<D1>>>
             and (Same<TypeOf<C, SHARED>, DeextAll<Deint<DN>>> and ...)),
@@ -512,7 +514,20 @@ namespace Langulus::Annies::Component
             offset = self.TableEmplace(FWDIntent(d1));
 
          auto h = self.GetHandle() + offset;
-         (h.template EmplaceWithIntent<SHARED>(LglsFwd(dn)), ...);
+
+         constexpr size_t overlapped_count
+            = sizeof...(DN) < sizeof...(SHARED) ? sizeof...(DN)
+                                                : sizeof...(SHARED);
+
+         // Emplace available                                           
+         LglsSequence(overlapped_count, {
+            (h.template EmplaceWithIntent<Id::template At<I+1>>(LglsFwd(dn)), ...);
+         });
+
+         // Default the rest                                            
+         LglsSequence(sizeof...(SHARED) - overlapped_count, {
+            (h.template EmplaceDefault<Id::template At<I+1+overlapped_count>>(), ...);
+         });
          return h;
       }
    };

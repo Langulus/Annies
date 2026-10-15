@@ -170,7 +170,7 @@ namespace Langulus::Annies
    ///              contents                                                  
    template<CT::Tag T> LANGULUS(INLINED)
    auto Neat::GetTraits() -> TagList* {
-      return GetTraits(MetaTraitOf<T>());
+      return GetTraits(MetaTagOf<T>());
    }
 
    /// Get list of traits, corresponding to a static trait (const)            
@@ -180,7 +180,7 @@ namespace Langulus::Annies
    ///              contents                                                  
    template<CT::Tag T> LANGULUS(INLINED)
    auto Neat::GetTraits() const -> const TagList* {
-      return GetTraits(MetaTraitOf<T>());
+      return GetTraits(MetaTagOf<T>());
    }
    
    /// Get list of traits, corresponding to a type                            
@@ -793,7 +793,7 @@ namespace Langulus::Annies
    ///   @attention if not nullptr, returned Many might contain a Neat        
    template<CT::Tag T> LANGULUS(INLINED)
    auto Neat::GetTag(size_t index) const -> const Tag* {
-      return Get(MetaTraitOf<T>(), index);
+      return Get(MetaTagOf<T>(), index);
    }
 
    /// Iterate through all relevant bucketed items                            
@@ -909,7 +909,7 @@ namespace Langulus::Annies
       if constexpr (CT::Tag<A>) {
          // Static trait provided, extract filter                       
          using TraitType = Decay<A>;
-         const auto filter = MetaTraitOf<TraitType>();
+         const auto filter = MetaTagOf<TraitType>();
          const auto found = mTags.FindIt(filter);
          if (not found)
             return index;
@@ -1172,7 +1172,7 @@ namespace Langulus::Annies
    ///   @return the number of removed trait entries                          
    template<CT::Tag T, bool EMPTY_TOO>
    size_t Neat::RemoveTrait() {
-      const auto filter = MetaTraitOf<T>();
+      const auto filter = MetaTagOf<T>();
       const auto found = mTags.FindIt(filter);
       if (not found)
          return 0;

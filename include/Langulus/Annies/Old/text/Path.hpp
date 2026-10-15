@@ -16,7 +16,7 @@ namespace Langulus::Annies
    ///   File path container                                                  
    ///                                                                        
    struct Path : Text {
-      LANGULUS(NAME) "Path";
+      using CTTI_Named = Yes<"Path";
       LANGULUS(FILES) "";
       LANGULUS(ACT_AS) Path;
       LANGULUS_BASES(Text);

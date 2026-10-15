@@ -43,17 +43,17 @@ namespace Langulus::Annies
       // Tags are ordered first by their trait type, then by their    
       // order of appearance. Duplicate trait types are allowed         
       // Tag contents may or may not also be normalized               
-      TUnorderedMap<TMeta, TagList> mTags;
+      TMapUnsorted<TMeta, TagList> mTags;
 
       // Subconstructs are sorted first by the construct type, and then 
       // by their order of appearance. Their contents may or may not    
       // also be normalized                                             
-      TUnorderedMap<DMeta, ConstructList> mConstructs;
+      TMapUnsorted<DMeta, ConstructList> mConstructs;
 
       // Any other block type that doesn't fit in the above is sorted   
       // first by the block type, then by the order of appearance       
       // These sub-blocks' contents may or may not be normalized        
-      TUnorderedMap<DMeta, TailList> mAnythingElse;
+      TMapUnsorted<DMeta, TailList> mAnythingElse;
 
    public:
       //LANGULUS(DEEP) true;

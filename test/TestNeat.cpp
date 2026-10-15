@@ -81,9 +81,9 @@ SCENARIO("Data normalization", "[neat]") {
    static_assert(CT::IntentMakableAlt<Referred<TPair<TMeta, TMany<Many>>>>);
    static_assert(CT::IntentMakableAlt<Cloned<TPair<TMeta, TMany<Many>>>>);
 
-   static_assert(CT::CopyMakable<TUnorderedMap<TMeta, TMany<Many>>>);
-   static_assert(CT::ReferMakable<TUnorderedMap<TMeta, TMany<Many>>>);
-   static_assert(CT::CloneMakable<TUnorderedMap<TMeta, TMany<Many>>>);
+   static_assert(CT::CopyMakable<TMapUnsorted<TMeta, TMany<Many>>>);
+   static_assert(CT::ReferMakable<TMapUnsorted<TMeta, TMany<Many>>>);
+   static_assert(CT::CloneMakable<TMapUnsorted<TMeta, TMany<Many>>>);
 
    static_assert(CT::MoveMakable<TPair<TMeta, TMany<Many>>>);
    static_assert(CT::CopyMakable<TPair<TMeta, TMany<Many>>>);

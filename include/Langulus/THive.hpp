@@ -7,14 +7,14 @@
 ///                                                                           
 #pragma once
 #include "Handle.hpp"
+#include "Annies/Components/Typed-Static.hpp"
+#include "Annies/Components/Count-Stack.hpp"
+#include "Annies/Components/Reserve-Emergent.hpp"
 #include "Annies/Components/Heap-Immovable.hpp"
 #include "Annies/Components/Ownership-Stack.hpp"
 #include "Annies/Components/OwnershipDeep-Heap.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Removal.hpp"
-#include "Annies/Components/Typed-Static.hpp"
-#include "Annies/Components/Count-Stack.hpp"
-#include "Annies/Components/Reserve-Stack.hpp"
 
 
 namespace Langulus::Annies
@@ -25,30 +25,17 @@ namespace Langulus::Annies
    /// instantiated in                                                        
    ///                                                                        
    template<CT::NotVoid T>
-   struct THive : Container<
-      Com::HeapImmovable<>,            // Immovable heap memory         
-      Com::OwnershipStack<>,           // Allocation is referenced      
-      Com::DeepOwnershipHeap<>,        // Referenced indirections       
-      Com::Emplacement<>,              // Allows emplacement            
-      Com::Removal<>,                  // Allows removal                
+   struct THive : Com::Container<
       Com::TypedStatic<DMeta, T>,      // Statically typed              
       Com::CountStack<>,               // Variable count                
-      Com::ReserveHeap<>               // Variable capacity             
+      Com::ReserveEmergent<>,          // Variable capacity             
+      Com::HeapImmovable<>,            // Immovable heap memory         
+      Com::OwnershipStack<>,           // Allocation is referenced      
+      Com::OwnershipDeepHeap<>,        // Referenced indirections       
+      Com::Emplacement<>,              // Allows emplacement            
+      Com::Removal<>                   // Allows removal                
    > {
       using CTTI_ReflectAs = THive;
-      using PickDenseMut   = T&;
-      using PickDense      = T const&;
-      
-      #if not LANGULUS(FORCE_TYPE_ERASURE)
-         using HandleTypeMut = THandle<T&>;
-         using HandleType    = THandle<T const&>;
-      #else
-         using HandleTypeMut = HandleMut;
-         using HandleType    = Handle;
-      #endif
-
-      using Pick          = Tif<CT::Sparse<T>, PickSparse,    PickDense>;
-      using PickMut       = Tif<CT::Sparse<T>, PickSparseMut, PickDenseMut>;
    };
 }
 

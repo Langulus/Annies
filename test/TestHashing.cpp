@@ -44,7 +44,7 @@ SCENARIO("Hashing different kinds of containers", "[hash]") {
 
 /// Cross-container consistency tests                                         
 TEMPLATE_TEST_CASE(
-   "Cross-container consistency tests for TOrderedMap/TUnorderedMap/OrderedMap/UnorderedMap", "[map]",
+   "Cross-container consistency tests for TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    (HashTest<Text, Tag*>),
 
    (HashTest<Text, int>),
@@ -65,7 +65,7 @@ TEMPLATE_TEST_CASE(
       const auto pair = CreatePair<TPair<K, V>, K, V>(
          "five hundred", 555);
 
-      TUnorderedMap<K, V> uset1 {pair};
+      TMapUnsorted<K, V> uset1 {pair};
       UnorderedMap uset2 {pair};
       TOrderedMap<K, V> oset1 {pair};
       OrderedMap oset2 {pair};

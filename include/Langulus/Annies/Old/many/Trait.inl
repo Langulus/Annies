@@ -95,7 +95,7 @@ namespace Langulus::Annies
    ///   @tparam T - the trait                                                
    template<CT::Tag T> LANGULUS(INLINED)
    void Tag::SetTrait() noexcept {
-      mTraitType = MetaTraitOf<T>();
+      mTraitType = MetaTagOf<T>();
    }
 
    /// Set the trait type dynamically                                         
@@ -110,7 +110,7 @@ namespace Langulus::Annies
    template<CT::DefineTag THIS> LANGULUS(INLINED)
    TMeta Tag::GetTag() const noexcept {
       if constexpr (CT::Tag<THIS>)
-         return (mTraitType = MetaTraitOf<THIS>());
+         return (mTraitType = MetaTagOf<THIS>());
       else
          return mTraitType;
    }
@@ -149,7 +149,7 @@ namespace Langulus::Annies
       if constexpr (CT::Tag<THIS>)
          return SameAsOneOf<THIS, T1>;
       else
-         return IsTrait(MetaTraitOf<T1>());
+         return IsTrait(MetaTagOf<T1>());
    }
 
    /// Check if a trait matches one of a set of trait types                   
