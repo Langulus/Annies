@@ -645,22 +645,6 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
    Langulus::Annies::Text
 );
 
-/// Map all arrays as convertible to text                                     
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Array, {
-      if constexpr (CT::Character<Deext<T>>)
-         return {from};
-      else {
-         TO result;
-         for (auto& i : from)
-            Langulus::Serialize(i, result);
-         return result;
-      }
-   },
-   Langulus::Annies::Text
-);
-
-#include "SerializeText.hpp"
-
 namespace Langulus
 {
    using Annies::Text;

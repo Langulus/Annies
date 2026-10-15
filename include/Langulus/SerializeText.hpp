@@ -8,6 +8,7 @@
 #pragma once
 #include "Text.hpp"
 #include "Bytes.hpp"
+#include "Recipe.hpp"
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/Derived.hpp>
 #include <Langulus/CT/Charged.hpp>
@@ -348,6 +349,69 @@ namespace Langulus::CTTI
    }
 }
 
+/// Map all arrays as convertible to text                                     
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Array, {
+      if constexpr (CT::Character<Deext<T>>)
+         return {from};
+      else {
+         TO result;
+         for (auto& i : from)
+            Langulus::Serialize(i, result);
+         return result;
+      }
+   },
+   Langulus::Annies::Text
+);
+
+/// Converting to text relies on the serializer                               
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Tag, {
+   Annies::Text text;
+   Langulus::Serialize(from, text);
+   return text;
+}, Annies::Text);
+
+/// Converting to text relies on the serializer                               
+LANGULUS_MORPHISM_CUSTOM(Annies::Recipe, {
+   Annies::Text text;
+   Langulus::Serialize(from, text);
+   return text;
+}, Annies::Text);
+
+/// Converting to text relies on the serializer                               
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Executable, {
+   Annies::Text text;
+   Langulus::Serialize(from, text);
+   return text;
+}, Annies::Text);
+
+/// Convert Charge -> Text                                                    
+LANGULUS_MORPHISM_CUSTOM(Langulus::Charge, { 
+      Langulus::Annies::Text text;
+      if (from.mass != Charge::DefaultMass) {
+         text += Serial::Mass.Token; 
+         text += from.mass;
+      }
+
+      if (from.rate != Charge::DefaultRate) {
+         text += Serial::Rate.Token; 
+         text += from.rate;
+      }
+
+      if (from.time != Charge::DefaultTime) {
+         text += Serial::Time.Token; 
+         text += from.time;
+      }
+
+      if (from.precedence != Charge::DefaultPrecedence) {
+         text += Serial::Precedence.Token; 
+         text += from.precedence;
+      }
+      
+      return text;
+   }, 
+   Langulus::Annies::Text
+);
+
 #if LANGULUS_FEATURE(LOGGING)
 namespace fmt
 {
@@ -435,31 +499,3 @@ namespace fmt
    };*/
 }
 #endif
-
-/// Convert Charge -> Text                                                    
-LANGULUS_MORPHISM_CUSTOM(Langulus::Charge, { 
-      Langulus::Annies::Text text;
-      if (from.mass != Charge::DefaultMass) {
-         text += Serial::Mass.Token; 
-         text += from.mass;
-      }
-
-      if (from.rate != Charge::DefaultRate) {
-         text += Serial::Rate.Token; 
-         text += from.rate;
-      }
-
-      if (from.time != Charge::DefaultTime) {
-         text += Serial::Time.Token; 
-         text += from.time;
-      }
-
-      if (from.precedence != Charge::DefaultPrecedence) {
-         text += Serial::Precedence.Token; 
-         text += from.precedence;
-      }
-      
-      return text;
-   }, 
-   Langulus::Annies::Text
-);

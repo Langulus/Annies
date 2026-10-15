@@ -58,11 +58,34 @@ namespace Langulus::Annies
          this->Absorb(Move(other));
       }
 
-      constexpr  TPin(T const& source)
-         : Base {Stackwise, source} {}
-
-      constexpr  TPin(T&& source) noexcept
-         : Base {Stackwise, LglsFwd(source)} {}
+      /// Construction that either absorbs the provided container, or         
+      /// emplaces T in the container, using A... as constructor arguments    
+      template<class...A>
+      constexpr TPin(A&&...arguments) {
+         if constexpr (sizeof...(A) == 1 and CT::ContainsOne<A...>) {
+            LglsAssumeUser((Same<Deint<A>, TPin> and ...),
+               "Ambiguous use of construction "
+               "- you should use tag-dispatch with first argument either Absorb "
+               "(if you want to overwrite the container itself) or Piecewise "
+               "(if you want to overwrite the first item) in order to clearly "
+               "state your intent. Absorb will be used by default!"
+            );
+            this->Absorb(LglsFwd(arguments)...);
+         }
+         else this->EmplaceConstruct(LglsFwd(arguments)...);
+      }
+      
+      /// Construction that absorbs the provided container                    
+      template<class A>
+      constexpr TPin(Inner::Absorb, A&& argument) {
+         this->Absorb(LglsFwd(argument));
+      }
+      
+      /// Emplaces T inside, using A... as constructor arguments              
+      template<class...A>
+      constexpr TPin(Inner::Piecewise, A&&...arguments) {
+         this->EmplaceConstruct(LglsFwd(arguments)...);
+      }
 
       constexpr ~TPin() noexcept {
          this->Destroy();

@@ -7,13 +7,12 @@
 ///                                                                           
 #pragma once
 #include "Many.hpp"
-#include "Text.hpp"
-#include "Langulus/CT/Convertible.hpp"
 #include "Annies/Components/Charged-Stack.hpp"
 #include "Annies/Components/Verbed-Stack.hpp"
 //#include "Langulus/CT/Able.hpp"
 //#include "Langulus/CT/Akin.hpp"
-#include "Langulus/CT/Executable.hpp"
+#include <Langulus/CT/Executable.hpp>
+#include <Langulus/CT/Convertible.hpp>
 
 
 namespace Langulus::Annies::Inner
@@ -244,13 +243,6 @@ namespace Langulus
    using Annies::TVerb;
    using Annies::Verb;
 }
-
-/// Converting to text relies on the serializer                               
-LANGULUS_MORPHISM_CUSTOM(Annies::Verb, {
-   Annies::Text text;
-   Langulus::Serialize(from, text);
-   return text;
-}, Annies::Text);
 
 /// Define a verb                                                             
 ///   @param P positive verb name, as it exists in namespace Langulus::Verbs  

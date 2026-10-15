@@ -7,7 +7,6 @@
 ///                                                                           
 #pragma once
 #include "Many.hpp"
-#include "Text.hpp"
 #include "Annies/Components/Stack.hpp"
 #include "Annies/Components/Charged-Stack.hpp"
 
@@ -192,10 +191,3 @@ namespace Langulus
 {
    using Annies::Recipe;
 }
-
-/// Converting to text relies on the serializer                               
-LANGULUS_MORPHISM_CUSTOM(Annies::Recipe, {
-   Annies::Text text;
-   Langulus::Serialize(from, text);
-   return text;
-}, Annies::Text);
