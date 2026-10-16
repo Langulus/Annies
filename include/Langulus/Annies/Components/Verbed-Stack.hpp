@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -22,10 +22,6 @@ namespace Langulus::Annies
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.VerbedStack<META, VERB, CONSTRAIN, ID>
-
    ///                                                                        
    /// Defines the contained verb as a member variable, allowing the use of   
    /// verb-erasure. You can optionally constrain the verb at runtime.        
@@ -38,6 +34,11 @@ namespace Langulus::Annies::Component
    ///   @tparam ID data provider that gets verbed                            
    template<class META, class VERB, bool CONSTRAIN, Cid ID>
    struct VerbedStack : State::Verbed<StateValueIf(CONSTRAIN or not ::std::is_void_v<VERB>), ID> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.VerbedStack<META, VERB, CONSTRAIN, ID>
+
       using CTTI_Component  = Yup;
       using CTTI_Executable = Yup;
       using CTTI_ReflectAs  = void;

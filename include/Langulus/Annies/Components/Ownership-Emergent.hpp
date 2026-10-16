@@ -12,12 +12,6 @@
 
 namespace Langulus::Annies::Component
 {
-   //using RTTI::DMeta;
-
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.OwnershipEmergent<STYLE, ID, SHARED...>
-
    ///                                                                        
    /// Heap allocation will be searched on demand every time.                 
    /// Manage its ownership by referencing and dereferencing it, if enabled.  
@@ -30,6 +24,11 @@ namespace Langulus::Annies::Component
    ///      variable.                                                         
    template<unsigned STYLE, Cid ID, Cid...SHARED>
    struct OwnershipEmergent {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.OwnershipEmergent<STYLE, ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id = Values<ID, SHARED...>;

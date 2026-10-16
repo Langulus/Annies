@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.IterationOperators<ID, SHARED...>
-
    ///                                                                        
    /// Adds +, -, +=, -=, ++ prefix/suffix, -- prefix/suffix operators.       
    /// Adds - operator for difference between two containers.                 
@@ -26,6 +22,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED other heap providers that get iterated together       
    template<Cid ID, Cid...SHARED>
    struct IterationOperators {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.IterationOperators<ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id = Values<ID, SHARED...>;

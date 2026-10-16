@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.IndexedHashStack<ID, HASH, SHARED...>
-
    ///                                                                        
    /// Provides random element access by hashing a value of the provided ID.  
    /// Uses a modified Robin Hood algorithm to reuse table space and minimize 
@@ -25,6 +21,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED providers that share the same indexing scheme         
    template<Cid ID, class HASH, Cid...SHARED>
    struct IndexedHashStack : IndexedCommonHashed<ID, HASH, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.IndexedHashStack<ID, HASH, SHARED...>
+
       using Base             = IndexedCommonHashed<ID, HASH, SHARED...>;
       using TableType        = typename Base::TableType;
       using HeapRequest      = PerElement<TableType>;

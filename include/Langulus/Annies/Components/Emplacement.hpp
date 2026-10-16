@@ -27,10 +27,6 @@ namespace Langulus::Annies::Component
       Reallocate
    };
 
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.Emplacement<ID, SHARED...>
-
    ///                                                                        
    /// Adds public emplacement methods.                                       
    /// Unlike insertion, emplacement reuses the same memory space and         
@@ -39,6 +35,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED other providers that share emplacement behavior       
    template<Cid ID, Cid...SHARED>
    struct Emplacement {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.Emplacement<ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;

@@ -17,10 +17,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.Merging<CONVERT, ID, SHARED...>
-
    ///                                                                        
    /// Implements merging for containers.                                     
    /// Merging (unlike emplacement) extends the memory space and may move     
@@ -32,6 +28,11 @@ namespace Langulus::Annies::Component
    ///   @tparam ID, SHARED providers that share the same merge behavior.     
    template<bool CONVERT, Cid ID, Cid...SHARED>
    struct Merging {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.Merging<CONVERT, ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;
@@ -514,14 +515,13 @@ namespace Langulus::Annies::Component
             offset = self.TableEmplace(FWDIntent(d1));
 
          auto h = self.GetHandle() + offset;
-
          constexpr size_t overlapped_count
             = sizeof...(DN) < sizeof...(SHARED) ? sizeof...(DN)
                                                 : sizeof...(SHARED);
 
          // Emplace available                                           
          LglsSequence(overlapped_count, {
-            (h.template EmplaceWithIntent<Id::template At<I+1>>(LglsFwd(dn)), ...);
+            (h.template EmplaceWithIntent<Id::template At<I+1>>(FWDIntent(dn)), ...);
          });
 
          // Default the rest                                            

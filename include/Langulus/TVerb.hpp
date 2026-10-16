@@ -233,6 +233,29 @@ namespace Langulus::Annies
       bool operator ==  (const TVerb&) const;
       auto operator <=> (const TVerb&) const -> std::partial_ordering;
 
+      /// MARK: Charge modification                                           
+      constexpr auto operator * (const Real& scalar) const noexcept -> TVerb {
+         auto copy = *this;
+         copy.GetCharge() *= scalar;
+         return copy;
+      }
+
+      constexpr auto operator ^ (const Real& scalar) const noexcept -> TVerb {
+         auto copy = *this;
+         copy.GetCharge() ^= scalar;
+         return copy;
+      }
+
+      constexpr auto operator *= (const Real& scalar) noexcept -> TVerb& {
+         GetCharge() *= scalar;
+         return *this;
+      }
+
+      constexpr auto operator ^= (const Real& scalar) noexcept -> TVerb& {
+         GetCharge() ^= scalar;
+         return *this;
+      }
+
       /// MARK: Removal                                                       
       void Reset();
    };

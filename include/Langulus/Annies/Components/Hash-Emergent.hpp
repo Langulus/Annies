@@ -46,7 +46,7 @@ namespace Langulus::Annies::Component
             //                                                          
             // Container is type-erased                                 
             const auto T = self.template GetType<SID>();
-            LglsAssumeDev((bool) T, "Can't hash untyped container");
+            LglsAssumeDev(T, "Can't hash untyped container");
             const auto hasher = T.GetHasher();
             LglsAssumeDev(hasher, "Not hashable");
             void* const data = const_cast<void*>(
@@ -145,7 +145,7 @@ namespace Langulus::Annies::Component
          // Do some assumption checking                                 
          if constexpr (CT::TypeErased<C>) {
             const auto T = self.template GetType<SID>();
-            LglsAssumeDev((bool) T, "Can't hash untyped container");
+            LglsAssumeDev(T, "Can't hash untyped container");
             LglsAssumeDev(T.GetHasher(), "Not hashable");
          }
          else {

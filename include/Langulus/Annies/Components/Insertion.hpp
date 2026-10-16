@@ -24,10 +24,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.Insertion<CONVERT, ID, SHARED...>
-
    ///                                                                        
    /// Implements insertion for containers.                                   
    /// Insertion (unlike emplacement) extends the memory space and may move   
@@ -52,6 +48,11 @@ namespace Langulus::Annies::Component
    ///   @tparam ID, SHARED providers that share the same insertion behavior. 
    template<bool CONVERT, Cid ID, Cid...SHARED>
    struct Insertion {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.Insertion<CONVERT, ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;
@@ -500,10 +501,12 @@ namespace Langulus::Annies::Component
       /// MARK: Deepen                                                        
       /// Wrap all contained elements inside a sub-block                      
       ///   @return a reference to the newly created inner container          
-      template<CT::Deep C>
+      template<class C> requires (CT::TypeErased<C> or CT::Deep<TypeOf<C>>)
       auto Deepen(this C& self) -> C& {
-         LglsAssert(not self.IsTypeConstrained() or self.template IsSame<C>(),
-            "Can't deepen with incompatible type");
+         if constexpr (not CT::TypeErased<C>) {
+            LglsAssert(not self.IsTypeConstrained() or self.IsDeep(),
+               "Can't deepen with incompatible type");
+         }
       
          // Allocate a new container and move this one inside of it     
          C temp {Piecewise, Abandon {self}};
@@ -959,22 +962,67 @@ namespace Langulus::Annies::Component
       /// 1. An invalid container is compatible with any other                
       /// 2. If one or more of the containers is disowned, they are always    
       ///    incompatible.                                                    
-      /// 3. Missing containers are not compatible with non-missing ones.     
+      /// 3. In order to be compatible, a container has to be either capable  
+      ///    of being deepened, or matching the other type exactly.           
+      /// 4. Missing containers are not compatible with non-missing ones.     
       ///    If both containers are missing, they are compatible only if they 
       ///    both are either past or future at the same time.                 
-      /// 4. In order to be compatible, a container has to be either capable  
-      ///    of being deepened, or matching the other type exactly.           
       /// 5. Containers of different or-ness are only compatible if one of    
       ///    the containers has count <= 1. That's the one case when or-ness  
       ///    does not matter at all.                                          
       ///   @param other - the block to check                                 
       ///   @return true if state is compatible                               
       constexpr bool CheckState(this auto const& self, CT::Container auto const& other) noexcept {
-         return not self.IsValid() or self.IsDisowned() or other.IsDisowned() or (
-                (not self.IsTypeConstrained() or other.IsExact(self)) //TODO IsTypeConstrained is allowed as long as it is deepenable
-            and (self.GetCount() <= 1 or other.GetCount() <= 1 or self.IsOr() == other.IsOr())
-            and ((not self.IsMissing() and not other.IsMissing()) or self.IsFuture() == other.IsFuture())
-         );
+         // 1.                                                          
+         if (not self.IsValid() or not other.IsValid())
+            return true;
+
+         // 2.                                                          
+         if constexpr (requires { self.IsDisowned(); }) {
+            if (self.IsDisowned())
+               return false;
+         }
+
+         if constexpr (requires { other.IsDisowned(); }) {
+            if (other.IsDisowned())
+               return false;
+         }
+
+         // 3.                                                          
+         if constexpr (requires { self.IsTypeConstrained(); }) { //TODO IsTypeConstrained is allowed as long as it is deepenable?
+            if (self.IsTypeConstrained() and not other.IsExact(self))
+               return false;
+         }
+
+         // 4.                                                          
+         if constexpr (requires { self.IsMissing(); } and requires { other.IsMissing(); }) {
+            if (self.IsMissing() != other.IsMissing() or self.IsFuture() != other.IsFuture())
+               return false;
+         }
+         else if constexpr (requires { self.IsMissing(); } and not requires { other.IsMissing(); }) {
+            if (self.IsMissing())
+               return false;
+         }
+         else if constexpr (not requires { self.IsMissing(); } and requires { other.IsMissing(); }) {
+            if (other.IsMissing())
+               return false;
+         }
+
+         // 5.                                                          
+         if constexpr (requires { self.IsOr(); } and requires { other.IsOr(); }) {
+            if (self.IsOr() != other.IsOr() and self.GetCount() > 1 and other.GetCount() > 1)
+               return false;
+         }
+         else if constexpr (requires { self.IsOr(); } and not requires { other.IsOr(); }) {
+            if (self.IsOr() and self.GetCount() > 1 and other.GetCount() > 1)
+               return false;
+         }
+         else if constexpr (not requires { self.IsOr(); } and requires { other.IsOr(); }) {
+            if (other.IsOr() and self.GetCount() > 1 and other.GetCount() > 1)
+               return false;
+         }
+         
+         return true;
       }
 
       /// Inner composition function                                          

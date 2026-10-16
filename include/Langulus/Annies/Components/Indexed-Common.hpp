@@ -13,10 +13,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.IndexedCommon<ID, SHARED...>
-
    ///                                                                        
    /// Provides a common element access interface.                            
    /// Needs to be specialized, relying on a custom SimplifyIndex method.     
@@ -24,6 +20,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED providers that share the same indexing scheme         
    template<Cid ID, Cid...SHARED>
    struct IndexedCommon {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.IndexedCommon<ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;
@@ -89,7 +90,7 @@ namespace Langulus::Annies::Component
             void* heap = DecvqAllCast(self.template GetRaw<SID>());
 
             const auto T = self.template GetType<SID>();
-            LglsAssumeDev((bool) T, "Block is not typed");
+            LglsAssumeDev(T, "Block is not typed");
 
             const auto offset_heap = [&self, &heap, &idx, &T] {
                const auto offset = self.SimplifyIndex(idx);

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.HashStack<ID, H, SHARED...>
-
    ///                                                                        
    /// Stores a precomputed hash on the stack.                                
    /// The hash is recomputed if GetHash() is invoked when stored hash is 0.  
@@ -24,6 +20,11 @@ namespace Langulus::Annies::Component
    ///      They will all share the same cached hash variable.                
    template<Cid ID, class H, Cid...SHARED>
    struct HashStack : HashEmergent<ID, H, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.HashStack<ID, H, SHARED...>
+
       using StackRequest = H;
       using Id = typename HashEmergent<ID, H, SHARED...>::Id;
 

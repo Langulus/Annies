@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.HashHeap<ID, H, SHARED...>
-
    ///                                                                        
    /// Stores a precomputed hash inside the heap with the given ID.           
    /// The hash is recomputed if GetHash() is invoked when stored hash is 0.  
@@ -29,6 +25,11 @@ namespace Langulus::Annies::Component
    ///      They will all share the same cached hash variable.                
    template<Cid ID, class H, Cid...SHARED>
    struct HashHeap : HashEmergent<ID, H, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.HashHeap<ID, H, SHARED...>
+
       using HeapRequest = H;
       using Id = typename HashEmergent<ID, H, SHARED...>::Id;
 

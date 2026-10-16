@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.OwnershipStack<STYLE, ID, SHARED...>
-
    ///                                                                        
    /// Keep a pointer to the heap allocation as a member.                     
    /// Manage its ownership by referencing and dereferencing it.              
@@ -27,6 +23,11 @@ namespace Langulus::Annies::Component
    ///      variable.                                                         
    template<unsigned STYLE, Cid ID, Cid...SHARED>
    struct OwnershipStack : OwnershipEmergent<STYLE, ID, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.OwnershipStack<STYLE, ID, SHARED...>
+
       using StackRequest = AllocationPtr;
       using Id = typename OwnershipEmergent<STYLE, ID, SHARED...>::Id;
 

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -15,10 +15,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.IndexedCommonHashed<ID, HASH, SHARED...>
-
    ///                                                                        
    /// Provides a common hashed-table based access & insertion interface.     
    ///   @tparam ID the provider we're indexing                               
@@ -26,6 +22,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED providers that share the same indexing scheme         
    template<Cid ID, class HASH, Cid...SHARED>
    struct IndexedCommonHashed : IndexedCommon<ID, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.IndexedCommonHashed<ID, HASH, SHARED...>
+
       using TableType        = uint8_t;
       using IteratorCategory = ::std::random_access_iterator_tag;
       using Id               = typename IndexedCommon<ID, SHARED...>::Id;
@@ -286,7 +287,9 @@ namespace Langulus::Annies::Component
       ///   @attention assumes item doesn't yet exist in the table            
       ///   @attention assumes there's at least one free spot, in any one of  
       ///      the cascades                                                   
-      ///   @attention works in all dimensions simultaneously                 
+      ///   @attention works in the dimension intersection between C's Id and 
+      ///      H's Id. Data will be allocated for all relevant dimensions,    
+      ///      but only the provided by H will be constructed!                
       ///   @attention assumes that reserved count is the same across all     
       ///      relevant dimensions                                            
       ///   @attention assumes that the same hash table is used across all    
@@ -300,7 +303,7 @@ namespace Langulus::Annies::Component
          // This hash will be truncated and used for bucketing in each  
          // cascading table.                                            
          Hash hash;
-         if constexpr (not Shared)
+         if constexpr (not Shared or not CT::Handle<H>)
             hash = HashOf(DeintCast(item));
          else
             hash = HashOf(DeintCast(item).GetKeyHandle()); //TODO this presumes the key dimension is the one the hash table is associated with
@@ -405,7 +408,9 @@ namespace Langulus::Annies::Component
       /// Table insertion function for e specific cascade level.              
       /// Doesn't move anything around, as it only seeks an empty spot that   
       /// can be easily filled.                                               
-      ///   @attention works in all dimensions simultaneously!                
+      ///   @attention works in the dimension intersection between C's Id and //TODO
+      ///      H's Id. Data will be allocated for all relevant dimensions,    
+      ///      but only the provided by H will be constructed!                
       ///   @return the offset at which item was inserted, relative to the    
       ///      current tableBeg. Returns 'reserved' if unable to insert here  
       //TODO maybe also collect data about where would be best to do the TableEmplaceForce on the way
@@ -466,7 +471,9 @@ namespace Langulus::Annies::Component
       /// Table insertion function for e specific cascade level. It will      
       /// insert at all cost, moving elements around if it has to.            
       ///   @attention assumes there's at least one free spot guaranteed!     
-      ///   @attention works in all dimensions simultaneously!                
+      ///   @attention works in the dimension intersection between C's Id and 
+      ///      H's Id. Data will be allocated for all relevant dimensions,    
+      ///      but only the provided by H will be constructed!                //TODO
       ///   @return the offset at which item was inserted, relative to the    
       ///      current tableBeg. Returns 'reserved' if unable to insert here  
       template<Cid SID = ID, CT::Intent H> requires Relevant<SID>

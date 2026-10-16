@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -13,10 +13,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.Removal<ID, SHARED...>
-
    ///                                                                        
    /// Implements removal for containers. This includes Trim, Clear, Reset    
    /// and other destruction-associated services.                             
@@ -25,6 +21,11 @@ namespace Langulus::Annies::Component
    //TODO add bool ORDER_PRESERVING as an optimization. if order is not required, we can do 'swap & pop tactic in contiguous containers for faster removal
    template<Cid ID, Cid...SHARED>
    struct Removal {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.Removal<ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;

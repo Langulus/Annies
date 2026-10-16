@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.ReserveStack<T, ID, SHARED...>
-
    ///                                                                        
    /// A dynamic reserve, stored as a member variable.                        
    /// Will increase container's stack size.                                  
@@ -23,6 +19,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED provider IDs that share the same reserve variable     
    template<class T, Cid ID, Cid...SHARED>
    struct ReserveStack : ReserveEmergent<T, ID, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.ReserveStack<T, ID, SHARED...>
+
       using StackRequest = T;
       using Id = typename ReserveEmergent<T, ID, SHARED...>::Id;
 

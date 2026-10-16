@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
+#include "Annies/Components/State-Stack.hpp"
 #include "Annies/Components/Typed-Static.hpp"
 #include "Annies/Components/Heap-Movable.hpp"
 #include "Annies/Components/Ownership-Stack.hpp"
@@ -21,6 +22,7 @@ namespace Langulus::Annies::Inner
 {
    template<class T> requires (not ::std::is_reference_v<T>)
    using TRefBase = Com::Container<
+      Com::StateStack<>,                  // Force no states            
       Com::TypedStatic<DMeta, T>,         // Statically typed           
       Com::HeapMovable<0, 0, HeapEntry<0, T*>>,
       Com::CountStatic<1u>,               // Statically sized           
@@ -104,8 +106,17 @@ namespace Langulus::Annies
       /// Assign a pointer. Respects intents.                                 
       template<class A>
       constexpr TRef& operator = (A&& pointer) noexcept {
-         if constexpr (CT::ContainsOne<A>)
-            return this->AssignAbsorb(FWDIntent(pointer));
+         if constexpr (CT::ContainsOne<A>) {
+            // It could be a handle to a sparse item                    
+            // TRef is an outlier in terms of type, because it is       
+            // a pointer only implicitly to avoid reallocation.         
+            if constexpr (Same<TypeOf<A>, T*>) {
+               // Handle mistypes here                                  
+               // Could probably be improved by copying entries         
+               return TRef::operator = (*pointer);
+            }
+            else return this->AssignAbsorb(FWDIntent(pointer));
+         }
          else {
             static_assert(CT::Sparse<A>,
                "A must be a pointer (intent is optional)");

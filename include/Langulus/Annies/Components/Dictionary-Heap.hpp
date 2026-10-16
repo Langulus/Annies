@@ -11,16 +11,17 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.DictionaryHeap<T, ID, SHARED...>
-
    ///                                                                        
    /// Serialization context as part of the heap                              
    ///   @tparam T the header type                                            
    ///   @tparam ID the heap provider(s) we will be using                     
    template<class T, Cid ID, Cid...SHARED>
    struct DictionaryHeap {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.DictionaryHeap<T, ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;

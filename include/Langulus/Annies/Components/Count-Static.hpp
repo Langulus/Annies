@@ -15,10 +15,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.CountStatic<COUNT, ID, SHARED...>
-
    ///                                                                        
    ///   A compile-time count                                                 
    ///                                                                        
@@ -34,6 +30,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED provider IDs that share the same count variable       
    template<auto COUNT, Cid ID, Cid...SHARED>
    struct CountStatic {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.CountStatic<COUNT, ID, SHARED...>
+
       using CTTI_Component  = Yup;
       using CTTI_ReflectAs  = void;
       using CTTI_Contiguous = Maybe<COUNT == 1>;

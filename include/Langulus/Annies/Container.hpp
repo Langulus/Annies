@@ -1116,7 +1116,6 @@ namespace Langulus::Annies::Component
 
       /// MARK: AssignAbsorb                                                  
       /// Call AssignFrom in all components that implement it.                
-      /// Fallback to AssignDefault otherwise.                                
       template<CT::Container LHS, CT::Container RHS>
       constexpr LHS& AssignAbsorb(this LHS& self, RHS&& rhs) {
          //TODO pinnables

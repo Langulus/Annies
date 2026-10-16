@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Annies/Container.hpp"
+#include "Annies/Components/State-Stack.hpp"
 #include "Annies/Components/Typed-Static.hpp"
 #include "Annies/Components/Stack.hpp"
 #include "Annies/Components/Count-Static.hpp"
@@ -19,6 +20,7 @@ namespace Langulus::Annies::Inner
 {
    template<CT::NotVoid T> requires CT::NotReference<T>
    using TOwnBase = Com::Container<
+      Com::StateStack<>,                  // Force stateless            
       Com::TypedStatic<DMeta, T>,         // Statically typed           
       Com::Stack<T>,                      // Element on the stack       
       Com::CountStatic<1u>,               // Statically sized           
@@ -34,6 +36,7 @@ namespace Langulus::Annies
    /// A statically typed stack-based container of size 1.                    
    /// Mainly serves to transfer values and/or pointers on move.              
    /// You can optionally add tags to it.                                     
+   ///   @attention doesn't default initialize fundamentals!                  
    template<CT::NotVoid T, class...TAGS>
    struct TOwn : Inner::TOwnBase<T> {
       using CTTI_ReflectAs = TOwn;
@@ -42,9 +45,9 @@ namespace Langulus::Annies
       using CTTI_POD       = Maybe<CT::POD<T>>;
       using Base           = Inner::TOwnBase<T>;
 
-      constexpr  TOwn() noexcept {
+      constexpr  TOwn() noexcept = default; /*{
          this->ConstructDefault();
-      }
+      }*/
 
       constexpr  TOwn(T const& source)
          : Base {Stackwise, source} {}

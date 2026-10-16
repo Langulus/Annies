@@ -13,15 +13,16 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.ChargedStack<ID>
-
    ///                                                                        
    /// MARK: Charge                                                           
    /// Carrying the four dimensions *ominous music*                           
    template<Cid ID>
    struct ChargedStack {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.ChargedStack<ID>
+
       using CTTI_ReflectAs = void;
       using CTTI_Component = Yup;
       using CTTI_Nullable  = No;

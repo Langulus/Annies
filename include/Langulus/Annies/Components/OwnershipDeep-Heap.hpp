@@ -12,10 +12,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.OwnershipDeepHeap<STYLE, REF_INDIVIDUAL, ID, SHARED...>
-
    ///                                                                        
    /// Reserves a part of the heap to keep track of sparse element's          
    /// allocations. The pointer to the array of allocations is recomputed     
@@ -43,18 +39,23 @@ namespace Langulus::Annies::Component
    ///      ownership in general. Shouldn't be used for embedded containers.  
    template<unsigned STYLE, bool REF_INDIVIDUAL, Cid ID, Cid...SHARED>
    struct OwnershipDeepHeap : OwnershipDeepEmergent<STYLE, REF_INDIVIDUAL, ID, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.OwnershipDeepHeap<STYLE, REF_INDIVIDUAL, ID, SHARED...>
+
       using HeapRequest = PerDimension<PerElement<PerIndirection<AllocationPtr>>>;
       using Id = typename OwnershipDeepEmergent<STYLE, REF_INDIVIDUAL, ID, SHARED...>::Id;
 
-      //template<Cid SID>
-      //static constexpr bool Relevant = Id::template Contains<SID>;
+      template<Cid SID>
+      static constexpr bool Relevant = Id::template Contains<SID>;
       static constexpr bool Shared   = sizeof...(SHARED) > 0;
 
       /// MARK: Public                                                        
       /// Get entry array if containing pointers                              
       ///   @attention may contain invalid data for discontiguous containers  
       ///   @return the array of entries                                      
-      template<Cid SID = ID> //requires Relevant<SID>
+      template<Cid SID = ID> requires Relevant<SID>
       auto GetEntries(this auto const& self) assumptious
       -> Allocation const* const* {
          if (self.template IsSparse<SID>() and self.template GetRaw<SID>()
@@ -65,7 +66,7 @@ namespace Langulus::Annies::Component
 
       /// Get entry array for all indirections of a specific element          
       ///   @return the array of entries                                      
-      template<Cid SID = ID, CT::Container C> requires (/*Relevant<SID> and*/ CT::Indexed<C>)
+      template<Cid SID = ID, CT::Container C> requires (Relevant<SID> and CT::Indexed<C>)
       auto GetEntriesAt(this C const& self, CT::Index auto&& idx) assumptious
       -> Allocation const* const* {
          if constexpr (CT::TypeErased<C>) {
@@ -87,17 +88,23 @@ namespace Langulus::Annies::Component
          return nullptr;
       }
 
-      auto GetKeyEntries(this auto&& self) assumptious -> AllocationPtr const* requires Shared {
+      auto GetKeyEntries(this auto&& self) assumptious
+      -> AllocationPtr const* requires Shared {
          return ThisCom::template GetEntries<Id::First>();
       }
-      auto GetValEntries(this auto&& self) assumptious -> AllocationPtr const* requires Shared {
+
+      auto GetValEntries(this auto&& self) assumptious
+      -> AllocationPtr const* requires Shared {
          return ThisCom::template GetEntries<Id::Second>();
       }
 
-      auto GetKeyEntriesAt(this auto&& self, CT::Index auto&& idx) assumptious requires Shared {
+      auto GetKeyEntriesAt(this auto&& self, CT::Index auto&& idx)
+      assumptious requires Shared {
          return ThisCom::template GetEntriesAt<Id::First>(LglsFwd(idx));
       }
-      auto GetValEntriesAt(this auto&& self, CT::Index auto&& idx) assumptious requires Shared {
+
+      auto GetValEntriesAt(this auto&& self, CT::Index auto&& idx)
+      assumptious requires Shared {
          return ThisCom::template GetEntriesAt<Id::Second>(LglsFwd(idx));
       }
 
@@ -111,7 +118,7 @@ namespace Langulus::Annies::Component
 
       /// Get entry array if containing pointers (inner)                      
       ///   @attention may be uninitialized                                   
-      template<Cid SID = ID> //requires Relevant<SID>
+      template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetEntriesInner(this auto&& self) noexcept {
          return self.template AccessHeap<OwnershipDeepHeap, SID>();
       }
@@ -119,7 +126,7 @@ namespace Langulus::Annies::Component
       /// This method is called upon allocation to nullify all entries for    
       /// a particular dimension.                                             
       ///   @attention works in one dimension at a time!                      
-      template<Cid SID = ID, CT::Container C> //requires Relevant<SID>
+      template<Cid SID = ID, CT::Container C> requires Relevant<SID>
       constexpr void ConstructHeapRequestPerDimension(this C& self) noexcept {
          auto count = 0;
          if constexpr (CT::TypeErased<C>) {

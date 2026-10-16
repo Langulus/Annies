@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component::State
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.Disowned<V, ID, SHARED...>
-
    ///                                                                        
    /// If enabled, allocations and entries will never be referenced or        
    /// dereferenced, neither at construction/destruction, nor on assignment.  
@@ -24,6 +20,11 @@ namespace Langulus::Annies::Component::State
    ///   @tparam ID, SHARED affected dimensions                               
    template<StateValue V, Cid ID, Cid...SHARED>
    struct Disowned {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.Disowned<V, ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_State     = Yup;
       using CTTI_ReflectAs = void;

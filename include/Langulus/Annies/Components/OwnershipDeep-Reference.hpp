@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -12,10 +12,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.OwnershipDeepReference<STYLE, REF_INDIVIDUAL, ID, SHARED...>
-
    ///                                                                        
    /// The pointer to the array of allocations for each element and           
    /// indirection is kept locally. Useful to carry allocation data inside    
@@ -34,6 +30,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED additional provider IDs that share the same behavior  
    template<unsigned STYLE, bool REF_INDIVIDUAL, Cid ID, Cid...SHARED>
    struct OwnershipDeepReference : OwnershipDeepEmergent<STYLE, REF_INDIVIDUAL, ID, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.OwnershipDeepReference<STYLE, REF_INDIVIDUAL, ID, SHARED...>
+
       using StackRequest = EntryPtr;
       using Id = typename OwnershipDeepEmergent<STYLE, REF_INDIVIDUAL, ID, SHARED...>::Id;
 

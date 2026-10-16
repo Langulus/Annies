@@ -13,10 +13,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.HeapMovable<INITIAL_SIZE, GROWTH_FACTOR, ENTRY0, ENTRYN...>
-
    ///                                                                        
    /// Interfaces a heap. Adds a member that points to the heap memory.       
    /// The heap is allowed to move on reallocation.                           
@@ -33,6 +29,11 @@ namespace Langulus::Annies::Component
    ///      including support for packed pointers.                            
    template<unsigned INITIAL_SIZE, unsigned GROWTH_FACTOR, CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
    struct HeapMovable : HeapReference<ENTRY0, ENTRYN...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.HeapMovable<INITIAL_SIZE, GROWTH_FACTOR, ENTRY0, ENTRYN...>
+
       using Id = typename HeapReference<ENTRY0, ENTRYN...>::Id;
       using HeapProvider = Id;
 
@@ -408,7 +409,7 @@ namespace Langulus::Annies::Component
             size_t indirections;
             if constexpr (CT::TypeErased<C>) {
                const auto T = self.template GetType<i>();
-               LglsAssumeDev((bool) T, "Requesting allocation size for an untyped container");
+               LglsAssumeDev(T, "Requesting allocation size for an untyped container");
                to_footer = Align(to_footer, T.GetAlignment());
                to_footer += reserved * T.GetSize();
                indirections = T.GetIndirections();
@@ -443,7 +444,7 @@ namespace Langulus::Annies::Component
          Id::ForEach([&self,&to_footer,&reserved]<Cid i>{
             if constexpr (CT::TypeErased<C>) {
                const auto T = self.template GetType<i>();
-               LglsAssumeDev((bool) T, "Requesting allocation size for an untyped container");
+               LglsAssumeDev(T, "Requesting allocation size for an untyped container");
                to_footer = Align(to_footer, T.GetAlignment());
                to_footer += reserved * T.GetSize();
             }

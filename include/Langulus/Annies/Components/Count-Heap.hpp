@@ -14,10 +14,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.CountHeap<T, ID, SHARED...>
-
    ///                                                                        
    /// Defines count as a part of the heap                                    
    /// Count shows how many elements inside a container are initialized       
@@ -30,6 +26,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED provider IDs that share the same count variable       
    template<class T, Cid ID, Cid...SHARED>
    struct CountHeap {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.CountHeap<T, ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id = Values<ID, SHARED...>;

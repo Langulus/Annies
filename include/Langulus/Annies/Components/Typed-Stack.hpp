@@ -22,10 +22,6 @@ namespace Langulus::Annies
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.TypedStack<META, TYPE, CONSTRAIN, ID>
-
    ///                                                                        
    /// Defines the contained type as a member variable, allowing the use of   
    /// type-erasure. You can optionally constrain the type at runtime.        
@@ -38,6 +34,11 @@ namespace Langulus::Annies::Component
    ///   @tparam ID data provider that gets typed                             
    template<class META, class TYPE, bool CONSTRAIN, Cid ID>
    struct TypedStack : State::Typed<StateValueIf(CONSTRAIN or not ::std::is_void_v<TYPE>), ID> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.TypedStack<META, TYPE, CONSTRAIN, ID>
+
       using CTTI_Component = Yup;
       using CTTI_Typed     = TYPE;
       using CTTI_ReflectAs = void;

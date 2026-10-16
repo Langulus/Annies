@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,10 +11,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.Stack<T, ID>
-
    ///                                                                        
    /// Adds a variable to a container. Supports references.                   
    /// Increases the container's bytesize.                                    
@@ -23,6 +19,11 @@ namespace Langulus::Annies::Component
    ///      All stack/heap providers must have unique sequential IDs.         
    template<CT::NotVoid T, Cid ID>
    struct Stack {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.Stack<T, ID>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using StackRequest   = T;

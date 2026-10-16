@@ -18,10 +18,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.Assignment<CONVERT, ID, SHARED...>
-
    ///                                                                        
    /// Implements element assignment for containers.                          
    /// Assignment acts on the first element, if container is contiguous.      
@@ -34,6 +30,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED other providers that share assignment behavior        
    template<bool CONVERT, Cid ID, Cid...SHARED>
    struct Assignment {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.Assignment<CONVERT, ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;

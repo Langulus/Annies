@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -17,10 +17,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.HeapReference<ENTRY0, ENTRYN...>
-
    ///                                                                        
    /// Adds a variable to a container that only references a remote heap.     
    /// No allocation interface is provided.                                   
@@ -34,6 +30,11 @@ namespace Langulus::Annies::Component
    ///      variable on the stack.                                            
    template<CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
    struct HeapReference {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.HeapReference<ENTRY0, ENTRYN...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ENTRY0::Id, ENTRYN::Id...>;
@@ -148,7 +149,7 @@ namespace Langulus::Annies::Component
             void* heap = DecvqAllCast(ThisCom::template GetRaw<SID>());
       
             const auto T = self.template GetType<SID>();
-            LglsAssumeDev((bool) T, "Block is not typed");
+            LglsAssumeDev(T, "Block is not typed");
 
             if constexpr (CT::Void<AS>) {
                // Unknown type, just return the heap pointer            
@@ -418,7 +419,7 @@ namespace Langulus::Annies::Component
             if constexpr (CT::TypeErased<C>) {
                // Check for reflected minimal allocation at runtime     
                const auto T = self.template GetType<Id::First>();
-               LglsAssumeDev((bool) T, "Requesting allocation size for an untyped container");
+               LglsAssumeDev(T, "Requesting allocation size for an untyped container");
                total += reserve * T.GetSize();
                total += C::template DefineHeapFooter<Id::First>(reserve, T.GetIndirections());
             }
@@ -436,7 +437,7 @@ namespace Langulus::Annies::Component
             if constexpr (CT::TypeErased<C>) {
                // Check for reflected minimal allocation at runtime     
                const auto T = self.template GetType<Id::First>();
-               LglsAssumeDev((bool) T, "Requesting allocation size for an untyped container");
+               LglsAssumeDev(T, "Requesting allocation size for an untyped container");
                const auto size = T.GetSize();
                size_t for_T = ::std::max(reserve * size, static_cast<size_t>(T.GetMinAllocation()));
                reserve = for_T / size;
@@ -455,7 +456,7 @@ namespace Langulus::Annies::Component
          Values<ENTRYN::Id...>::ForEach([&]<Cid i>{
             if constexpr (CT::TypeErased<C>) {
                const auto T = self.template GetType<i>();
-               LglsAssumeDev((bool) T, "Requesting allocation size for an untyped container");
+               LglsAssumeDev(T, "Requesting allocation size for an untyped container");
                total = Align(total, T.GetAlignment());
                total += reserve * T.GetSize();
                total += C::template DefineHeapFooter<i>(reserve, T.GetIndirections());

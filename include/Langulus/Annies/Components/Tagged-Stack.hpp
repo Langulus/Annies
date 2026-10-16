@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -19,10 +19,6 @@ namespace Langulus::Annies
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.TaggedStack<META, TYPE, CONSTRAIN, ID>
-
    ///                                                                        
    /// Defines the contained tag as a member variable, allowing the use of    
    /// tag-erasure. You can optionally constrain the tag at runtime.          
@@ -35,6 +31,11 @@ namespace Langulus::Annies::Component
    ///   @tparam ID data provider that gets tagged                            
    template<class META, class TYPE, bool CONSTRAIN, Cid ID>
    struct TaggedStack : State::Tagged<StateValueIf(CONSTRAIN or not ::std::is_void_v<TYPE>), ID> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.TaggedStack<META, TYPE, CONSTRAIN, ID>
+
       using CTTI_Component = Yup;
       using CTTI_Tagged    = TYPE;
       using CTTI_ReflectAs = void;

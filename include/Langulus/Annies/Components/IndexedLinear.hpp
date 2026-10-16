@@ -13,10 +13,6 @@
 
 namespace Langulus::Annies::Component
 {
-   /// Refers back to this particular component instance through the deduced  
-   /// 'this'. Just for convenience. It is #undef-ed at the end of this file. 
-   #define ThisCom self.IndexedLinear<ID, SHARED...>
-
    ///                                                                        
    /// Provides random element access based on a linear index, that is        
    /// mapped directly onto contiguous memory.                                
@@ -24,6 +20,11 @@ namespace Langulus::Annies::Component
    ///   @tparam SHARED providers that share the same indexing scheme         
    template<Cid ID, Cid...SHARED>
    struct IndexedLinear : IndexedCommon<ID, SHARED...> {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.IndexedLinear<ID, SHARED...>
+
       using CTTI_Contiguous  = Yup;
       using IteratorCategory = ::std::contiguous_iterator_tag;
 
@@ -105,13 +106,7 @@ namespace Langulus::Annies::Component
          }
       }
       
-      /// Select a contiguous region from the memory block. Unsafe and may    
-      /// return memory that has not been initialized yet! The resulting      
-      /// data will be disowned.                                              
-      ///   @attention assumes container is typed and allocated               
-      ///   @param start starting element index (included)                    
-      ///   @param count number of sequential elements                        
-      ///   @return the selected disowned contiguous range                    
+      /// Inner selection helper                                              
       template<CT::Container C>
       auto SelectInner(this C&& self, size_t start, size_t count) assumptious -> Decay<C> {
          LglsAssumeDev(self.GetRaw(),  "Block is not allocated");
@@ -127,18 +122,29 @@ namespace Langulus::Annies::Component
          return result;
       }
 
-      /// Same as above, but implies that count is the remainder              
-      ///   @param start starting element index (included)                    
-      ///   @return the selected disowned contiguous range                    
+      /// Inner selection helper                                              
       template<CT::Container C>
       auto SelectInner(this C&& self, size_t start) assumptious -> Decay<C> {
          return ThisCom::SelectInner(start, self.GetCount() - start);
       }
 
    public:
+      /// Get the "mode" of the container - the position of the first element 
+      /// that repeats most throughout the container.                         
+      ///   @param count [out] the bumber of occurences                       
+      ///   @return the offset at which the element was first found. If there 
+      ///      are multiple modes in the container, return the position of    
+      ///      the first that's encountered.                                  
       template<CT::Container C>
-      auto GetFirstMostOccuring(this C const&, size_t&) assumptious -> size_t;
+      auto GetFirstMostOccuring(this C const&, size_t& count) assumptious -> size_t;
 
+      /// Select a contiguous region from the memory block. Unsafe and may    
+      /// return memory that has not been initialized yet! The resulting      
+      /// data will be disowned.                                              
+      ///   @attention assumes container is typed and allocated               
+      ///   @param start starting element index (included)                    
+      ///   @param count number of sequential elements                        
+      ///   @return the selected disowned contiguous range                    
       template<CT::Container C>
       auto Select(this C&& self, CT::Index auto&& start, CT::Index auto&& count) assumptious -> Decay<C> {
          const size_t begin = ThisCom::SimplifyIndex(LglsFwd(start));
@@ -146,8 +152,20 @@ namespace Langulus::Annies::Component
          return ThisCom::SelectInner(begin, size);
       }
 
+      /// Same as above, but implies that count is the remainder              
+      ///   @param start starting element index (included)                    
+      ///   @return the selected disowned contiguous range                    
       template<CT::Container C>
-      void SwapContentsAt(this C&, CT::Index auto&&, CT::Index auto&&) assumptious;
+      auto Select(this C&& self, CT::Index auto&& start) assumptious -> Decay<C> {
+         const size_t begin = ThisCom::SimplifyIndex(LglsFwd(start));
+         const size_t size  = self.GetCount() - begin;
+         return ThisCom::SelectInner(begin, size);
+      }
+
+      /// Swap the contents at two places inside this container               
+      ///   @param p1, p2 the places to swap                                  
+      template<CT::Container C>
+      void SwapContentsAt(this C&, CT::Index auto&& p1, CT::Index auto&& p2) assumptious;
    
       /// Remove elements from the left side of an offset                     
       ///   @param offset the number of elements to discard from the front    
