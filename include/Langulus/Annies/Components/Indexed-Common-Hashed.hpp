@@ -67,8 +67,7 @@ namespace Langulus::Annies::Component
       /// lower tables first. Some fragmentation might occur when items       
       /// are removed, but this shouldn't cause any harm. Worst case is, the  
       /// map would perform as bad as a conventional one. :)                  
-      ///   Some ideas were extracted from here:                              
-      ///      https://arxiv.org/pdf/2501.02305                               
+      ///   Some ideas were extracted from: https://arxiv.org/pdf/2501.02305  
       template<CT::Container C>
       constexpr auto BrowseTable(this C const& self, Count<C> index) assumptious -> Count<C> {
          LglsAssumeDev(self.GetReserved(),       "Invalid reserve");
@@ -428,9 +427,13 @@ namespace Langulus::Annies::Component
             // Optimal path - the first bucket spot is already empty    
             auto absolute_idx = table - self.template GetHashTableInner<SID>();
             auto handle = self.GetHandle().ForceMutable() + absolute_idx;
-            Id::ForEach([&handle,&item]<Cid D>{
-               handle.template EmplaceWithIntent<D>(LglsFwd(item));
-            });
+            if constexpr (not Shared or not CT::Handle<H>)
+               handle.template EmplaceWithIntent<SID>(LglsFwd(item));
+            else {
+               Id::ForEach([&handle,&item]<Cid D>{
+                  handle.template EmplaceWithIntent<D>(LglsFwd(item));
+               });
+            }
             
             *table = 1;
             return start;
@@ -459,9 +462,13 @@ namespace Langulus::Annies::Component
          // If reached, then empty slot found, so put the value there   
          auto absolute_idx = table - self.template GetHashTableInner<SID>();
          auto handle = self.GetHandle().ForceMutable() + absolute_idx;
-         Id::ForEach([&handle,&item]<Cid D>{
-            handle.template EmplaceWithIntent<D>(LglsFwd(item));
-         });
+         if constexpr (not Shared or not CT::Handle<H>)
+            handle.template EmplaceWithIntent<SID>(LglsFwd(item));
+         else {
+            Id::ForEach([&handle,&item]<Cid D>{
+               handle.template EmplaceWithIntent<D>(LglsFwd(item));
+            });
+         }
          
          *table = attempts;
          return table - tableBeg;
@@ -490,9 +497,13 @@ namespace Langulus::Annies::Component
             // No swapping will happen                                  
             auto absolute_idx = table - self.template GetHashTableInner<SID>();
             auto handle = self.GetHandle().ForceMutable() + absolute_idx;
-            Id::ForEach([&handle,&item]<Cid D>{
-               handle.template EmplaceWithIntent<D>(LglsFwd(item));
-            });
+            if constexpr (not Shared or not CT::Handle<H>)
+               handle.template EmplaceWithIntent<SID>(LglsFwd(item));
+            else {
+               Id::ForEach([&handle,&item]<Cid D>{
+                  handle.template EmplaceWithIntent<D>(LglsFwd(item));
+               });
+            }
             
             *table = 1;
             return start;
@@ -502,7 +513,12 @@ namespace Langulus::Annies::Component
          const auto tableEnd = tableBeg + reserved;
          auto handle = self.GetHandle().ForceMutable()
                      + (tableBeg - self.template GetHashTableInner<SID>());
-         auto swapper = self.CreateSwapper(LglsFwd(item));
+         auto swapper = self.CreateSwapper(LglsFwd(item)); //TODO unfortunately, this is a bit suboptimal, 
+                                                           //TODO because we have to default-initialize all 
+                                                           //TODO the uncovered dimensions in order to swap. 
+                                                           //TODO happens relatively rarely though. 
+                                                           //TODO what's more important, is that it poses risk of not freeing some default-allocated heap data
+                                                           //TODO when we initialize these same dimensions from outside on top of those
          auto swapper_handle = swapper.GetHandle();
          TableType attempts = 1;
          auto insertedAt = reserved;

@@ -614,7 +614,7 @@ namespace Langulus::Annies::Component
                if constexpr (IsLocalFooterRequest<R> and C::Id::template Contains<SID>) {
                   //if constexpr (R::AllocatedPerDimension) {
                      bytesize += sizeof(TypeOf<R>)
-                        * (R::AllocatedPerElement     ? count      : 1)
+                        * (R::AllocatedPerElement     ? count / R::AllocatedPerElement : 1)
                         * (R::AllocatedPerIndirection ? indirects  : 1);
                   //}
                }
@@ -646,7 +646,7 @@ namespace Langulus::Annies::Component
                if constexpr (IsLocalFooterRequest<R> and C::Id::template Contains<SID>) {
                   //if constexpr (R::AllocatedPerDimension) {
                      offset += sizeof(TypeOf<R>)
-                        * (R::AllocatedPerElement     ? count     : 1)
+                        * (R::AllocatedPerElement     ? count / R::AllocatedPerElement : 1)
                         * (R::AllocatedPerIndirection ? indirects : 1);
                   //}
                }
@@ -707,7 +707,7 @@ namespace Langulus::Annies::Component
                      using PROVIDER  = typename decltype(FindProvider<SID>())::First;
                      using INTERSECT = C::Id::template Intersect<typename PROVIDER::Id>;
                      if constexpr (not INTERSECT::Empty)
-                        bytesize += sizeof(TypeOf<R>) * (R::AllocatedPerElement ? count : 1);
+                        bytesize += sizeof(TypeOf<R>) * (R::AllocatedPerElement ? count / R::AllocatedPerElement : 1);
                   //}
                }
             }
@@ -742,7 +742,7 @@ namespace Langulus::Annies::Component
                      using PROVIDER  = typename decltype(FindProvider<SID>())::First;
                      using INTERSECT = C::Id::template Intersect<typename PROVIDER::Id>;
                      if constexpr (not INTERSECT::Empty)
-                        offset += sizeof(TypeOf<R>) * (R::AllocatedPerElement ? count : 1);
+                        offset += sizeof(TypeOf<R>) * (R::AllocatedPerElement ? count / R::AllocatedPerElement : 1);
                   //}
                }
                return No {};

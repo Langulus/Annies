@@ -417,7 +417,7 @@ namespace Verbs
 
 struct ImplicitlyReflectedData {
    using CTTI_POD = true;
-   LANGULUS(FILES) "ASE";
+   using CTTI_Files = Yes<"ASE";
 
    enum Named {One, Two, Three};
    LANGULUS_NAMED_VALUES(One, Two, Three);
@@ -453,7 +453,7 @@ public:
 
    using CTTI_Named = Yes<"MyType";
    LANGULUS(INFO) "Info about MyType";
-   LANGULUS(FILES) "txt, pdf";
+   using CTTI_Files = Yes<"txt, pdf";
    LANGULUS(VERSION_MAJOR) 2;
    LANGULUS(VERSION_MINOR) 1;
    LANGULUS(DEEP) true;

@@ -160,14 +160,14 @@ namespace Langulus::Annies
       }
 
       /// Set source                                                          
-      TVerb& In(auto&&...arguments) {
+      auto In(auto&&...arguments) -> TVerb& {
          mContext = Many {LglsFwd(arguments)...};
          return *this;
       }
       
       /// Set arguments                                                       
       template<class...A>
-      TVerb& SetArgument(A&&...arguments) {
+      auto SetArgument(A&&...arguments) -> TVerb& {
          if constexpr (sizeof...(A) == 1) {
             if constexpr (((CT::DeepDense<Deint<A>> and not CT::Executable<Deint<A>>) and ...))
                this->Absorb(LglsFwd(arguments)...);
@@ -179,7 +179,7 @@ namespace Langulus::Annies
       }
 
       // Set output                                                           
-      TVerb& SetOutput(auto&&...arguments) {
+      auto SetOutput(auto&&...arguments) -> TVerb& {
          mOutput = Many {LglsFwd(arguments)...};
          return *this;
       }
@@ -223,7 +223,7 @@ namespace Langulus::Annies
       void Done() noexcept;
 
       /// Reset progress by marking verb as undone and zeroing output         
-      TVerb& Clear() noexcept {
+      auto Clear() noexcept -> TVerb& {
          mSuccesses = 0;
          mOutput.Reset();
          return *this;
@@ -254,6 +254,21 @@ namespace Langulus::Annies
       constexpr auto operator ^= (const Real& scalar) noexcept -> TVerb& {
          GetCharge() ^= scalar;
          return *this;
+      }
+
+      /// Multiply verb charges                                               
+      ///   @param rhs the mass to multiply by                                
+      ///   @return a new verb, with the modified mass                        
+      auto operator * (CT::Executable auto const& rhs) const -> TVerb {
+         TVerb shallowCopy = *this;
+         shallowCopy.mMass *= rhs.mMass;
+         shallowCopy.mTime += rhs.mTime;
+
+         if (not shallowCopy.mRate and rhs.mRate)
+            shallowCopy.mRate = rhs.mRate;
+         else if (shallowCopy.mRate and rhs.mRate)
+            shallowCopy.mRate *= rhs.mRate;
+         return shallowCopy;
       }
 
       /// MARK: Removal                                                       

@@ -102,7 +102,8 @@ namespace Langulus::Annies::Component
    enum IndexingStyle {
       NotIndexed = 0,
       IndexedLinearly = 1,
-      IndexedTable = 2
+      IndexedTable = 2,
+      IndexedCoverage = 3
    };
 
    constexpr unsigned WeakOwnership   = OnAssign;
@@ -301,7 +302,7 @@ namespace Langulus::Annies
       /// Checks for either IsLocalFooterRequest or IsGlobalFooterRequest     
       template<class T>
       concept IsFooterRequest = IsRequestModifier<T>
-          and (T::AllocatedPerElement or T::AllocatedPerIndirection);
+          and (T::AllocatedPerElement > 0 or T::AllocatedPerIndirection);
 
       /// Local footers are placed immediately after data, so they are easily 
       /// transferrable by a single pointer when absorbing containers.        
@@ -318,7 +319,7 @@ namespace Langulus::Annies
 
       /// Helper for propagating modifiers. Undefined after no longer used.   
       #define propagate_modifier(a) \
-         static constexpr bool a = [] { \
+         static constexpr auto a = [] { \
             if constexpr (IsRequestModifier<T>) return T::a; \
             else return false; \
          }()
@@ -346,7 +347,8 @@ namespace Langulus::Annies
       ///      elements __of the specific dimension__ in order to avoid moving
       ///      elements when heap is resized. Data remains relative to the    
       ///      heap origin for the particular dimension.                      
-      template<class T>
+      ///   @tparam ON_EVERY this amount of count equals one element          
+      template<class T, size_t ON_EVERY = 1>
       struct PerElement {
          using CTTI_ReflectAs = void;
          using CTTI_Typed     = Tif<IsRequestModifier<T>, TypeOf<T>, T>;
@@ -358,8 +360,8 @@ namespace Langulus::Annies
             "PerDimension<PerElement<PerIndirection>>"
          );
 
-         static constexpr bool AllocatedPerDimension = false;
-         static constexpr bool AllocatedPerElement   = true;
+         static constexpr bool   AllocatedPerDimension = false;
+         static constexpr size_t AllocatedPerElement   = ON_EVERY;
          propagate_modifier(AllocatedPerIndirection);
       };
 
@@ -381,9 +383,9 @@ namespace Langulus::Annies
             "PerDimension<PerElement<PerIndirection>>"
          );
 
-         static constexpr bool AllocatedPerDimension   = false;
-         static constexpr bool AllocatedPerElement     = false;
-         static constexpr bool AllocatedPerIndirection = true;
+         static constexpr bool   AllocatedPerDimension   = false;
+         static constexpr size_t AllocatedPerElement     = 0;
+         static constexpr bool   AllocatedPerIndirection = true;
       };
 
       #undef propagate_modifier
@@ -521,6 +523,10 @@ namespace Langulus::Annies
       template<Cid = 0, class H = Hash, Cid...> struct IndexedHashStack;
       #define LglsComIndexedHashStack(modifier) \
          template<Cid, class, Cid...> modifier struct IndexedHashStack
+
+      template<Cid = 0, Cid...> struct IndexedCoverageStack;
+      #define LglsComIndexedCoverageStack(modifier) \
+         template<Cid, Cid...> modifier struct IndexedCoverageStack
 
       /// Iteration                                                           
       template<Cid = 0, Cid...> struct IterationForEach;

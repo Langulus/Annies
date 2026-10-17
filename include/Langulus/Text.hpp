@@ -419,7 +419,8 @@ namespace Langulus::Annies
       /// Same as above, but generates token from reflected T                 
       template<class T>
       static Text Mention(T const& instance) {
-         auto token = RTTI::Registry::GetShortestUnambiguousToken(MetaOf<Decay<T>>().GetDefinition());
+         auto meta = MetaOf<Decay<T>>().GetDefinition();
+         auto token = RTTI::Registry::GetShortestUnambiguousToken(meta);
          return Mention(token, instance);
       }
 
