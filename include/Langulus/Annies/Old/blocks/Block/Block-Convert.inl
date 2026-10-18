@@ -48,7 +48,7 @@ namespace Langulus::Annies
             }
          }         
       }
-      else if (IsSimilar(out)) {
+      else if (IsSame(out)) {
          // Types are already the same, don't convert anything          
          if (out.IsEmpty())
             out = *this;
@@ -476,7 +476,7 @@ namespace Langulus::Annies
 
       if constexpr (TypeErased) {
          if constexpr (RULE::sMatch == Serial::Exact) {
-            if (not IsSimilar<Type>())
+            if (not IsSame<Type>())
                return 0;
          }
          else if constexpr (RULE::sMatch == Serial::BasedOn) {
@@ -773,7 +773,7 @@ namespace Langulus::Annies
          "THIS isn't a byte container");
       static_assert(OUT::TypeErased or CT::TypeErased<NEXT>
          or CT::Similar<TypeOf<OUT>, NEXT>, "Type mismatch");
-      LglsAssumeDev(IsSimilar<Byte>(),
+      LglsAssumeDev(IsSame<Byte>(),
          "THIS isn't a byte container");
 
       size_t deserializedCount = 0;
@@ -807,7 +807,7 @@ namespace Langulus::Annies
          // We have predictable data                                    
          // In this case, 'to' should already be allocated and known    
          if constexpr (not CT::SameAsOneOf<T, RTTI::Base, RTTI::Member>) {
-            LglsAssumeDev(to.template IsSimilar<T>(),
+            LglsAssumeDev(to.template IsSame<T>(),
                "Bad binary deserializing block type: ",
                to.GetType(), " instead of ", MetaDataOf<T>()
             );
@@ -930,7 +930,7 @@ namespace Langulus::Annies
             if constexpr (CT::TypeErased<T>)
                to.New(deserializedCount);
 
-            if (to.template IsSimilar<Tag>()) {
+            if (to.template IsSame<Tag>()) {
                // Each trait can be different                           
                to.ForEach([&](Tag& trait) {
                   TMeta ttype;

@@ -239,8 +239,8 @@ namespace Langulus::Annies
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
    TEMPLATE() template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
-   constexpr bool TABLE()::IsSimilar() const noexcept {
-      return BlockSet::IsSimilar<TSet, T1, TN...>();
+   constexpr bool TABLE()::IsSame() const noexcept {
+      return BlockSet::IsSame<TSet, T1, TN...>();
    }
    
    /// Check if value type loosely matches a given type, ignoring             
@@ -248,8 +248,8 @@ namespace Langulus::Annies
    ///   @param meta - the type to check for                                  
    ///   @return true if this set contains similar value data                 
    TEMPLATE() LANGULUS(INLINED)
-   bool TABLE()::IsSimilar(DMeta meta) const noexcept {
-      return BlockSet::IsSimilar<TSet>(meta);
+   bool TABLE()::IsSame(DMeta meta) const noexcept {
+      return BlockSet::IsSame<TSet>(meta);
    }
 
    /// Check if value type is exactly as one of the listed types,             

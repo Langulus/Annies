@@ -62,7 +62,7 @@ void Any_Helper_TestType(auto const& any) {
    REQUIRE      (any.IsTyped());
    REQUIRE_FALSE(any.IsUntyped());
    REQUIRE      (any.GetType() == MetaDataOf<E>());
-   REQUIRE      (any.GetType()->template IsSimilar<const E>());
+   REQUIRE      (any.GetType()->template IsSame<const E>());
    REQUIRE      (any.GetType()->template IsExact<E>());
    REQUIRE      (any.GetType()->template Is<E*>());
    REQUIRE      (any.IsDense() == CT::Dense<E>);

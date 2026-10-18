@@ -139,7 +139,7 @@ namespace Langulus::Annies
       }
       else {
          LglsAssumeDev(
-            mKeys.IsSimilar<K_ALT>() or (CT::Sparse<K_ALT> and mKeys.IsSparse()),
+            mKeys.IsSame<K_ALT>() or (CT::Sparse<K_ALT> and mKeys.IsSparse()),
             "Key type ", MetaDataOf<K_ALT>(), " differs from contained type ", mKeys.GetType(),
             ", hash integrity is compromised "
          );
@@ -154,7 +154,7 @@ namespace Langulus::Annies
    LANGULUS(INLINED)
    size_t BlockMap::GetBucketUnknown(size_t mask, const Block<>& key) const IF_UNSAFE(noexcept) {
       LglsAssumeDev(
-         mKeys.IsSimilar(key.GetType()) or (key.IsSparse() and mKeys.IsSparse()),
+         mKeys.IsSame(key.GetType()) or (key.IsSparse() and mKeys.IsSparse()),
          "Key type ", key.GetType(), " differs from contained type ", mKeys.GetType(),
          ", hash integrity is compromised "
       );

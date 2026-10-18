@@ -71,7 +71,7 @@ namespace Langulus::Annies
          // Undefined/abstract containers can mutate freely             
          SetType<false, THIS>(meta);
       }
-      else if (mKeys.mType->IsSimilar(meta)) {
+      else if (mKeys.mType->IsSame(meta)) {
          // No need to mutate - types are compatible                    
          return false;
       }
@@ -119,8 +119,8 @@ namespace Langulus::Annies
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if value type is similar to at least one of the types   
    template<CT::Set THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
-   constexpr bool BlockSet::IsSimilar() const noexcept {
-      return GetValues<THIS>().template IsSimilar<T1, TN...>();
+   constexpr bool BlockSet::IsSame() const noexcept {
+      return GetValues<THIS>().template IsSame<T1, TN...>();
    }
    
    /// Check if value type loosely matches a given type, ignoring             
@@ -128,8 +128,8 @@ namespace Langulus::Annies
    ///   @param meta - the type to check for                                  
    ///   @return true if this set contains similar value data                 
    template<CT::Set THIS> LANGULUS(INLINED)
-   bool BlockSet::IsSimilar(DMeta meta) const noexcept {
-      return GetValues<THIS>().IsSimilar(meta);
+   bool BlockSet::IsSame(DMeta meta) const noexcept {
+      return GetValues<THIS>().IsSame(meta);
    }
 
    /// Check if value type is exactly as one of the listed types,             
@@ -162,7 +162,7 @@ namespace Langulus::Annies
       }
       else {
          // Dynamic type check                                          
-         return GetValues<THIS>().IsSimilar(other.GetType());
+         return GetValues<THIS>().IsSame(other.GetType());
       }
    }
 

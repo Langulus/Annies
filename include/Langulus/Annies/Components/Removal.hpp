@@ -9,6 +9,7 @@
 #include "../Container.hpp"
 #include "Langulus/Assume.hpp"
 #include <Langulus/CT/Index.hpp>
+#include <Langulus/CT/NullTerminated.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -18,6 +19,8 @@ namespace Langulus::Annies::Component
    /// and other destruction-associated services.                             
    ///   @tparam ID provider we're removing from                              
    ///   @tparam SHARED additional providers we're removing from              
+   ///   @attention this component will append a silent zero byte after each  
+   ///      modification of the container, if container is CT::NullTerminated.
    //TODO add bool ORDER_PRESERVING as an optimization. if order is not required, we can do 'swap & pop tactic in contiguous containers for faster removal
    template<Cid ID, Cid...SHARED>
    struct Removal {
@@ -86,6 +89,8 @@ namespace Langulus::Annies::Component
             self.Swap(shallow_clone);
          }
 
+         if constexpr (CT::NullTerminated<C>)
+            memset((self.GetHandle() + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
          return removed;
       }
 
@@ -167,11 +172,10 @@ namespace Langulus::Annies::Component
             self.Swap(shallow_clone);
          }
 
+         if constexpr (CT::NullTerminated<C>)
+            memset((self.GetHandle() + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
          return count;
       }
-
-      template<CT::ContainsMany C>
-      auto EraseIt(this C&, Iterator<C> const&, size_t = 1) -> Iterator<C>;
       
       template<CT::ContainsMany C>
       auto EraseDeepAt(this C&, CT::Index auto&&) -> size_t;
@@ -190,12 +194,22 @@ namespace Langulus::Annies::Component
          if constexpr (C::TypeErased) {
             if (not self.GetType().GetDestructor()) {
                self.SetCount(desiredCount);
+
+               if constexpr (CT::NullTerminated<C>) {
+                  if (desiredCount)
+                     memset((self.GetHandle() + desiredCount).GetRaw(), 0, 1);
+               }
                return;
             }
          }
          else {
             if constexpr (not CT::Destroyable<TypeOf<C>>) {
                self.SetCount(desiredCount);
+
+               if constexpr (CT::NullTerminated<C>) {
+                  if (desiredCount)
+                     memset((self.GetHandle() + desiredCount).GetRaw(), 0, 1);
+               }
                return;
             }
          }
@@ -206,8 +220,13 @@ namespace Langulus::Annies::Component
          LglsAssert(self.GetAllocation()->GetUses() != 1,
             "Can't trim container used elsewhere");
 
-         self.SelectInner(desiredCount, currentCount - desiredCount).FreeInner();
+         self.SelectInner(desiredCount, currentCount - desiredCount).FreeInner(); //TODO doesn't select disown? if so, will FreeInner work? if not, maybe we need HandleRange?
          self.SetCount(desiredCount);
+
+         if constexpr (CT::NullTerminated<C>) {
+            if (desiredCount)
+               memset((self.GetHandle() + desiredCount).GetRaw(), 0, 1);//TODO bit farfetched, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
+         }
       }
 
       template<CT::ContainsMany C>

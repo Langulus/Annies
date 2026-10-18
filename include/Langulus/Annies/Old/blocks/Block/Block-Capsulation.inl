@@ -540,7 +540,7 @@ namespace Langulus::Annies
    template<class TYPE> LANGULUS(INLINED)
    constexpr bool Block<TYPE>::IsConcatable(const CT::Block auto& other) const noexcept {
       return not IsStatic() and not IsConstant()
-         and CanFitState(other) and IsSimilar(other);
+         and CanFitState(other) and IsSame(other);
    }
 
    /// Check if a type can be inserted to this block                          

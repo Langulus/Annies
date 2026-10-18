@@ -40,9 +40,9 @@ namespace Langulus::Annies
          mKeys.mType = MetaDataOf<typename THIS::Key>();
          mValues.mType = MetaDataOf<typename THIS::Value>();
 
-         LANGULUS_ASSERT(mKeys.mType->IsSimilar(key), Mutate,
+         LANGULUS_ASSERT(mKeys.mType->IsSame(key), Mutate,
             "Can't mutate to incompatible key");
-         LANGULUS_ASSERT(mValues.mType->IsSimilar(value), Mutate,
+         LANGULUS_ASSERT(mValues.mType->IsSame(value), Mutate,
             "Can't mutate to incompatible value");
       }
       else {
@@ -96,7 +96,7 @@ namespace Langulus::Annies
    ///   @return true if key type is similar to at least one of the types     
    template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsKeySimilar() const noexcept {
-      return GetKeys<THIS>().template IsSimilar<T1, TN...>();
+      return GetKeys<THIS>().template IsSame<T1, TN...>();
    }
 
    /// Check if key type loosely matches a given type, ignoring               
@@ -105,7 +105,7 @@ namespace Langulus::Annies
    ///   @return true if this map contains similar key data                   
    template<CT::Map THIS> LANGULUS(INLINED)
    bool BlockMap::IsKeySimilar(DMeta meta) const noexcept {
-      return GetKeys<THIS>().IsSimilar(meta);
+      return GetKeys<THIS>().IsSame(meta);
    }
    
    /// Check if key type is exactly as one of the listed types,               
@@ -150,7 +150,7 @@ namespace Langulus::Annies
    ///   @return true if value type is similar to at least one of the types   
    template<CT::Map THIS, CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
    constexpr bool BlockMap::IsValueSimilar() const noexcept {
-      return GetVals<THIS>().template IsSimilar<T1, TN...>();
+      return GetVals<THIS>().template IsSame<T1, TN...>();
    }
 
    /// Check if value type loosely matches a given type, ignoring             
@@ -159,7 +159,7 @@ namespace Langulus::Annies
    ///   @return true if this map contains similar value data                 
    template<CT::Map THIS> LANGULUS(INLINED)
    bool BlockMap::IsValueSimilar(DMeta meta) const noexcept {
-      return GetVals<THIS>().IsSimilar(meta);
+      return GetVals<THIS>().IsSame(meta);
    }
    
    /// Check if value type is exactly as one of the listed types,             
@@ -193,8 +193,8 @@ namespace Langulus::Annies
       }
       else {
          // Dynamic type check                                          
-         return mKeys.IsSimilar(other.GetKeyType())
-            and mValues.IsSimilar(other.GetValueType());
+         return mKeys.IsSame(other.GetKeyType())
+            and mValues.IsSame(other.GetValueType());
       }
    }
 
@@ -211,8 +211,8 @@ namespace Langulus::Annies
       }
       else {
          // Dynamic type check                                          
-         return mKeys.IsSimilar(other.GetKeyType())
-            and mValues.IsSimilar(other.GetValueType());
+         return mKeys.IsSame(other.GetKeyType())
+            and mValues.IsSame(other.GetValueType());
       }
    }
 

@@ -141,7 +141,7 @@ namespace Langulus::Annies
 
       if constexpr (CT::Typed<THIS>) {
          IF_SAFE(using K = TypeOf<THIS>);
-         LglsAssumeDev((IsSimilar<THIS, K>()),
+         LglsAssumeDev((IsSame<THIS, K>()),
             "Wrong type when accessing set",
             ", using type `", NameOf<K>(), "` instead of `", GetType(), '`');
          return GetValues<THIS>().GetRaw() + i;
@@ -201,7 +201,7 @@ namespace Langulus::Annies
 
       if constexpr (CT::Typed<THIS>) {
          IF_SAFE(using K = TypeOf<THIS>);
-         LglsAssumeDev((IsSimilar<THIS, K>()),
+         LglsAssumeDev((IsSame<THIS, K>()),
             "Wrong type when accessing set",
             ", using type `", NameOf<K>(), "` instead of `", GetType(), '`');
          return GetValues<THIS>().GetHandle(i);

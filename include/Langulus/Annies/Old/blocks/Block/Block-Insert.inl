@@ -111,7 +111,7 @@ namespace Langulus::Annies
       }
       else {
          // Type can't mutate, but we still have to check if compatible 
-         LANGULUS_ASSERT(IsSimilar(DeintCast(data)), Meta,
+         LANGULUS_ASSERT(IsSame(DeintCast(data)), Meta,
             "Inserting incompatible type `", DeintCast(data).GetType(),
             "` to container of type `", GetType(), '`'
          );
@@ -277,11 +277,11 @@ namespace Langulus::Annies
       if constexpr (CT::Array<T>) {
          if constexpr (CT::StringLiteral<T>) {
             // Implicitly convert string literals to Text containers    
-            if (CT::Void<FORCE> and not IsSimilar<Text>())
+            if (CT::Void<FORCE> and not IsSame<Text>())
                return 0;
 
             Text text {S::Nest(item)};
-            if (not IsSimilar<Text>() or not Find<false>(text)) {
+            if (not IsSame<Text>() or not Find<false>(text)) {
                InsertInner<FORCE, MOVE_ASIDE>(index, Abandon(text));
                return 1;
             }
@@ -289,11 +289,11 @@ namespace Langulus::Annies
          else {
             // Insert the array                                         
             using DT = Deext<T>;
-            if (CT::Void<FORCE> and not IsSimilar<DT>())
+            if (CT::Void<FORCE> and not IsSame<DT>())
                return 0;
 
             const auto data = Block<DT>::From(item);
-            if (not IsSimilar<DT>()
+            if (not IsSame<DT>()
             or  not FindBlock<false>(data, IndexFront)) {
                InsertBlockInner<FORCE, MOVE_ASIDE>(index, S::Nest(data));
                return ExtentOf<T>;
@@ -303,10 +303,10 @@ namespace Langulus::Annies
       else {
          // Some of the arguments might still be used directly to       
          // make an element, forward these to standard insertion here   
-         if (CT::Void<FORCE> and not IsSimilar<T>())
+         if (CT::Void<FORCE> and not IsSame<T>())
             return 0;
 
-         if (not IsSimilar<T>() or not Find<false>(DeintCast(item))) {
+         if (not IsSame<T>() or not Find<false>(DeintCast(item))) {
             InsertInner<FORCE, MOVE_ASIDE>(index, S::Nest(item));
             return 1;
          }
@@ -459,7 +459,7 @@ namespace Langulus::Annies
    T& Block<TYPE>::Deepen() {
       static_assert(CT::CanBeDeepened<T, Block>,
          "This Block can't be deepened with T");
-      LANGULUS_ASSERT(not IsTypeConstrained() or IsSimilar<T>(), Mutate,
+      LANGULUS_ASSERT(not IsTypeConstrained() or IsSame<T>(), Mutate,
          "Can't deepen with incompatible type");
 
       // Back up the state so that we can restore it if not moved over  
@@ -550,7 +550,7 @@ namespace Langulus::Annies
          // At runtime...                                               
          const bool typeCompliant = IsUntyped()
             or (not CT::Void<FORCE> and DeintCast(value).IsDeep())
-            or IsSimilar(DeintCast(value));
+            or IsSame(DeintCast(value));
 
          if (not IsConstant() and typeCompliant and sc
          and not (GetCount() > 1 and not mState.IsOr() and state.IsOr())) {
@@ -572,7 +572,7 @@ namespace Langulus::Annies
       }
       else {
          // As statically optimized as possible                         
-         const bool typeCompliant = IsSimilar(DeintCast(value)) or
+         const bool typeCompliant = IsSame(DeintCast(value)) or
             (not CT::Void<FORCE> and DeintCast(value).IsDeep());
 
          if (not IsConstant() and typeCompliant and sc
@@ -612,7 +612,7 @@ namespace Langulus::Annies
             SetState(mState + state);
             return Insert<void>(index, S::Nest(value));
          }
-         else if (IsSimilar<T>()) {
+         else if (IsSame<T>()) {
             // Insert to a same-typed container                         
             SetState(mState + state);
             return Insert<void>(index, S::Nest(value));
@@ -942,7 +942,7 @@ namespace Langulus::Annies
                // for the rest of the elements.                         
                CreateDescribe(Forward<A>(arguments)...);
             }
-            else if (IsSimilar<Deint<F>>()) {
+            else if (IsSame<Deint<F>>()) {
                // One argument, that is the same as the contained type, 
                // so just invoke the refer-construction for each newly  
                // allocated item                                        
@@ -1046,9 +1046,9 @@ namespace Langulus::Annies
 
       // Type-erased pointers (void*) are acceptable                    
       LglsAssumeDev(
-            (DeintCast(source).IsSimilar(*this)
-         or (DeintCast(source).template IsSimilar<void*>() and IsSparse())
-         or (DeintCast(source).IsSparse() and IsSimilar<void*>())),
+            (DeintCast(source).IsSame(*this)
+         or (DeintCast(source).template IsSame<void*>() and IsSparse())
+         or (DeintCast(source).IsSparse() and IsSame<void*>())),
          "Type mismatch on creation", ": ", DeintCast(source).GetType(), " != ", GetType());
 
       using B = Conditional<TypeErased, TypeOf<S>, Block>;
@@ -1319,7 +1319,7 @@ namespace Langulus::Annies
       // Type-erased pointers (void*) are acceptable, because they're   
       // required for some internal stuff, although not recommended     
       LglsAssumeDev((
-         (IsSparse() and CT::Similar<T, void*>) or IsSimilar<T>()),
+         (IsSparse() and CT::Similar<T, void*>) or IsSame<T>()),
          "Type mismatch on creation from handle", ": ", GetType(),
          " instead of ", MetaDataOf<T>());
 
@@ -1337,7 +1337,7 @@ namespace Langulus::Annies
       using S  = IntentOf<decltype(source)>;
       using ST = TypeOf<S>;
 
-      LglsAssumeDev(IsSimilar(DeintCast(source)),
+      LglsAssumeDev(IsSame(DeintCast(source)),
          "Type mismatch");
 
       static_assert(TypeErased or Sparse,
@@ -1453,9 +1453,9 @@ namespace Langulus::Annies
          "Data is referenced from multiple locations");
 
       // Type-erased pointers (void*) are acceptable                    
-      LglsAssumeDev((source->IsSimilar(*this)
-         or (source->template IsSimilar<void*>() and IsSparse())
-         or (source->IsSparse() and IsSimilar<void*>())),
+      LglsAssumeDev((source->IsSame(*this)
+         or (source->template IsSame<void*>() and IsSparse())
+         or (source->IsSparse() and IsSame<void*>())),
          "Type mismatch on assignment", ": ", source->GetType(), " != ", GetType());
 
       using OTHER = Deint<T1>;
@@ -1709,7 +1709,7 @@ namespace Langulus::Annies
          // We expect, that type has been previously set                
          LglsAssumeDev(IsTyped(),
             "Block was expected to be typed");
-         LANGULUS_ASSERT(IsSimilar<ST>(), Mutate,
+         LANGULUS_ASSERT(IsSame<ST>(), Mutate,
             "Type mismatch");
 
          // Wrap argument into a block, and assign it to each element   

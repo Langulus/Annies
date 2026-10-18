@@ -9,6 +9,7 @@
 #include "../Component.hpp"
 #include "Langulus/CT/Index.hpp"
 #include "Langulus/CT/Serializer.hpp"
+#include <Langulus/CT/NullTerminated.hpp>
 #include "Langulus/IntentOf.hpp"
 #include "Langulus/Typenav.hpp"
 #include <cstddef>
@@ -26,6 +27,8 @@ namespace Langulus::Annies::Component
    ///      Useful for byte and text containers. Use 'false' to merge without 
    ///      serialization.                                                    
    ///   @tparam ID, SHARED providers that share the same merge behavior.     
+   ///   @attention this component will append a silent zero byte after each  
+   ///      modification of the container, if container is CT::NullTerminated.
    template<bool CONVERT, Cid ID, Cid...SHARED>
    struct Merging {
       /// Refers back to this particular component instance through the       
@@ -89,24 +92,30 @@ namespace Langulus::Annies::Component
                else {
                   // This is empty and unallocated                      
                   self.AllocateFresh(reduced.size());
-                  auto to = self.GetHandle();
-                  size_t const* it = reduced.data();
-                  size_t counter = 0;
+               }
 
-                  try {
-                     MergeInnerLinear(to, it, counter, LglsFwd(a1));
-                    (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
-                  }
-                  catch (...) {
-                     // Account for throws inside constructors          
-                     const size_t inserted = to - self.GetHandle();
-                     TODO(); //TODO a gap remains, move things back
-                     self.SetCountInner(inserted);
-                     throw;
-                  }
+               auto to = self.GetHandle();
+               size_t const* it = reduced.data();
+               size_t counter = 0;
+
+               try {
+                  MergeInnerLinear(to, it, counter, LglsFwd(a1));
+                  (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
+               }
+               catch (...) {
+                  // Account for throws inside constructors          
+                  const size_t inserted = to - self.GetHandle();
+                  TODO(); //TODO a gap remains, move things back
+                  self.SetCountInner(inserted);
+
+                  if constexpr (CT::NullTerminated<C>)
+                     memset(to.GetRaw(), 0, 1);
+                  throw;
                }
 
                self.SetCountInner(reduced.size());
+               if constexpr (CT::NullTerminated<C>)
+                  memset(to.GetRaw(), 0, 1);
                return reduced.size();  
             }
 
@@ -131,6 +140,9 @@ namespace Langulus::Annies::Component
                   const size_t inserted = to - self.GetHandle();
                   TODO(); //TODO a gap (of only one element!!!) remains, move things back
                   self.SetCountInner(inserted);
+
+                  if constexpr (CT::NullTerminated<C>)
+                     memset(to.GetRaw(), 0, 1);
                   throw;
                }
             }
@@ -157,6 +169,9 @@ namespace Langulus::Annies::Component
                   const size_t inserted = dst - self.GetHandle();
                   TODO(); //TODO a gap remains, move things back
                   self.SetCountInner(inserted);
+                  
+                  if constexpr (CT::NullTerminated<C>)
+                     memset(dst.GetRaw(), 0, 1);
                   throw;
                }
 
@@ -168,6 +183,8 @@ namespace Langulus::Annies::Component
             }
 
             self.SetCountInner(all_count);
+            if constexpr (CT::NullTerminated<C>)
+               memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
             return reduced.size();
          }
       }
@@ -230,11 +247,17 @@ namespace Langulus::Annies::Component
                   // Account for throws inside constructors             
                   const ptrdiff_t inserted = it - reduced.data();
                   self.SetCountInner(inserted);
+
+                  if constexpr (CT::NullTerminated<C>)
+                     memset(to.GetRaw(), 0, 1);
                   throw;
                }
             }
             else {
                // Insert in a hash table                                
+               static_assert(not CT::NullTerminated<C>,
+                  "Hash tables can't be null-terminated");
+
                try {
                   ThisCom::MergeInnerTable1D(it, counter, LglsFwd(a1));
                  (ThisCom::MergeInnerTable1D(it, counter, LglsFwd(an)), ...);
@@ -248,6 +271,8 @@ namespace Langulus::Annies::Component
             }
 
             self.SetCountInner(all_count);
+            if constexpr (CT::NullTerminated<C>)
+               memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
             return reduced.size();
          }
       }
@@ -264,6 +289,8 @@ namespace Langulus::Annies::Component
       auto Merge(this C& self, A1&& a1, AN&&...an) -> DecideHandle<C> {
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
+         static_assert(not CT::NullTerminated<C>,
+            "Hash tables can't be null-terminated");
 
          auto found = self.template TableSearch<ID>(a1);
          if (found)

@@ -147,7 +147,7 @@ namespace Langulus::Annies
             }
             else {
                // The rhs set is type-erased                            
-               LANGULUS_ASSERT(DeintCast(item).template IsSimilar<E>(), Meta,
+               LANGULUS_ASSERT(DeintCast(item).template IsSame<E>(), Meta,
                   "Type mismatch");
 
                Reserve(GetCount() + DeintCast(item).GetCount());

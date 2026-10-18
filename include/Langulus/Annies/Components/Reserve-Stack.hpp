@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Reserve-Emergent.hpp"
+#include <Langulus/CT/NullTerminated.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -17,6 +18,8 @@ namespace Langulus::Annies::Component
    ///   @tparam T the reserve counter type                                   
    ///   @tparam ID provider ID to keep reserve of                            
    ///   @tparam SHARED provider IDs that share the same reserve variable     
+   ///   @attention when container is CT::NullTerminated, the reserved count  
+   ///      will always report one element less, as it is reserved for zero.  
    template<class T, Cid ID, Cid...SHARED>
    struct ReserveStack : ReserveEmergent<T, ID, SHARED...> {
       /// Refers back to this particular component instance through the       
@@ -27,20 +30,21 @@ namespace Langulus::Annies::Component
       using StackRequest = T;
       using Id = typename ReserveEmergent<T, ID, SHARED...>::Id;
 
-      //template<Cid SID>
-      //static constexpr bool Relevant = Id::template Contains<SID>;
-
       /// Get the number of reserved (maybe uninitialized) elements           
-      template<Cid SID = ID>// requires Relevant<SID>
-      constexpr T GetReserved(this auto const& self) noexcept {
-         return ThisCom::GetReservedInner();
+      template<Cid SID = ID, class C>
+      constexpr T GetReserved(this C const& self) noexcept {
+         if constexpr (CT::NullTerminated<C>) {
+            T result = ThisCom::GetReservedInner();
+            return result ? result - 1 : 0;
+         }
+         else return ThisCom::GetReservedInner();
       }
 
       /// Reserve a number of elements without initializing them.             
       /// If reserved data is smaller than currently initialized count, the   
       /// excess elements will be dereferenced/destroyed.                     
       ///   @param reserve number of elements to reserve                      
-      template<Cid SID = ID, CT::ContainsMany C>// requires Relevant<SID>
+      template<Cid SID = ID, CT::ContainsMany C>
       C& Reserve(this C& self, const T reserve) {
          if (reserve < self.template GetCount<SID>())
             self.template AllocateLess<SID>(reserve);
@@ -60,7 +64,7 @@ namespace Langulus::Annies::Component
       }
       
       /// Set the number of reserved elements                                 
-      template<Cid SID = ID>// requires Relevant<SID>
+      template<Cid SID = ID>
       constexpr void SetReservedInner(this auto& self, T c) noexcept {
          ThisCom::GetReservedInner() = c;
       }
@@ -71,18 +75,20 @@ namespace Langulus::Annies::Component
       }
       
       /// Transfer from any kind of container, respecting intents             
-      ///   @important notice that Copy and Clone intents are not handled     
+      ///   @attention notice that Copy and Clone intents are not handled     
       ///      here. They're handled in heap components instead, in case      
       ///      something throws an exception while constructing. Same applies 
       ///      to source containers that are allocated on the stack.          
       ///   @param intent the intent and container to transfer from           
+      //TODO what happens if we transfer from not CT::NullTerminated to CT::NullTerminated - we must anticipate a resize and do shallow copy instead of absorb, or we lose last byte!
       template<class SELF, CT::Intent I> requires CT::Container<I>
       void ConstructFrom(this SELF& self, I&& intent) {
          if constexpr (not CT::Copied<I> and not CT::Cloned<I> and CT::HeapAllocated<I>) {
             decltype(auto) from = LglsFwd(intent.what);
          
             // Always propagate custom reserve if available             
-            if_available(ThisCom::SetReservedInner(from.template GetReserved<ID>()))
+                 if_available(ThisCom::SetReservedInner(from.template GetReservedInner<ID>()))
+            else if_available(ThisCom::SetReservedInner(from.template GetReserved<ID>())) 
             else {
                // Otherwise derive reserve from current heap pointer,   
                // the start of the allocation, and by element size.     

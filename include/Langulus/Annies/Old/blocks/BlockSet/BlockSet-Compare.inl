@@ -120,11 +120,11 @@ namespace Langulus::Annies
 
       auto& me = reinterpret_cast<const THIS&>(*this);
       if constexpr (CT::StringLiteral<K>) {
-         if (me.template IsSimilar<Text>()) {
+         if (me.template IsSame<Text>()) {
             // Implicitly make a text container on string literal       
             return FindInner<THIS>(Text {Disown(match)});
          }
-         else if (me.template IsSimilar<char*, wchar_t*>()) {
+         else if (me.template IsSame<char*, wchar_t*>()) {
             // Cast away the extent, search for pointer                 
             return FindInner<THIS>(static_cast<const Deext<K>*>(match));
          }
@@ -138,7 +138,7 @@ namespace Langulus::Annies
          }
          else if (not CT::Deep<K>
               and not me.IsDeep()
-              and not me.template IsSimilar<K>())
+              and not me.template IsSame<K>())
             return InvalidOffset;
 
          // Get the starting index based on the key hash                
@@ -201,7 +201,7 @@ namespace Langulus::Annies
    ///   @return the index, or InvalidOffset if not found                     
    template<CT::Set THIS>
    size_t BlockSet::FindBlockInner(const Block<>& match) const {
-      if (IsEmpty() or not IsSimilar<THIS>(match.GetType()))
+      if (IsEmpty() or not IsSame<THIS>(match.GetType()))
          return InvalidOffset;
 
       // Get the starting index based on the key hash                   

@@ -184,7 +184,7 @@ namespace Langulus::Annies
                }
                else if constexpr (CT::Deep<T>) {
                   // Type-erased block, do run-time type checks         
-                  if (IsSimilar(DeintCast(t1).GetType())) {
+                  if (IsSame(DeintCast(t1).GetType())) {
                      // If types are similar, it is safe to absorb the  
                      // block, essentially converting a type- erased    
                      // Many back to its TMany equivalent               
@@ -367,7 +367,7 @@ namespace Langulus::Annies
             Free();
             new (this) THIS {S::Nest(rhs)};
          }
-         else if (IsSimilar<CT::Unfold<T>>()) {
+         else if (IsSame<CT::Unfold<T>>()) {
             // Unfold-insert by reusing memory                          
             Clear();
             UnfoldInsert<void, true>(IndexBack, S::Nest(rhs));

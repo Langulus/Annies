@@ -172,7 +172,7 @@ namespace Langulus::Annies
 
             if constexpr (CT::Typed<T>) {
                // Additional check, if T is a typed block               
-               LANGULUS_ASSERT(result.template IsSimilar<TypeOf<T>>(),
+               LANGULUS_ASSERT(result.template IsSame<TypeOf<T>>(),
                   Access, "Deep type mismatch");
             }
 
@@ -227,7 +227,7 @@ namespace Langulus::Annies
 
             if constexpr (CT::Typed<T>) {
                // Additional check, if T is a typed block               
-               if (not result.template IsSimilar<TypeOf<T>>())
+               if (not result.template IsSame<TypeOf<T>>())
                   LANGULUS_THROW(Access, "Deep type mismatch");
             }
 
@@ -579,10 +579,10 @@ namespace Langulus::Annies
          "Invalid count");
 
       // Type-erased pointers (void*) are always acceptable             
-      //TODO add this check to IsSimilar(Block auto) directly?
+      //TODO add this check to IsSame(Block auto) directly?
       LglsAssumeDev((
-          DeintCast(rhs).IsSimilar(*this)
-      or (DeintCast(rhs).template IsSimilar<void*>() and IsSparse())
+          DeintCast(rhs).IsSame(*this)
+      or (DeintCast(rhs).template IsSame<void*>() and IsSparse())
       ), "Type mismatch on swap", ": ", DeintCast(rhs).GetType(), " != ", GetType());
 
       using B = Block<TypeOf<ST>>;

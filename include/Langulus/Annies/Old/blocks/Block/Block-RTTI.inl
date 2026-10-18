@@ -51,9 +51,9 @@ namespace Langulus::Annies
    ///   @tparam T1, TN... - the types to compare against                     
    ///   @return true if data type is similar to at least one of the types    
    template<class TYPE> template<CT::NotVoid T1, CT::NotVoid...TN> LANGULUS(INLINED)
-   constexpr bool Block<TYPE>::IsSimilar() const noexcept {
+   constexpr bool Block<TYPE>::IsSame() const noexcept {
       if constexpr (TypeErased)
-         return mType and mType->template IsSimilar<T1, TN...>();
+         return mType and mType->template IsSame<T1, TN...>();
       else
          return CT::SimilarAsOneOf<TYPE, T1, TN...>;
    }
@@ -63,7 +63,7 @@ namespace Langulus::Annies
    ///   @param type - the type to check for                                  
    ///   @return true if this block contains similar data                     
    template<class TYPE> LANGULUS(INLINED)
-   bool Block<TYPE>::IsSimilar(DMeta type) const noexcept {
+   bool Block<TYPE>::IsSame(DMeta type) const noexcept {
       return GetType() & type;
    }
 
@@ -72,12 +72,12 @@ namespace Langulus::Annies
    ///   @param other - the block to check for                                
    ///   @return true if this block contains similar data                     
    template<class TYPE> LANGULUS(INLINED)
-   bool Block<TYPE>::IsSimilar(const CT::Block auto& other) const noexcept {
+   bool Block<TYPE>::IsSame(const CT::Block auto& other) const noexcept {
       using T = Deref<decltype(other)>;
       if constexpr (TypeErased or T::TypeErased)
-         return IsSimilar(other.GetType());
+         return IsSame(other.GetType());
       else
-         return IsSimilar<TypeOf<T>>();
+         return IsSame<TypeOf<T>>();
    }
 
    /// Check if this type is exactly one of the provided types                
@@ -185,7 +185,7 @@ namespace Langulus::Annies
    B Block<TYPE>::ReinterpretAs(const B& pattern) const {
       if (IsEmpty() or IsSparse() or IsUntyped() or pattern.IsUntyped())
          return B {};
-      else if (IsSimilar(pattern))
+      else if (IsSame(pattern))
          return reinterpret_cast<const B&>(*this);
 
       if constexpr (not TypeErased and not B::TypeErased) {
@@ -345,7 +345,7 @@ namespace Langulus::Annies
          // Undefined/abstract containers can mutate freely             
          SetType<false>(meta);
       }
-      else if (mType->IsSimilar(meta)) {
+      else if (mType->IsSame(meta)) {
          // No need to mutate - types are compatible                    
          return false;
       }

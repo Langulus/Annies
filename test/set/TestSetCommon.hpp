@@ -52,7 +52,7 @@ void Set_Helper_TestType(auto const& set) {
    REQUIRE_FALSE(set.IsUntyped());
 
    REQUIRE      (set.GetType() == MetaDataOf<K>());
-   REQUIRE      (set.GetType()->template IsSimilar<const K>());
+   REQUIRE      (set.GetType()->template IsSame<const K>());
    REQUIRE      (set.GetType()->template IsExact<K>());
    REQUIRE      (set.GetType()->template Is<K*>());
    REQUIRE      (set.IsDense() == CT::Dense<K>);

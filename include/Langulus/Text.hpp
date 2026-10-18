@@ -71,14 +71,18 @@ namespace Langulus::Annies
 
 
    ///                                                                        
-   /// A continuous text container of variable size                           
-   ///                                                                        
+   /// MARK: Text                                                             
+   /// A continuous text container of variable size.                          
+   /// Equivalent to std::string. Guarantees that contained string is always  
+   /// null-terminated, unless IsEmpty().                                     
    struct Text : Inner::TextBase {
-      using CTTI_ReflectAs = Text;
-      using CTTI_Text      = Yup;
-      using CTTI_POD       = No; //TODO could be, when we implement SVO
-      using CountType      = Base::CountType;
+      using CTTI_ReflectAs       = Text;
+      using CTTI_Text            = Yup;
+      using CTTI_POD             = No; //TODO could be, when we implement SVO
+      using CTTI_NullTerminated  = Yup;
+      using CountType            = Base::CountType;
 
+      /// MARK: Construct                                                     
       constexpr Text() noexcept {
          this->ConstructDefault();
       }
@@ -113,12 +117,6 @@ namespace Langulus::Annies
          this->ConstructDefault();
          this->Insert(LglsFwd(a1), LglsFwd(an)...);
       }
-
-      /// Construction from Serial::Operator                                  
-      ///   @attention this is a non-owning constructor, often used as a      
-      ///      temporary                                                      
-      /*explicit constexpr Text(Serial::Operator const& o)
-         : Text {o.token} {}*/
 
       /// Construction from any kind of text that is an Annies container     
       template<CT::Text T> requires CT::Container<T>
@@ -227,19 +225,8 @@ namespace Langulus::Annies
          and (CT::Copied<I> or CT::Cloned<I>))
             this->TakeOwnership();
       }
-
-      /// Construction from all kinds of characters                           
-      ///   @attention this is an owning constructor                          
-      /*template<CT::Character T>
-      constexpr Text(T&& ch) {
-         this->ResetState();
-         this->AllocateFresh(1);
-         *this->GetRawAs<char>() = DeintCast(ch);
-         this->SetCountInner(1);
-         this->ResetHash();
-      }*/
       
-      /// MARK: =                                                             
+      /// MARK: Assign                                                        
       constexpr Text& operator = (Text const& other) {
          return this->AssignAbsorb(Refer {other});
       }
@@ -380,6 +367,7 @@ namespace Langulus::Annies
          return result;
       }
 
+      /// MARK: Hex                                                           
       /// Generate hexadecimal string from a given value                      
       ///   @param from the argument                                          
       ///   @return the resulting text                                        
@@ -399,6 +387,7 @@ namespace Langulus::Annies
          return result;
       }
 
+      /// MARK: Mention                                                       
       /// Get a string representing an instance in memory.                    
       /// Used all across framework to stringify short instance IDs.          
       ///   @param token custom token to wrap pointer in                      
@@ -450,6 +439,7 @@ namespace Langulus::Annies
          return this->IsEmpty();
       }
 
+      /// MARK: Comparison                                                    
       /// Comparing against null-terminated strings                           
       constexpr bool operator == (const CT::TextPointer auto& rhs) const noexcept {
          if (rhs == nullptr or *rhs == 0)
@@ -487,12 +477,13 @@ namespace Langulus::Annies
          return Matches(Text {token}) == token.size();
       }
 
+      /// MARK: Replace                                                       
       /// Replace every occurence of 'what' with the provided string          
       ///   @param what characters/strings to search for                      
       ///   @param with characters/strings to replace with                    
       ///   @return a new container with the text replaced                    
       template<class C>
-      C Replace(this C const& self, CT::Text auto const& what, CT::Text auto const& with) {
+      C Replace(this C const& self, CT::Text auto const& what, CT::Text auto const& with) { //TODO maybe move to insertion/removal components? make generic?
          const Text pattern     {Disown(what)};
          const Text replacement {Disown(with)};
          if (self.IsEmpty() or pattern.IsEmpty())
@@ -555,6 +546,7 @@ namespace Langulus::Annies
    }
 }
 
+/// MARK: CT                                                                  
 namespace Langulus::CT
 {
    namespace Inner
@@ -580,6 +572,7 @@ namespace Langulus::CT
                           or Inner::StringifiableByConstructor<T>) and ...);
 }
 
+/// MARK: Morphisms                                                           
 /// Convert std::string_view -> Text                                          
 LANGULUS_MORPHISM(std::string_view, Langulus::Annies::Text);
 

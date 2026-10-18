@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Container.hpp"
+#include <Langulus/CT/NullTerminated.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -18,30 +19,33 @@ namespace Langulus::Annies::Component
    ///   @tparam T the reserve type                                           
    ///   @tparam ID provider ID to keep reserve of                            
    ///   @tparam SHARED provider IDs that share the same reserve variable     
+   ///   @attention when container is CT::NullTerminated, the reserved count  
+   ///      will always report one element less, as it is reserved for zero.  
    template<class T, Cid ID, Cid...SHARED>
    struct ReserveEmergent {
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
-      using ReserveType = T;
-      using Id = Values<ID, SHARED...>;
+      using ReserveType    = T;
+      using Id             = Values<ID, SHARED...>;
 
       static constexpr int ComponentPrecedence = -1000;
-      //template<Cid SID>
-      //static constexpr bool Relevant = Id::template Contains<SID>;
 
       static_assert(CT::Integer<T> and not CT::Signed<T>,
          "Reserve type must be an unsigned integer");
 
       /// Get the number of reserved (maybe uninitialized) elements           
-      template<Cid SID = ID, CT::Container C>// requires Relevant<SID>
+      template<Cid SID = ID, CT::Container C>
       constexpr T GetReserved(this const C& self) noexcept {
          if constexpr (requires { self.template GetAllocation<SID>(); }) {
             const auto al = self.template GetAllocation<SID>();
             if (not al)
                return 0;
 
-            if constexpr (CT::ContainsOne<C>)
+            if constexpr (CT::ContainsOne<C>) {
+               static_assert(not CT::NullTerminated<C>,
+                  "Container with static capacity of 1 can't be null-terminated");
                return 1;
+            }
             else {
                static_assert(C::template CountHeapFooterRequests<SID>() == 0,
                   "ReserveEmergent can't be used in containers with heap footer, "
@@ -53,11 +57,14 @@ namespace Langulus::Annies::Component
                size_t header = C::template DefineHeapHeader<SID>();
                using PROVIDER = typename decltype(C::template FindProvider<SID>())::First;
                header = Align(header, self.template GetAlignment<PROVIDER::Id::First>());
-               return (al->GetSize() - header) / self.template GetStride<SID>();
+               return (al->GetSize() - header) / self.template GetStride<SID>() - CT::NullTerminated<C>;
             }
          }
-         else if constexpr (CT::ContainsOne<C>)
+         else if constexpr (CT::ContainsOne<C>) {
+            static_assert(not CT::NullTerminated<C>,
+               "Container with static capacity of 1 can't be null-terminated");
             return 1;
+         }
          else {
             static_assert(false,
                "Emergent reserve can't derive the amount of reserved items, "
@@ -71,7 +78,7 @@ namespace Langulus::Annies::Component
       /// If reserved data is smaller than currently initialized count, the   
       /// excess elements will be dereferenced/destroyed.                     
       ///   @param reserve number of elements to reserve                      
-      template<Cid SID = ID, CT::ContainsMany C>// requires Relevant<SID>
+      template<Cid SID = ID, CT::ContainsMany C>
       C& Reserve(this C& self, const T reserve) {
          if (reserve < self.template GetCount<SID>())
             self.template AllocateLess<SID>(reserve);

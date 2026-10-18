@@ -19,6 +19,7 @@
 #include <Langulus/CT/Defaultable.hpp>
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/Deep.hpp>
+#include <Langulus/CT/NullTerminated.hpp>
 #include <type_traits>
 
 
@@ -46,6 +47,8 @@ namespace Langulus::Annies::Component
    ///      Useful for byte and text containers. Use 'false' to insert without
    ///      serialization.                                                    
    ///   @tparam ID, SHARED providers that share the same insertion behavior. 
+   ///   @attention this component will append a silent zero byte after each  
+   ///      modification of the container, if container is CT::NullTerminated.
    template<bool CONVERT, Cid ID, Cid...SHARED>
    struct Insertion {
       /// Refers back to this particular component instance through the       
@@ -68,6 +71,8 @@ namespace Langulus::Annies::Component
       template<CT::Container C>
       using PickRangeMut = typename Deref<C>::PickRangeMut;
 
+      /// MARK: MakeGap                                                       
+      /// Helper for moving stuff around to make space for more stuff         
       template<CT::Handle H>
       static void MakeGap(H const& start, size_t offset, size_t lhs_count, size_t rhs_count) {
          if (offset >= lhs_count)
@@ -88,6 +93,8 @@ namespace Langulus::Annies::Component
          }
       }
 
+      /// MARK: CopyRegion                                                    
+      /// Helper for copying data from another place                          
       template<CT::Handle H1, CT::Handle H2>
       static void CopyRegion(H1& src, H2& dst, size_t count) {
          //TODO batch optimization for PODs
@@ -100,6 +107,8 @@ namespace Langulus::Annies::Component
          }
       }
       
+      /// MARK: CopyContainer                                                 
+      /// Helper for copying data from another place                          
       template<CT::Container C1, CT::Handle H2>
       static void CopyContainer(C1&& src_container, H2& dst) {
          //TODO batch optimization for PODs
@@ -171,22 +180,27 @@ namespace Langulus::Annies::Component
                else {
                   // This is empty and unallocated                      
                   self.AllocateFresh(rhs_count);
-                  auto to = self.GetHandle();
+               }
+            
+               auto to = self.GetHandle();
+               try {
+                  InsertInner(to, LglsFwd(a1));
+                 (InsertInner(to, LglsFwd(an)), ...);
+               }
+               catch (...) {
+                  // Account for throws inside constructors             
+                  const size_t inserted = to - self.GetHandle();
+                  TODO(); //TODO a gap remains, move things back
+                  self.SetCountInner(inserted);
 
-                  try {
-                     InsertInner(to, LglsFwd(a1));
-                    (InsertInner(to, LglsFwd(an)), ...);
-                  }
-                  catch (...) {
-                     // Account for throws inside constructors          
-                     const size_t inserted = to - self.GetHandle();
-                     TODO(); //TODO a gap remains, move things back
-                     self.SetCountInner(inserted);
-                     throw;
-                  }
+                  if constexpr (CT::NullTerminated<C>)
+                     memset(to.GetRaw(), 0, 1);
+                  throw;
                }
 
                self.SetCountInner(rhs_count);
+               if constexpr (CT::NullTerminated<C>)
+                  memset(to.GetRaw(), 0, 1);
                return rhs_count;  
             }
 
@@ -209,6 +223,9 @@ namespace Langulus::Annies::Component
                   const size_t inserted = to - self.GetHandle();
                   TODO(); //TODO a gap remains, move things back
                   self.SetCountInner(inserted);
+
+                  if constexpr (CT::NullTerminated<C>)
+                     memset(to.GetRaw(), 0, 1);
                   throw;
                }
             }
@@ -233,6 +250,9 @@ namespace Langulus::Annies::Component
                   const size_t inserted = dst - self.GetHandle();
                   TODO(); //TODO a gap remains, move things back
                   self.SetCountInner(inserted);
+
+                  if constexpr (CT::NullTerminated<C>)
+                     memset(dst.GetRaw(), 0, 1);
                   throw;
                }
 
@@ -244,6 +264,8 @@ namespace Langulus::Annies::Component
             }
 
             self.SetCountInner(all_count);
+            if constexpr (CT::NullTerminated<C>)
+               memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
             return rhs_count;
          }
       }
@@ -361,10 +383,14 @@ namespace Langulus::Annies::Component
                // Account for throws inside constructors                
                const size_t inserted = to - self.GetHandle();
                self.SetCountInner(inserted);
+               if constexpr (CT::NullTerminated<C>)
+                  memset(to.GetRaw(), 0, 1);
                throw;
             }
 
             self.SetCountInner(all_count);
+            if constexpr (CT::NullTerminated<C>)
+               memset(to.GetRaw(), 0, 1);
             return rhs_count;
          }
       }
@@ -586,10 +612,15 @@ namespace Langulus::Annies::Component
                const size_t inserted = dst - self.GetHandle();
                TODO(); //TODO a gap remains, move things back
                self.SetCountInner(inserted);
+
+               if constexpr (CT::NullTerminated<C>)
+                  memset(dst.GetRaw(), 0, 1);
                throw;
             }
 
             self.SetCountInner(rhs_count);
+            if constexpr (CT::NullTerminated<C>)
+               memset(dst.GetRaw(), 0, 1);
             return rhs_count;  
          }
 
@@ -611,6 +642,8 @@ namespace Langulus::Annies::Component
                const size_t inserted = dst - self.GetHandle();
                TODO(); //TODO a gap remains, move things back
                self.SetCountInner(inserted);
+               if constexpr (CT::NullTerminated<C>)
+                  memset(dst.GetRaw(), 0, 1);
                throw;
             }
          }
@@ -634,6 +667,8 @@ namespace Langulus::Annies::Component
                const size_t inserted = dst - self.GetHandle();
                TODO(); //TODO a gap remains, move things back
                self.SetCountInner(inserted);
+               if constexpr (CT::NullTerminated<C>)
+                  memset(dst.GetRaw(), 0, 1);
                throw;
             }
 
@@ -645,6 +680,8 @@ namespace Langulus::Annies::Component
          }
 
          self.SetCountInner(all_count);
+         if constexpr (CT::NullTerminated<C>)
+            memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
          return rhs_count;
       }
 
@@ -685,10 +722,15 @@ namespace Langulus::Annies::Component
             // Account for throws inside constructors                   
             const size_t inserted = to - self.GetHandle();
             self.SetCountInner(inserted);
+
+            if constexpr (CT::NullTerminated<C>)
+               memset(to.GetRaw(), 0, 1);
             throw;
          }
 
          self.SetCountInner(all_count);
+         if constexpr (CT::NullTerminated<C>)
+            memset(to.GetRaw(), 0, 1);
          return rhs_count;
       }
          

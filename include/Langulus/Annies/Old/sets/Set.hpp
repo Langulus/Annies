@@ -87,8 +87,8 @@ namespace Langulus::Annies
       bool Is(DMeta) const noexcept;
 
       template<CT::Data, CT::NotVoid...>
-      constexpr bool IsSimilar() const noexcept;
-      bool IsSimilar(DMeta) const noexcept;
+      constexpr bool IsSame() const noexcept;
+      bool IsSame(DMeta) const noexcept;
 
       template<CT::Data, CT::NotVoid...>
       constexpr bool IsExact() const noexcept;

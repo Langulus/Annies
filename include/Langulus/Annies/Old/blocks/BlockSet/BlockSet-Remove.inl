@@ -24,17 +24,17 @@ namespace Langulus::Annies
 
       auto& me = reinterpret_cast<THIS&>(*this);
       if constexpr (CT::StringLiteral<K>) {
-         if (me.template IsSimilar<Text>()) {
+         if (me.template IsSame<Text>()) {
             // Implicitly make a text container on string literal       
             return RemoveKeyInner<THIS>(Text {Disown(key)});
          }
-         else if (me.template IsSimilar<char*, wchar_t*>()) {
+         else if (me.template IsSame<char*, wchar_t*>()) {
             // Cast away the extent, search for pointer                 
             return RemoveKeyInner<THIS>(static_cast<const Deext<K>*>(key));
          }
          else return 0;
       }
-      else if (me.template IsSimilar<K>())
+      else if (me.template IsSame<K>())
          return RemoveKeyInner<THIS>(key);
       
       return 0;

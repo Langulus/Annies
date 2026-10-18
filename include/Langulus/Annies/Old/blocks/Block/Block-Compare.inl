@@ -90,7 +90,7 @@ namespace Langulus::Annies
       else if constexpr (not TypeErased or not RHS::TypeErased) {
          // One of the blocks is statically typed - a runtime type      
          // check is required                                           
-         if ((mCount or right.mCount) and not IsSimilar(right)) { //TODO but what if differently typed pointers to the same virtual objects?
+         if ((mCount or right.mCount) and not IsSame(right)) { //TODO but what if differently typed pointers to the same virtual objects?
             VERBOSE_COMPARE(Logger::Red, "Types differ (runtime): ",
                GetType(), " != ", right.GetType());
             return false;
@@ -102,7 +102,7 @@ namespace Langulus::Annies
             return right.template Compare<RESOLVE>(reinterpret_cast<const RHS&>(*this));
       }
       else {
-         if (not IsSimilar(right)) { //TODO but what if differently typed pointers to the same virtual objects?
+         if (not IsSame(right)) { //TODO but what if differently typed pointers to the same virtual objects?
             VERBOSE_COMPARE(Logger::Red, "Types differ (runtime): ",
                mType, " != ", right.mType);
             return false;
@@ -180,11 +180,11 @@ namespace Langulus::Annies
             return GetDeep() == rhs;
          }
          else if constexpr (CT::StringLiteral<T>) {
-            if (mType->template IsSimilar<Text>()) {
+            if (mType->template IsSame<Text>()) {
                // Implicitly make a text container on string literal    
                return *GetRaw<Text>() == Text {Disown(rhs)};
             }
-            else if (mType->template IsSimilar<char*, wchar_t*>()) {
+            else if (mType->template IsSame<char*, wchar_t*>()) {
                // Cast away the extent, compare against pointer         
                return GetRaw<void*>() == static_cast<const void*>(rhs);
             }
@@ -192,10 +192,10 @@ namespace Langulus::Annies
          }
          else if constexpr (CT::Comparable<T, T>) {
             // Non-deep element compare                                 
-            if (mType->template IsSimilar<T>())
+            if (mType->template IsSame<T>())
                return *GetRaw<T>() == rhs;
             else if constexpr (CT::Owned<T>) {
-               if (mType->template IsSimilar<TypeOf<T>>())
+               if (mType->template IsSame<TypeOf<T>>())
                   return *GetRaw<T>() == rhs.Get();
                else
                   return false;
@@ -368,7 +368,7 @@ namespace Langulus::Annies
          }
          else {
             // One or none of the participants is typed                 
-            if (not IsSimilar(item))
+            if (not IsSame(item))
                return IndexNone;
          }
 
@@ -559,7 +559,7 @@ namespace Langulus::Annies
          if constexpr (not OUT::TypeErased) {
             // Output container is strictly typed, we can't make loose  
             // matches                                                  
-            if (IsSimilar<Block<TYPE>, TypeOf<OUT>>())
+            if (IsSame<Block<TYPE>, TypeOf<OUT>>())
                return output.InsertBlock(IndexBack, *this);
             else
                return 0;
@@ -568,7 +568,7 @@ namespace Langulus::Annies
             if (output.IsTypeConstrained()) {
                // Output container is strictly typed, we can't make     
                // loose matches                                         
-               if (IsSimilar(output))
+               if (IsSame(output))
                   return output.template InsertBlock<void, false>(IndexBack, *this);
                else
                   return 0;
@@ -632,7 +632,7 @@ namespace Langulus::Annies
    ///   @return true if both containers match loosely                        
    template<class TYPE> LANGULUS(INLINED)
    bool Block<TYPE>::CompareLoose(const CT::Block auto& other) const noexcept {
-      return (IsEmpty() and other.IsEmpty() and IsSimilar(other))
+      return (IsEmpty() and other.IsEmpty() and IsSame(other))
           or MatchesLoose(other) == mCount;
    }
 

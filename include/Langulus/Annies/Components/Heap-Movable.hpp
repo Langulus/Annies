@@ -9,6 +9,7 @@
 #include "Heap-Reference.hpp"
 #include "Langulus/Assume.hpp"
 #include "Langulus/Typenav.hpp"
+#include <Langulus/CT/NullTerminated.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -27,6 +28,8 @@ namespace Langulus::Annies::Component
    ///      the heap allocation. Each ID must correspond to a matching type   
    ///      component ID. Each entry also allows for pointer customization,   
    ///      including support for packed pointers.                            
+   ///   @attention this component will allocate an additional silent byte    
+   ///      if container is CT::NullTerminated.                               
    template<unsigned INITIAL_SIZE, unsigned GROWTH_FACTOR, CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
    struct HeapMovable : HeapReference<ENTRY0, ENTRYN...> {
       /// Refers back to this particular component instance through the       
@@ -37,11 +40,9 @@ namespace Langulus::Annies::Component
       using Id = typename HeapReference<ENTRY0, ENTRYN...>::Id;
       using HeapProvider = Id;
 
-      static constexpr unsigned InitialSize  = INITIAL_SIZE;
-      static constexpr unsigned GrowthFactor = GROWTH_FACTOR;
-      static constexpr bool Reallocatable = true;
-      //template<Cid SID>
-      //static constexpr bool Relevant = Id::template Contains<SID>;
+      static constexpr unsigned InitialSize   = INITIAL_SIZE;
+      static constexpr unsigned GrowthFactor  = GROWTH_FACTOR;
+      static constexpr bool     Reallocatable = true;
 
    protected:
       LglsComIterationOperators(friend);
@@ -158,7 +159,7 @@ namespace Langulus::Annies::Component
                   self.template CopyOrCloneAllItemsOneByOne<CT::Cloned<I>>(from);
             }
                      
-            // Full success                                             
+            // Reached only on full success                             
             if constexpr (requires { from.template GetHashInner<Id::First>(); }) {
                     if_available(self.template SetHashInner<Id::First>(from.template GetHashInner<Id::First>()))
                else if_available(self.template ResetHash<Id::First>())
@@ -205,10 +206,12 @@ namespace Langulus::Annies::Component
       /// Allocate a fresh allocation                                         
       ///   @attention works on all relevant dimensions at once               
       ///   @attention changes allocation, heap pointer and reserve count only
+      ///   @attention may allocate an additional element if the container    
+      ///      is CT::NullTerminated                                          
       ///   @param request request to fulfill                                 
-      template<Cid SID = Id::First, CT::Container C> //requires Relevant<SID>
-      void AllocateFresh(this C& self, size_t elements /*const Request& request*/) {
-         const auto request = ThisCom::RequestHeap(elements);
+      template<Cid SID = Id::First, CT::Container C>
+      void AllocateFresh(this C& self, size_t elements) {
+         const auto request = ThisCom::RequestHeap(elements + size_t(CT::NullTerminated<C>));
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
             auto al = Allocator::Allocate(self.template GetType<SID>(), request.mTotalBytes);
@@ -230,8 +233,10 @@ namespace Langulus::Annies::Component
       /// Allocate a number of elements, relying on the type of the container 
       ///   @attention assumes container is typed                             
       ///   @attention works on all relevant dimensions at once               
+      ///   @attention may allocate an additional element if the container    
+      ///      is CT::NullTerminated                                          
       ///   @param elements number of elements to allocate                    
-      template<Cid SID = Id::First, CT::Container C> //requires Relevant<SID>
+      template<Cid SID = Id::First, CT::Container C>
       void AllocateMore(this C& self, Count<C> elements) {
          static_assert(not CT::Handle<C>, "Handles aren't allowed to reallocate");
          LglsAssumeDev(elements > self.template GetCount<SID>(), "Bad element count");
@@ -249,7 +254,7 @@ namespace Langulus::Annies::Component
             "Container should've branched-out prior to AllocateMore. "
          );
 
-         const auto request = ThisCom::RequestHeap(elements);
+         const auto request = ThisCom::RequestHeap(elements + size_t(CT::NullTerminated<C>));
          if constexpr (CT::ContainsMany<C>) {
             if (self.template GetReserved<SID>() >= request.mReserved)
                return;
@@ -324,7 +329,7 @@ namespace Langulus::Annies::Component
       /// allocations never move when shrinking.                              
       ///   @attention works on all relevant dimensions at once               
       ///   @param desiredReserve number of elements to reserve               
-      template<Cid SID = Id::First, CT::Container C> //requires Relevant<SID>
+      template<Cid SID = Id::First, CT::Container C>
       void AllocateLess(this C& self, const Count<C> desiredReserve) {
          static_assert(not CT::Handle<C>,
             "Handles aren't allowed to reallocate");
@@ -337,7 +342,7 @@ namespace Langulus::Annies::Component
             // We have to branch out                                    
             const C backup {Abandon{self}};
             if_available(self.DisableDisowned());
-            ThisCom::AllocateFresh(desiredReserve /*ThisCom::RequestHeap(desiredReserve)*/);
+            ThisCom::AllocateFresh(desiredReserve);
 
             // Reinsert only the relevant items                         
             auto to = self.GetHandle();
@@ -375,7 +380,7 @@ namespace Langulus::Annies::Component
             if_available(self.template SetCountInner<SID>(desiredReserve));
          }
 
-         const auto request = ThisCom::RequestHeap(desiredReserve);
+         const auto request = ThisCom::RequestHeap(desiredReserve + size_t(CT::NullTerminated<C>));
          if (self.template GetReserved<SID>() == request.mReserved)
             return;
       
@@ -794,7 +799,7 @@ namespace Langulus::Annies::Component
       /// MARK: PartialSuccess                                                
       /// Invoked to remedy the situation when element constructors throw     
       ///   @param n the number of elements that were actually initialized    
-      template<Cid SID = Id::First, CT::Container C> //requires Relevant<SID>
+      template<Cid SID = Id::First, CT::Container C>
       void PartialSuccess(this C& self, Count<C> n) {
          if constexpr (requires { self.template SetCountInner<SID>(1); }) {
             // Partial success is supported                             
@@ -805,6 +810,13 @@ namespace Langulus::Annies::Component
                // Partial success involving maps/sets might result in   
                // gaps in the hash table that need to be accounted for. 
                self.template ShiftEntries<SID>();
+            }
+            
+            if constexpr (CT::NullTerminated<C>) {
+               // Make sure last byte is zero                           
+               static_assert(CT::Contiguous<C>,
+                  "Only contiguous containers can be null-terminated");
+               memset((self.GetHandle() + n).GetRaw(), 0, 1);
             }
          }
          else {
@@ -824,7 +836,7 @@ namespace Langulus::Annies::Component
       /// allocated anything yet.                                             
       ///   @param newReserve usually branching is accompanied by a resize,   
       ///      so specify it here                                             
-      template<Cid SID = Id::First, CT::Container C> //requires Relevant<SID>
+      template<Cid SID = Id::First, CT::Container C>
       void BranchOut(this C& self, Count<C> newReserve) {
          if (not self.IsDisowned() and self.template GetUses<SID>() == 1) {
             // No need to branch out - reuse the current allocation     
@@ -874,6 +886,15 @@ namespace Langulus::Annies::Component
                }
                ++dst;
             });
+
+            if constexpr (CT::NullTerminated<C>) {
+               // Make sure last byte is zero                              
+               static_assert(CT::Contiguous<C>,
+                  "Only contiguous containers can be null-terminated");
+               Id::ForEach([&dst]<Cid D>{
+                  memset(dst.template GetRaw<D>(), 0, 1);
+               });
+            }
          }
          catch (...) {
             //TODO what if it throws while all dimensions except the first one are uninitialized??
@@ -906,9 +927,16 @@ namespace Langulus::Annies::Component
             auto dst = self.template GetSlice<D>().ForceMutable();
             auto src = from.template GetSlice<D>();
             if constexpr (CT::Contiguous<C1>)
-               memcpy(dst.GetRaw(), src.GetRaw(), from.GetBytesize());
+               memcpy(dst.GetRaw(), src.GetRaw(), from.GetBytesize() + size_t(CT::NullTerminated<C1,C2>));
             else
                memcpy(dst.GetRaw(), src.GetRaw(), from.GetStride() * from.GetReserved());
+
+            if constexpr (CT::NullTerminated<C1> and not CT::NullTerminated<C2>) {
+               // Make sure last byte is zero                           
+               static_assert(CT::Contiguous<C1>,
+                  "Only contiguous containers can be null-terminated");
+               memset((dst + self.GetCount()).GetRaw(), 0, 1);
+            }
          });
 
          //TODO just copy these along with elements in the above Id::ForEach if oldReserved and newReserved are the same

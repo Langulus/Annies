@@ -42,8 +42,9 @@ namespace Langulus::Annies
       //TODO hmm, should we just inherit Many, so that we can easily get a reference to it? 
       //TODO and just keep everything else on the stack?
       //TODO well, we have composable containers, so we can seamlessly test that out and 
-      //TODO measure compile-time and runtime speed
+      //TODO measure compile-time and runtime speed. let's try it once we pass all current tests
       using CTTI_ReflectAs = Verb;
+      using DeepType       = Many;
       
    private:
       // The number of successful executions                            
@@ -257,17 +258,17 @@ namespace Langulus::Annies
       }
 
       /// Multiply verb charges                                               
-      ///   @param rhs the mass to multiply by                                
-      ///   @return a new verb, with the modified mass                        
+      ///   @param rhs the verb to multiply by                                
+      ///   @return a new verb, with the modified charge                      
       auto operator * (CT::Executable auto const& rhs) const -> TVerb {
          TVerb shallowCopy = *this;
-         shallowCopy.mMass *= rhs.mMass;
-         shallowCopy.mTime += rhs.mTime;
+         shallowCopy.mass *= rhs.mass;
+         shallowCopy.time += rhs.time; // addition is intentional       
 
-         if (not shallowCopy.mRate and rhs.mRate)
-            shallowCopy.mRate = rhs.mRate;
-         else if (shallowCopy.mRate and rhs.mRate)
-            shallowCopy.mRate *= rhs.mRate;
+         if (not shallowCopy.rate and rhs.rate)
+            shallowCopy.rate = rhs.rate;
+         else if (shallowCopy.rate and rhs.rate)
+            shallowCopy.rate *= rhs.rate;
          return shallowCopy;
       }
 
