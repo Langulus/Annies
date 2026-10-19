@@ -152,8 +152,14 @@ namespace Langulus::Annies
       /// it with a compatible value, by shallow copying it.                  
       template<class A>
       constexpr auto CreateSwapper(A&& argument) assumptious {
-         static_assert(Same<T, Deint<A>>, "Type mismatch");
-         return TAny {Annies::Piecewise, LglsFwd(argument)};
+         if constexpr (CT::Handle<A>) {
+            static_assert(Same<T, TypeOf<A>>, "Type mismatch");
+            return TAny {Annies::Absorb, Copy {LglsFwd(argument)}};
+         }
+         else {
+            static_assert(Same<T, Deint<A>>, "Type mismatch");
+            return TAny {Annies::Piecewise, LglsFwd(argument)};
+         }
       }
       
       using Com::Comparison<>::operator <=>;

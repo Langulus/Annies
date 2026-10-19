@@ -714,7 +714,7 @@ namespace Langulus::Annies
             exe = trait.IsExecutable();
             return not exe;
          },
-         [&exe](const Construct& cst) noexcept {
+         [&exe](Recipe const& cst) noexcept {
             // Scan deeper into constructs, because they're not deep,   
             // unless they're being executed                            
             exe = cst.IsExecutable();

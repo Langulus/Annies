@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "HandlePair.hpp"
+#include "Pair.hpp"
 #include "Annies/Components/Typed-Stack.hpp"
 #include "Annies/Components/Multitype.hpp"
 #include "Annies/Components/Heap-Movable.hpp"
@@ -161,15 +162,31 @@ namespace Langulus::Annies::Inner
       }
 
       /// Create a temporary swapper with compatible elements and initialize  
-      /// it with a compatible value, by shallow copying it.                  
-      template<CT::Pair P>
-      constexpr auto CreateSwapper(P&& pair) assumptious {
-         using K = Decvq<Deref<TypeOf<P, 0>>>;
-         using V = Decvq<Deref<TypeOf<P, 1>>>;
-         LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
-         LglsAssumeDev(this->template IsSame<V, 1>(), "Type mismatch");
-         return TPair<K, V> {Copy {LglsFwd(pair)}}; //TODO Annies::Piecewise, ?
-         //return TPair<K, V> {LglsFwd(pair)}; //TODO Annies::Piecewise, ?
+      /// it with a compatible value, by shallow copying it. Missing          
+      /// dimensions will be default-initialized.                             
+      template<class P>
+      constexpr auto CreateSwapper(P&& initializer) assumptious {
+         if constexpr (CT::Handle<P>) {
+            if constexpr (Decvq<Deref<P>>::Dimensions::Count > 1) {
+               using K = Decvq<Deref<TypeOf<P, 0>>>;
+               using V = Decvq<Deref<TypeOf<P, 1>>>;
+               LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
+               LglsAssumeDev(this->template IsSame<V, 1>(), "Type mismatch");
+               return TPair<K, V> {Annies::Absorb, Copy {LglsFwd(initializer)}};
+            }
+            else {
+               using K = Decvq<Deref<TypeOf<P, 0>>>;
+               LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
+               LglsAssumeDev(this->template IsTyped<1>(), "No default value type");
+               return Pair::From(*this, Annies::Piecewise,  LglsFwd(initializer));
+            }
+         }
+         else {
+            using K = Decvq<ShedDeref<P>>;
+            LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
+            LglsAssumeDev(this->template IsTyped<1>(), "No default value type");
+            return Pair::From(*this, Annies::Piecewise,  LglsFwd(initializer));
+         }
       }
 
       /// Clear the map and assign a single pair                              

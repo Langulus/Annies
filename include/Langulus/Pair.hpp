@@ -59,7 +59,7 @@ namespace Langulus::Annies
       static constexpr bool ReferenceElements = true;
 
       using Base           = Inner::PairBase;
-      using DeepType       = Many;//Any;
+      using DeepType       = Many;
       using HandleType     = THandlePair<Handle, Handle>;
       using HandleMutType  = THandlePair<HandleMut, HandleMut>;
       using Pick           = HandleType;
@@ -78,6 +78,47 @@ namespace Langulus::Annies
          this->Destroy();
       }
       
+      /// Create an empty container from a dynamic type and state             
+      ///   @param type type of the container                                 
+      ///   @param states optional states of the container                    
+      ///   @return the new container instance                                
+      static Pair Typed(DMeta k, DMeta v, int states = 0) {
+         Pair result;
+         result.SetKeyType(k);
+         result.SetValType(v);
+         result.SetState(states);
+         return result;
+      }
+   
+      /// Same as above, but copied the types of another container            
+      static Pair Typed(CT::Container auto const& typed, int states = 0) {
+         Pair result;
+         result.SetKeyType(typed.GetKeyType());
+         if constexpr (requires { typed.GetValType(); })
+            result.SetValType(typed.GetValType());
+         result.SetState(states);
+         return result;
+      }
+
+      /// Copy type from another container, and initialize only key. Value    
+      /// will be default-initialized.                                        
+      static Pair From(CT::Container auto const& typed, Inner::Piecewise, auto&& key) {
+         Pair result = Typed(typed);
+         result.AllocateFresh(1);
+         result.template EmplaceConstruct<0, Com::AllocationStrategy::DontAllocate>(LglsFwd(key));
+         result.template EmplaceDefault  <1, Com::AllocationStrategy::DontAllocate>();
+         return result;
+      }
+
+      /// Copy type from another container, and initialize both key and value 
+      static Pair From(CT::Container auto const& typed, Inner::Piecewise, auto&& key, auto&& val) {
+         Pair result = Typed(typed);
+         result.AllocateFresh(1);
+         result.template EmplaceConstruct<0, Com::AllocationStrategy::DontAllocate>(LglsFwd(key));
+         result.template EmplaceConstruct<1, Com::AllocationStrategy::DontAllocate>(LglsFwd(val));
+         return result;
+      }
+
       constexpr Pair(CT::Pair auto&& p) {
          this->Absorb(LglsFwd(p));
       }

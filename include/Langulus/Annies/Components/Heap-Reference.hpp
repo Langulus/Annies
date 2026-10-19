@@ -143,7 +143,7 @@ namespace Langulus::Annies::Component
          static_assert(not CT::Handle<AS>,    "AS can't be a handle");
          static_assert(not CT::Reference<AS>, "Strip references first");
 
-         IF_NOT_LANGULUS_FORCE_TYPE_ERASURE(if constexpr (CT::TypeErased<C>) {)
+         if_constexpr_type_erased(C) {
             using TH   = Tif<CT::Void<AS>, void, AS>;
             using THP  = LglsMutIf(C, TH*);
             void* heap = DecvqAllCast(ThisCom::template GetRaw<SID>());
@@ -189,8 +189,9 @@ namespace Langulus::Annies::Component
                   return static_cast<THP>(heap);
                }
             }
+         }
          #if not LANGULUS(FORCE_TYPE_ERASURE)
-         } else {
+         else {
             using TC   = LglsMutIf(C, TypeOf<C, SID>);
             using TCP  = LglsMutIf(C, TC*);
             using TH   = Tif<CT::Void<AS>, TC, AS>;
@@ -255,7 +256,7 @@ namespace Langulus::Annies::Component
                   ThisCom::template As<Decvq<Deref<AS2>>, SID + 1>()
                };
             }
-            else IF_NOT_LANGULUS_FORCE_TYPE_ERASURE(if constexpr (CT::TypeErased<C>)) {
+            else if_constexpr_type_erased(C) {
                auto type = self.template GetType<SID>();
                auto requested = MetaDataOf<AS>();
                LglsAssert(type.Is(requested), 
@@ -277,6 +278,20 @@ namespace Langulus::Annies::Component
                      return *ThisCom::template Get<AS, SID>();
                   else
                      return ThisCom::template Get<Deptr<AS>, SID>();
+               }
+               else if constexpr (CT::DerivedFrom<T, AS>) {
+                  // Access by downcast                                 
+                  //if constexpr (CT::Dense<AS> or CT::CustomPointer<AS>)
+                     return static_cast<AS>(*ThisCom::template Get<T, SID>());
+                  //else
+                  //   return ThisCom::template Get<Deptr<AS>, SID>();
+               }
+               else if constexpr (CT::DerivedFrom<AS, T>) {
+                  // Access by upcast                                   
+                  //if constexpr (CT::Dense<AS> or CT::CustomPointer<AS>)
+                     return dynamic_cast<AS>(*ThisCom::template Get<T, SID>());
+                  //else
+                  //   return ThisCom::template Get<Deptr<AS>, SID>();
                }
                else {
                   // Wrap in a container                                

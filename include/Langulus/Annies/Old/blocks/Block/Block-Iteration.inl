@@ -419,7 +419,7 @@ namespace Langulus::Annies
          }
          else if (Is<Neat>()) {
             // Iterate normalized subblocks                             
-            using SubNeat = Conditional<MUTABLE, Neat&, const Neat&>;
+            using SubNeat = Conditional<MUTABLE, Neat&, Neat const&>;
 
             loop = ForEachInner<MUTABLE, REVERSE>(
                [&call](SubNeat neat) {
@@ -495,7 +495,7 @@ namespace Langulus::Annies
          }
          else if constexpr (CT::Same<TYPE, Neat>) {
             // Iterate normalized subblocks                             
-            using SubNeat = Conditional<MUTABLE, Neat&, const Neat&>;
+            using SubNeat = Conditional<MUTABLE, Neat&, Neat const&>;
 
             loop = ForEachInner<MUTABLE, REVERSE>(
                [&call](SubNeat neat) {

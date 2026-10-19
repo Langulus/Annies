@@ -262,13 +262,13 @@ namespace Langulus::Annies
       ///   @return a new verb, with the modified charge                      
       auto operator * (CT::Executable auto const& rhs) const -> TVerb {
          TVerb shallowCopy = *this;
-         shallowCopy.mass *= rhs.mass;
-         shallowCopy.time += rhs.time; // addition is intentional       
+         shallowCopy.GetCharge().mass *= rhs.GetCharge().mass;
+         shallowCopy.GetCharge().time += rhs.GetCharge().time;    // addition is intentional          
 
-         if (not shallowCopy.rate and rhs.rate)
-            shallowCopy.rate = rhs.rate;
-         else if (shallowCopy.rate and rhs.rate)
-            shallowCopy.rate *= rhs.rate;
+         if (not shallowCopy.GetCharge().rate and rhs.GetCharge().rate)
+            shallowCopy.GetCharge().rate = rhs.GetCharge().rate;  // overwrite is intentional         
+         else if (shallowCopy.GetCharge().rate and rhs.GetCharge().rate)
+            shallowCopy.GetCharge().rate *= rhs.GetCharge().rate;
          return shallowCopy;
       }
 

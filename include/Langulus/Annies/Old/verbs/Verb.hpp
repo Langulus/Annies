@@ -138,20 +138,20 @@ namespace Langulus::A
 
 } // namespace Langulus::A
 
-LANGULUS_MORPHISM(Langulus::A::Verb, Langulus::Annies::Text);
+LANGULUS_MORPHISM(Langulus::Verb, Langulus::Annies::Text);
 
 namespace Langulus::CT
 {
    
-   /// A VerbBased type is any type that inherits A::Verb                     
+   /// A VerbBased type is any type that inherits Verb                     
    template<class...T>
-   concept VerbBased = (DerivedFrom<T, A::Verb> and ...);
+   concept VerbBased = (DerivedFrom<T, Verb> and ...);
 
-   /// A reflected verb type is any type that inherits A::Verb, is binary     
+   /// A reflected verb type is any type that inherits Verb, is binary     
    /// compatible to it, and is reflected as a verb                           
    template<class...T>
    concept Verb = VerbBased<T...> and ((
-      sizeof(T) == sizeof(A::Verb) and (
+      sizeof(T) == sizeof(Verb) and (
          requires {
             {Decay<T>::CTTI_Verb} -> Same<Token>;
          } or requires {

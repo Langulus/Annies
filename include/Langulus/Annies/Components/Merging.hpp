@@ -307,8 +307,8 @@ namespace Langulus::Annies::Component
          return found;
       }
 
-      template<CT::Container C>
-      auto MergeRange(this C&, CT::Container auto&&) -> Count<C>;
+      template<CT::Container C, class CONFLICT_RESOLVER>
+      auto MergeRange(this C&, CT::Container auto&&, CONFLICT_RESOLVER&&) -> Count<C>;
       
    protected:
       /// MARK: PrepareForMerging                                             
@@ -529,9 +529,7 @@ namespace Langulus::Annies::Component
       template<class C, class D1, class...DN> requires (C::Dimensions::Count > 1)
       auto MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C> {
          static_assert(sizeof...(SHARED) >= sizeof...(DN), "Too many arguments");
-         static_assert(not CONVERT or (
-                 Same<TypeOf<C, ID>,     DeextAll<Deint<D1>>>
-            and (Same<TypeOf<C, SHARED>, DeextAll<Deint<DN>>> and ...)),
+         static_assert(not CONVERT or Same<TypeOf<C, ID>, DeextAll<Deint<D1>>>,
             "Use ConvertMergeInnerTableMD instead" //TODO function not implemented yet
          ); 
 
@@ -548,12 +546,16 @@ namespace Langulus::Annies::Component
 
          // Emplace available                                           
          LglsSequence(overlapped_count, {
+            static_assert(not CONVERT
+               or ((Same<TypeOf<C, Id::template At<I+1>>, DeextAll<Deint<DN>>>) and ...),
+               "Use ConvertMergeInnerTableMD instead" //TODO function not implemented yet
+            );
             (h.template EmplaceWithIntent<Id::template At<I+1>>(FWDIntent(dn)), ...);
          });
 
          // Default the rest                                            
          LglsSequence(sizeof...(SHARED) - overlapped_count, {
-            (h.template EmplaceDefault<Id::template At<I+1+overlapped_count>>(), ...);
+            (h.template EmplaceDefault<Id::template At<I+1+overlapped_count>, AllocationStrategy::DontAllocate>(), ...);
          });
          return h;
       }

@@ -20,7 +20,7 @@ namespace Langulus::Annies
    ///   @tparam TRAIT - trait to set                                         
    ///   @param value - the value to assign                                   
    template<class TYPE> template<class TRAIT, CT::NotVoid D>
-   void Block<TYPE>::SetDefaultTrait(D&& value) {
+   void Block<TYPE>::SetDefaultTag(D&& value) {
       static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
       bool satisfied = false;
       ForEachDeep([&](const TRAIT& trait) {
@@ -54,7 +54,7 @@ namespace Langulus::Annies
    template<class TYPE> template<class...TRAIT>
    bool Block<TYPE>::ExtractTag(CT::NotVoid auto&...values) const {
       static_assert(CT::Tag<TRAIT...>, "TRAIT is not a trait type");
-      return (ExtractTraitInner<TRAIT>(values...) or ...);
+      return (ExtractTagInner<TRAIT>(values...) or ...);
    }
 
    /// Extract data of an exact type, doing only pointer arithmetic           
@@ -137,7 +137,7 @@ namespace Langulus::Annies
       DMeta found;
 
       ForEachDeep([&](Many const& group) noexcept {
-         group.ForEach([&](const Construct& c) noexcept {
+         group.ForEach([&](Recipe const& c) noexcept {
             if (not c.CastsTo(type))
                return;
 
@@ -164,25 +164,25 @@ namespace Langulus::Annies
 
    ///                                                                        
    template<class TYPE> template<class TRAIT>
-   bool Block<TYPE>::ExtractTraitInner(CT::NotVoid auto&...values) const {
+   bool Block<TYPE>::ExtractTagInner(CT::NotVoid auto&...values) const {
       static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
-      return ExtractTraitInner<TRAIT>(
+      return ExtractTagInner<TRAIT>(
          Sequence<sizeof...(values)>::Expand, values...
       );
    }
 
    ///                                                                        
    template<class TYPE> template<class TRAIT, size_t...IDX>
-   bool Block<TYPE>::ExtractTraitInner(
+   bool Block<TYPE>::ExtractTagInner(
       ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
       static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
-      return (ExtractTraitInnerInner<TRAIT, IDX>(values) or ...);
+      return (ExtractTagInnerInner<TRAIT, IDX>(values) or ...);
    }
 
    ///                                                                        
    template<class TYPE> template<class TRAIT, size_t IDX>
-   bool Block<TYPE>::ExtractTraitInnerInner(CT::NotVoid auto& value) const {
+   bool Block<TYPE>::ExtractTagInnerInner(CT::NotVoid auto& value) const {
       static_assert(CT::Tag<TRAIT>, "TRAIT is not a trait type");
       using D = Deref<decltype(value)>;
       bool satisfied = false;
@@ -212,7 +212,7 @@ namespace Langulus::Annies
    ///   @param trait - trait to set                                          
    ///   @param index - the index we're interested with if repeated           
    template<class TYPE> template<class TRAIT>
-   void Block<TYPE>::SetTrait(TRAIT&& trait, size_t index) {
+   void Block<TYPE>::SetTag(TRAIT&& trait, size_t index) {
       using S = IntentOf<TRAIT>;
       using T = TypeOf<S>;
       static_assert(CT::DefineTag<T>, "T is not trait-based");
@@ -236,7 +236,7 @@ namespace Langulus::Annies
 
       // Then try pushing a new trait into a contained Neat scope       
       ForEachDeep([&](Neat& neat) {
-         neat.SetTrait(Forward<TRAIT>(trait));
+         neat.SetTag(Forward<TRAIT>(trait));
          satisfied = true;
          return Loop::Break;
       });

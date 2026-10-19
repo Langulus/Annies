@@ -210,7 +210,7 @@ namespace Langulus::A
    }
    
    /// Get the verb type                                                      
-   ///   @attention verb might not be set yet, if taken from A::Verb          
+   ///   @attention verb might not be set yet, if taken from Verb          
    ///   @return the hash of the content                                      
    LANGULUS(INLINED)
    auto Verb::GetVerb() const noexcept -> VMeta {

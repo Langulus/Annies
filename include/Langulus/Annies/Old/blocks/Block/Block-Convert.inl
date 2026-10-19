@@ -935,7 +935,7 @@ namespace Langulus::Annies
                to.ForEach([&](Tag& trait) {
                   TMeta ttype;
                   read = DeserializeMeta(ttype, read, header, loader);
-                  trait.SetTrait(ttype);
+                  trait.SetTag(ttype);
 
                   auto& block = static_cast<Block<>&>(trait);
                   read = DeserializeBinary<void>(block, header, read, loader);

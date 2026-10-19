@@ -526,12 +526,12 @@ namespace Langulus::Annies::Component
          self.C::template SetType<T>();
       }
       template<CT::NotVoid T>
-      constexpr void SetKeyType(this auto const& self) {
+      constexpr void SetKeyType(this auto& self) {
          using C = typename Subcomponents::First;
          self.C::template SetType<T>();
       }
       template<CT::NotVoid T>
-      constexpr void SetValType(this auto const& self) {
+      constexpr void SetValType(this auto& self) {
          using C = typename Subcomponents::Second;
          self.C::template SetType<T>();
       }
@@ -546,11 +546,11 @@ namespace Langulus::Annies::Component
          using C = typename Subcomponents::template At<SID>;
          self.C::SetType(type);
       }
-      constexpr void SetKeyType(this auto const& self, auto const& type) {
+      constexpr void SetKeyType(this auto& self, auto const& type) {
          using C = typename Subcomponents::First;
          self.C::SetType(type);
       }
-      constexpr void SetValType(this auto const& self, auto const& type) {
+      constexpr void SetValType(this auto& self, auto const& type) {
          using C = typename Subcomponents::Second;
          self.C::SetType(type);
       }
@@ -596,9 +596,17 @@ namespace Langulus::Annies::Component
       /// Deduce all types of the container from provided arguments           
       ///   @param a The arguments - one for each dimension.                  
       constexpr void DeduceType(this auto& self, auto const&...a) {
-         Expand(Subcomponents{}, [&]<class...C> {
-            (self.C::DeduceType(a), ...);
-         });
+         if constexpr (Subcomponents::Count == sizeof...(a)) {
+            Expand(Subcomponents{}, [&]<class...C> {
+               (self.C::DeduceType(a), ...);
+            });
+         }
+         else {
+            static_assert(sizeof...(a) == 1,
+               "Can't do partial deduction, unless it's just the first type"); //TODO could be generalized though
+            using C = typename Subcomponents::First;
+            self.C::DeduceType(a...);
+         }
       }
 
    protected:

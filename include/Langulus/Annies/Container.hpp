@@ -12,6 +12,7 @@
 #include <Langulus/Utils/Sequence.hpp>
 #include <Langulus/HashOf.hpp>
 #include <Langulus/CT/Bool.hpp>
+#include <Langulus/CT/Deep.hpp>
 #include <concepts>
 
 /// Make the rest of the code aware, that Langulus::Annies has been included 
@@ -132,7 +133,7 @@ namespace Langulus::Annies
             );
             return Types<Tmut<C, mutbl, immut>> {};
          }
-         else IF_NOT_LANGULUS_FORCE_TYPE_ERASURE(if constexpr (CT::TypeErased<C>)) {
+         else if_constexpr_type_erased(C) {
             // Type-erased handle                                       
             static_assert(C::Dimensions::Count == 1, 
                "Multidimensional containers should result in multidimensional handles! "
@@ -177,7 +178,7 @@ namespace Langulus::Annies
             // Always prioritize custom pick types if defined           
             return Types<Tmut<C, typename C::PickMut, typename C::Pick>> {};
          }
-         else IF_NOT_LANGULUS_FORCE_TYPE_ERASURE(if constexpr (CT::TypeErased<C>)) {
+         else if_constexpr_type_erased(C) {
             // Type-erased containers always result in handle picks     
             return DecideHandleType<C>();
          }
@@ -1137,6 +1138,39 @@ namespace Langulus::Annies::Component
          self.ResetCount(); //TODO not redundant! but why? shouldn't Absorb set it either way?
          self.Absorb(LglsFwd(rhs));
          return self;
+      }
+
+      /// Check if container has missing past/future in any nested container  
+      template<class SELF>
+      constexpr bool IsMissingDeep(this SELF const& self) noexcept {
+         if constexpr (SELF::CanBeMissing) {
+            // Check locally first                                      
+            if (self.IsMissing())
+               return true;
+         }
+
+         // Then dig deeper                                             
+         bool result = false;
+         if constexpr (CT::Deep<SELF>) {
+            if_constexpr_type_erased(SELF) {
+               auto probe = self.GetType().GetProbe();
+               self.Apply([&](auto const& item) noexcept {
+                  result = probe(item.GetRaw(), [](auto const& inner) noexcept {
+                     return inner.IsMissingDeep();
+                  });
+                  return not result;
+               });
+            }
+            #if not LANGULUS(FORCE_TYPE_ERASURE)
+            else {
+               self.Apply([&](auto const& item) noexcept {
+                  result = item.IsMissingDeep();
+                  return not result;
+               });
+            }
+            #endif
+         }
+         return result;
       }
    };
 }

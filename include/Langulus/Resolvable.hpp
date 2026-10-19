@@ -89,7 +89,7 @@ namespace Langulus
       bool GetValue(CT::NotVoid auto&) const;
 
       template<CT::Tag, bool DIRECT = false>
-      bool SetTrait(CT::NotVoid auto&&);
+      bool SetTag(CT::NotVoid auto&&);
       template<bool DIRECT = false>
       bool SetValue(CT::NotVoid auto&&);
 

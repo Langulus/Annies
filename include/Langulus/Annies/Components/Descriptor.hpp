@@ -176,5 +176,33 @@ namespace Langulus::Annies::Component
 
          return found;
       }
+      
+      /// Get a reflected member variable inside the first element by index   
+      ///   @param index the member index to search for                       
+      ///   @return type-erased container to the reflected member(s)          
+      auto GetMember(this auto&& self, CT::Index auto&& index) -> Many {
+         if (self.IsEmpty())
+            return {};
+
+         auto& members = self.GetType().GetMembers();
+         //TODO special indices
+         return self.GetMemberInner(members[index]);
+      }
+
+   protected:
+      /// Get handle to a reflected member variable inside the first element  
+      ///   @attention assumes block is not empty                             
+      ///   @param member the member reflection to search for                 
+      ///   @return type-erased container to the reflected member(s)          
+      auto GetMemberInner(this auto&& self, RTTI::DefinitionData::Member const& member) -> Many {
+         LglsAssumeDev(not self.IsEmpty(),
+            "Getting member from an empty descriptor");
+            
+         return {
+            Annies::Stackwise, Many::StateType{0},
+            member.type(), member.member(const_cast<void*>(self.GetRaw())),
+            member.extent, member.extent, self.GetAllocation(), Hash {0}
+         };
+      }
    };
 }

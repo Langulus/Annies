@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,25 +7,25 @@
 ///                                                                           
 #pragma once
 #include "HandlePair.hpp"
-#include <Annies/Components/Typed-Static.hpp"
-#include <Annies/Components/Typed-Stack.hpp"
-#include <Annies/Components/Heap-Movable.hpp"
-#include <Annies/Components/Stack.hpp"
-#include <Annies/Components/Count-Static.hpp"
-#include <Annies/Components/Reserve-Static.hpp"
-#include <Annies/Components/Ownership-Stack.hpp"
-#include <Annies/Components/OwnershipDeep-Heap.hpp"
-#include <Annies/Components/Hash-Emergent.hpp"
-#include <Annies/Components/Emplacement.hpp"
-#include <Annies/Components/Assignment.hpp"
-#include <Annies/Components/Removal.hpp"
-#include <Annies/Components/Conversion.hpp"
-#include <Annies/Components/Comparison.hpp"
-#include <Annies/Components/Multitype.hpp"
-#include <Annies/Components/Multiprovider.hpp"
-#include <Annies/Components/Multiown-Deep.hpp"
-#include <Annies/States/Encrypted.hpp"
-#include <Annies/States/Disowned.hpp"
+#include "Annies/Components/Typed-Static.hpp"
+#include "Annies/Components/Typed-Stack.hpp"
+#include "Annies/Components/Heap-Movable.hpp"
+#include "Annies/Components/Stack.hpp"
+#include "Annies/Components/Count-Static.hpp"
+#include "Annies/Components/Reserve-Static.hpp"
+#include "Annies/Components/Ownership-Stack.hpp"
+#include "Annies/Components/OwnershipDeep-Heap.hpp"
+#include "Annies/Components/Hash-Emergent.hpp"
+#include "Annies/Components/Emplacement.hpp"
+#include "Annies/Components/Assignment.hpp"
+#include "Annies/Components/Removal.hpp"
+#include "Annies/Components/Conversion.hpp"
+#include "Annies/Components/Comparison.hpp"
+#include "Annies/Components/Multitype.hpp"
+#include "Annies/Components/Multiprovider.hpp"
+#include "Annies/Components/Multiown-Deep.hpp"
+#include "Annies/States/Encrypted.hpp"
+#include "Annies/States/Disowned.hpp"
 
 
 namespace Langulus::Annies::Inner
@@ -159,7 +159,7 @@ namespace Langulus::Annies
             this->Com::OwnershipDeepEmergent<Com::StrongOwnership, true, 0, 1>::Keep();
       }
 
-      /// Construct from handles                                              
+      /// Construct on the heap (or from handles)                             
       template<Disambiguate K_ALT, class V_ALT>
       constexpr TPair(K_ALT&& a1, V_ALT&& a2)
       requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT> or CT::Handle<V_ALT>) {
@@ -177,8 +177,29 @@ namespace Langulus::Annies
          }
       }
 
+      /// Construct on the heap (or from handles)                             
+      ///   @attention default-initializes the value                          
+      template<Disambiguate K_ALT>
+      constexpr TPair(K_ALT&& a1) requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT>) {
+         this->ResetState();
+         this->DeduceType(a1);
+         
+         if constexpr (Inner::PairOnHeap<K, V>) {
+            this->AllocateFresh(1);
+            this->template EmplaceConstruct<0, Com::AllocationStrategy::DontAllocate>(FWDIntent(a1));
+            this->template EmplaceDefault  <1, Com::AllocationStrategy::DontAllocate>();
+         }
+         else {
+            this->template EmplaceWithIntent<0>(FWDIntent(a1));
+            this->template EmplaceDefault   <1>();
+         }
+      }
+
       constexpr TPair(Inner::Piecewise, auto&& a1, auto&& a2) requires Inner::PairOnHeap<K, V>
          : TPair {LglsFwd(a1), LglsFwd(a2)} {}
+     
+      constexpr TPair(Inner::Piecewise, auto&& a1) requires Inner::PairOnHeap<K, V>
+         : TPair {LglsFwd(a1)} {}
      
       /// Assignment                                                          
       constexpr TPair& operator = (TPair const& other) {

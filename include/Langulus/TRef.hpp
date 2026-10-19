@@ -69,12 +69,12 @@ namespace Langulus::Annies
       constexpr TRef(nullptr_t) noexcept
          : TRef {} {}
 
-      constexpr TRef(TRef const& other)
-         : Base {Absorb, Refer {other}} {}
-
-      constexpr TRef(TRef&& other) noexcept
-         : Base {Absorb, Move {other}} {}
-
+      constexpr TRef(TRef const& other) {
+         this->Absorb(Refer(other));
+      }
+      constexpr TRef(TRef&& other) noexcept {
+         this->Absorb(Move(other));
+      }
       constexpr ~TRef() noexcept {
          this->Destroy();
       }

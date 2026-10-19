@@ -48,7 +48,7 @@ namespace Langulus::Annies
       // Subconstructs are sorted first by the construct type, and then 
       // by their order of appearance. Their contents may or may not    
       // also be normalized                                             
-      TMapUnsorted<DMeta, ConstructList> mConstructs;
+      TMapUnsorted<DMeta, ConstructList> mRecipes;
 
       // Any other block type that doesn't fit in the above is sorted   
       // first by the block type, then by the order of appearance       
@@ -64,7 +64,7 @@ namespace Langulus::Annies
       ///   Construction                                                      
       ///                                                                     
       constexpr Neat() = default;
-      Neat(const Neat&);
+      Neat(Neat const&);
       Neat(Neat&&) noexcept;
 
       template<template<class> class S> requires CT::Intent<S<Neat>>
@@ -76,7 +76,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Assignment                                                        
       ///                                                                     
-      Neat& operator = (const Neat&) = default;
+      Neat& operator = (Neat const&) = default;
       Neat& operator = (Neat&&) noexcept = default;
 
       template<template<class> class S> requires CT::Intent<S<Neat>>
@@ -85,7 +85,7 @@ namespace Langulus::Annies
       ///                                                                     
       ///   Comparison                                                        
       ///                                                                     
-      bool operator == (const Neat&) const;
+      bool operator == (Neat const&) const;
 
       void Clear();
       void Reset();
@@ -101,12 +101,12 @@ namespace Langulus::Annies
       explicit operator bool() const noexcept;
 
       template<CT::Tag>
-      auto GetTraits() -> TagList*;
+      auto GetTags() -> TagList*;
 
       template<CT::Tag>
-      auto GetTraits()      const -> const TagList*;
-      auto GetTraits(TMeta)       ->       TagList*;
-      auto GetTraits(TMeta) const -> const TagList*;
+      auto GetTags()      const -> const TagList*;
+      auto GetTags(TMeta)       ->       TagList*;
+      auto GetTags(TMeta) const -> const TagList*;
 
       template<CT::Data>
       auto GetData() -> TailList*;
@@ -129,7 +129,7 @@ namespace Langulus::Annies
       auto GetConstructs(DMeta) const -> const ConstructList*;
 
       template<CT::Tag>
-      void SetDefaultTrait(CT::NotVoid auto&&);
+      void SetDefaultTag(CT::NotVoid auto&&);
 
       template<CT::Tag...>
       bool ExtractTag(CT::NotVoid auto&...) const;
@@ -142,11 +142,11 @@ namespace Langulus::Annies
 
    protected:
       template<CT::Tag>
-      bool ExtractTraitInner(CT::NotVoid auto&...) const;
+      bool ExtractTagInner(CT::NotVoid auto&...) const;
       template<size_t...IDX>
-      bool ExtractTraitInner(const TagList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
+      bool ExtractTagInner(const TagList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
       template<size_t>
-      bool ExtractTraitInnerInner(const TagList&, CT::NotVoid auto&) const;
+      bool ExtractTagInnerInner(const TagList&, CT::NotVoid auto&) const;
 
    public:
       ///                                                                     
@@ -161,12 +161,12 @@ namespace Langulus::Annies
       size_t ForEachDeep(auto&&...) const;
 
       template<bool MUTABLE = true>
-      size_t ForEachTrait(auto&&);
-      size_t ForEachTrait(auto&&) const;
+      size_t ForEachTag(auto&&);
+      size_t ForEachTag(auto&&) const;
 
       template<bool MUTABLE = true>
-      size_t ForEachConstruct(auto&&);
-      size_t ForEachConstruct(auto&&) const;
+      size_t ForEachRecipe(auto&&);
+      size_t ForEachRecipe(auto&&) const;
 
       template<bool MUTABLE = true>
       size_t ForEachTail(auto&&);
@@ -183,8 +183,8 @@ namespace Langulus::Annies
       ///                                                                     
       template<class T1, class...TN>
       size_t Insert(T1&&, TN&&...);
-      void  Merge(const Neat&);
-      Neat& SetTrait(CT::DefineTag auto&&, size_t = 0);
+      void  Merge(Neat const&);
+      Neat& SetTag(CT::DefineTag auto&&, size_t = 0);
 
       Neat& operator <<  (auto&&);
       Neat& operator <<= (auto&&);
@@ -194,7 +194,7 @@ namespace Langulus::Annies
       void InsertInner(auto&&);
 
       void AddTag(CT::Intent auto&&);
-      void AddConstruct(CT::Intent auto&&);
+      void AddRecipe(CT::Intent auto&&);
       void AddVerb(CT::Intent auto&&);
 
    public:
@@ -204,9 +204,9 @@ namespace Langulus::Annies
       template<CT::Data, bool EMPTY_TOO = false>
       size_t RemoveData();
       template<CT::Data>
-      size_t RemoveConstructs();
+      size_t RemoveRecipes();
       template<CT::Tag, bool EMPTY_TOO = false>
-      size_t RemoveTrait();
+      size_t RemoveTag();
 
       ///                                                                     
       ///   Conversion                                                        

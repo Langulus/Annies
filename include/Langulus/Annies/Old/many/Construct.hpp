@@ -40,8 +40,8 @@ namespace Langulus::Annies
       static constexpr bool Ownership = true;
 
       constexpr Construct() noexcept = default;
-      Construct(const Construct&) noexcept;
-      Construct(Construct&&) noexcept;
+      Construct(Recipe const&) noexcept;
+      Construct(Recipe&&) noexcept;
 
       template<template<class> class S> requires CT::Intent<S<Construct>>
       Construct(S<Construct>&&);
@@ -54,10 +54,10 @@ namespace Langulus::Annies
          Construct(Token const&, auto&&, const Charge& = {});
       #endif
 
-      Construct& operator = (const Construct&) noexcept;
-      Construct& operator = (Construct&&) noexcept;
+      Recipe& operator = (Recipe const&) noexcept;
+      Recipe& operator = (Recipe&&) noexcept;
       template<template<class> class S> requires CT::Intent<S<Construct>>
-      Construct& operator = (S<Construct>&&);
+      Recipe& operator = (S<Construct>&&);
 
    public:
       Hash GetHash() const;
@@ -78,7 +78,7 @@ namespace Langulus::Annies
       bool StaticCreation(Many&) const;
 
    public:
-      bool operator == (const Construct&) const;
+      bool operator == (Recipe const&) const;
 
       template<CT::NotVoid>
       bool CastsTo() const;
@@ -111,8 +111,8 @@ namespace Langulus::Annies
       auto operator -> () const -> Many const*;
       auto operator -> ()       ->       Many*;
 
-      Construct& operator <<  (auto&&);
-      Construct& operator <<= (auto&&);
+      Recipe& operator <<  (auto&&);
+      Recipe& operator <<= (auto&&);
 
       ///                                                                     
       ///   Conversion                                                        

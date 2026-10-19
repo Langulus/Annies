@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Map.hpp"
+#include "TPair.hpp"
 #include "Annies/Components/Multiown-Deep.hpp"
 
 
@@ -137,14 +138,29 @@ namespace Langulus::Annies
       }
       
       /// Create a temporary swapper with compatible elements and initialize  
-      /// it with a compatible value, by shallow copying it.                  
-      template<CT::Pair P>
-      constexpr auto CreateSwapper(P&& pair) assumptious {
-         using PK = Decvq<Deref<TypeOf<P, 0>>>;
-         using PV = Decvq<Deref<TypeOf<P, 1>>>;
-         static_assert(Same<PK, K>, "Key type mismatch");
-         static_assert(Same<PV, V>, "Val type mismatch");
-         return TPair<PK, PV> {Copy {LglsFwd(pair)}}; //TODO Annies::Piecewise, ?
+      /// it with a compatible value, by shallow copying it. Missing          
+      /// dimensions will be default-initialized.                             
+      template<class P>
+      constexpr auto CreateSwapper(P&& initializer) assumptious {
+         if constexpr (CT::Handle<P>) {
+            if constexpr (Decvq<Deref<P>>::Dimensions::Count > 1) {
+               using PK = Decvq<Deref<TypeOf<P, 0>>>;
+               using PV = Decvq<Deref<TypeOf<P, 1>>>;
+               static_assert(Same<PK, K>, "Key type mismatch");
+               static_assert(Same<PV, V>, "Val type mismatch");
+               return TPair<PK, PV> {Absorb, Copy {LglsFwd(initializer)}};
+            }
+            else {
+               using PK = Decvq<Deref<TypeOf<P, 0>>>;
+               static_assert(Same<PK, K>, "Key type mismatch");
+               return TPair<PK, V> {Piecewise, LglsFwd(initializer)};
+            }
+         }
+         else {
+            using PK = Decvq<ShedDeref<P>>;
+            static_assert(Same<PK, K>, "Key type mismatch");
+            return TPair<PK, V> {Piecewise, LglsFwd(initializer)};
+         }
       }
 
       /// Clear the map and assign a single pair                              

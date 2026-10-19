@@ -16,13 +16,13 @@ namespace Langulus::Annies
    /// Refer constructor                                                      
    ///   @param other - construct to refer to                                 
    LANGULUS(INLINED)
-   Construct::Construct(const Construct& other) noexcept
+   Construct::Construct(Recipe const& other) noexcept
       : Construct    {Refer(other)} {}
 
    /// Move constructor                                                       
    ///   @param other - construct to move                                     
    LANGULUS(INLINED)
-   Construct::Construct(Construct&& other) noexcept
+   Construct::Construct(Recipe&& other) noexcept
       : Construct    {Move(other)} {}
 
    /// Intent constructor                                                     
@@ -80,7 +80,7 @@ namespace Langulus::Annies
    ///   @param rhs - the construct to shallow-copy                           
    ///   @return a reference to this construct                                
    LANGULUS(INLINED)
-   Construct& Construct::operator = (const Construct& rhs) noexcept {
+   Recipe& Construct::operator = (Recipe const& rhs) noexcept {
       return operator = (Refer(rhs));
    }
 
@@ -88,7 +88,7 @@ namespace Langulus::Annies
    ///   @param rhs - the construct to move                                   
    ///   @return a reference to this construct                                
    LANGULUS(INLINED)
-   Construct& Construct::operator = (Construct&& rhs) noexcept {
+   Recipe& Construct::operator = (Recipe&& rhs) noexcept {
       return operator = (Move(rhs));
    }
 
@@ -96,7 +96,7 @@ namespace Langulus::Annies
    ///   @param rhs - the right hand side                                     
    ///   @return a reference to this construct                                
    template<template<class> class S> requires CT::Intent<S<Construct>>
-   LANGULUS(INLINED) Construct& Construct::operator = (S<Construct>&& rhs) {
+   LANGULUS(INLINED) Recipe& Construct::operator = (S<Construct>&& rhs) {
       mType       = rhs->mType;
       mHash       = rhs->mHash;
       mCharge     = rhs->mCharge;
@@ -200,7 +200,7 @@ namespace Langulus::Annies
    ///   @param rhs - descriptor to compare with                              
    ///   @return true if both constructs are the same                         
    LANGULUS(INLINED)
-   bool Construct::operator == (const Construct& rhs) const {
+   bool Construct::operator == (Recipe const& rhs) const {
       VERBOSE_COMPARE_TAB("Comparing Construct of type ",
          Logger::PushWhite, mType, Logger::Pop, " with construct of type ",
          Logger::PushWhite, rhs.mType
@@ -355,7 +355,7 @@ namespace Langulus::Annies
    ///   @param rhs - stuff to push                                           
    ///   @return a reference to this construct for chaining                   
    template<class T> LANGULUS(INLINED)
-   Construct& Construct::operator << (T&& rhs) {
+   Recipe& Construct::operator << (T&& rhs) {
       if constexpr (requires {mDescriptor << Forward<T>(rhs); }) {
          mDescriptor << Forward<T>(rhs);
          mHash = {};
@@ -369,7 +369,7 @@ namespace Langulus::Annies
    ///   @param rhs - stuff to merge                                          
    ///   @return a reference to this construct for chaining                   
    template<class T> LANGULUS(INLINED)
-   Construct& Construct::operator <<= (T&& rhs) {
+   Recipe& Construct::operator <<= (T&& rhs) {
       if constexpr (requires {mDescriptor <<= Forward<T>(rhs); }) {
          mDescriptor <<= Forward<T>(rhs);
          mHash = {};

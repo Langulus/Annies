@@ -54,18 +54,6 @@ namespace Langulus
       template<class TYPE>
       auto FindType(RTTI::DMeta) const -> RTTI::DMeta;
 
-      /// Get a reflected member variable inside the first element by index   
-      ///   @param index the member index to search for                       
-      ///   @return type-erased container to the reflected member(s)          
-      auto GetMember(CT::Index auto&& index) -> Many {
-         if (what.IsEmpty())
-            return {};
-
-         auto& members = what.GetType().GetMembers();
-         //TODO special indices
-         return GetMemberInner(members[index]);
-      }
-
    private:
       ///                                                                     
       template<CT::DefineTag TAG, size_t IDX, class D>
@@ -105,20 +93,6 @@ namespace Langulus
          return ExtractTagInner<TAG>( 
             Sequence<sizeof...(values)>::Expand, values...
          );
-      }
-
-      /// Get handle to a reflected member variable inside the first element  
-      ///   @attention assumes block is not empty                             
-      ///   @param member the member reflection to search for                 
-      ///   @return type-erased container to the reflected member(s)          
-      auto GetMemberInner(RTTI::DefinitionData::Member const& member) -> Many {
-         LglsAssumeDev(not what.IsEmpty(), "Getting member from an empty descriptor");
-         return {Annies::Stackwise, Many::StateType{0},
-            member.type(), member.member(const_cast<void*>(what.GetRaw())),
-            member.extent, member.extent, what.GetAllocation(), Hash {0}
-         };
-         //result.EnableTypeConstrained();
-         //return result;
       }
    };
 }

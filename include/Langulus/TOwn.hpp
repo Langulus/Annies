@@ -83,7 +83,9 @@ namespace Langulus::Annies
          return lhs == rhs.GetStackInner();
       }
 
-      operator bool() = delete("Boolean conversion not allowed here - too error prone");
+      explicit constexpr operator bool() const {
+         return static_cast<bool>(Base::GetStackInner());
+      }
    };
 
    template<CT::NotVoid T, class...TAGS>
