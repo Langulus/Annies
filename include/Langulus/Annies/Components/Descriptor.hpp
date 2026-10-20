@@ -37,7 +37,7 @@ namespace Langulus::Annies::Component
       ///   @param value the value to assign                                  
       ///   @param force whether to set tag even if it already exists         
       template<CT::DefineTag TAG>
-      void Set(this auto& self, auto&& value, bool force) {
+      void Set(this auto& self, auto&& value, bool force = false) {
          bool satisfied = false;
          self.ForEachDeep([&](TAG& tag) {
             if (tag) {
