@@ -70,7 +70,7 @@ namespace Langulus::Annies
       using Pick           = HandleType;
       using PickMut        = HandleMutType;
 
-      static constexpr bool ReferenceElements = true;
+      //static constexpr bool ReferenceElements = true;
 
       constexpr TMap() noexcept {
          this->ConstructDefault();
@@ -138,28 +138,28 @@ namespace Langulus::Annies
       }
       
       /// Create a temporary swapper with compatible elements and initialize  
-      /// it with a compatible value, by shallow copying it. Missing          
-      /// dimensions will be default-initialized.                             
+      /// it with provided value or handle.                                   
+      ///   @attention missing dimensions will be default-initialized.        
       template<class P>
       constexpr auto CreateSwapper(P&& initializer) assumptious {
+         using DP = Decvq<ShedDeref<P>>;
          if constexpr (CT::Handle<P>) {
-            if constexpr (Decvq<Deref<P>>::Dimensions::Count > 1) {
-               using PK = Decvq<Deref<TypeOf<P, 0>>>;
-               using PV = Decvq<Deref<TypeOf<P, 1>>>;
+            if constexpr (DP::Dimensions::Count > 1) {
+               using PK = Decvq<Deref<TypeOf<DP, 0>>>;
+               using PV = Decvq<Deref<TypeOf<DP, 1>>>;
                static_assert(Same<PK, K>, "Key type mismatch");
                static_assert(Same<PV, V>, "Val type mismatch");
                return TPair<PK, PV> {Absorb, Copy {LglsFwd(initializer)}};
             }
             else {
-               using PK = Decvq<Deref<TypeOf<P, 0>>>;
+               using PK = Decvq<Deref<TypeOf<DP, 0>>>;
                static_assert(Same<PK, K>, "Key type mismatch");
                return TPair<PK, V> {Piecewise, LglsFwd(initializer)};
             }
          }
          else {
-            using PK = Decvq<ShedDeref<P>>;
-            static_assert(Same<PK, K>, "Key type mismatch");
-            return TPair<PK, V> {Piecewise, LglsFwd(initializer)};
+            static_assert(Same<DP, K>, "Key type mismatch");
+            return TPair<DP, V> {Piecewise, LglsFwd(initializer)};
          }
       }
 

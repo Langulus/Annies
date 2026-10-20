@@ -7,6 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Many.hpp"
+#include "Annies/Components/Multiprovider.hpp"
 #include "Annies/Components/Stack.hpp"
 #include "Annies/Components/Charged-Stack.hpp"
 
@@ -39,6 +40,7 @@ namespace Langulus::Annies
    /// After execution all these are replaced by the two created Things       
    struct Recipe : Inner::RecipeBase {
       using CTTI_ReflectAs = Recipe;
+      using CTTI_Recipe    = Yup;
       using Base           = Inner::RecipeBase;
       using DeepType       = Many;
 

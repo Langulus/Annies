@@ -404,7 +404,7 @@ namespace Langulus::Annies::Component
             else
                static_assert(Same<TypeOf<C, SID>, TypeOf<IT, SID>>, "Type mismatch");
             
-            src_origin = rhs.template GetDense<SID>().GetRaw();
+            src_origin = rhs.template GetDense<SID>().data;//.GetRaw();
          }
          else {
             if constexpr (CT::TypeErased<C>)

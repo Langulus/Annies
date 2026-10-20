@@ -140,7 +140,10 @@ namespace Langulus::Annies::Component
       ///   @return the most concrete representation of the first item        
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = 0>
-      auto GetResolved(this auto&& self) -> HandleDisowned;
+      auto GetResolved(this auto&& self) -> RTTI::Block {
+         using C = typename Subcomponents::template At<SID>;
+         return self.C::template GetResolved<SID>();
+      }
 
       /// Get first element, removing 'count' indirections                    
       ///   @attention throws if type is incomplete and origin was reached    
@@ -151,7 +154,10 @@ namespace Langulus::Annies::Component
       ///   @return the dense first element for chosen dimension              
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = 0>
-      auto GetDense(this auto&& self, size_t count = -1) -> HandleDisowned;
+      auto GetDense(this auto&& self, size_t count = -1) -> RTTI::Block {
+         using C = typename Subcomponents::template At<SID>;
+         return self.C::template GetDense<SID>(count);
+      }
 
    protected:
       LglsComIterationOperators(friend);

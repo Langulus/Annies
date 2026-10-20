@@ -40,7 +40,7 @@ namespace Langulus::Annies
    ///                                                                        
    ///   Templated container used to contain, produce, but most importantly   
    /// reuse memory for instances of data. Elements are guaranteed to NEVER   
-   /// move, and are reused in-place. Extensively used by Flow::TFactory.     
+   /// move, and are reused in-place. Extensively used by TFactory.           
    /// https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p0447r21.html 
    ///                                                                        
    template<CT::NotVoid T>

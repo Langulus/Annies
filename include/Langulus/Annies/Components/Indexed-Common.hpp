@@ -128,7 +128,7 @@ namespace Langulus::Annies::Component
                   // We need to dereference. Supports packed pointers   
                   auto diff = indirections - IndirectsOf<TH>;
                   auto denser = ThisCom::template GetDenseAt<SID>(LglsFwd(idx), diff);
-                  return static_cast<THP>(denser.GetRaw());
+                  return static_cast<THP>(denser.data/*GetRaw()*/);
                }
                else {
                   // We are allowed to add one additional indirection   
@@ -265,7 +265,20 @@ namespace Langulus::Annies::Component
       ///   @param idx the index                                              
       ///   @return the most concrete representation of the first item        
       template<Cid SID = ID, CT::Container C>// requires (Relevant<SID>)
-      auto GetResolvedAt(this C&& self, CT::Index auto&& idx) -> HandleDisowned {
+      auto GetResolvedAt(this C&& self, CT::Index auto&& idx) -> RTTI::Block {
+         if (self.IsEmpty())
+            return {};
+
+         RTTI::Block h {
+            self.template GetRawVoid<SID>(),
+            self.template GetType<SID>(), 
+            1
+         };
+         h += self.SimplifyIndex(idx);
+         return h.GetResolved();
+      }
+      
+       /*{
          if (self.IsEmpty())
             return {};
 
@@ -298,7 +311,7 @@ namespace Langulus::Annies::Component
                   return {Stackwise, MetaDataOf<Decay<T>>(), &dense_item};
             }
          }
-      }
+      }*/
 
       /// Get Nth element, removing 'count' indirections                      
       ///   @attention throws if type is incomplete and origin was reached    
@@ -309,102 +322,56 @@ namespace Langulus::Annies::Component
       ///   @param count how many levels of indirection to remove?            
       ///   @return the dense first element for chosen dimension              
       template<Cid SID = ID, CT::Container C>// requires (Relevant<SID>)
-      auto GetDenseAt(this C&& self, CT::Index auto&& idx, size_t count = -1) -> HandleDisowned {
-      if (self.IsEmpty())
-         return {};
-
-      HandleDisowned h {Slice<SID>, self};
-      h += self.SimplifyIndex(idx);
-      auto T = h.GetType();
-      if (not T.IsSparse() or count <= 0)
-         return h;
-
-      // Check if origin type is complete before attempting anything    
-      if (count >= T.GetIndirections()) {
-         LglsAssert((bool) T.GetOrigin(),
-            "Trying to interface incomplete data `", T,
-            "` as dense"
-         );
-      }
-
-      void* src = h.GetRaw();//DecvqAllCast(h.GetRaw());
-      while (count and T.IsSparse()) {
-         auto nextT = T.GetDeptr();
-         if (nextT.IsSparse()) {
-            // Pointer T -> Pointer nextT                               
-            T.GetDereffer()(src, &src);
-         }
-         else {
-            // Pointer T -> Dense nextT                                 
-            return {Stackwise, nextT, UnpackPointer(T, nextT, src)};
-         }
-
-         T = nextT;
-         --count;
-      }
-      
-      LglsError("Should never be reached");
-      return {};
-   }
-
-
-
-         /*if (self.IsEmpty())
+      auto GetDenseAt(this C&& self, CT::Index auto&& idx, size_t count = -1) -> RTTI::Block {
+         if (self.IsEmpty())
             return {};
 
-         // Offset the heap                                             
-         void* heap = DecvqAllCast(self.template GetRaw<SID>());
-         const auto offset = self.SimplifyIndex(idx);
-         const auto byte_offset = self.template GetStride<SID>() * offset;
-         heap = reinterpret_cast<void*>(
-            reinterpret_cast<uint8_t*>(heap) + byte_offset
-         );
+         RTTI::Block h {
+            self.template GetRawVoid<SID>(),
+            self.template GetType<SID>(), 
+            1
+         };
+         h += self.SimplifyIndex(idx);
+         return h.GetDense(count);
+      }
+      
+      /* -> HandleDisowned {
+         if (self.IsEmpty())
+            return {};
 
-         if (not self.template IsSparse<SID>() or count <= 0) {
-            // Early return if nothing to do                            
-            D temp;
-            temp.SetTypeInner(self.template GetType<SID>());
-            temp.SetHeapInner(heap);
-            if_available(temp.SetCountInner(1));
-            return temp;
+         HandleDisowned h {Slice<SID>, self};
+         h += self.SimplifyIndex(idx);
+         auto T = h.GetType();
+         if (not T.IsSparse() or count <= 0)
+            return h;
+
+         // Check if origin type is complete before attempting anything    
+         if (count >= T.GetIndirections()) {
+            LglsAssert((bool) T.GetOrigin(),
+               "Trying to interface incomplete data `", T,
+               "` as dense"
+            );
          }
 
-         // Check if origin type is complete before attempting anything 
-         if constexpr (CT::TypeErased<C>) {
-            const auto T = self.template GetType<SID>();
-            if (count >= T.GetIndirections()) {
-               LglsAssert((bool) T.GetOrigin(),
-                  "Trying to interface incomplete data `", T,
-                  "` as dense"
-               );
-            }
-         }
-         else {
-            using T = TypeOf<C, SID>;
-            if (count >= IndirectsOf<T>) {
-               LglsAssert(CT::Complete<Decay<T>>,
-                  "Trying to interface incomplete data `", MetaDataOf<T>(),
-                  "` as dense"
-               );
-            }
-         }
-
-         auto     T = self.template GetType<SID>();
-         auto nextT = T.GetDeptr();
+         void* src = h.GetRaw();//DecvqAllCast(h.GetRaw());
          while (count and T.IsSparse()) {
+            auto nextT = T.GetDeptr();
             if (nextT.IsSparse()) {
-               // Pointer T -> Pointer nextT                            
-               T.GetDereffer()(heap, &heap);
-               T = nextT;
-               nextT = T.GetDeptr();
-               --count;
+               // Pointer T -> Pointer nextT                               
+               T.GetDereffer()(src, &src);
             }
-            else break;
-         }
-         return {Stackwise, nextT, UnpackPointer(T, nextT, heap)};*/
+            else {
+               // Pointer T -> Dense nextT                                 
+               return {Stackwise, nextT, UnpackPointer(T, nextT, src)};
+            }
 
-      /*template<CT::NotVoid AS, bool FATAL_FAILURE = true, CT::Container C>
-      auto CastAt(this C const&, CT::Index auto&&) -> AS;*/
+            T = nextT;
+            --count;
+         }
+         
+         LglsError("Should never be reached");
+         return {};
+      }*/
    };
 }
 

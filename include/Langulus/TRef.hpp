@@ -28,7 +28,7 @@ namespace Langulus::Annies::Inner
       Com::CountStatic<1u>,               // Statically sized           
       Com::ReserveEmergent<>,             // Reserve derived from alloc 
       Com::OwnershipStack<>,              // Allocation is referenced   
-      Com::OwnershipDeepHeap<>,           // Individual references      
+      Com::OwnershipDeepHeap<>,           // Individual references      //TODO what if we initialize heap using some arbitrary pointer and there is no entry data beside it??
       Com::Emplacement<>,                 // Can be emplaced            
       Com::Assignment<>,                  // Can be reassigned          
       Com::Comparison<>,                  // Can be compared            

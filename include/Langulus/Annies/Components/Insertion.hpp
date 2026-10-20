@@ -790,7 +790,7 @@ namespace Langulus::Annies::Component
                size_t count = 0;
                source->Apply([&](auto& i) {//TODO reverse?
                   count += ThisCom::template GatherInner<REVERSE, D>(
-                     NestIntentOf(source, *i.GetDense().template Get<D>())
+                     NestIntentOf(source, *static_cast<D*>(i.GetDense().data)/*template Get<D>()*/)
                   );
                });
                return count;
@@ -844,7 +844,7 @@ namespace Langulus::Annies::Component
                   localOutput.SetState(source->GetUnconstrainedState());
                   source->Apply([&](auto& i) {//TODO reverse?
                      localOutput.template GatherPolarInner<REVERSE, D>(
-                        NestIntentOf(source, *i.GetDense().template Get<D>()), 
+                        NestIntentOf(source, *static_cast<D*>(i.GetDense().data)), 
                         condition
                      );
                   });

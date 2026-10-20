@@ -623,8 +623,9 @@ namespace Langulus::Annies::Component
                LglsAssumeDev(comparer, "Type-erased data not comparable");
             }
             else {
-               static_assert(CT::Comparable<TypeOf<C, SID>, TypeOf<H, SID>>,
-                  "Type not comparable");
+               static_assert(CT::ComparableEqual<TypeOf<C, SID>, TypeOf<H, SID>>,
+                  NameOf<TypeOf<C, SID>>() + " not comparable to " + NameOf<TypeOf<H, SID>>()
+               );
             }
          }
          else {
@@ -638,8 +639,9 @@ namespace Langulus::Annies::Component
                LglsAssumeDev(comparer, "Type-erased data not comparable");
             }
             else {
-               static_assert(CT::Comparable<TypeOf<C, SID>, H>,
-                  "Type not comparable");
+               static_assert(CT::ComparableEqual<TypeOf<C, SID>, H>,
+                  NameOf<TypeOf<C, SID>>() + " not comparable to " + NameOf<H>()
+               );
             }
          }
 

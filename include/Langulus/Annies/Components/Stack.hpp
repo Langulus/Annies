@@ -174,7 +174,26 @@ namespace Langulus::Annies::Component
       ///   @return the most concrete representation of the first item        
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = ID, CT::Container C>// requires (SID == ID)
-      auto GetResolved(this C&& self) -> HandleDisowned;
+      auto GetResolved(this C&& self) -> RTTI::Block {
+         //if (self.template IsEmpty<SID>())
+         //   return {};
+
+         RTTI::Block h {
+            self.template GetRawVoid<SID>(),
+            self.template GetType<SID>(),
+            1
+         };
+
+         if constexpr (CT::Dense<T>)
+            return h;
+         else {
+            auto& dense_item = DenseCast(self.Stack<T, ID>::Get());
+            if constexpr (CT::Resolvable<Decay<T>>)
+               return dense_item.GetResolved();
+            else
+               return {&dense_item, MetaDataOf<Decay<T>>(), 1};
+         }
+      }
 
       /// Get the first contained element, removing 'count' indirections.     
       /// Available only if container has DeepType defined.                   
@@ -186,7 +205,17 @@ namespace Langulus::Annies::Component
       ///   @return the dense first element                                   
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = ID, CT::Container C>// requires (SID == ID)
-      auto GetDense(this C&& self, size_t count = -1) -> HandleDisowned;
+      auto GetDense(this C&& self, size_t count = -1) -> RTTI::Block {
+         //if (self.template IsEmpty<SID>())
+         //   return {};
+
+         RTTI::Block h {
+            self.template GetRawVoid<SID>(),
+            self.template GetType<SID>(),
+            1
+         };
+         return h.GetDense(count); //TODO lacks statically-typed routine
+      }
 
    protected:
       /// Get a direct access to the stack memory                             

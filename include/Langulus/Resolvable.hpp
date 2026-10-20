@@ -6,22 +6,22 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus/Handle.hpp>
+#include <Langulus/Allocator.hpp>
 #include <Langulus/CT/Resolvable.hpp>
 
 
 namespace Langulus
 {
    ///                                                                        
-   /// Gives derived types the ability to be resolved to their derived type   
-   /// at runtime through RTTI.                                               
+   /// Gives base types the ability to be resolved to their derived type      
+   /// at runtime through RTTI. I.e. performs a downcast.                     
    ///                                                                        
    struct Resolvable {
       using CTTI_Resolvable = Yup;
 
       template<class T> requires (not ::std::is_same_v<T, Resolvable>)
-      auto GetResolved(this T&& self) noexcept -> Annies::HandleDisowned {
-         return {Annies::Stackwise, MetaDataOf<T>(), &self};
+      auto GetResolved(this T&& self) noexcept -> RTTI::Block {
+         return {&self, MetaDataOf<T>(), 1};
       }
 
       /*using CTTI_Abstract   = Yup;

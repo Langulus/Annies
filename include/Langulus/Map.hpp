@@ -78,7 +78,7 @@ namespace Langulus::Annies::Inner
       using Pick           = HandleType;
       using PickMut        = HandleMutType;
 
-      static constexpr bool ReferenceElements = true;
+      //static constexpr bool ReferenceElements = true;
 
       constexpr Map() noexcept {
          this->ConstructDefault();

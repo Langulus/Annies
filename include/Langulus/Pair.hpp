@@ -56,7 +56,7 @@ namespace Langulus::Annies
       using CTTI_Deep      = Yup;
       using CTTI_Pair      = Yup;
 
-      static constexpr bool ReferenceElements = true;
+      //static constexpr bool ReferenceElements = true;
 
       using Base           = Inner::PairBase;
       using DeepType       = Many;

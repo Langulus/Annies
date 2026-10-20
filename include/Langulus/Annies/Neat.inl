@@ -317,12 +317,12 @@ namespace Langulus::Annies
             return operator << (S::Nest(rhs));
       }
       else if constexpr (CT::Recipe<T>) {
-         // Check if the construct already exists, before pushing it    
+         // Check if the recipe already exists, before pushing it       
          if (not GetConstructs(rhsd.GetType()))
             return operator << (S::Nest(rhs));
       }
       else if constexpr (Same<T, DMeta>) {
-         // Check if the construct already exists, before pushing it    
+         // Check if the recipe already exists, before pushing it       
          if (not GetData(rhsd))
             return operator << (S::Nest(rhs));
       }
@@ -349,7 +349,7 @@ namespace Langulus::Annies
    ///   @attention hash will be recomputed on demand                         
    ///   @param tag tag to set                                                
    ///   @param index the index we're interested with if repeated             
-   ///   @return a reference to this construct for chaining                   
+   ///   @return a reference to this recipe for chaining                      
    Neat& Neat::SetTag(CT::DefineTag auto&& tag, size_t index) {
       const auto meta = tag.GetTag();
       auto found = mTags/*.BranchOut()*/.Find(meta);
@@ -416,9 +416,9 @@ namespace Langulus::Annies
          mAnythingElse.Merge(meta, verb.Forward());
    }
 
-   /// Push a construct to the appropriate bucket                             
+   /// Push a recipe to the appropriate bucket                                
    ///   @attention this is an inner function that doesn't affect the hash    
-   ///   @param messy the construct and intent to insert                      
+   ///   @param messy the recipe and intent to insert                         
    void Neat::AddRecipe(CT::Intent auto&& messy) {
       using S = IntentOf(messy);
       using T = Deint<S>;
@@ -432,7 +432,7 @@ namespace Langulus::Annies
          else
             mRecipes.Merge(meta, messy.Forward());
       }
-      else static_assert(false, "Can't insert construct");
+      else static_assert(false, "Can't insert recipe");
    }
 
    /// Iterate through all relevant bucketed items.                           
@@ -505,63 +505,63 @@ namespace Langulus::Annies
       using A = LglsArgumentOf(call);
       using R = LglsReturnOf(call);
 
-      static_assert(CT::DefineTag<A> or CT::Deep<A>,
-         "Iterator must be either trait-based or deep");
+      static_assert(CT::Tag<A> or CT::Deep<A>,
+         "Iterator must be either tag or deep");
       static_assert(CT::Slab<A> or LglsMutable(self) or CT::ConstantEverywhere<A>,
          "Mutable reference/pointer iterator not allowed for constant container");
 
-      size_t index = 0;
-      if constexpr (CT::Tag<A>) {
+      if constexpr (CT::DefineTag<A>) {
          // Static tag provided, extract filter                         
          using TagType = Decay<A>;
          const auto filter = MetaTagOf<TagType>();
          const auto found = self.mTags.Find(filter);
          if (not found)
-            return index;
+            return 0;
 
          // Iterate all relevant tags                                   
-         for (auto& data : found.GetVal()) {
+         size_t index = 0;
+         for (auto& tag : *found.GetValHandle()) {
             if constexpr (CT::Bool<R>) {
-               if (not call(reinterpret_cast<TagType&>(data)))
+               if (not call(reinterpret_cast<TagType&>(tag)))
                   return index + 1;
             }
-            else call(reinterpret_cast<TagType&>(data));
+            else call(reinterpret_cast<TagType&>(tag));
 
             ++index;
          }
+         return index;
       }
       else {
          // Iterate all tags, either using type-erased tag, or deep     
-         for (auto group : self.mTags) {
-            for (auto& data : group.GetVal()) {
+         size_t index = 0;
+         for (auto& taglist : self.mTags) {
+            for (auto& tag : *taglist.GetValHandle()) {
                if constexpr (CT::Deep<A>) {
-                  auto wrapper = MakeBlock<Decay<A>>(data);
                   if constexpr (CT::Bool<R>) {
-                     if (not call(wrapper))
+                     if (not call(Decay<A> {Annies::Absorb, tag}))
                         return index + 1;
                   }
-                  else call(wrapper);
+                  else call(Decay<A> {Annies::Absorb, tag});
                }
                else {
                   if constexpr (CT::Bool<R>) {
-                     if (not call(data))
+                     if (not call(tag))
                         return index + 1;
                   }
-                  else call(data);
+                  else call(tag);
                }
 
                ++index;
             }
          }
+         return index;
       }
-
-      return index;
    }
 
-   /// Iterate all constructs                                                 
-   ///   @attention if call's argument is a generic Block/Many type, construct
+   /// Iterate all recipes                                                    
+   ///   @attention if call's argument is a generic Block/Many type, recipe   
    ///      will be wrapped in it                                             
-   ///   @param call the function to execute for each construct               
+   ///   @param call the function to execute for each recipe                  
    ///      If `call` returns bool, you can decide when to break the loop by  
    ///      simply returning Flow::Break (or just false)                      
    ///   @return the number of executions of 'call'                           
@@ -574,10 +574,10 @@ namespace Langulus::Annies
       static_assert(CT::Slab<A> or LglsMutable(self) or CT::ConstantEverywhere<A>,
          "Mutable reference/pointer iterator not allowed for constant container");
 
-      // Iterate all constructs                                         
+      // Iterate all recipes                                            
       size_t index = 0;
       for (auto group : self.mRecipes) {
-         for (auto& data : group.GetVal()) {
+         for (auto& data : *group.GetValHandle()) {
             if constexpr (CT::Deep<A>) {
                // Iterate using deep A                                  
                auto wrapper = MakeBlock<Decay<A>>(data);
@@ -588,7 +588,7 @@ namespace Langulus::Annies
                else call(wrapper);
             }
             else {
-               // Iterate using construct                               
+               // Iterate using recipe                                  
                if constexpr (CT::Bool<R>) {
                   if (not call(data))
                      return index + 1;
@@ -624,7 +624,7 @@ namespace Langulus::Annies
             return 0;
 
          // Iterate all relevant datas                                  
-         for (auto& data : found.GetValue()) {
+         for (auto& data : *found.GetValHandle()) {
             auto& dataTyped = reinterpret_cast<Decay<A>&>(data);
             if constexpr (CT::Bool<R>) {
                if (not call(dataTyped))
@@ -638,7 +638,7 @@ namespace Langulus::Annies
       else if constexpr (CT::Deep<A>) {
          // Type-erased container provided, iterate the entire tail     
          for (auto group : self.mAnythingElse) {
-            for (auto& data : group.GetVal()) {
+            for (auto& data : *group.GetValHandle()) {
                if constexpr (CT::Bool<R>) {
                   if (not call(data))
                      return index + 1;
@@ -657,7 +657,7 @@ namespace Langulus::Annies
             return 0;
 
          // Iterate all relevant datas                                  
-         for (auto& data : found.GetValue()) {
+         for (auto& data : *found.GetValHandle()) {
             for (auto element : data) {
                if constexpr (CT::Bool<R>) {
                   if (not call(element.template Get<A>()))
@@ -714,9 +714,9 @@ namespace Langulus::Annies
       return count;
    }
 
-   /// Remove constructs that match the given type                            
-   ///   @tparam T type of construct to remove                                
-   ///   @return the number of removed constructs                             
+   /// Remove recipes that match the given type                               
+   ///   @tparam T type of recipe to remove                                   
+   ///   @return the number of removed recipes                                
    template<CT::NotVoid T>
    size_t Neat::RemoveRecipes() {
       const auto filter = MetaDataOf<Decay<T>>();
@@ -726,7 +726,7 @@ namespace Langulus::Annies
 
       /*if (mRecipes.GetKeys().GetUses() > 1
       or  mRecipes.GetVals().GetUses() > 1) {
-         // mRecipes is used from multiple locations, and we must    
+         // mRecipes is used from multiple locations, and we must       
          // branch out this particular instance before modifying it     //TODO do we?
          found = mRecipes.BranchOut().Find(filter);
       }*/
@@ -766,7 +766,7 @@ namespace Langulus::Annies
 
       /*if (mTags.GetKeys().GetUses() > 1
       or  mTags.GetVals().GetUses() > 1) {
-         // mTags is used from multiple locations, and we must        
+         // mTags is used from multiple locations, and we must          
          // branch out this particular instance before modifying it     //TODO do we?
          found = mTags.BranchOut().Find(filter);
       }*/
@@ -821,13 +821,13 @@ namespace Langulus::Annies
       }
 
       for (auto pair : mRecipes) {
-         for (auto& construct : pair.GetValue()) {
+         for (auto& recipe : pair.GetValue()) {
             if (separator)
                to += ", ";
 
-            if (construct->IsValid()
-            or not construct.GetCharge().IsDefault())
-               construct.Serialize(to);
+            if (recipe->IsValid()
+            or not recipe.GetCharge().IsDefault())
+               recipe.Serialize(to);
             else
                to += static_cast<OUT>(pair.GetKey());
             separator = true;

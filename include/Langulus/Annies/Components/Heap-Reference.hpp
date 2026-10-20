@@ -180,7 +180,7 @@ namespace Langulus::Annies::Component
                   // We need to dereference. Supports packed pointers   
                   auto diff = indirections - IndirectsOf<TH>;
                   auto denser = ThisCom::template GetDense<SID>(diff);
-                  return static_cast<THP>(denser.GetRaw());
+                  return static_cast<THP>(denser.data/*GetRaw()*/);
                }
                else {
                   // We are allowed to add one additional indirection   
@@ -280,18 +280,18 @@ namespace Langulus::Annies::Component
                      return ThisCom::template Get<Deptr<AS>, SID>();
                }
                else if constexpr (CT::DerivedFrom<T, AS>) {
-                  // Access by downcast                                 
-                  //if constexpr (CT::Dense<AS> or CT::CustomPointer<AS>)
-                     return static_cast<AS>(*ThisCom::template Get<T, SID>());
-                  //else
-                  //   return ThisCom::template Get<Deptr<AS>, SID>();
+                  // Access by upcast                                   
+                  if constexpr (CT::Dense<AS, T>)
+                     return static_cast<AS&>(*ThisCom::template Get<T, SID>());
+                  else
+                     return static_cast<AS >( ThisCom::template Get<T, SID>());
                }
                else if constexpr (CT::DerivedFrom<AS, T>) {
-                  // Access by upcast                                   
-                  //if constexpr (CT::Dense<AS> or CT::CustomPointer<AS>)
-                     return dynamic_cast<AS>(*ThisCom::template Get<T, SID>());
-                  //else
-                  //   return ThisCom::template Get<Deptr<AS>, SID>();
+                  // Access by downcast                                 
+                  if constexpr (CT::Dense<AS, T>)
+                     return *dynamic_cast<AS*>( ThisCom::template Get<T, SID>());
+                  else
+                     return  dynamic_cast<AS >( ThisCom::template Get<T, SID>());
                }
                else {
                   // Wrap in a container                                
@@ -327,7 +327,31 @@ namespace Langulus::Annies::Component
       ///   @return the most concrete representation of the first item        
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = Id::First, CT::Contiguous C> //requires Relevant<SID>
-      auto GetResolved(this C&& self) -> HandleDisowned;
+      auto GetResolved(this C&& self) -> RTTI::Block {
+         if (self.template IsEmpty<SID>())
+            return {};
+
+         RTTI::Block h {
+            self.template GetRawVoid<SID>(),
+            self.template GetType<SID>(),
+            1
+         };
+
+         if constexpr (CT::TypeErased<C>)
+            return h.GetResolved();
+         else {
+            using T = TypeOf<C, SID>;
+            if constexpr (CT::Dense<T>)
+               return h;
+            else {
+               auto& dense_item = DenseCast(self.HeapReference<ENTRY0, ENTRYN...>::template Get<T, SID>());
+               if constexpr (CT::Resolvable<Decay<T>>)
+                  return dense_item.GetResolved();
+               else
+                  return {&dense_item, MetaDataOf<Decay<T>>(), 1};
+            }
+         }
+      }
 
       /// Get first element, removing 'count' indirections                    
       ///   @attention throws if type is incomplete and origin was reached    
@@ -336,7 +360,17 @@ namespace Langulus::Annies::Component
       ///   @return the dense first element for chosen dimension              
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = Id::First, CT::Contiguous C>// requires Relevant<SID>
-      auto GetDense(this C&& self, size_t count = -1) -> HandleDisowned;
+      auto GetDense(this C&& self, size_t count = -1) -> RTTI::Block {
+         if (self.template IsEmpty<SID>())
+            return {};
+
+         RTTI::Block h {
+            self.template GetRawVoid<SID>(),
+            self.template GetType<SID>(),
+            1
+         };
+         return h.GetDense(count); //TODO lacks statically-typed routine
+      }
 
    protected:
       /// Get the heap pointer (inner)                                        

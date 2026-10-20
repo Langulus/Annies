@@ -335,8 +335,8 @@ namespace Langulus::Annies
          if (not rhs)
             return;
 
-         auto conflict_resolver = [](auto& lhs, auto& rhs) {
-            lhs.MergeRange(rhs);
+         auto conflict_resolver = [](auto&& lhs, auto&& rhs) {
+            lhs.Concat(LglsFwd(rhs));
          };
 
          mTags.MergeRange(rhs.mTags, conflict_resolver);

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -24,6 +24,7 @@ namespace Langulus::CTTI
    template<class T> struct Component;
    template<class T> struct Container;
    template<class T> struct Map;
+   template<class T> struct Table;
    template<class T> struct Set;
    template<class T> struct Tag;
    template<class T> struct Pair;
@@ -37,6 +38,7 @@ LANGULUS_CTTI_CONCEPT_DECVQ(State);
 LANGULUS_CTTI_CONCEPT_DECVQ(Component);
 LANGULUS_CTTI_CONCEPT_DECVQE(Container);
 LANGULUS_CTTI_CONCEPT_DECVQ(Map);
+LANGULUS_CTTI_CONCEPT_DECVQ(Table);
 LANGULUS_CTTI_CONCEPT_DECVQ(Set);
 LANGULUS_CTTI_CONCEPT_DECVQ(Tag);
 LANGULUS_CTTI_CONCEPT_DECVQ(Pair);
@@ -76,15 +78,6 @@ namespace Langulus::Annies
       };
    }
    
-   /// I don't like how long ::std::conditional_t is to write.                
-   /// Also, std::conditional_t must instantiate both paths, which is a big   
-   /// design flaw.                                                           
-   template<bool CONDITION, class YES, class NO>
-   using Tif = typename ::std::conditional_t<CONDITION,
-         ::std::type_identity<YES>,
-         ::std::type_identity<NO>
-      >::type;
-
    /// Enables COMPONENT only if CONDITION is met.                            
    /// Useful for making container definitions more flexible.                 
    template<bool CONDITION, CT::Component COMPONENT>

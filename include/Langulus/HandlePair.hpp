@@ -406,7 +406,7 @@ namespace Langulus::Annies
       using KeyHandle = THandle<K>;
       using ValHandle = THandle<V>;
 
-      static constexpr bool ReferenceElements = true;
+      //static constexpr bool ReferenceElements = true;
 
       constexpr THandlePair() noexcept {
          this->ConstructDefault();
@@ -512,7 +512,7 @@ namespace Langulus::Annies
       using KeyHandle = Tif<CT::Sparse<K>, THandle<K&>, THandleEmergent<K&>>;
       using ValHandle = Tif<CT::Sparse<V>, THandle<V&>, THandleEmergent<V&>>;
 
-      static constexpr bool ReferenceElements = true;
+      //static constexpr bool ReferenceElements = true;
 
       constexpr THandlePair() noexcept {
          this->ConstructDefault();

@@ -40,7 +40,7 @@ namespace Langulus::Annies::Component
       /// Get the reflected type definition                                   
       template<Cid SID = ID>
       META GetType() const noexcept {
-         return MetaOf<TYPE>();
+         return MetaDataOf<TYPE>();
       }
 
       /// Get the size of a single element of TYPE in bytes                   

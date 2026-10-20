@@ -95,7 +95,7 @@ namespace Langulus::Annies::Component
       }
 
       /// Erase a key from a non-linearly indexed container                   
-      ///   @param key - the key to search for                                
+      ///   @param key the key to search for                                  
       ///   @return the number of removed elements                            
       template<CT::ContainsMany C> requires (not CT::IndexedLinearly<C>)
       auto Erase(this C& self, CT::NoIntent auto const& key) -> size_t {

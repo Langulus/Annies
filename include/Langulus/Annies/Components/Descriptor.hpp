@@ -8,7 +8,9 @@
 #pragma once
 #include "../Container.hpp"
 #include <Langulus/CT/DefineTag.hpp>
+#include <Langulus/CT/Index.hpp>
 #include <Langulus/MetaOf.hpp>
+#include <Langulus/Allocator.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -62,7 +64,7 @@ namespace Langulus::Annies::Component
       template<CT::DefineTag...TAG>
       bool ExtractTag(this auto const& self, auto&...values) {
          bool satisfied = false;
-         ((satisfied |= self.template ExtractTagInner<TAG>(values)), ...);
+         ((satisfied |= self.template ExtractTagInner<TAG>(values...)), ...);
          return satisfied;
       }
 
@@ -180,7 +182,7 @@ namespace Langulus::Annies::Component
       /// Get a reflected member variable inside the first element by index   
       ///   @param index the member index to search for                       
       ///   @return type-erased container to the reflected member(s)          
-      auto GetMember(this auto&& self, CT::Index auto&& index) -> Many {
+      auto GetMember(this auto&& self, CT::Index auto&& index) -> RTTI::Block {
          if (self.IsEmpty())
             return {};
 
@@ -194,15 +196,62 @@ namespace Langulus::Annies::Component
       ///   @attention assumes block is not empty                             
       ///   @param member the member reflection to search for                 
       ///   @return type-erased container to the reflected member(s)          
-      auto GetMemberInner(this auto&& self, RTTI::DefinitionData::Member const& member) -> Many {
+      auto GetMemberInner(this auto&& self, RTTI::DefinitionData::Member const& member)
+      -> RTTI::Block {
          LglsAssumeDev(not self.IsEmpty(),
             "Getting member from an empty descriptor");
             
          return {
+            member.member(const_cast<void*>(self.GetRaw())),
+            member.type(),
+            member.extent
+         };
+         /*return {
             Annies::Stackwise, Many::StateType{0},
             member.type(), member.member(const_cast<void*>(self.GetRaw())),
             member.extent, member.extent, self.GetAllocation(), Hash {0}
-         };
+         };*/
+      }
+      
+      ///                                                                     
+      template<CT::DefineTag TAG, size_t IDX, class D>
+      bool ExtractTagInnerInner(this auto const& self, D& value) {
+         bool satisfied = false;
+         size_t counter = 0;
+
+         self.ForEachDeep([&](const TAG& tag) {
+            if (counter < IDX) {
+               // We're only interested in the Nth tag                
+               ++counter;
+               return Loop::Continue;
+            }
+
+            if constexpr (CT::Deep<D>) {
+               value = tag.GetData();
+               satisfied = true;
+            }
+            else if (tag.GetData().ExtractDataAs(value))
+               satisfied = true;
+
+            return Loop::Break;
+         });
+
+         return satisfied;
+      }
+
+      ///                                                                     
+      template<CT::DefineTag TAG, size_t...IDX>
+      bool ExtractTagInner(this auto const& self, ExpandedSequence<IDX...>, auto&...values) {
+         return (self.template ExtractTagInnerInner<TAG, IDX>(values) or ...);
+      }
+
+      ///                                                                     
+      template<CT::DefineTag TAG>
+      bool ExtractTagInner(this auto const& self, auto&...values) {
+         return self.template ExtractTagInner<TAG>( 
+            Sequence<sizeof...(values)>::Expand,
+            values...
+         );
       }
    };
 }

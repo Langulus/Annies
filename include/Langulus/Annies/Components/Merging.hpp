@@ -292,7 +292,7 @@ namespace Langulus::Annies::Component
          static_assert(not CT::NullTerminated<C>,
             "Hash tables can't be null-terminated");
 
-         auto found = self.template TableSearch<ID>(a1);
+         auto found = self.template TableSearch<ID>(DeintCast(a1));
          if (found)
             return found;
          
@@ -307,8 +307,41 @@ namespace Langulus::Annies::Component
          return found;
       }
 
-      template<CT::Container C, class CONFLICT_RESOLVER>
-      auto MergeRange(this C&, CT::Container auto&&, CONFLICT_RESOLVER&&) -> Count<C>;
+      /// MARK: Merge every entry of one table into another                   
+      /// Insert each element if the elements don't exist in the table yet.   
+      /// Nothing will get inserted, if the first dimension already exists.   
+      /// Supports intents.                                                   
+      ///   @param other container to merge                                   
+      ///   @return the number of inserted elements                           
+      template<CT::Container C>
+      auto MergeRange(this C& self, CT::Container auto&& other) -> size_t {
+         const size_t prev_size = self.GetCount();
+         DeintCast(other).Apply([&](auto& h) {
+            self.Merge(NestIntentOf(other, h));
+         });
+         return self.GetCount() - prev_size;
+      }
+      
+      /// MARK: Merge every entry of one table into another                   
+      /// Insert each element if the elements don't exist in the table yet.   
+      /// If the first dimension already exists, the conflict resolver will   
+      /// be executed. Supports intents.                                      
+      ///   @param other container to merge                                   
+      ///   @param conflict custom merge routine in case key already exists   
+      ///      Example: [](auto&& old_value, auto&& new_value) { ... }        
+      ///   @return the number of inserted elements                           
+      template<CT::Container C> requires (C::Dimensions::Count > 1)
+      auto MergeRange(this C& self, CT::Container auto&& other, auto&& conflict) -> size_t {
+         const size_t prev_size = self.GetCount();
+         DeintCast(other).Apply([&](auto& h) {
+            auto found = self.Find(*h.GetKeyHandle());
+            if (found)
+               conflict(*found.GetValHandle(), NestIntentOf(other, *h.GetValHandle()));
+            else
+               self.Merge(NestIntentOf(other, h));
+         });
+         return self.GetCount() - prev_size;
+      }
       
    protected:
       /// MARK: PrepareForMerging                                             

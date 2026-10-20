@@ -54,45 +54,5 @@ namespace Langulus
       template<class TYPE>
       auto FindType(RTTI::DMeta) const -> RTTI::DMeta;
 
-   private:
-      ///                                                                     
-      template<CT::DefineTag TAG, size_t IDX, class D>
-      bool ExtractTagInnerInner(D& value) const {
-         bool satisfied = false;
-         size_t counter = 0;
-
-         what.ForEachDeep([&](const TAG& tag) {
-            if (counter < IDX) {
-               // We're only interested in the Nth tag                
-               ++counter;
-               return Loop::Continue;
-            }
-
-            if constexpr (CT::Deep<D>) {
-               value = tag.GetData();
-               satisfied = true;
-            }
-            else if (Describe{tag.GetData()}.ExtractDataAs(value))
-               satisfied = true;
-
-            return Loop::Break;
-         });
-
-         return satisfied;
-      }
-
-      ///                                                                     
-      template<CT::DefineTag TAG, size_t...IDX>
-      bool ExtractTagInner(ExpandedSequence<IDX...>, auto&...values) const {
-         return (ExtractTagInnerInner<TAG, IDX>(values) or ...);
-      }
-
-      ///                                                                     
-      template<CT::DefineTag TAG>
-      bool ExtractTagInner(auto&...values) const {
-         return ExtractTagInner<TAG>( 
-            Sequence<sizeof...(values)>::Expand, values...
-         );
-      }
    };
 }

@@ -883,9 +883,9 @@ namespace Langulus::Annies
 
 
 /// Some components need to be aware of HandleDisowned                        
-#include "Annies/Components/Heap-Reference.hpp"
+/*#include "Annies/Components/Heap-Reference.hpp"
 #include "Annies/Components/Stack.hpp"
-#include "Annies/Components/Multiprovider.hpp"
+#include "Annies/Components/Multiprovider.hpp"*/
 
 
 namespace Langulus::Annies::Component
@@ -893,7 +893,7 @@ namespace Langulus::Annies::Component
    /// A safe way to get the first sparse entry after being resolved to       
    /// the most concrete type. Available only if container has DeepType.      
    ///   @return the most concrete representation of the first item           
-   template<CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
+   /*template<CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
    template<Cid SID, CT::Contiguous C>
    auto HeapReference<ENTRY0, ENTRYN...>::GetResolved(this C&& self) -> HandleDisowned {
       if (self.template IsEmpty<SID>())
@@ -923,14 +923,14 @@ namespace Langulus::Annies::Component
                return {Stackwise, MetaDataOf<Decay<T>>(), &dense_item};
          }
       }
-   }
+   }*/
 
    /// Get first element, removing 'count' indirections                       
    ///   @attention throws if type is incomplete and origin was reached       
    ///   @tparam SID can be used to access specific dimension                 
    ///   @param count how many levels of indirection to remove?               
    ///   @return the dense first element for chosen dimension                 
-   template<CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
+   /*template<CT::HeapEntry ENTRY0, CT::HeapEntry...ENTRYN>
    template<Cid SID, CT::Contiguous C>
    auto HeapReference<ENTRY0, ENTRYN...>::GetDense(this C&& self, size_t count) -> HandleDisowned {
       if (self.template IsEmpty<SID>())
@@ -974,12 +974,12 @@ namespace Langulus::Annies::Component
          else break;
       }
       return {Stackwise, nextT, UnpackPointer(T, nextT, heap)};
-   }
+   }*/
 
    /// A safe way to get the first sparse entry after being resolved to       
    /// the most concrete type. Available only if container has DeepType.      
    ///   @return the most concrete representation of the first item           
-   template<CT::NotVoid T, Cid ID>
+   /*template<CT::NotVoid T, Cid ID>
    template<Cid SID, CT::Container C>
    auto Stack<T, ID>::GetResolved(this C&& self) -> HandleDisowned {
       if (self.IsEmpty())
@@ -992,7 +992,7 @@ namespace Langulus::Annies::Component
          return DenseCast(self.Stack<T, ID>::Get()).GetResolved();
       else
          return {Stackwise, self.template GetType<SID>().GetOrigin(), &DenseCast(self.Stack<T, ID>::Get())};
-   }
+   }*/
 
    /// Get the first contained element, removing 'count' indirections.        
    /// Available only if container has DeepType defined.                      
@@ -1002,7 +1002,7 @@ namespace Langulus::Annies::Component
    ///   @param self deduced this                                             
    ///   @param count how many levels of indirection to remove?               
    ///   @return the dense first element                                      
-   template<CT::NotVoid T, Cid ID>
+   /*template<CT::NotVoid T, Cid ID>
    template<Cid SID, CT::Container C>
    auto Stack<T, ID>::GetDense(this C&& self, size_t count) -> HandleDisowned {
       if (self.IsEmpty())
@@ -1039,7 +1039,7 @@ namespace Langulus::Annies::Component
       
       LglsError("Should never be reached");
       return {};
-   }
+   }*/
 
 LglsDisableWarningPush
 LglsDisableWarning_UnusedLocalTypedef
@@ -1047,12 +1047,12 @@ LglsDisableWarning_UnusedLocalTypedef
    /// A safe way to get the first sparse entry after being resolved to       
    /// the most concrete type. Available only if container has DeepType.      
    ///   @return the most concrete representation of the first item           
-   template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
+   /*template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
    template<Cid SID>
    auto Multiprovider<TN...>::GetResolved(this auto&& self) -> HandleDisowned {
       using C = typename Subcomponents::template At<SID>;
       return self.C::template GetResolved<SID>();
-   }
+   }*/
 
    /// Get first element, removing 'count' indirections                       
    ///   @attention throws if type is incomplete and origin was reached       
@@ -1061,12 +1061,12 @@ LglsDisableWarning_UnusedLocalTypedef
    ///      Using 'void' will default to C::DeepType.                         
    ///   @param count how many levels of indirection to remove?               
    ///   @return the dense first element for chosen dimension                 
-   template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
+   /*template<CT::Component...TN> requires (CountEnabled<TN...> >= 2)
    template<Cid SID>
    auto Multiprovider<TN...>::GetDense(this auto&& self, size_t count) -> HandleDisowned {
       using C = typename Subcomponents::template At<SID>;
       return self.C::template GetDense<SID>(count);
-   }
+   }*/
 
 LglsDisableWarningPop
 }

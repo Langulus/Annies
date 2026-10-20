@@ -49,7 +49,7 @@ namespace Langulus::Annies::Component
       using Id = Values<ID, SHARED...>;
 
       static constexpr unsigned OwnedDeep = STYLE;
-      static constexpr bool ReferenceElements = REF_INDIVIDUAL;
+      //static constexpr bool ReferenceElements = REF_INDIVIDUAL;
       static constexpr bool Shared = sizeof...(SHARED) > 0;
       static constexpr int  ComponentPrecedence = 2000;
       //template<Cid SID>

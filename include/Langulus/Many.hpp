@@ -199,8 +199,12 @@ namespace Langulus::Annies
          }
       }
       
+      /// Construction that absorbs an abstract memory block                  
+      constexpr Many(Inner::Absorb, RTTI::Block const& b)
+         : Base {Stackwise, StateType{}, b.type, b.data, b.count, 0u, nullptr, Hash {0}} {}
+
       /// Construction that absorbs the provided containers                   
-      template<class A1, class...AN>
+      template<class A1, class...AN> requires (not Same<A1, RTTI::Block>)
       constexpr Many(Inner::Absorb, A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0)
             this->Absorb(LglsFwd(a1));
