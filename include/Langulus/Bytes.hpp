@@ -288,6 +288,14 @@ namespace Langulus::Annies
 
       template<Cid> void GetResolved()         = delete("Nothing to resolve");
       template<Cid> void GetDense(size_t = -1) = delete("Nothing to dereference");
+
+      /// Allocate additional 'nbytes' and zero them                          
+      void Null(size_t nbytes) {
+         const size_t current_size = this->GetCount();
+         this->AllocateMore(current_size + nbytes);
+         memset(this->GetRaw() + current_size, 0, nbytes);
+         this->GetCountInner() = current_size + nbytes;
+      }
    };
    #pragma pack(pop)
 }

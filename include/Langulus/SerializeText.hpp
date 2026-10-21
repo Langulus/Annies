@@ -259,7 +259,7 @@ namespace Langulus::CTTI
 
    /// MARK: Text                                                             
    /// Rule for serializing characters to Text. Wraps it in "".               
-   void SerializationRule<Annies::Text, Annies::Text>::Serialize(
+   inline void SerializationRule<Annies::Text, Annies::Text>::Serialize(
       Annies::Text const& item, Annies::Text& out, Context*
    ) {
       out += Serial::OpenString.Token;
@@ -279,7 +279,7 @@ namespace Langulus::CTTI
 
    /// MARK: Bytes                                                            
    /// Rule for serializing bytes to Text. Prepends 0x.                       
-   void SerializationRule<Annies::Text, Annies::Bytes>::Serialize(
+   inline void SerializationRule<Annies::Text, Annies::Bytes>::Serialize(
       Annies::Bytes const& item, Annies::Text& out, Context*
    ) {
       out += Serial::OpenByte.Token;

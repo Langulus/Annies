@@ -188,8 +188,8 @@ namespace Langulus::Annies::Component
             return h;
          else {
             auto& dense_item = DenseCast(self.Stack<T, ID>::Get());
-            if constexpr (CT::Resolvable<Decay<T>>)
-               return dense_item.GetResolved();
+            if constexpr (CT::Downcastable<Decay<T>>)
+               return dense_item.Downcast();
             else
                return {&dense_item, MetaDataOf<Decay<T>>(), 1};
          }

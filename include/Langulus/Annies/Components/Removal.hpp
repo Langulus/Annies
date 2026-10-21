@@ -46,8 +46,9 @@ namespace Langulus::Annies::Component
       /// Designed for linearly indexed containers.                           
       ///   @param value the value to match                                   
       ///   @return the number of removed elements that matched the value     
-      template<CT::ContainsMany C> requires CT::IndexedLinearly<C>
-      auto Erase(this C& self, CT::NoIntent auto const& value) -> size_t {
+      template<CT::ContainsMany C, CT::NoIntent A>
+      requires (CT::IndexedLinearly<C> and not CT::Handle<A>)
+      auto Erase(this C& self, A const& value) -> size_t {
          if (self.IsEmpty())
             return 0;
 
@@ -94,17 +95,89 @@ namespace Langulus::Annies::Component
          return removed;
       }
 
+      /// Erase a handle that belongs to this container.                      
+      /// Designed for linearly indexed containers.                           
+      ///   @param value the handle to erase                                  
+      ///   @return a handle to the previous element                          
+      ///   @attention previous element might not exist before being          
+      ///      incremented (when erasing the first element), so be careful.   
+      template<CT::ContainsMany C, CT::NoIntent A>
+      requires (CT::IndexedLinearly<C> and CT::Handle<A>)
+      [[nodiscard("Make sure you reassign your interator if inside loop")]]
+      A Erase(this C& self, A const& value) {
+         LglsAssumeDev(not self.IsEmpty(),
+            "How can you have a handle from an emtpy container?");
+         LglsAssumeDev(value.GetRaw()    >= self.GetRaw()
+                   and value.GetRawEnd() <= self.GetRawEnd(),
+            "Handle doesn't belong to this container");
+
+         const size_t offset = value - self.GetHandle();
+         if (not self.IsDisowned() and self.GetUses() == 1) {
+            // No need to branch-out                                    
+            value.ForceMutable().Free();
+            A gap_filler = value;
+            while (gap_filler.GetRaw() != self.GetRawEnd()) {
+               A next = gap_filler + 1;
+               gap_filler.EmplaceWithIntent(Abandon {next}); //TODO multdimensional? batch optimize for PODs?
+               gap_filler = next;
+            }
+            self.SetCountInner(self.GetCountInner() - 1);
+         }
+         else {
+            // Branching out is required - insert nonmatching elements  
+            // into a new container.                                    
+            C shallow_clone;
+            shallow_clone.Reserve(self.GetCountInner());
+            self.Apply([&](auto const& element) {
+               if (element.GetRaw() == value.GetRaw()) 
+                  return;
+                  
+               shallow_clone.Insert(element);
+            });
+
+            // Then swap 'self' with the new container                  
+            self.Swap(shallow_clone);
+         }
+
+         // Handle might move in new memory, so reconstructing it here  
+         A result = self.GetHandle();
+         if constexpr (CT::NullTerminated<C>)
+            memset((result + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
+         return (result + offset) - 1;
+      }
+
       /// Erase a key from a non-linearly indexed container                   
       ///   @param key the key to search for                                  
       ///   @return the number of removed elements                            
-      template<CT::ContainsMany C> requires (not CT::IndexedLinearly<C>)
-      auto Erase(this C& self, CT::NoIntent auto const& key) -> size_t {
+      template<CT::ContainsMany C, CT::NoIntent A>
+      requires (not CT::IndexedLinearly<C> and not CT::Handle<A>)
+      auto Erase(this C& self, A const& key) -> size_t {
          if (self.IsEmpty())
             return 0;
 
          auto h = self.Find(key).ForceMutable();
          ThisCom::EraseFromTable(h);
          return 1;
+      }
+
+      /// Erase a handle from a non-linearly indexed container                
+      ///   @param key the handle to erase                                    
+      ///   @return a handle to the previous table cell                       
+      ///   @attention previous element might not exist before being          
+      ///      incremented (when erasing the first element), so be careful.   
+      template<CT::ContainsMany C, CT::NoIntent A>
+      requires (not CT::IndexedLinearly<C> and CT::Handle<A>)
+      [[nodiscard("Make sure you reassign your interator if inside loop")]]
+      A Erase(this C& self, A const& key) {
+         LglsAssumeDev(not self.IsEmpty(),
+            "How can you have a handle from an emtpy container?");
+         LglsAssumeDev(key.GetRaw()    >= self.GetRaw()
+                   and key.GetRawEnd() <= self.GetRawEnd(),
+            "Handle doesn't belong to this container");
+
+         auto h = key.ForceMutable();
+         ThisCom::EraseFromTable(h);
+         return h - 1;
       }
 
       /// Erase a number of elements starting at a specific position.         
@@ -177,8 +250,8 @@ namespace Langulus::Annies::Component
          return count;
       }
       
-      template<CT::ContainsMany C>
-      auto EraseDeepAt(this C&, CT::Index auto&&) -> size_t;
+      /*template<CT::ContainsMany C>
+      auto EraseDeepAt(this C&, CT::Index auto&&) -> size_t;*/
 
       /// Sets a new smaller count by destroying elements on the back.        
       /// Does nothing if 'desiredCount' is larger or equals the current.     

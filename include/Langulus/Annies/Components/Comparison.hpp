@@ -555,16 +555,80 @@ namespace Langulus::Annies::Component
          return lhs.GetHash() == rhs.GetHash();
       }
       
+      /// Count the number of matching elements at the front of two containers
+      ///   @param other the container to compare against                     
+      ///   @return the number of matching elements                           
       template<CT::Container C1, CT::Container C2> requires CT::NoIntent<C2>
-      auto Matches(this const C1&, const C2&) noexcept -> size_t;
+      auto Matches(this const C1& self, const C2& other) noexcept -> size_t {
+         if (self.IsEmpty() or other.IsEmpty())
+            return 0;
 
-      template<CT::Container C1, CT::Container C2>
+         if constexpr (not CT::TypeErased<C1> and not CT::TypeErased<C2>) {
+            static_assert(C1::Dimensions::Count == 1,
+               "TODO multidimensional matches");
+            static_assert(CT::IndexedLinearly<C1, C2>,
+               "TODO nonlinear matches - iterate using handles");
+
+            using T1 = TypeOf<C1>;
+            using T2 = TypeOf<C2>;
+            static_assert(Same<T1, T2>, "Type mistmatch");
+         
+            auto t1 = self.GetRaw();
+            auto t2 = other.GetRaw();
+            const auto t1end = self.GetRawEnd();
+            const auto t2end = other.GetRawEnd();
+            while (t1 != t1end and t2 != t2end and *t1 == *t2) {//TODO POD batch optimization?
+               ++t1;
+               ++t2;
+            }
+            return t1 - self.GetRaw();
+         }
+         else {
+            TODO();
+            return 0;
+         }
+      }
+
+      /// Count the number of matching elements at the front of two containers
+      /// Use a lambda of the form [](auto const& lhs, auto const& rhs) for   
+      /// the comparison.                                                     
+      ///   @param other the container to compare against                     
+      ///   @param compare_func the comparison function                       
+      ///   @return the number of matching elements                           
+      template<CT::Container C1, CT::Container C2> requires CT::NoIntent<C2>
+      auto MatchesExt(this const C1& self, const C2& other, auto&& compare_func) noexcept -> size_t {
+         if (self.IsEmpty() or other.IsEmpty())
+            return 0;
+
+         if constexpr (not CT::TypeErased<C1> and not CT::TypeErased<C2>) {
+            static_assert(C1::Dimensions::Count == 1,
+               "TODO multidimensional matches");
+            static_assert(CT::IndexedLinearly<C1, C2>,
+               "TODO nonlinear matches - iterate using handles");
+
+            auto t1 = self.GetRaw();
+            auto t2 = other.GetRaw();
+            const auto t1end = self.GetRawEnd();
+            const auto t2end = other.GetRawEnd();
+            while (t1 != t1end and t2 != t2end and compare_func(*t1, *t2)) {//TODO POD batch optimization?
+               ++t1;
+               ++t2;
+            }
+            return t1 - self.GetRaw();
+         }
+         else {
+            TODO();
+            return 0;
+         }
+      }
+
+      /*template<CT::Container C1, CT::Container C2>
       requires (CT::NoIntent<C2> and CT::Character<TypeOf<C1>, TypeOf<C2>>)
       auto MatchesLoose(this const C1&, const C2&) noexcept -> size_t;
 
       template<CT::Container C1, CT::Container C2>
       requires (CT::NoIntent<C2> and CT::Character<TypeOf<C1>, TypeOf<C2>>)
-      bool CompareLoose(this const C1&, const C2&) noexcept;
+      bool CompareLoose(this const C1&, const C2&) noexcept;*/
 
       /// MARK: Find                                                          
       /// Get a handle to a matching item                                     

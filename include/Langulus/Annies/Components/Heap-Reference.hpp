@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Container.hpp"
-#include <Langulus/CT/Resolvable.hpp>
+#include <Langulus/CT/Downcastable.hpp>
 #include <Langulus/CT/MinAlloc.hpp>
 #include <Langulus/MetaOf.hpp>
 #include <Langulus/Utils/Pot.hpp>
@@ -345,8 +345,8 @@ namespace Langulus::Annies::Component
                return h;
             else {
                auto& dense_item = DenseCast(self.HeapReference<ENTRY0, ENTRYN...>::template Get<T, SID>());
-               if constexpr (CT::Resolvable<Decay<T>>)
-                  return dense_item.GetResolved();
+               if constexpr (CT::Downcastable<Decay<T>>)
+                  return dense_item.Downcast();
                else
                   return {&dense_item, MetaDataOf<Decay<T>>(), 1};
             }

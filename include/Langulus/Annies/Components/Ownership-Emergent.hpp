@@ -88,7 +88,7 @@ namespace Langulus::Annies::Component
 
       /// Emergent shallow ownership if STYLE has OnCreate                    
       ///   @param intent the intent and container to transfer from           
-      ///   @important notice that Copy and Clone intents are not handled     
+      ///   @attention notice that Copy and Clone intents are not handled     
       ///      here. They're handled in heap components instead, in case      
       ///      something throws an exception while constructing.              
       template<class SELF, CT::Intent I>

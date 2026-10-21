@@ -23,7 +23,7 @@ class Part;
 using UnitMap = TMapUnsorted<DMeta, TMany<Part*>>;
 using TraitMap = TMapUnsorted<TMeta, TMany<Tag>>;
 
-struct Thing final : Resolvable {
+struct Thing final : Downcastable {
    using CTTI_Abstract = No;
    using CTTI_Producer = Thing;
    LANGULUS_BASES(Resolvable);
@@ -37,7 +37,7 @@ struct Thing final : Resolvable {
    TraitMap mTags;
 };
 
-Thing::Thing() : Resolvable {MetaOf<Thing>()} {}
+Thing::Thing() : Downcastable {MetaOf<Thing>()} {}
 
 SCENARIO("Testing incomplete type hierarchy", "[incomplete]") {
    static_assert(CT::Complete<Resolvable>);
