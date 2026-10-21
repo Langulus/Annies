@@ -185,12 +185,12 @@ namespace Langulus::Annies
          return *this;
       }
 
-      /// Execute the verb in stateless mode (ignores context)                
+      /// Execute the verb in unary mode (ignores context).                   
       /// The ability is determined by the contents of the argument instead.  
       /// Useful for instantiating constants, unary operations, etc.          
       /// Implemented in Langulus::Flow, as it requires some prime verbs      
       /// being defined, such as Verbs::Do.                                   
-      bool RunStateless();
+      bool RunUnary();
 
       /// Execute the verb.                                                   
       /// Implemented in Langulus::Flow, as it requires some prime verbs      
@@ -201,17 +201,21 @@ namespace Langulus::Annies
       auto GetHash() const -> Hash;
       auto GetOperatorToken(bool& tokenized) const -> Text;
 
-      auto GetSource()       noexcept -> Many&;
-      auto GetSource() const noexcept -> Many const&;
+      auto& GetSource(this auto&& self) noexcept {
+         return self.mContext;
+      }
 
-      //auto GetArgument()       noexcept -> Many&;
-      auto GetArgument() const noexcept -> Many;
+      auto GetArgument() const noexcept -> Many {
+         return {Absorb, *this};
+      }
 
-      auto GetOutput()       noexcept -> Many&;
-      auto GetOutput() const noexcept -> Many const&;
+      auto& GetOutput(this auto&& self) noexcept {
+         return self.mOutput;
+      }
 
-      auto operator -> ()       noexcept -> Many*;
-      auto operator -> () const noexcept -> Many const*;
+      auto* operator -> (this auto&& self) noexcept {
+         return &self.mOutput;
+      }
       
       auto GetSuccesses() const noexcept -> size_t;
       bool IsDone() const noexcept;

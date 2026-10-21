@@ -144,6 +144,11 @@ namespace Langulus::Annies
       explicit constexpr operator bool() const {
          return static_cast<bool>(Base::GetStackInner());
       }
+
+      /// Access the first element inside the container                       
+      constexpr auto& operator -> (this auto&& self) assumptious {
+         return self.GetStackInner();
+      }
    };
 
    template<CT::NotVoid T>
