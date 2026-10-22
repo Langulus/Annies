@@ -7,12 +7,14 @@
 ///                                                                           
 #pragma once
 #include "Many.hpp"
+#include "Text.hpp"
 #include "Annies/Components/Charged-Stack.hpp"
 #include "Annies/Components/Verbed-Stack.hpp"
 //#include "Langulus/CT/Able.hpp"
 //#include "Langulus/CT/Akin.hpp"
 #include <Langulus/CT/Executable.hpp>
 #include <Langulus/CT/Convertible.hpp>
+#include <Langulus/CT/Members.hpp>
 
 
 namespace Langulus::Annies::Inner
@@ -134,7 +136,7 @@ namespace Langulus::Annies
       /// Create a verb by extracting verb ID, charge and argument from verb. 
       /// Source and output remain empty.                                     
       static TVerb Like(CT::Executable auto const& source) {
-         return From(source, source.GetArgument());
+         return From(source, source.GetRHS());
       }
 
       /// Assignment                                                          
@@ -198,30 +200,113 @@ namespace Langulus::Annies
       bool Run();
 
       /// MARK: Access                                                        
-      auto GetHash() const -> Hash;
-      auto GetOperatorToken(bool& tokenized) const -> Text;
+      /// Hash the verb (emergent). Each sub container should cache their own,
+      /// to make things relatively fast.                                     
+      auto GetHash() const -> Hash {
+         return HashOf(//TODO should charge be ignored?
+            this->GetVerb(),//TODO can't we xor these, so that if one changes we just do xor push/pop?
+            mContext, 
+            Inner::TVerbBase<V>::GetHash(),
+            mOutput
+         );
+      }
 
-      auto& GetSource(this auto&& self) noexcept {
+      /// Get the verb token or operator depending on context and energy      
+      auto GetOperatorToken(bool& tokenized) const -> Text {
+         const auto v = this->GetVerb();
+         const auto c = this->GetCharge();
+         Text out;
+         if (not v) {
+            // An invalid verb is always written as token               
+            out += NameOf<Verb>();//TODO should we just use DefinitionVerb::InvalidName here?
+            tokenized = true;
+            return out.Lowercase();
+         }
+
+         // A valid verb is written either as token, or as operator     
+         if (c.mass < 0) {
+            if (not v.GetNegativeOperator().empty() and not (-c).IsCharged()) {
+               // Write as operator                                     
+               out += v.GetNegativeOperator();
+            }
+            else if (not v.GetNegativeName().empty()) {
+               // Write as token                                        
+               out += v.GetNegativeName();
+               out += -c;
+               tokenized = true;
+            }
+            else {
+               // Write as token                                        
+               out += v.GetPositiveName();
+               out += c;
+               tokenized = true;
+            }
+         }
+         else {
+            if (not c.IsCharged()) {
+               // Write as operator                                     
+               out += v.GetPositiveOperator();
+            }
+            else {
+               // Write as token                                        
+               out += v.GetPositiveName();
+               out += c;
+               tokenized = true;
+            }
+         }
+
+         return out.Lowercase();
+      }
+
+      /// Get verb left operand, a.k.a. the context                           
+      auto& GetLHS(this auto&& self) noexcept {
          return self.mContext;
       }
 
-      auto GetArgument() const noexcept -> Many {
+      /// Get verb right operand, a.k.a the argument.                         
+      ///   @attention notice it's not by reference. Once retrieved, it will  
+      ///      be referenced, and thus locked in memory.                      
+      auto GetRHS() const noexcept -> Many {
          return {Absorb, *this};
       }
 
+      /// Get verb output                                                     
       auto& GetOutput(this auto&& self) noexcept {
          return self.mOutput;
       }
 
+      /// Access outputs                                                      
       auto* operator -> (this auto&& self) noexcept {
          return &self.mOutput;
       }
       
-      auto GetSuccesses() const noexcept -> size_t;
-      bool IsDone() const noexcept;
+      /// Get the number of successful satisfactions of the verb              
+      constexpr auto GetSuccesses() const noexcept -> size_t {
+         return mSuccesses;
+      }
 
-      bool IsMissing() const noexcept;
-      bool IsMissingDeep() const noexcept;
+      /// Check if verb has been satisfied at least once                      
+      ///   @attention a successfully executed verb may or may not have output
+      constexpr bool IsDone() const noexcept {
+         return mSuccesses > 0;
+      }
+
+      /// Check if anything inside the verb is missing on the surface level   
+      ///   @return true if anything is missing                               
+      bool IsMissing() const noexcept {
+         return mContext.IsMissing()
+             or Inner::TVerbBase<V>::IsMissing()
+             or mOutput.IsMissing();
+      }
+
+      /// Check if anything inside the verb is missing deeply                 
+      ///   @return true if anything is missing                               
+      bool IsMissingDeep() const noexcept {
+         return mContext.IsMissingDeep()
+             or Inner::TVerbBase<V>::IsMissingDeep()
+             or mOutput.IsMissingDeep();
+      }
+
       bool Validate(CT::Index auto&&) const noexcept;
 
       void Done(size_t) noexcept;
@@ -235,28 +320,43 @@ namespace Langulus::Annies
       }
 
       /// MARK: Compare                                                       
-      bool operator ==  (const TVerb&) const;
-      auto operator <=> (const TVerb&) const -> std::partial_ordering;
+      /// Compare verbs for equality                                          
+      ///   @param rhs the verb to compare against                            
+      ///   @return true if verbs match                                       
+      ///   @attention charges are ignored                                    
+      constexpr bool operator == (const TVerb& rhs) const {
+         return this->GetVerb() == rhs.GetVerb()
+            and mContext == rhs.mContext
+            and Inner::TVerbBase<V>::operator == (rhs.GetRHS())
+            and mOutput == rhs.mOutput;
+      }
+
+      /// Three-way comparison by precedence only                             
+      ///   @param rhs the verb to compare against                            
+      ///   @returns the ordering by precedence                               
+      constexpr auto operator <=> (const TVerb& rhs) const noexcept {
+         return this->GetPrecedence() <=> rhs.GetPrecedence();
+      }
 
       /// MARK: Charge modification                                           
-      constexpr auto operator * (const Real& scalar) const noexcept -> TVerb {
+      constexpr auto operator * (Real const& scalar) const noexcept -> TVerb {
          auto copy = *this;
          copy.GetCharge() *= scalar;
          return copy;
       }
 
-      constexpr auto operator ^ (const Real& scalar) const noexcept -> TVerb {
+      constexpr auto operator ^ (Real const& scalar) const noexcept -> TVerb {
          auto copy = *this;
          copy.GetCharge() ^= scalar;
          return copy;
       }
 
-      constexpr auto operator *= (const Real& scalar) noexcept -> TVerb& {
+      constexpr auto operator *= (Real const& scalar) noexcept -> TVerb& {
          GetCharge() *= scalar;
          return *this;
       }
 
-      constexpr auto operator ^= (const Real& scalar) noexcept -> TVerb& {
+      constexpr auto operator ^= (Real const& scalar) noexcept -> TVerb& {
          GetCharge() ^= scalar;
          return *this;
       }

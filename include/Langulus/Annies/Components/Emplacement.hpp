@@ -8,6 +8,7 @@
 #pragma once
 #include "../Container.hpp"
 #include <Langulus/CT/Describable.hpp>
+#include <Langulus/CT/Defaultable.hpp>
 #include <Langulus/CT/Index.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/Allocator.hpp>

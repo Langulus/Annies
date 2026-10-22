@@ -51,7 +51,7 @@ namespace Langulus::Annies
    ///   @param args - the arguments for construction, with or without intent 
    ///   @param charge - the charge for the construction                      
    LANGULUS(INLINED)
-   Construct::Construct(DMeta type, auto&& args, const Charge& charge)
+   Construct::Construct(DMeta type, auto&& args, Charge const& charge)
       : mType        {type ? type->mOrigin : nullptr}
       , mCharge      {charge}
       , mDescriptor  {Forward<Deref<decltype(args)>>(args)} {}
@@ -68,7 +68,7 @@ namespace Langulus::Annies
    ///   @param token - the type name of the content                          
    ///   @param args - the arguments for construction, with or without intent 
    ///   @param charge - the charge for the construction                      
-   Construct::Construct(Token const& token, auto&& args, const Charge& charge)
+   Construct::Construct(Token const& token, auto&& args, Charge const& charge)
       : Construct {
          RTTI::GetMetaData(token),
          Forward<Deref<decltype(args)>>(args),
@@ -305,7 +305,7 @@ namespace Langulus::Annies
    /// Get construct's charge (const)                                         
    ///   @return the charge                                                   
    LANGULUS(INLINED)
-   auto Construct::GetCharge() const noexcept -> const Charge& {
+   auto Construct::GetCharge() const noexcept -> Charge const& {
       return mCharge;
    }
 

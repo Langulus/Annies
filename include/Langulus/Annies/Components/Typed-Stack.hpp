@@ -13,6 +13,7 @@
 #include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/CT/Deep.hpp>
+#include <Langulus/CT/Executable.hpp>
 
 
 namespace Langulus::Annies

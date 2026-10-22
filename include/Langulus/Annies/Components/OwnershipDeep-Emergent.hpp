@@ -13,6 +13,7 @@
 #include <Langulus/CT/Allocatable.hpp>
 #include <Langulus/CT/Referenced.hpp>
 #include <Langulus/CT/Index.hpp>
+#include <Langulus/CT/Destroyable.hpp>
 
 
 namespace Langulus::Annies

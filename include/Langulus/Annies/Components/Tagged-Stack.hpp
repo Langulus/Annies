@@ -10,6 +10,7 @@
 #include "Langulus/IntentOf.hpp"
 #include "Langulus/Typenav.hpp"
 #include <Langulus/RTTI/MetaTag.hpp>
+#include <Langulus/CT/Tagged.hpp>
 
 
 namespace Langulus::Annies

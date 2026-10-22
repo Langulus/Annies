@@ -294,7 +294,7 @@ namespace Langulus::Annies::Component
                      previous.template Apply<false>([&to,&self,&previous](auto&& from) {
                         (void) self; (void) previous;
 
-                        if constexpr (CT::Supported<decltype(from)>) {
+                        if constexpr (LglsSupported(from)) {
                            Id::ForEach([&]<Cid D>{
                               to.template EmplaceWithIntent<D>(Abandon(from));
                            });
@@ -869,7 +869,7 @@ namespace Langulus::Annies::Component
             from.template Apply<false>([&dst,&self,&from](auto const& src) {
                (void) self; (void) from;
 
-               if constexpr (CT::Supported<decltype(src)>) {
+               if constexpr (LglsSupported(src)) {
                   Id::ForEach([&dst,&src]<Cid D>{
                      if constexpr (CLONE)
                         dst.template EmplaceWithIntent<D>(Clone(src));

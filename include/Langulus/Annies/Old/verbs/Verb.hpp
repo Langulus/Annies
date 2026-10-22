@@ -76,7 +76,7 @@ namespace Langulus::A
       ///                                                                     
       auto GetVerb() const noexcept -> VMeta;
       auto GetHash() const -> Hash;
-      auto GetCharge() const noexcept -> const Charge&;
+      auto GetCharge() const noexcept -> Charge const&;
       auto GetMass() const noexcept -> Real;
       auto GetRate() const noexcept -> Real;
       auto GetTime() const noexcept -> Real;

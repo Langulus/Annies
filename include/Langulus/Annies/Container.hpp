@@ -1044,7 +1044,7 @@ namespace Langulus::Annies::Component
       /// Handles both linear and non-linear containers gracefully.           
       ///   @tparam SKIP_EMPTY whether or not to skip empty elements inside   
       ///      maps/sets. If set to false, you have to check whether the      
-      ///      current lambda argument is `if constexpr(CT::Supported)`       
+      ///      current lambda argument is `if constexpr(LglsSupported)`       
       ///   @param lambda the function to perform. If the lambda returns bool,
       ///      you can end the loop early by returning false.                 
       ///   @param cookie the element/hash table spot to start off from       
@@ -1150,27 +1150,29 @@ namespace Langulus::Annies::Component
          }
 
          // Then dig deeper                                             
-         bool result = false;
-         if constexpr (CT::Deep<SELF>) {
-            if_constexpr_type_erased(SELF) {
-               auto probe = self.GetType().GetProbe();
-               self.Apply([&](auto const& item) noexcept {
-                  result = probe(item.GetRaw(), [](auto const& inner) noexcept {
-                     return inner.IsMissingDeep();
-                  });
-                  return not result;
-               });
-            }
-            #if not LANGULUS(FORCE_TYPE_ERASURE)
-            else {
-               self.Apply([&](auto const& item) noexcept {
-                  result = item.IsMissingDeep();
-                  return not result;
-               });
-            }
-            #endif
+         if_constexpr_type_erased(SELF) {
+            auto const type = self.GetType();
+            if (not type.IsDeep())
+               return false;
+
+            bool result = false;
+            auto method = type.GetMethod("IsMissingDeep");
+            LglsAssumeDev(method, "Deep type has no reflected IsMissingDeep method");
+            self.Apply([&result,&method](auto const& item) noexcept {
+               result = method->method(item.GetRawVoid(), {}, {});
+               return not result;
+            });
+            return result;
          }
-         return result;
+         #if not LANGULUS(FORCE_TYPE_ERASURE)
+         else if constexpr (CT::Deep<TypeOf<SELF>>) {
+            for (auto const& item : self) {
+               if (DenseCast(item).IsMissingDeep())
+                  return true;
+            }
+         }
+         #endif
+         return false;
       }
    };
 }

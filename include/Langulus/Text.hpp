@@ -536,6 +536,26 @@ namespace Langulus::Annies
          }
          return result;
       }
+
+      /// Make all letters lowercase                                          
+      ///   @return a new text container with all letter made lowercase       
+      template<class C>
+      C Lowercase(this C const& self) {
+         C result {Clone{self}};
+         for (auto& i : result)
+            i = ::std::tolower(i);
+         return result;
+      }
+
+      /// Make all letters uppercase                                          
+      ///   @return a new text container with all letter made uppercase       
+      template<class C>
+      C Uppercase(this C const& self) {
+         C result {Clone{self}};
+         for (auto& i : result)
+            i = ::std::toupper(i);
+         return result;
+      }
    };
    
    static_assert(CT::NotVoid<CT::ReflectedAs<Text>>);

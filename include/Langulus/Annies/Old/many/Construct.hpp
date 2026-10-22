@@ -47,11 +47,11 @@ namespace Langulus::Annies
       Construct(S<Construct>&&);
 
       Construct(DMeta);
-      Construct(DMeta, auto&&, const Charge& = {});
+      Construct(DMeta, auto&&, Charge const& = {});
 
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          Construct(Token const&);
-         Construct(Token const&, auto&&, const Charge& = {});
+         Construct(Token const&, auto&&, Charge const& = {});
       #endif
 
       Recipe& operator = (Recipe const&) noexcept;

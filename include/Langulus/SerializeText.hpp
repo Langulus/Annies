@@ -321,7 +321,7 @@ namespace Langulus::CTTI
 
       // If reached, then verb hasn't been executed yet.                
       // Let's check if there's a source in which verb is executed.     
-      auto& source = verb.GetSource();
+      auto& source = verb.GetLHS();
       if (source.IsValid()) {
          S::BeginScope(source, out, context);
          Langulus::Serialize(source, out, context);
@@ -338,7 +338,7 @@ namespace Langulus::CTTI
       out += token;
 
       // Now it's time to take care of the arguments                    
-      auto argument = verb.GetArgument();
+      auto argument = verb.GetRHS();
       if (not argument.IsValid())
          return;
       

@@ -227,7 +227,7 @@ namespace Langulus::A
    /// Get the verb id and charge                                             
    ///   @return verb charge                                                  
    LANGULUS(INLINED)
-   auto Verb::GetCharge() const noexcept -> const Charge& {
+   auto Verb::GetCharge() const noexcept -> Charge const& {
       return static_cast<const Annies::Charge&>(*this);
    }
 

@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -11,6 +11,7 @@
 #include "Langulus/CT/Serializer.hpp"
 #include <Langulus/CT/Character.hpp>
 #include <Langulus/CT/Comparable.hpp>
+#include <Langulus/CT/Convertible.hpp>
 #include <Langulus/CT/Index.hpp>
 #include <Langulus/CT/Text.hpp>
 #include <Langulus/CT/Unfold.hpp>
@@ -142,7 +143,7 @@ namespace Langulus::Annies::Component
                bool result = true;
                auto t2 = rhs.GetHandle();
                lhs.template Apply<false>([&](auto&& t1) -> bool {
-                  if constexpr (CT::Supported<decltype(t1)>) {
+                  if constexpr (LglsSupported(t1)) {
                      if constexpr (not CT::Contiguous<RHS>) {
                         // Make sure hash table spot is valid           
                         const auto idx = t1 - lhs.GetHandle();
@@ -236,7 +237,7 @@ namespace Langulus::Annies::Component
                      bool result = true;
                      auto t2 = rhs.GetHandle();
                      lhs.template Apply<false>([&](auto&& t1) -> bool {
-                        if constexpr (CT::Supported<decltype(t1)>) {
+                        if constexpr (LglsSupported(t1)) {
                            if constexpr (not CT::Contiguous<RHS>) {
                               // Make sure hash table spot is valid     
                               const auto idx = t1 - lhs.GetHandle();
@@ -966,7 +967,7 @@ namespace Langulus::Annies::Component
 
          DecideHandle<C> result;
          self.template Apply<false>([&](auto&& test) -> bool {
-            if constexpr (CT::Supported<decltype(test)>) {
+            if constexpr (LglsSupported(test)) {
                if constexpr (CT::Handle<T>) {
                   if constexpr (CT::TypeErased<C> or CT::TypeErased<T>) {
                      if (not comparer(test.template GetRaw<SID>(), item.template GetRaw<SID>()))
