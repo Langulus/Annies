@@ -1159,7 +1159,7 @@ namespace Langulus::Annies::Component
             auto method = type.GetMethod("IsMissingDeep");
             LglsAssumeDev(method, "Deep type has no reflected IsMissingDeep method");
             self.Apply([&result,&method](auto const& item) noexcept {
-               result = method->method(item.GetRawVoid(), {}, {});
+               method->invoke(item.GetRawVoid(), nullptr, &result);
                return not result;
             });
             return result;

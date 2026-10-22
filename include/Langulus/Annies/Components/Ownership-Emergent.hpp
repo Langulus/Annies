@@ -8,6 +8,7 @@
 #pragma once
 #include "../Component.hpp"
 #include <Langulus/Allocator.hpp>
+#include <Langulus/CT/Destroyable.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -163,7 +164,7 @@ namespace Langulus::Annies::Component
          // immediate elements. It is time to destroy them.             
          if (not self.template IsEmpty<Id::First>()) {
             Id::ForEach([&self]<Cid D> {
-               if constexpr (CT::TypeErased<C>) {
+               if constexpr (CT::TypeErased<C> or not CT::Complete<TypeOf<C, D>>) { //TODO more elegant solution? directly affect CT::TypeErased when incomplete?
                   auto T = self.template GetType<D>();
                   if (const auto destructor = T.GetDestructor()) {
                      self.Apply([&destructor](auto&& item) {

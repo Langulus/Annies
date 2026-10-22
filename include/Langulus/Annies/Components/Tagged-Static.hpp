@@ -8,7 +8,7 @@
 #pragma once
 //#include "../Container.hpp"
 #include "../Component.hpp"
-#include <Langulus/MetaOf.hpp>
+//#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Deep.hpp>
 
 

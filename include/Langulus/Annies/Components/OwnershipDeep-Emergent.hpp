@@ -9,7 +9,7 @@
 #include "../Container.hpp"
 #include <Langulus/Assume.hpp>
 #include <Langulus/Allocator.hpp>
-#include <Langulus/MetaOf.hpp>
+//#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Allocatable.hpp>
 #include <Langulus/CT/Referenced.hpp>
 #include <Langulus/CT/Index.hpp>

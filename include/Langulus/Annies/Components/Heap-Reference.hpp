@@ -9,7 +9,7 @@
 #include "../Container.hpp"
 #include <Langulus/CT/Downcastable.hpp>
 #include <Langulus/CT/MinAlloc.hpp>
-#include <Langulus/MetaOf.hpp>
+//#include <Langulus/MetaOf.hpp>
 #include <Langulus/Utils/Pot.hpp>
 #include <Langulus/Utils/Align.hpp>
 #include <Langulus/Allocator.hpp>
@@ -98,7 +98,15 @@ namespace Langulus::Annies::Component
             );
          }
       }
-      
+
+      /// Get a direct access to the heap memory                              
+      ///   @attention using raw pointer while self.IsEmpty() may lead to     
+      ///      undefined behavior                                             
+      template<Cid SID = Id::First, CT::Container C>// requires Relevant<SID>
+      constexpr void* GetRawVoid(this C&& self) noexcept {
+         return const_cast<void*>(static_cast<const void*>(ThisCom::template GetRaw<SID>()));
+      }
+
       /// Get a direct access to the heap memory as a different type          
       ///   @attention using raw pointer while self.IsEmpty() may lead to     
       ///      undefined behavior                                             
@@ -377,14 +385,6 @@ namespace Langulus::Annies::Component
       template<Cid SID = Id::First>// requires Relevant<SID>
       constexpr auto& GetHeapInner(this auto&& self) noexcept {
          return self.template AccessStack<HeapReference>();
-      }
-
-      /// Get a direct access to the heap memory                              
-      ///   @attention using raw pointer while self.IsEmpty() may lead to     
-      ///      undefined behavior                                             
-      template<Cid SID = Id::First, CT::Container C>// requires Relevant<SID>
-      constexpr void* GetRawVoid(this C&& self) noexcept {
-         return const_cast<void*>(static_cast<const void*>(ThisCom::template GetRaw<SID>()));
       }
 
       /// Set the heap pointer, any data pointer will do                      

@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "../Component.hpp"
-#include <Langulus/MetaOf.hpp>
+//#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Deep.hpp>
 
 

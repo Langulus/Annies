@@ -309,14 +309,14 @@ namespace Langulus::Annies
 
       bool Validate(CT::Index auto&&) const noexcept;
 
-      void Done(size_t) noexcept;
-      void Done() noexcept;
+      /// Satisfy verb a number of times                                      
+      void Done(size_t c) noexcept {
+         mSuccesses = c;
+      }
 
-      /// Reset progress by marking verb as undone and zeroing output         
-      auto Clear() noexcept -> TVerb& {
-         mSuccesses = 0;
-         mOutput.Reset();
-         return *this;
+      /// Satisfy verb once                                                   
+      void Done() noexcept {
+         ++mSuccesses;
       }
 
       /// MARK: Compare                                                       
@@ -377,7 +377,21 @@ namespace Langulus::Annies
       }
 
       /// MARK: Removal                                                       
-      void Reset();
+      void Reset() {
+         this->ResetVerb();
+         this->ResetCharge();
+         mContext.Reset();
+         Inner::TVerbBase<V>::Reset();
+         mOutput.Reset();
+         mSuccesses = 0;
+      };
+
+      /// Reset progress by marking verb as undone and zeroing output         
+      auto Clear() noexcept -> TVerb& {
+         mSuccesses = 0;
+         mOutput.Reset();
+         return *this;
+      }
    };
 }
 

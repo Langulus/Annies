@@ -10,9 +10,10 @@
 #include <Langulus/CT/Deep.hpp>
 #include <Langulus/CT/ReflectAs.hpp>
 #include <Langulus/CT/DefineTag.hpp>
+#include <Langulus/CT/DefineVerb.hpp>
 #include <Langulus/Lambda.hpp>
 #include <Langulus/Assume.hpp>
-#include <Langulus/MetaOf.hpp>
+//#include <Langulus/MetaOf.hpp>
 
 
 namespace Langulus::Annies::Component

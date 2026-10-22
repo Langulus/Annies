@@ -11,6 +11,8 @@
 #include <Langulus/CT/Convertible.hpp>
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/DefineConst.hpp>
+#include <Langulus/RTTI/MetaConst.hpp>
+#include <Langulus/RTTI/MetaVerb.hpp>
 #include <Langulus/Utils/Byte.hpp>
 
 #include "Handle.hpp"

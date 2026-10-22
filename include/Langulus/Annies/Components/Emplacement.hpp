@@ -12,7 +12,7 @@
 #include <Langulus/CT/Index.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/Allocator.hpp>
-#include <Langulus/MetaOf.hpp>
+//#include <Langulus/MetaOf.hpp>
 
 
 namespace Langulus::Annies
