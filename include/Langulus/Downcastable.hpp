@@ -36,7 +36,7 @@ namespace Langulus
       template<CT::Downcastable T>
       Downcastable(T const* p) noexcept
          : mClassType    {MetaDataOf<T>()}
-         , mClassPointer {p} {
+         , mClassPointer {const_cast<void*>(static_cast<void const*>(p))} {
          (void) MetaDataOf<T const>(); // Make sure const is reflected  
       }
 
