@@ -163,6 +163,7 @@ namespace Langulus::Annies::Component
 
    protected:
       /// MARK: Protected                                                     
+      LglsComIterationForEach(friend);
       /*LglsComRemoval(friend);
       LglsComHeapMovable(friend);
       LglsComIndexedCommon(friend);

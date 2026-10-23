@@ -118,22 +118,31 @@ namespace Langulus::Annies::Component
 
       /// Get a direct access to the initialized heap memory's end.           
       ///   @attention this makes sense only when heap is contiguous.         
-      template<Cid SID = Id::First, CT::Contiguous C>// requires Relevant<SID>
+      template<Cid SID = Id::First, class C>// requires Relevant<SID>
       constexpr auto GetRawEnd(this C&& self) noexcept {
-         if constexpr (CT::TypeErased<C>)
-            return ThisCom::template GetRawAs<uint8_t, SID>() + self.template GetBytesize<SID>();
-         else
-            return ThisCom::template GetRaw<SID>() + self.template GetCount<SID>();
+         if constexpr (not CT::Contiguous<C>) {
+            // Likely a table/map/set                                   
+            return self.GetRawReserveEnd();
+         }
+         else if constexpr (CT::TypeErased<C>) {
+            return ThisCom::template GetRawAs<uint8_t, SID>()
+                     + self.template GetBytesize<SID>();
+         }
+         else {
+            return ThisCom::template GetRaw<SID>()
+                     + self.template GetCount<SID>();
+         }
       }
     
       /// Get a direct access to the entire heap reserve's end.               
       template<Cid SID = Id::First, CT::Container C>// requires Relevant<SID>
       constexpr auto GetRawReserveEnd(this C&& self) noexcept {
          const auto reserved = self.template GetReserved<SID>();
-         if constexpr (CT::TypeErased<C>)
-            return ThisCom::template GetRawAs<uint8_t, SID>() + reserved * self.template GetStride<SID>();
-         else
-            return ThisCom::template GetRaw<SID>() + reserved;
+         if constexpr (CT::TypeErased<C>) {
+            return ThisCom::template GetRawAs<uint8_t, SID>()
+                 + reserved * self.template GetStride<SID>();
+         }
+         else return ThisCom::template GetRaw<SID>() + reserved;
       }
       
       /// Get pointer to the first element for the given dimension.           
@@ -289,17 +298,33 @@ namespace Langulus::Annies::Component
                }
                else if constexpr (CT::DerivedFrom<T, AS>) {
                   // Access by upcast                                   
-                  if constexpr (CT::Dense<AS, T>)
-                     return static_cast<AS&>(*ThisCom::template Get<T, SID>());
-                  else
-                     return static_cast<AS >( ThisCom::template Get<T, SID>());
+                  if constexpr (CT::Dense<AS, T>) {
+                     if constexpr (CT::Mutable<C, AS>)
+                        return DecvqAllCast(static_cast<AS const&>(*ThisCom::template Get<T, SID>()));
+                     else
+                        return static_cast<AS const&>(*ThisCom::template Get<T, SID>());
+                  }
+                  else {
+                     if constexpr (CT::Mutable<C, Deptr<AS>>)
+                        return DecvqAllCast(static_cast<ConstAll<AS >>( ThisCom::template Get<T, SID>()));
+                     else
+                        return static_cast<ConstAll<AS >>( ThisCom::template Get<T, SID>());
+                  }
                }
                else if constexpr (CT::DerivedFrom<AS, T>) {
                   // Access by downcast                                 
-                  if constexpr (CT::Dense<AS, T>)
-                     return *dynamic_cast<AS*>( ThisCom::template Get<T, SID>());
-                  else
-                     return  dynamic_cast<AS >( ThisCom::template Get<T, SID>());
+                  if constexpr (CT::Dense<AS, T>) {
+                     if constexpr (CT::Mutable<C, AS>)
+                        return DecvqAllCast(*dynamic_cast<ConstAll<AS*>>( ThisCom::template Get<T, SID>()));
+                     else
+                        return *dynamic_cast<ConstAll<AS*>>( ThisCom::template Get<T, SID>());
+                  }
+                  else {
+                     if constexpr (CT::Mutable<C, Deptr<AS>>)
+                        return  DecvqAllCast(dynamic_cast<ConstAll<AS >>(&DenseCast(ThisCom::template Get<T, SID>())));
+                     else 
+                        return  dynamic_cast<ConstAll<AS >>(&DenseCast(ThisCom::template Get<T, SID>()));
+                  }
                }
                else {
                   // Wrap in a container                                

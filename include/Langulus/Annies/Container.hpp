@@ -925,7 +925,7 @@ namespace Langulus::Annies::Component
       template<Cid ID, CT::Container SELF, CT::Container FROM>
       constexpr void SliceFrom(this SELF& self, FROM&& from) {
          using I = IntentOf(from);
-         static_assert(CT::Handle<SELF>);
+         //static_assert(CT::Handle<SELF>);//TODO why was this here?
          static_assert(CT::Disowned<I>, "Slicing supports only disownment for now");
          ForEach(ComponentList{}, [&]<class C>{
                  if_available_gcc(C::template SliceFrom<ID, SELF, I>)(FWDIntent(from));

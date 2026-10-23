@@ -86,8 +86,9 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto& ForceMutable() noexcept {
-         return *reinterpret_cast<THandlePair<HandleMut, HandleMut>*>(this);
+      auto& ForceMutable() const noexcept {
+         using MUT = THandlePair<HandleMut, HandleMut>;
+         return const_cast<MUT&>(*reinterpret_cast<MUT const*>(this));
       }
 
       /// Pick a specific dimension                                           
@@ -171,7 +172,9 @@ namespace Langulus::Annies
       HandleMut GetValHandle() const noexcept { return {Slice<1>, *this}; }
 
       /// Already as mutable as it gets                                       
-      auto& ForceMutable() noexcept { return *this; }
+      auto& ForceMutable() const noexcept {
+         return const_cast<THandlePair&>(*this);
+      }
 
       /// Pick a specific dimension                                           
       template<Cid SID>
@@ -255,8 +258,9 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto& ForceMutable() noexcept {
-         return *reinterpret_cast<THandlePair<HandleMut, HandleMut>*>(this);
+      auto& ForceMutable() const noexcept {
+         using MUT = THandlePair<HandleMut, HandleMut>;
+         return const_cast<MUT&>(*reinterpret_cast<MUT const*>(this));
       }
  
       /// Pick a specific dimension                                           
@@ -358,9 +362,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto& ForceMutable() noexcept {
-         return *reinterpret_cast<THandlePair<THandleEmergent<DecvqAll<K>&>,
-                                              THandleEmergent<DecvqAll<V>&>>*>(this);
+      auto& ForceMutable() const noexcept {
+         using MUT = THandlePair<THandleEmergent<DecvqAll<K>&>,
+                                 THandleEmergent<DecvqAll<V>&>>;
+         return const_cast<MUT&>(*reinterpret_cast<MUT const*>(this));
       }
 
       /// Pick a specific dimension                                           
@@ -463,9 +468,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto& ForceMutable() noexcept {
-         return *reinterpret_cast<THandlePair<THandle<DecvqAll<K>&>,
-                                              THandle<DecvqAll<V>&>>*>(this);
+      auto& ForceMutable() const noexcept {
+         using MUT = THandlePair<THandle<DecvqAll<K>&>,
+                                 THandle<DecvqAll<V>&>>;
+         return const_cast<MUT&>(*reinterpret_cast<MUT const*>(this));
       }
 
       /// Pick a specific dimension                                           
@@ -561,9 +567,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto& ForceMutable() noexcept {
-         return *reinterpret_cast<THandlePair<THandle<DecvqAll<K>>,
-                                              THandle<DecvqAll<V>>>*>(this);
+      auto& ForceMutable() const noexcept {
+         using MUT = THandlePair<THandle<DecvqAll<K>>,
+                                 THandle<DecvqAll<V>>>;
+         return const_cast<MUT&>(*reinterpret_cast<MUT const*>(this));
       }
 
       /// Pick a specific dimension                                           

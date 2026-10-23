@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -68,7 +68,7 @@ namespace Langulus::Annies::Component
          else if constexpr (not CT::HeapAllocated<C>) {
             // This container is on the stack, and by extension         
             // statically-typed and always initialized                  
-            auto& data = self.template AccessProvider<ID>();
+            auto& data = *self.template Get<ID>();
             data = LglsFwd(argument);
          }
          else {

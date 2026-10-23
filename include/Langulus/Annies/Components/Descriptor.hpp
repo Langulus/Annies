@@ -101,7 +101,7 @@ namespace Langulus::Annies::Component
       auto ExtractDataAs(this SELF const& self, D& value) -> size_t {
          size_t progress = 0;
 
-         self.ForEachDeep([&](auto const& group) {
+         self.ForEachDeep([&](typename SELF::DeepType const& group) {
             if constexpr (CT::Array<D>) {
                const auto count  = group.GetCount();
                const auto remain = ExtentOf<D> - progress;

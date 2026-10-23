@@ -10,6 +10,7 @@
 #include "Langulus/Assume.hpp"
 #include <Langulus/CT/Index.hpp>
 #include <Langulus/CT/NullTerminated.hpp>
+#include <Langulus/CT/Destroyable.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -167,7 +168,6 @@ namespace Langulus::Annies::Component
       ///      incremented (when erasing the first element), so be careful.   
       template<CT::ContainsMany C, CT::NoIntent A>
       requires (not CT::IndexedLinearly<C> and CT::Handle<A>)
-      [[nodiscard("Make sure you reassign your interator if inside loop")]]
       A Erase(this C& self, A const& key) {
          LglsAssumeDev(not self.IsEmpty(),
             "How can you have a handle from an emtpy container?");
@@ -178,6 +178,14 @@ namespace Langulus::Annies::Component
          auto h = key.ForceMutable();
          ThisCom::EraseFromTable(h);
          return h - 1;
+      }
+
+      /// If key is mutable and can be reassigned, we can notify on discard   
+      template<CT::ContainsMany C, CT::NoIntent A>
+      requires (not CT::IndexedLinearly<C> and CT::Handle<A>)
+      [[nodiscard("Make sure you reassign your iterator if inside loop")]]
+      A Erase(this C& self, A& key) {
+         return self.Erase(const_cast<A const&>(key));
       }
 
       /// Erase a number of elements starting at a specific position.         

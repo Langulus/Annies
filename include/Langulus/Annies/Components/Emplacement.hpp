@@ -594,10 +594,14 @@ namespace Langulus::Annies::Component
             else {
                //                                                       
                // This container is statically-typed                    
-               if constexpr (CT::Typed<C>)
-                  static_assert(Same<TypeOf<C, SID>, IT>, "Type mismatch");
-               else
-                  LglsAssumeDev((self.template IsSame<IT, SID>()), "Type mismatch");
+               if constexpr (CT::Typed<C>) {
+                  using T = TypeOf<C, SID>;
+                  static_assert(Same<T, IT> or ::std::is_constructible_v<T, IT>,
+                     "Type mismatch: " + NameOf<T>() +
+                     " is not compatible with " + NameOf<IT>()
+                  );
+               }
+               else LglsAssumeDev((self.template IsSame<IT, SID>()), "Type mismatch");
 
                IntentNew(dst, LglsFwd(intent));
             }

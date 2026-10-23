@@ -237,8 +237,8 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> HandleMut& {
-         return *this;
+      auto ForceMutable() const noexcept -> HandleMut& {
+         return const_cast<HandleMut&>(*this);
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -292,8 +292,8 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> HandleDisownedMut& {
-         return *this;
+      auto ForceMutable() const noexcept -> HandleDisownedMut& {
+         return const_cast<HandleDisownedMut&>(*this);
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -352,8 +352,8 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> HandleMut& {
-         return *reinterpret_cast<HandleMut*>(this);
+      auto ForceMutable() const noexcept -> HandleMut& {
+         return const_cast<HandleMut&>(*reinterpret_cast<HandleMut const*>(this));
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -416,8 +416,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> HandleDisownedMut& {
-         return *reinterpret_cast<HandleDisownedMut*>(this);
+      auto ForceMutable() const noexcept -> HandleDisownedMut& {
+         return const_cast<HandleDisownedMut&>(
+            *reinterpret_cast<HandleDisownedMut const*>(this)
+         );
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -481,8 +483,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> THandle<DecvqAll<T>>& {
-         return *reinterpret_cast<THandle<DecvqAll<T>>*>(this);
+      auto ForceMutable() const noexcept -> THandle<DecvqAll<T>>& {
+         return const_cast<THandle<DecvqAll<T>>&>(
+            *reinterpret_cast<THandle<DecvqAll<T>> const*>(this)
+         );
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -534,8 +538,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> THandle<DecvqAll<T>>& {
-         return *reinterpret_cast<THandle<DecvqAll<T>>*>(this);
+      auto ForceMutable() const noexcept -> THandle<DecvqAll<T>>& {
+         return const_cast<THandle<DecvqAll<T>>&>(
+            *reinterpret_cast<THandle<DecvqAll<T>> const*>(this)
+         );
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -594,8 +600,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> THandleEmergent<DecvqAll<T>>& {
-         return *reinterpret_cast<THandleEmergent<DecvqAll<T>>*>(this);
+      auto ForceMutable() const noexcept -> THandleEmergent<DecvqAll<T>>& {
+         return const_cast<THandleEmergent<DecvqAll<T>>&>(
+            *reinterpret_cast<THandleEmergent<DecvqAll<T>> const*>(this)
+         );
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -648,8 +656,10 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> THandleEmergent<DecvqAll<T>>& {
-         return *reinterpret_cast<THandleEmergent<DecvqAll<T>>*>(this);
+      auto ForceMutable() const noexcept -> THandleEmergent<DecvqAll<T>>& {
+         return const_cast<THandleEmergent<DecvqAll<T>>&>(
+            *reinterpret_cast<THandleEmergent<DecvqAll<T>> const*>(this)
+         );
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -707,8 +717,8 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> THandleDisowned<DecvqAll<T>>& {
-         return *this;
+      auto ForceMutable() const noexcept -> THandleDisowned<DecvqAll<T>>& {
+         return const_cast<THandleDisowned<DecvqAll<T>>&>(*this);
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -790,8 +800,8 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> THandle<DecvqAll<T>>& {
-         return *this;
+      auto ForceMutable() const noexcept -> THandle<DecvqAll<T>>& {
+         return const_cast<THandle<DecvqAll<T>>&>(*this);
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  
@@ -866,8 +876,8 @@ namespace Langulus::Annies
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
-      auto ForceMutable() noexcept -> THandle<DecvqAll<T>>& {
-         return *this;
+      auto ForceMutable() const noexcept -> THandle<DecvqAll<T>>& {
+         return const_cast<THandle<DecvqAll<T>>&>(*this);
       }
 
       /// Pick a specific dimension if handle is complex (like THandlePair).  

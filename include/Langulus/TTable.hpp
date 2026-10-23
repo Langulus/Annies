@@ -67,7 +67,7 @@ namespace Langulus::Annies
       
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
-      template<class A1, class...AN>
+      template<Disambiguate A1, class...AN>
       constexpr TTable(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (CT::Table<A1>) {
@@ -110,6 +110,12 @@ namespace Langulus::Annies
          this->ConstructDefault();
          this->Merge(LglsFwd(a1));
         (this->Merge(LglsFwd(an)), ...);
+      }
+
+      /// Slice a container that is representable by a table                  
+      template<Cid SID>
+      constexpr TTable(Inner::Slice<SID>, CT::NotContiguous auto&& other) noexcept {
+         this->template SliceFrom<SID>(Disown(other));
       }
 
       /// Assignment                                                          
