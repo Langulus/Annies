@@ -144,9 +144,9 @@ namespace Langulus::Annies
       template<CT::Tag>
       bool ExtractTagInner(CT::NotVoid auto&...) const;
       template<size_t...IDX>
-      bool ExtractTagInner(const TagList&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
+      bool ExtractTagInner(TagList const&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
       template<size_t>
-      bool ExtractTagInnerInner(const TagList&, CT::NotVoid auto&) const;
+      bool ExtractTagInnerInner(TagList const&, CT::NotVoid auto&) const;
 
    public:
       ///                                                                     

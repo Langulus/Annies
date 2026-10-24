@@ -89,15 +89,28 @@ namespace Langulus::Annies
          }
       }
       
+      /// Create an empty tag from a dynamic tag, type and state              
+      ///   @param tag type of the tag                                        
+      ///   @param type type of the contained data                            
+      ///   @param states optional states of the container                    
+      ///   @return the new tag instance                                      
+      static TTag Typed(TMeta tag, DMeta type = {}, int states = 0) requires ::std::is_void_v<TAG> {
+         TTag result;
+         result.SetTag(tag);
+         result.SetType(type);
+         result.SetState(states);
+         return result;
+      }
+
       /// Create a tag by manually specifying the tag ID                      
-      static TTag From(TMeta tag, auto&&...arguments) {
+      static TTag From(TMeta tag, auto&&...arguments) requires ::std::is_void_v<TAG> {
          TTag result {LglsFwd(arguments)...};
          result.SetTag(tag);
          return result;
       }
 
       /// Create a tag by extracting tag ID from another container            
-      static TTag From(CT::Tag auto const& source, auto&&...arguments) {
+      static TTag From(CT::Tag auto const& source, auto&&...arguments) requires ::std::is_void_v<TAG> {
          return From(source.GetTag(), LglsFwd(arguments)...);
       }
 

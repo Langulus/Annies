@@ -61,7 +61,7 @@ void Set_Helper_TestType(auto const& set) {
 }
 
 template<CT::Set LHS, CT::Set RHS>
-void Set_Helper_TestSame(const LHS& lhs, const RHS& rhs) {
+void Set_Helper_TestSame(LHS const& lhs, RHS const& rhs) {
    REQUIRE(lhs.GetRaw() == rhs.GetRaw());
    REQUIRE(lhs.IsExact(rhs.GetType()));
    REQUIRE(lhs == rhs);

@@ -68,7 +68,7 @@ namespace Langulus::Annies::Component
          else if constexpr (not CT::HeapAllocated<C>) {
             // This container is on the stack, and by extension         
             // statically-typed and always initialized                  
-            auto& data = *self.template Get<ID>();
+            auto& data = *self.template Get<void, ID>();
             data = LglsFwd(argument);
          }
          else {

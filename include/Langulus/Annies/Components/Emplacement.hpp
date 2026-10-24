@@ -25,7 +25,8 @@ namespace Langulus::Annies::Component
    enum class AllocationStrategy {
       DontAllocate,
       FreshAllocate,
-      Reallocate
+      Reallocate,
+      FreshAllocateAllIndirections
    };
 
    ///                                                                        
@@ -59,23 +60,27 @@ namespace Langulus::Annies::Component
       ///   @param arguments Constructor arguments for initializing an        
       ///      element. If C is type-erased, argument must be Describe.       
       ///   @return a reference or handle to the newly created element        
-      template<class E = void, Cid SID = ID, CT::ContainsMany C, class...A> requires Relevant<SID>
+      template<class E = void, Cid SID = ID, CT::ContainsMany C, class...A> 
       auto EmplaceAt(this C& self, CT::Index auto&& at, A&&...arguments)
-      -> DecidePick<C> requires CT::IndexedLinearly<C> /*requires CT::RangeEmplaceable<C, A...>*/ {
-         DecidePick<C> pick = self.template AsAt<DecidePick<C>, SID>(LglsFwd(at));
-         pick.template Emplace<E, SID>(LglsFwd(arguments)...);
-         return pick;
+      -> DecideHandle<C> requires (Relevant<SID> and CT::IndexedLinearly<C>) {
+         auto handle = self.GetHandle() + self.SimplifyIndex(LglsFwd(at));
+         handle.template Emplace<E, SID>(LglsFwd(arguments)...);
+         return handle;
+         //DecidePick<C> pick = self.template AsAt<DecidePick<C>, SID>(LglsFwd(at));
+         //pick.template Emplace<E, SID>(LglsFwd(arguments)...);
+         //return pick;
       }
 
       /// Generic emplacement that constructs/overwrites the first element.   
       /// Any overwritten element will be dereferenced/destroyed first.       
+      /// Designed for heap-allocated containers.                             
       ///   @tparam E Sets the type of the container if empty. Ignored if     
       ///      container is statically-typed.                                 
       ///   @param arguments Constructor arguments                            
       ///   @return a reference or handle to the newly created element        
-      template<class E = void, Cid SID = ID, CT::Container C, class...A> requires Relevant<SID>//TODO its not clear whether Emplace works on all dimensions or not - figure it out
+      template<class E = void, Cid SID = ID, CT::Container C, class...A> //TODO its not clear whether Emplace works on all dimensions or not - figure it out
       auto Emplace(this C& self, A&&...arguments)
-      -> DecidePick<C> /*requires CT::RangeEmplaceable<C, A...>*/ {
+      -> DecideHandle<C> requires (Relevant<SID> and CT::HeapAllocated<C>) {
          auto a = self.template GetAllocation<SID>();
          if (not a) {
             // No ownership, just fresh-allocate                        
@@ -175,7 +180,96 @@ namespace Langulus::Annies::Component
          }
 
          // Return a reference/handle to the newly emplaced element     
-         return self.template As<Deref<DecidePick<C>>, SID>();
+         //return self.template As<Deref<DecidePick<C>>, SID>();
+         return self.GetHandle();
+      }
+
+      /// Generic emplacement that constructs/overwrites the first element.   
+      /// Any overwritten element will be dereferenced/destroyed first.       
+      /// Designed for stack-allocated containers.                            
+      ///   @tparam E Sets the type of the container if empty. Ignored if     
+      ///      container is statically-typed.                                 
+      ///   @param arguments Constructor arguments                            
+      ///   @return a reference or handle to the newly created element        
+      template<class E = void, Cid SID = ID, CT::Container C, class...A> //TODO its not clear whether Emplace works on all dimensions or not - figure it out
+      auto Emplace(this C& self, A&&...arguments)
+      -> DecideHandle<C> requires (Relevant<SID> and not CT::HeapAllocated<C>) {
+         // Need to destroy and overwrite only the first element.       
+         auto item = self.GetHandle();
+         item.template Free<false>();
+         if_available(item.ResetAllEntries());
+         //TODO clear the correspnding hash table spot?
+
+         // Emplace a new element on the first position.                
+         // Any state change is forbidden - container is full.          
+         try {
+            if constexpr (sizeof...(arguments) > 0)
+               ThisCom::template EmplaceConstruct<SID, AllocationStrategy::DontAllocate, E>(LglsFwd(arguments)...);
+            else
+               ThisCom::template EmplaceDefault<SID, AllocationStrategy::DontAllocate, E>();
+         }
+         catch (...) {
+            // If emplacement fails, we are forced to destroy           
+            // all remaining elements as well.                          
+            if constexpr (CT::ContainsMany<C>) {
+               item += 1;
+               const auto itemsEnd = self.GetHandle() + self.template GetCount<SID>();
+               while (item.GetRaw() != itemsEnd.GetRaw()) {
+                  item.template Free<false>();
+                  ++item;
+               }
+            }
+            
+            throw;
+         }
+
+         return self.GetHandle();
+      }
+
+      /// Generic emplacement that constructs/overwrites the first element.   
+      /// Any overwritten element will be dereferenced/destroyed first.       
+      /// Designed for stack-allocated containers. Unlike Emplace, this       
+      /// allocate all levels of indirection and forward the arguments to     
+      /// the densest element constructor.                                    
+      ///   @tparam E sets the type of the container if empty. Ignored if     
+      ///      container is statically-typed. E can have as many indirections 
+      ///      as you like.                                                   
+      ///   @param arguments constructor arguments                            
+      ///   @return a reference or handle to the newly created element        
+      ///   @attention works only for one-dimensional containers              
+      template<class E = void, Cid SID = ID, CT::Container C, class...A>
+      auto New(this C& self, A&&...arguments) -> DecideHandle<C>
+      requires (Relevant<SID> and not CT::HeapAllocated<C> and not Shared) {
+         // Need to destroy and overwrite only the first element.       
+         auto item = self.GetHandle();
+         item.template Free<false>();
+         if_available(item.ResetAllEntries());
+         //TODO clear the correspnding hash table spot?
+
+         // Emplace a new element on the first position.                
+         // Any state change is forbidden - container is full.          
+         try {
+            if constexpr (sizeof...(arguments) > 0)
+               ThisCom::template EmplaceConstruct<SID, AllocationStrategy::FreshAllocateAllIndirections, E>(LglsFwd(arguments)...);
+            else
+               ThisCom::template EmplaceDefault<SID, AllocationStrategy::FreshAllocateAllIndirections, E>();
+         }
+         catch (...) {
+            // If emplacement fails, we are forced to destroy           
+            // all remaining elements as well.                          
+            if constexpr (CT::ContainsMany<C>) {
+               item += 1;
+               const auto itemsEnd = self.GetHandle() + self.template GetCount<SID>();
+               while (item.GetRaw() != itemsEnd.GetRaw()) {
+                  item.template Free<false>();
+                  ++item;
+               }
+            }
+            
+            throw;
+         }
+
+         return self.GetHandle();
       }
 
    protected:
@@ -390,7 +484,7 @@ namespace Langulus::Annies::Component
       /// Clone the 'rhs'.                                                    
       /// This is a more generic approach that is considerably slower.        
       ///   @attention Works in one dimension at a time!                      
-      //TODO could benefit from static optimization                          
+      //TODO could benefit from static optimization                           
       template<Cid SID = ID, CT::Container C, CT::NoIntent IT> requires Relevant<SID>
       void EmplaceByCloningCustomPointers(this C& self, IT const& rhs) {
          /*static_assert(CT::ContainsOne<C>,

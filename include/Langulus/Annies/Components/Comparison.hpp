@@ -68,7 +68,7 @@ namespace Langulus::Annies::Component
       ///   @return true if the two containers are identical                  
       template<Cid SID = ID, CT::Container LHS, CT::Container RHS>
       requires (Relevant<SID> and CT::NoIntent<RHS>)
-      constexpr bool CompareEqual(this const LHS& lhs, const RHS& rhs) {
+      constexpr bool CompareEqual(this LHS const& lhs, RHS const& rhs) {
          if consteval {
             // Heap should be empty at compile-time                     
             //TODO what about stacks??
@@ -288,7 +288,7 @@ namespace Langulus::Annies::Component
       ///      compare all elements until short-circuited                     
       ///   @return the ordering result                                       
       template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
-      constexpr auto Compare(this const LHS& lhs, const RHS& rhs) /*-> Ordering<LHS>*/ {
+      constexpr auto Compare(this LHS const& lhs, RHS const& rhs) /*-> Ordering<LHS>*/ {
          LglsVerboseScoped(Info, "Comparing ",
             Logger::White, lhs.GetCount(), "x of ", lhs.GetName(),
             Logger::Reset, " with ",

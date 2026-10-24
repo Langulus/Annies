@@ -356,14 +356,14 @@ namespace Langulus::Annies
    ///                                                                        
    template<size_t...IDX>
    bool Neat::ExtractTagInner(
-      const TagList& found, ExpandedSequence<IDX...>, CT::NotVoid auto&...values
+      TagList const& found, ExpandedSequence<IDX...>, CT::NotVoid auto&...values
    ) const {
       return (ExtractTagInnerInner<IDX>(found, values) or ...);
    }
    
    ///                                                                        
    template<size_t IDX>
-   bool Neat::ExtractTagInnerInner(const TagList& found, CT::NotVoid auto& value) const {
+   bool Neat::ExtractTagInnerInner(TagList const& found, CT::NotVoid auto& value) const {
       if (IDX >= found.GetCount())
          return false;
 

@@ -71,7 +71,7 @@ void Any_Helper_TestType(auto const& any) {
 }
 
 template<CT::BlockBased LHS, CT::BlockBased RHS>
-void Any_Helper_TestSame(const LHS& lhs, const RHS& rhs) {
+void Any_Helper_TestSame(LHS const& lhs, RHS const& rhs) {
    REQUIRE(lhs.GetRaw() == rhs.GetRaw());
    REQUIRE(lhs.IsExact(rhs.GetType()));
    REQUIRE(lhs == rhs);

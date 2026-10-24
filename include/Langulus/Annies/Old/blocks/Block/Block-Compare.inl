@@ -99,7 +99,7 @@ namespace Langulus::Annies
          if constexpr (not TypeErased)
             return Compare<RESOLVE>(reinterpret_cast<const Block<TYPE>&>(right));
          else
-            return right.template Compare<RESOLVE>(reinterpret_cast<const RHS&>(*this));
+            return right.template Compare<RESOLVE>(reinterpret_cast<RHS const&>(*this));
       }
       else {
          if (not IsSame(right)) { //TODO but what if differently typed pointers to the same virtual objects?

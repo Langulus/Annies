@@ -142,7 +142,8 @@ namespace Langulus::Annies::Component
          LglsAssumeDev(not self.IsDisowned(),
             "Can't keep anything in a container without ownership");
 
-         auto entries = self.template GetEntriesInner<SID>();
+         //auto entries = self.template GetEntriesInner<SID>();
+         auto entries = self.template GetEntries<SID>();
          if (not entries)
             return;
 
@@ -300,7 +301,8 @@ namespace Langulus::Annies::Component
             "Can't keep anything in a container without ownership");
 
          // Check if disowned/outside authority                         
-         auto entries = self.template GetEntriesInner<SID>();
+         //auto entries = self.template GetEntriesInner<SID>();
+         auto entries = self.template GetEntries<SID>();
          if (not entries)
             return;
 
@@ -469,7 +471,8 @@ namespace Langulus::Annies::Component
             LglsAssumeDev(T.IsSparse(),
                "Don't call DestroyElementDeepStandardPointers if container isn't sparse");
 
-            auto entries = self.template GetEntriesInner<SID>();
+            //auto entries = self.template GetEntriesInner<SID>();
+            auto entries = self.template GetEntries<SID>();
             if (not entries)
                return;
 
@@ -543,7 +546,8 @@ namespace Langulus::Annies::Component
                "Don't call DestroyElementDeepStandardPointers if container isn't sparse");
 
             using DT = Deptr<T>;
-            auto entries = self.template GetEntriesInner<SID>();
+            //auto entries = self.template GetEntriesInner<SID>();
+            auto entries = self.template GetEntries<SID>();
             if (not entries)
                return;
 
@@ -774,7 +778,8 @@ namespace Langulus::Annies::Component
             LglsAssumeDev(T.IsSparse(),
                "Don't call DestroyElementDeepCustomPointers if container isn't sparse");
 
-            auto entries = self.template GetEntriesInner<SID>();
+            //auto entries = self.template GetEntriesInner<SID>();
+            auto entries = self.template GetEntries<SID>();
             if (not entries)
                return;
             
@@ -976,7 +981,8 @@ namespace Langulus::Annies::Component
          decltype(auto) rhs = LglsFwd(intent.what);
          const auto indirections = self.template GetIndirections<SID>();
          const auto entries_size = sizeof(AllocationPtr) * indirections;
-         const auto entries = self.template GetEntriesInner<SID>();
+         //const auto entries = self.template GetEntriesInner<SID>();
+         const auto entries = self.template GetEntries<SID>();
          constexpr bool sought = not CT::Disowned<I>;
 
          if constexpr (CT::Handle<I>) {

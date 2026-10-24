@@ -568,7 +568,7 @@ namespace Langulus::Annies
 }
 
 /// MARK: CT                                                                  
-namespace Langulus::CT
+/*namespace Langulus::CT
 {
    namespace Inner
    {
@@ -591,7 +591,7 @@ namespace Langulus::CT
    template<class...T>
    concept Stringifiable = ((Inner::StringifiableByOperator<T>
                           or Inner::StringifiableByConstructor<T>) and ...);
-}
+}*/
 
 /// MARK: Morphisms                                                           
 /// Convert std::string_view -> Text                                          

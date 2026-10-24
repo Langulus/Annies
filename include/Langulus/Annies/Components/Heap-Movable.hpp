@@ -119,13 +119,18 @@ namespace Langulus::Annies::Component
                   }
                }
                else {
+                  using T = TypeOf<IT, D>;
                   if constexpr (CT::Cloned<I>) {
-                     static_assert(CT::CloneConstructible<TypeOf<IT, D>>,
-                        "Contained type is not clone-constructible");
+                     static_assert(CT::CloneConstructible<T>,
+                        "Contained type is not clone-constructible: "
+                        + NameOf<T>()
+                     );
                   }
                   else {
-                     static_assert(CT::ReferConstructible<TypeOf<IT, D>>,
-                        "Contained type is not refer-constructible");
+                     static_assert(CT::ReferConstructible<T>,
+                        "Contained type is not refer-constructible: "
+                        + NameOf<T>()
+                     );
                   }
                }
             });

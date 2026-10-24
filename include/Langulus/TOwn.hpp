@@ -14,6 +14,7 @@
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Assignment.hpp"
 #include "Annies/Components/Comparison.hpp"
+#include <Langulus/CT/Number.hpp>
 
 
 namespace Langulus::Annies::Inner
@@ -35,7 +36,7 @@ namespace Langulus::Annies
    ///                                                                        
    /// A statically typed stack-based container of size 1.                    
    /// Mainly serves to transfer values and/or pointers on move.              
-   /// You can optionally add tags to it.                                     
+   /// You can optionally add tags to it. Can be used in unions.              
    ///   @attention doesn't default initialize fundamentals!                  
    template<CT::NotVoid T, class...TAGS>
    struct TOwn : Inner::TOwnBase<T> {
@@ -45,9 +46,11 @@ namespace Langulus::Annies
       using CTTI_POD       = Maybe<CT::POD<T>>;
       using Base           = Inner::TOwnBase<T>;
 
-      constexpr  TOwn() noexcept = default; /*{
-         this->ConstructDefault();
-      }*/
+      // Can be seamlessly used as a scalar operand by Langulus::Math   
+      using CTTI_Number       = Maybe<CT::Number<T>>;
+      using CTTI_CustomNumber = Maybe<CT::Number<T>>;
+
+      constexpr  TOwn() noexcept = default;
 
       constexpr  TOwn(T const& source)
          : Base {Stackwise, source} {}

@@ -816,7 +816,7 @@ namespace Langulus::Annies
 
    ///                                                                        
    /// When T is not a reference, then it is not embedded.                    
-   /// Such sparse handles are similar to TRef<Deptr<T>>.                     
+   /// Such sparse handles are similar to TRef<Deptr<T>>.                     //TODO update doc when tests pass
    ///   @attention such handles are local and have strong ownership! This    
    ///      means that they need to be cleared of their allocation upon move  
    ///      or abandon!                                                       

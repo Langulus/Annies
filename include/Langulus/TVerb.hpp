@@ -392,6 +392,10 @@ namespace Langulus::Annies
          mOutput.Reset();
          return *this;
       }
+
+      /// Type-erasure operator to TVerb<void>                                
+      operator Verb&       () noexcept { return reinterpret_cast<Verb      &>(*this); }
+      operator Verb const& () noexcept { return reinterpret_cast<Verb const&>(*this); }
    };
 }
 

@@ -71,7 +71,7 @@ void Map_Helper_TestType(auto const& map) {
 }
 
 template<CT::Map LHS, CT::Map RHS>
-void Map_Helper_TestSame(const LHS& lhs, const RHS& rhs) {
+void Map_Helper_TestSame(LHS const& lhs, RHS const& rhs) {
    REQUIRE(lhs.GetRaw() == rhs.GetRaw());
    REQUIRE(lhs.IsKeyExact(rhs.GetKeyType()));
    REQUIRE(lhs.IsValueExact(rhs.GetValueType()));

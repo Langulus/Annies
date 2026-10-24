@@ -363,6 +363,7 @@ namespace Langulus::Annies::Component
       LglsComReserveEmergent(friend);
       LglsComIndexedHashHeap(friend);
       LglsComIndexedHashStack(friend);
+      LglsComIndexedCoverageStack(friend);
       LglsComStateStack(friend);
       LglsComIndexedCommon(friend);
       LglsComIndexedCommonHashed(friend);
