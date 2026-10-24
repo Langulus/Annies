@@ -57,7 +57,7 @@ namespace Langulus::Annies
          : range {a} {}
 
       /// MARK: Iterator                                                      
-      struct Iterator : Tif<CT::IndexedLinearly<C>, NoHashtable, AddHashtable> {
+      struct Iterator : Tif<CT::IndexedHashTable<C>, AddHashtable, NoHashtable> {
          using CTTI_ReflectAs    = void;
          using CTTI_Iterator     = Yup;
          using difference_type   = std::ptrdiff_t;
@@ -75,7 +75,7 @@ namespace Langulus::Annies
          constexpr Iterator(Deptr<H> const& it, C* range) noexcept requires CT::Sparse<H>
             : mIt    {&it}
             , mRange {range} {
-            if constexpr (not CT::IndexedLinearly<C>) {
+            if constexpr (CT::IndexedHashTable<C>) {
                AddHashtable::mTable = range->GetHashTable();
 
                if (AddHashtable::mTable) {
@@ -90,7 +90,7 @@ namespace Langulus::Annies
          constexpr Iterator(H const& it, C* range) noexcept
             : mIt    {it}
             , mRange {range} {
-            if constexpr (not CT::IndexedLinearly<C>) {
+            if constexpr (CT::IndexedHashTable<C>) {
                AddHashtable::mTable = range->GetHashTable();
 
                if (AddHashtable::mTable) {
@@ -108,7 +108,7 @@ namespace Langulus::Annies
          constexpr Iterator(H&& it, C* range) noexcept
             : mIt    {LglsFwd(it)}
             , mRange {range} {
-            if constexpr (not CT::IndexedLinearly<C>) {
+            if constexpr (CT::IndexedHashTable<C>) {
                AddHashtable::mTable = range->GetHashTable();
 
                if (AddHashtable::mTable) {
@@ -127,7 +127,7 @@ namespace Langulus::Annies
             LglsAssumeUser(mRange == rhs.mRange,
                "Iterators are for different containers");
             mIt = rhs.mIt;
-            if constexpr (not CT::IndexedLinearly<C>)
+            if constexpr (CT::IndexedHashTable<C>)
                AddHashtable::mTable = rhs.mTable;
             return *this;
          }
@@ -136,14 +136,14 @@ namespace Langulus::Annies
             LglsAssumeUser(mRange == rhs.mRange,
                "Iterators are for different containers");
             mIt = rhs.mIt;
-            if constexpr (not CT::IndexedLinearly<C>)
+            if constexpr (CT::IndexedHashTable<C>)
                AddHashtable::mTable = rhs.mTable;
             return *this;
          }
 
          constexpr bool operator == (CT::Iterator auto const& rhs) const noexcept {
             // We sneakily skip invalid table entries while comparing   
-            if constexpr (CT::IndexedTable<C>) {
+            if constexpr (CT::IndexedHashTable<C>) {
                if constexpr (REVERSE) {
                   if constexpr (CT::Handle<H>) {
                      while (rhs.mIt.GetRaw() < mIt.GetRaw() and not *AddHashtable::mTable) {
@@ -182,7 +182,7 @@ namespace Langulus::Annies
 
          constexpr auto operator <=> (CT::Iterator auto const& rhs) const noexcept {
             // We sneakily skip invalid table entries while comparing   
-            if constexpr (CT::IndexedTable<C>) {
+            if constexpr (CT::IndexedHashTable<C>) {
                if constexpr (REVERSE) {
                   if constexpr (CT::Handle<H>) {
                      while (rhs.mIt.GetRaw() < mIt.GetRaw() and not *AddHashtable::mTable) {
@@ -570,14 +570,14 @@ namespace Langulus::Annies
          if constexpr (REVERSE) {
             Iterator temp {range.template AsAt<H>(Index::First), &range};
             --temp.mIt;
-            if constexpr (CT::IndexedTable<C>)
+            if constexpr (CT::IndexedHashTable<C>)
                --temp.mTable;
             return temp;
          }
          else {
             Iterator temp {range.template AsAt<H>(Index::Last), &range};
             ++temp.mIt;
-            if constexpr (CT::IndexedTable<C>)
+            if constexpr (CT::IndexedHashTable<C>)
                ++temp.mTable;
             return temp;
          }
@@ -602,14 +602,14 @@ namespace Langulus::Annies
          if constexpr (not REVERSE) {
             Iterator temp {range.template AsAt<H>(Index::First), &range};
             --temp.mIt;
-            if constexpr (CT::IndexedTable<C>)
+            if constexpr (CT::IndexedHashTable<C>)
                --temp.mTable;
             return temp;
          }
          else {
             Iterator temp {range.template AsAt<H>(Index::Last), &range};
             ++temp.mIt;
-            if constexpr (CT::IndexedTable<C>)
+            if constexpr (CT::IndexedHashTable<C>)
                ++temp.mTable;
             return temp;
          }

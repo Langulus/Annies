@@ -296,7 +296,7 @@ namespace Langulus::Annies::Component
                         if (self.GetCount() == 1)
                            return Loop::Discard;
 
-                        handle = self.EraseAt(handle);
+                        handle = self.Erase(handle);
                         --handle;
                      }
                      else {

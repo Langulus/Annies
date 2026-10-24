@@ -89,6 +89,13 @@ namespace Langulus::Annies
       explicit constexpr operator bool() const {
          return static_cast<bool>(Base::GetStackInner());
       }
+
+      constexpr operator T& () noexcept {
+         return this->GetStackInner();
+      }
+      constexpr operator T const& () const noexcept {
+         return this->GetStackInner();
+      }
    };
 
    template<CT::NotVoid T, class...TAGS>

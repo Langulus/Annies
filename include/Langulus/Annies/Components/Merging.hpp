@@ -285,7 +285,7 @@ namespace Langulus::Annies::Component
       ///   @param a1, an elements for each dimension, first being the key    
       ///   @return a multidimensional handle to the inserted/found entry     
       ///   @attention doesn't support arrays or any kind of unfolding        
-      template<class A1, class...AN, CT::IndexedTable C> requires (C::Dimensions::Count > 1)
+      template<class A1, class...AN, CT::IndexedHashTable C> requires (C::Dimensions::Count > 1)
       auto Merge(this C& self, A1&& a1, AN&&...an) -> DecideHandle<C> {
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");

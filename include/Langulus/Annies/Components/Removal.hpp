@@ -379,8 +379,8 @@ namespace Langulus::Annies::Component
       /// Erases an element at a specific index from a hash table             
       ///   @attention assumes that index points to a valid element           
       ///   @attention operates on all dimensions at once                     
-      ///   @param index - the index to remove                                
-      template<CT::ContainsMany C> requires (not CT::IndexedLinearly<C>)
+      ///   @param index the index to remove                                  
+      template<CT::ContainsMany C> requires CT::IndexedHashTable<C>
       void EraseFromTable(this C& self, CT::Handle auto& h) assumptious {
          const auto tableBeg = DecvqAllCast(self.template GetHashTable<ID>()); //TODO what if different tables per dimension?
          auto psl = tableBeg + (h - self.GetHandle());

@@ -283,14 +283,9 @@ namespace Langulus::Annies::Component
 
       /// Clone the 'rhs'.                                                    
       /// Assumes all indirections are ordinary pointers, and is thus faster. 
-      ///   @attention Works in one dimension at a time!                      
+      ///   @attention works in one dimension at a time!                      
       template<Cid SID = ID, CT::Container C, CT::NoIntent IT> requires Relevant<SID>
       void EmplaceByCloningStandardPointers(this C& self, IT const& rhs) {
-         /*static_assert(CT::ContainsOne<C>,
-            "Emplacing only first element in a container with many. "
-            "GetHandle() first?"
-         );*/
-
          constexpr bool has_entries = requires { self.template GetEntriesInner<SID>(); };
          [[maybe_unused]] DMeta T;
          // If T is Text**, then dst/src are Text***                    
@@ -949,7 +944,9 @@ namespace Langulus::Annies::Component
             }
             else {
                static_assert(CT::Dense<T>,
-                  "Too many arguments for emplacing a sparse instance");
+                  "Too many arguments for emplacing a sparse instance. "
+                  "Use " + LastCppNameOf<C>() + "::New method instead of Emplace?"
+               );
 
                if constexpr (requires { Decvq<T> {LglsFwd(arguments)...}; } )
                   ThisCom::template EmplaceWithIntent<SID>(Abandon {Decvq<T> {LglsFwd(arguments)...}});

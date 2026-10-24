@@ -37,7 +37,7 @@ namespace Langulus::Annies::Component
       static constexpr bool Relevant = Id::template Contains<SID>;
 
       /// Get the start of the coverage table                                 
-      template<Cid SID = ID> requires Relevant<SID>
+      /*template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetCoverageTable(this auto const& self) noexcept -> TableType const* {
          return ThisCom::GetCoverageTableInner();
       }
@@ -46,7 +46,7 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetCoverageTableEnd(this auto const& self) noexcept -> TableType const* {
          return ThisCom::GetCoverageTableInner() + self.template GetReserved<SID>();
-      }
+      }*/
 
    protected:
       LglsComHeapMovable(friend);

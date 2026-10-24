@@ -95,7 +95,7 @@ namespace Langulus::Annies::Component
    enum IndexingStyle {
       NotIndexed = 0,
       IndexedLinearly = 1,
-      IndexedTable = 2,
+      IndexedHashTable = 2,
       IndexedCoverage = 3
    };
 
@@ -221,8 +221,13 @@ namespace Langulus::CT
 
    /// Check if listed types are containers, and are hash table indexed       
    template<class...T>
-   concept IndexedTable = Container<T...>
-      and ((ShedDeref<T>::Indexed == Annies::Component::IndexedTable) and ...);
+   concept IndexedHashTable = Container<T...>
+      and ((ShedDeref<T>::Indexed == Annies::Component::IndexedHashTable) and ...);
+
+   /// Check if listed types are containers, and are coverage table indexed   
+   template<class...T>
+   concept IndexedCoverage = Container<T...>
+      and ((ShedDeref<T>::Indexed == Annies::Component::IndexedCoverage) and ...);
 
    /// Check if listed types are containers, and are linearly indexed         
    template<class T>
