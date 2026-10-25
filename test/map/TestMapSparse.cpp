@@ -167,15 +167,15 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetCount() == 1);
          REQUIRE(map.GetKeys().GetUses() == 1);
          REQUIRE(map.GetVals().GetUses() == 1);
-         REQUIRE(map[pair.GetKey()] == pair.GetValue());
+         REQUIRE(map[pair.GetKey()] == pair.GetVal());
 
          if constexpr (CT::Text<K>) {
-            REQUIRE(map["five hundred"] == pair.GetValue());
-            REQUIRE_THROWS(map["missing"] != pair.GetValue());
+            REQUIRE(map["five hundred"] == pair.GetVal());
+            REQUIRE_THROWS(map["missing"] != pair.GetVal());
          }
          else {
-            REQUIRE(map[pair.GetKey()] == pair.GetValue());
-            REQUIRE_THROWS(map[pairMissing.GetKey()] != pair.GetValue());
+            REQUIRE(map[pair.GetKey()] == pair.GetVal());
+            REQUIRE_THROWS(map[pairMissing.GetKey()] != pair.GetVal());
          }
 
          #ifdef LANGULUS_STD_BENCHMARK
@@ -213,15 +213,15 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetCount() == 1);
          REQUIRE(map.GetKeys().GetUses() == 1);
          REQUIRE(map.GetVals().GetUses() == 1);
-         REQUIRE(map[pair.GetKey()] == pair.GetValue());
+         REQUIRE(map[pair.GetKey()] == pair.GetVal());
 
          if constexpr (CT::Text<K>) {
-            REQUIRE(map["five hundred"] == pair.GetValue());
-            REQUIRE_THROWS(map["missing"] != pair.GetValue());
+            REQUIRE(map["five hundred"] == pair.GetVal());
+            REQUIRE_THROWS(map["missing"] != pair.GetVal());
          }
          else {
-            REQUIRE(map[pair.GetKey()] == pair.GetValue());
-            REQUIRE_THROWS(map[pairMissing.GetKey()] != pair.GetValue());
+            REQUIRE(map[pair.GetKey()] == pair.GetVal());
+            REQUIRE_THROWS(map[pairMissing.GetKey()] != pair.GetVal());
          }
 
          //TODO benchmark
@@ -238,7 +238,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetKeys().GetUses() == 1);
          REQUIRE(map.GetVals().GetUses() == 1);
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          REQUIRE(map.GetReserved() >= 5);
 
          //TODO benchmark
@@ -263,25 +263,25 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetKeys().GetUses() == 1);
          REQUIRE(map.GetVals().GetUses() == 1);
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          REQUIRE(map.GetReserved() >= 5);
       }
 
       WHEN("Shallow-copy more of the same stuff") {
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
 
          map << darray2[0];
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
 
          map << darray2[1];
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
 
          map << darray2[2];
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
 
 
          /*Logger::SpecialTab("Map before: ");
@@ -296,12 +296,12 @@ TEMPLATE_TEST_CASE(
 
          for (auto& comparer : darray1) {
             //Logger::Special("Searching for: ", comparer.mKey->As<Text>());
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          }
 
          map << darray2[4];
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
 
          Map_CheckState_OwnedFull<K, V>(map);
 
@@ -310,9 +310,9 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetCount() == 10);
 
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          for (auto& comparer : darray2)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
             REQUIRE(map.GetRawKeysMemory() == keyMemory);
@@ -408,9 +408,9 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetVals().GetUses() == 1);
          REQUIRE(map.GetCount() == 10);
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          for (auto& comparer : darray2)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
             REQUIRE(map.GetRawKeysMemory() == keyMemory);
             REQUIRE(map.GetRawValsMemory() == valueMemory);
@@ -452,8 +452,8 @@ TEMPLATE_TEST_CASE(
          static_assert(CT::Comparable<Tag*, Own<Tag*>>);
          static_assert(CT::Comparable<Tag*, Ref<Tag>>);
 
-         const auto removed2 = map.RemoveValue(darray1[1].GetValue());
-         const auto removed4 = map.RemoveValue(darray1[3].GetValue());
+         const auto removed2 = map.RemoveValue(darray1[1].GetVal());
+         const auto removed4 = map.RemoveValue(darray1[3].GetVal());
 
          Map_CheckState_OwnedFull<K, V>(map);
 
@@ -466,11 +466,11 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.GetRawValsMemory() == valueMemory);
          REQUIRE(map.GetReserved() >= 5);
 
-         REQUIRE      (map.ContainsValue(darray1[0].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetValue()));
-         REQUIRE      (map.ContainsValue(darray1[2].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetValue()));
-         REQUIRE      (map.ContainsValue(darray1[4].GetValue()));
+         REQUIRE      (map.ContainsValue(darray1[0].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetVal()));
+         REQUIRE      (map.ContainsValue(darray1[2].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetVal()));
+         REQUIRE      (map.ContainsValue(darray1[4].GetVal()));
 
          REQUIRE      (map.ContainsKey(darray1[0].GetKey()));
          REQUIRE_FALSE(map.ContainsKey(darray1[1].GetKey()));
@@ -478,15 +478,15 @@ TEMPLATE_TEST_CASE(
          REQUIRE_FALSE(map.ContainsKey(darray1[3].GetKey()));
          REQUIRE      (map.ContainsKey(darray1[4].GetKey()));
 
-         const auto removed3 = map.RemoveValue(darray1[2].GetValue());
+         const auto removed3 = map.RemoveValue(darray1[2].GetVal());
          REQUIRE(removed3 == 1);
          REQUIRE(map.GetCount() == 2);
 
-         REQUIRE      (map.ContainsValue(darray1[0].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[2].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetValue()));
-         REQUIRE      (map.ContainsValue(darray1[4].GetValue()));
+         REQUIRE      (map.ContainsValue(darray1[0].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[2].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetVal()));
+         REQUIRE      (map.ContainsValue(darray1[4].GetVal()));
 
          REQUIRE      (map.ContainsKey(darray1[0].GetKey()));
          REQUIRE_FALSE(map.ContainsKey(darray1[1].GetKey()));
@@ -494,15 +494,15 @@ TEMPLATE_TEST_CASE(
          REQUIRE_FALSE(map.ContainsKey(darray1[3].GetKey()));
          REQUIRE      (map.ContainsKey(darray1[4].GetKey()));
 
-         const auto removed1 = map.RemoveValue(darray1[0].GetValue());
+         const auto removed1 = map.RemoveValue(darray1[0].GetVal());
          REQUIRE(removed1 == 1);
          REQUIRE(map.GetCount() == 1);
 
-         REQUIRE_FALSE(map.ContainsValue(darray1[0].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[2].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetValue()));
-         REQUIRE      (map.ContainsValue(darray1[4].GetValue()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[0].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[2].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetVal()));
+         REQUIRE      (map.ContainsValue(darray1[4].GetVal()));
 
          REQUIRE_FALSE(map.ContainsKey(darray1[0].GetKey()));
          REQUIRE_FALSE(map.ContainsKey(darray1[1].GetKey()));
@@ -510,15 +510,15 @@ TEMPLATE_TEST_CASE(
          REQUIRE_FALSE(map.ContainsKey(darray1[3].GetKey()));
          REQUIRE      (map.ContainsKey(darray1[4].GetKey()));
 
-         const auto removed5 = map.RemoveValue(darray1[4].GetValue());
+         const auto removed5 = map.RemoveValue(darray1[4].GetVal());
          REQUIRE(removed5 == 1);
          REQUIRE(map.GetCount() == 0);
 
-         REQUIRE_FALSE(map.ContainsValue(darray1[0].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[2].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[4].GetValue()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[0].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[2].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[4].GetVal()));
 
          REQUIRE_FALSE(map.ContainsKey(darray1[0].GetKey()));
          REQUIRE_FALSE(map.ContainsKey(darray1[1].GetKey()));
@@ -586,11 +586,11 @@ TEMPLATE_TEST_CASE(
          REQUIRE_FALSE(map.ContainsKey(darray1[3].GetKey()));
          REQUIRE(map.ContainsKey(darray1[4].GetKey()));
 
-         REQUIRE(map.ContainsValue(darray1[0].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[2].GetValue()));
-         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[4].GetValue()));
+         REQUIRE(map.ContainsValue(darray1[0].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[1].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[2].GetVal()));
+         REQUIRE_FALSE(map.ContainsValue(darray1[3].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[4].GetVal()));
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Annies::TMapUnsorted::RemoveKey") (timer meter) {
@@ -622,13 +622,13 @@ TEMPLATE_TEST_CASE(
       }
 
       WHEN("Removing non-available elements by value") {
-         const auto removed9 = map.RemoveValue(darray2[3].GetValue());
+         const auto removed9 = map.RemoveValue(darray2[3].GetVal());
 
          Map_CheckState_OwnedFull<K, V>(map);
 
          REQUIRE(removed9 == 0);
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          REQUIRE(map.GetCount() == 5);
          REQUIRE(map.GetRawKeysMemory() == keyMemory);
          REQUIRE(map.GetRawValsMemory() == valueMemory);
@@ -640,11 +640,11 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.ContainsKey(darray1[3].GetKey()));
          REQUIRE(map.ContainsKey(darray1[4].GetKey()));
 
-         REQUIRE(map.ContainsValue(darray1[0].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[1].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[2].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[3].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[4].GetValue()));
+         REQUIRE(map.ContainsValue(darray1[0].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[1].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[2].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[3].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[4].GetVal()));
       }
       
       WHEN("Removing non-available elements by key") {
@@ -654,7 +654,7 @@ TEMPLATE_TEST_CASE(
 
          REQUIRE(removed9 == 0);
          for (auto& comparer : darray1)
-            REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
          REQUIRE(map.GetCount() == 5);
          REQUIRE(map.GetKeys().GetUses() == 1);
          REQUIRE(map.GetVals().GetUses() == 1);
@@ -666,11 +666,11 @@ TEMPLATE_TEST_CASE(
          REQUIRE(map.ContainsKey(darray1[3].GetKey()));
          REQUIRE(map.ContainsKey(darray1[4].GetKey()));
 
-         REQUIRE(map.ContainsValue(darray1[0].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[1].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[2].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[3].GetValue()));
-         REQUIRE(map.ContainsValue(darray1[4].GetValue()));
+         REQUIRE(map.ContainsValue(darray1[0].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[1].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[2].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[3].GetVal()));
+         REQUIRE(map.ContainsValue(darray1[4].GetVal()));
       }
       
       WHEN("More capacity is reserved") {
@@ -729,7 +729,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(copy.GetRawValsMemory() == map.GetRawValsMemory());
 
          for (auto& comparer : darray1)
-            REQUIRE(copy[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(copy[comparer.GetKey()] == comparer.GetVal());
 
          if constexpr (CT::Typed<T>) {
             for (auto& comparer : darray1)
@@ -757,7 +757,7 @@ TEMPLATE_TEST_CASE(
                   REQUIRE_THROWS(clone[comparer.GetKey()]);
                }
                else {
-                  REQUIRE(clone[comparer.GetKey()] != comparer.GetValue());
+                  REQUIRE(clone[comparer.GetKey()] != comparer.GetVal());
                   REQUIRE(map[comparer.GetKey()] != clone[comparer.GetKey()]);
 
                   if constexpr (CT::Typed<T>)
@@ -766,7 +766,7 @@ TEMPLATE_TEST_CASE(
                      REQUIRE(map[comparer.GetKey()].GetRaw() != clone[comparer.GetKey()].GetRaw());
                }
 
-               REQUIRE(map[comparer.GetKey()] == comparer.GetValue());
+               REQUIRE(map[comparer.GetKey()] == comparer.GetVal());
             }
          }
          else if constexpr (CT::Untyped<T>) {
@@ -790,7 +790,7 @@ TEMPLATE_TEST_CASE(
          REQUIRE(moved.GetKeys().GetUses() == 2);
          REQUIRE(moved.GetVals().GetUses() == 2);
          for (auto& comparer : darray1)
-            REQUIRE(moved[comparer.GetKey()] == comparer.GetValue());
+            REQUIRE(moved[comparer.GetKey()] == comparer.GetVal());
       }
 
       WHEN("Maps are compared") {
@@ -815,7 +815,7 @@ TEMPLATE_TEST_CASE(
          for (auto pair : map) {
             static_assert(CT::Untyped<T> or CT::Reference<decltype(pair.GetKey())>,
                "Pair key type is not a reference for statically optimized map");
-            static_assert(CT::Untyped<T> or CT::Reference<decltype(pair.GetValue())>,
+            static_assert(CT::Untyped<T> or CT::Reference<decltype(pair.GetVal())>,
                "Pair value type is not a reference for statically optimized map");
 
             // Pointers are always random, can't ensure order           

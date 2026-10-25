@@ -123,12 +123,12 @@ namespace Langulus::Annies
    /// Get contained value                                                    
    ///   @return the value                                                    
    TEMPLATE() LANGULUS(INLINED)
-   auto PAIR()::GetValue() noexcept -> Conditional<CT::Dense<V>, V&, V> {
+   auto PAIR()::GetVal() noexcept -> Conditional<CT::Dense<V>, V&, V> {
       return mValue;
    }
 
    TEMPLATE() LANGULUS(ALWAYS_INLINED)
-   auto PAIR()::GetValue() const noexcept -> V const& {
+   auto PAIR()::GetVal() const noexcept -> V const& {
       return mValue;
    }
 

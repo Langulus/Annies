@@ -97,8 +97,8 @@ namespace Langulus::Annies
       auto GetKeyHandle()         -> Handle<K>;
       auto GetKeyHandle()   const -> Handle<const K>;
 
-      auto GetValue()       const noexcept -> V const&;
-      auto GetValue()             noexcept -> std::conditional_t<CT::Dense<V>, V&, V>;
+      auto GetVal()       const noexcept -> V const&;
+      auto GetVal()             noexcept -> std::conditional_t<CT::Dense<V>, V&, V>;
       auto GetValueBlock()  const noexcept -> Block<V>;
       auto GetValueBlock()        noexcept -> Block<V>;
       auto GetValueHandle()       -> Handle<V>;

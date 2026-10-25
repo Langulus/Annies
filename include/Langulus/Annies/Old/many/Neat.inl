@@ -428,7 +428,7 @@ namespace Langulus::Annies
          // Fill a bounded array                                        
          size_t scanned = 0;
          for (auto pair : mAnythingElse) {
-            for (auto& group : pair.GetValue()) {
+            for (auto& group : pair.GetVal()) {
                const auto toscan = ::std::min(ExtentOf<D> - scanned, group.GetCount());
                for (size_t i = 0; i < toscan; ++i) {
                   //TODO can be optimized-out for POD
@@ -449,7 +449,7 @@ namespace Langulus::Annies
       else {
          // Fill a single value                                         
          for (auto pair : mAnythingElse) {
-            for (auto& group : pair.GetValue()) {
+            for (auto& group : pair.GetVal()) {
                try {
                   value = group.template AsCast<D>();
                   return 1;
@@ -474,7 +474,7 @@ namespace Langulus::Annies
          // Insert trait to its bucket                                  
          AddTag(S::Nest(item));
       }
-      else if constexpr (CT::Same<T, CMeta>) {
+      else if constexpr (Same<T, CMeta>) {
          // Expand the constant, and push it                            
          operator << (Clone(Block<> {{}, DeintCast(item)}));
       }
@@ -503,7 +503,7 @@ namespace Langulus::Annies
          const auto found = mAnythingElse.FindIt(meta);
 
          if (found)
-            found.GetValue() << S::Nest(item);
+            found.GetVal() << S::Nest(item);
          else
             mAnythingElse.Insert(meta, S::Nest(item));
       }
@@ -513,7 +513,7 @@ namespace Langulus::Annies
          const auto found = mAnythingElse.FindIt(meta);
 
          if (found)
-            found.GetValue() << Messy {S::Nest(item)};
+            found.GetVal() << Messy {S::Nest(item)};
          else
             mAnythingElse.Insert(meta, Messy {S::Nest(item)});
       }
@@ -642,7 +642,7 @@ namespace Langulus::Annies
          if (not GetTags(rhsd.GetTag()))
             return operator << (S::Nest(rhs));
       }
-      else if constexpr (CT::Same<T, TMeta>) {
+      else if constexpr (Same<T, TMeta>) {
          // Check if the trait already exists, before pushing it        
          if (not GetTags(rhsd))
             return operator << (S::Nest(rhs));
@@ -652,7 +652,7 @@ namespace Langulus::Annies
          if (not GetConstructs(rhsd.GetType()))
             return operator << (S::Nest(rhs));
       }
-      else if constexpr (CT::Same<T, DMeta>) {
+      else if constexpr (Same<T, DMeta>) {
          // Check if the construct already exists, before pushing it    
          if (not GetData(rhsd))
             return operator << (S::Nest(rhs));
@@ -715,7 +715,7 @@ namespace Langulus::Annies
          const auto meta = messy->GetTag();
          auto found = mTags.BranchOut().FindIt(meta);
          if (found)
-            found.GetValue() << messy.Forward();
+            found.GetVal() << messy.Forward();
          else
             mTags.Insert(meta, messy.Forward());
       }
@@ -724,7 +724,7 @@ namespace Langulus::Annies
          const auto trait = *messy;
          auto found = mTags.BranchOut().FindIt(trait);
          if (found)
-            found.GetValue() << Tag::FromMeta(trait);
+            found.GetVal() << Tag::FromMeta(trait);
          else
             mTags.Insert(trait, Tag::FromMeta(trait));
       }
@@ -748,7 +748,7 @@ namespace Langulus::Annies
       const auto meta = MetaDataOf<Decay<V>>();
       auto found = mAnythingElse.BranchOut().FindIt(meta);
       if (found)
-         found.GetValue() << verb.Forward();
+         found.GetVal() << verb.Forward();
       else
          mAnythingElse.Insert(meta, verb.Forward());
    }
@@ -768,7 +768,7 @@ namespace Langulus::Annies
          const auto found = mRecipes.BranchOut().FindIt(meta);
 
          if (found)
-            found.GetValue() << messy.Forward();
+            found.GetVal() << messy.Forward();
          else
             mRecipes.Insert(meta, messy.Forward());
       }
@@ -782,8 +782,8 @@ namespace Langulus::Annies
    ///   @attention if not nullptr, returned Many might contain a Neat        
    inline auto Neat::GetTag(TMeta meta, size_t index) const -> const Tag* {
       const auto found = mTags.FindIt(meta);
-      if (found and found.GetValue().GetCount() > index)
-         return &(found.GetValue()[index]);
+      if (found and found.GetVal().GetCount() > index)
+         return &(found.GetVal()[index]);
       return nullptr;
    }
 
@@ -915,7 +915,7 @@ namespace Langulus::Annies
             return index;
 
          // Iterate all relevant traits                                 
-         for (auto& data : found.GetValue()) {
+         for (auto& data : found.GetVal()) {
             if constexpr (CT::Bool<R>) {
                if (not call(reinterpret_cast<TagType&>(data)))
                   return index + 1;
@@ -928,7 +928,7 @@ namespace Langulus::Annies
       else {
          // Iterate all traits, either using type-erased trait, or deep 
          for (auto group : mTags) {
-            for (auto& data : group.GetValue()) {
+            for (auto& data : group.GetVal()) {
                if constexpr (CT::Deep<A>) {
                   auto wrapper = MakeBlock<Decay<A>>(data);
                   if constexpr (CT::Bool<R>) {
@@ -981,7 +981,7 @@ namespace Langulus::Annies
       // Iterate all constructs                                         
       size_t index = 0;
       for (auto group : mRecipes) {
-         for (auto& data : group.GetValue()) {
+         for (auto& data : group.GetVal()) {
             if constexpr (CT::Deep<A>) {
                // Iterate using deep A                                  
                auto wrapper = MakeBlock<Decay<A>>(data);
@@ -1037,7 +1037,7 @@ namespace Langulus::Annies
             return 0;
 
          // Iterate all relevant datas                                  
-         for (auto& data : found.GetValue()) {
+         for (auto& data : found.GetVal()) {
             auto& dataTyped = reinterpret_cast<Decay<A>&>(data);
             if constexpr (CT::Bool<R>) {
                if (not call(dataTyped))
@@ -1051,7 +1051,7 @@ namespace Langulus::Annies
       else if constexpr (CT::Deep<A>) {
          // Type-erased container provided, iterate the entire tail     
          for (auto group : mAnythingElse) {
-            for (auto& data : group.GetValue()) {
+            for (auto& data : group.GetVal()) {
                if constexpr (CT::Bool<R>) {
                   if (not call(data))
                      return index + 1;
@@ -1070,7 +1070,7 @@ namespace Langulus::Annies
             return 0;
 
          // Iterate all relevant datas                                  
-         for (auto& data : found.GetValue()) {
+         for (auto& data : found.GetVal()) {
             for (auto element : data) {
                if constexpr (CT::Bool<R>) {
                   if (not call(element.template Get<A>()))
@@ -1129,7 +1129,7 @@ namespace Langulus::Annies
          ++count;
       }
 
-      if (not found.GetValue())
+      if (not found.GetVal())
          mAnythingElse.RemoveIt(found);
       return count;
    }
@@ -1216,7 +1216,7 @@ namespace Langulus::Annies
 
       bool separator = false;
       for (auto pair : mAnythingElse) {
-         for (auto& group : pair.GetValue()) {
+         for (auto& group : pair.GetVal()) {
             if (separator)
                to += ", ";
 
@@ -1229,7 +1229,7 @@ namespace Langulus::Annies
       }
 
       for (auto pair : mTags) {
-         for (auto& trait : pair.GetValue()) {
+         for (auto& trait : pair.GetVal()) {
             if (separator)
                to += ", ";
 
@@ -1242,7 +1242,7 @@ namespace Langulus::Annies
       }
 
       for (auto pair : mRecipes) {
-         for (auto& construct : pair.GetValue()) {
+         for (auto& construct : pair.GetVal()) {
             if (separator)
                to += ", ";
 

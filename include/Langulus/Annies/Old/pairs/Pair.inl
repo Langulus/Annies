@@ -73,12 +73,12 @@ namespace Langulus::Annies
    /// Get the contained value                                                
    ///   @return a reference to the contained key                             
    LANGULUS(INLINED)
-   Many const& Pair::GetValue() const noexcept {
+   Many const& Pair::GetVal() const noexcept {
       return mValue;
    }
 
    LANGULUS(INLINED)
-   Many& Pair::GetValue() noexcept {
+   Many& Pair::GetVal() noexcept {
       return mValue;
    }
 

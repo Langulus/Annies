@@ -1065,10 +1065,11 @@ namespace Langulus::Annies::Component
          else {
             auto item = self.GetHandle() + cookie;
 
-            if constexpr (CT::Contiguous<C>) {
+            if constexpr (CT::IndexedLinearly<C>) {
                // Iterate a contiguous array of elements                
-               LglsAssumeDev(cookie < self.GetCount(), "Limp cookie (contiguous)");
+               LglsAssumeDev(cookie < self.GetCount(), "Limp cookie (linear)");
                auto const end = item + (self.GetCount() - cookie);
+
                while (item.GetRaw() != end.GetRaw()) {
                   if constexpr (CT::Bool<decltype(lambda(item))>) {
                      if (not lambda(item))
@@ -1078,17 +1079,20 @@ namespace Langulus::Annies::Component
                   ++item;
                }
             }
-            else {
-               // Iterate a hash table - some cells might be empty,     
-               // thus container might not be a contiguous array        
-               LglsAssumeDev(cookie < self.GetReserved(), "Limp cookie (discontiguous)");
-               const auto tableBeg = self.GetHashTableInner() + cookie;
+            else if constexpr (CT::IndexedHashTable<C> or CT::IndexedCoverage<C>) {
+               // Iterate a hash/coverage table - some cells might be   
+               // empty, thus container might not be a contiguous array 
+               LglsAssumeDev(cookie < self.GetReserved(), "Limp cookie (nonlinear)");
+               auto const beg = self.GetHandle();
+               auto const end = item + (self.GetReserved() - cookie);
+
+               /*const auto tableBeg = self.GetHashTableInner() + cookie;
                const auto tableEnd = tableBeg + (self.GetReserved() - cookie);
-               auto table = tableBeg;
+               auto table = tableBeg;*/
                [[maybe_unused]] size_t scanned = 0;
                [[maybe_unused]] const size_t scannedMax = self.GetCount();
-               while (table != tableEnd) {
-                  if (*table) {
+               while (item.GetRaw() != end.GetRaw()) {
+                  if (self.IsSlotOccupied(item - beg)) {
                      if constexpr (CT::Bool<decltype(lambda(item))>) {
                         if (not lambda(item))
                            return;
@@ -1110,9 +1114,10 @@ namespace Langulus::Annies::Component
                   }
 
                   ++item;
-                  ++table;
+                  //++table;
                }
             }
+            else static_assert(false, "Indexed scheme not implemented");
          }
       }
 

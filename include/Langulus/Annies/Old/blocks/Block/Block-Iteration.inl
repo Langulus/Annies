@@ -291,10 +291,10 @@ namespace Langulus::Annies
             loop = IterateInner<MUTABLE, REVERSE>(mCount,
                [&index, &f](Tag*& element) noexcept(NOE) -> R {
                   if constexpr (CT::Void<R>) {
-                     if (not element->template IsTrait<DA>())
+                     if (not element->template IsTag<DA>())
                         return;
                   }
-                  else if (not element->template IsTrait<DA>())
+                  else if (not element->template IsTag<DA>())
                      return Loop::Continue;
 
                   ++index;
@@ -311,10 +311,10 @@ namespace Langulus::Annies
             loop = IterateInner<MUTABLE, REVERSE>(mCount,
                [&index, &f](Tag& element) noexcept(NOE) -> R {
                   if constexpr (CT::Void<R>) {
-                     if (not element.template IsTrait<DA>())
+                     if (not element.template IsTag<DA>())
                         return;
                   }
-                  else if (not element.template IsTrait<DA>())
+                  else if (not element.template IsTag<DA>())
                      return Loop::Continue;
 
                   ++index;
@@ -435,7 +435,7 @@ namespace Langulus::Annies
       }
       else {
          if constexpr (CT::Deep<A> and (not SKIP
-         or (not CT::Deep<Decay<TYPE>> and not CT::Same<TYPE, Neat>))) {
+         or (not CT::Deep<Decay<TYPE>> and not Same<TYPE, Neat>))) {
             // Always execute for intermediate/non-deep *this           
             ++counter;
 
@@ -493,7 +493,7 @@ namespace Langulus::Annies
                intermediateCounterSink
             );
          }
-         else if constexpr (CT::Same<TYPE, Neat>) {
+         else if constexpr (Same<TYPE, Neat>) {
             // Iterate normalized subblocks                             
             using SubNeat = Conditional<MUTABLE, Neat&, Neat const&>;
 

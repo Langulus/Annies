@@ -802,7 +802,7 @@ namespace Langulus::Annies
          InsertBlockInner<THIS, CHECK_FOR_MATCH>(
             GetBucketUnknown(hashmask, pair->GetKey()),
             pair.Nest(pair->GetKey()),
-            pair.Nest(pair->GetValue())
+            pair.Nest(pair->GetVal())
          );
       }
       return GetCount() - initialCount;

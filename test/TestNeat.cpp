@@ -207,17 +207,17 @@ SCENARIO("Data normalization", "[neat]") {
 
       Neat neat {
          Tags::Name {"Root"},
-         Recipe::From<int>(),
-         Recipe::From<float>(),
-         Recipe::From<double>(),
-         Recipe::From<ComplexStuff>(
+         Recipe::For<int>(),
+         Recipe::For<float>(),
+         Recipe::For<double>(),
+         Recipe::For<ComplexStuff>(
             Tags::Name {"Child1"},
-            Recipe::From<int>(),
-            Recipe::From<float>(),
-            Recipe::From<ComplexStuff>(Tags::Name {"GrandChild1"}),
-            Recipe::From<ComplexStuff>(Tags::Name {"GrandChild2"})
+            Recipe::For<int>(),
+            Recipe::For<float>(),
+            Recipe::For<ComplexStuff>(Tags::Name {"GrandChild1"}),
+            Recipe::For<ComplexStuff>(Tags::Name {"GrandChild2"})
          ),
-         Recipe::From<ComplexStuff>(Tags::Name {"Child2"})
+         Recipe::For<ComplexStuff>(Tags::Name {"Child2"})
       };
 
       WHEN("Copied") {

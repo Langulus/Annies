@@ -36,6 +36,17 @@ namespace Langulus::Annies::Component
       template<Cid SID>
       static constexpr bool Relevant = Id::template Contains<SID>;
 
+      /// Check if coverage table slot is occupied                            
+      template<Cid SID = ID> requires Relevant<SID>
+      constexpr bool IsSlotOccupied(this auto const& self, size_t slot) noexcept {
+         if (ThisCom::GetCoverageTableInner()) {
+            const size_t idx = slot / BitsPerCell;
+            const size_t bit = size_t {1} << (slot - idx);
+            return (ThisCom::GetCoverageTableInner()[idx] & bit) != 0;
+         }
+         return false;
+      }
+
       /// Get the start of the coverage table                                 
       /*template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetCoverageTable(this auto const& self) noexcept -> TableType const* {
@@ -114,10 +125,9 @@ namespace Langulus::Annies::Component
       /// So indices are:                                                     
       ///         0     1  2                              3  4                
       ///   @param index the index to access with                             
-      ///   @param mask [out] mask showing the exact bit of the table         
-      ///   @return offset into the coverage table                            
+      ///   @return absolute offset into the table                            
       template<CT::Container C>
-      constexpr size_t BrowseTable(this C const& self, size_t index, TableType& mask) assumptious {
+      constexpr size_t BrowseTable(this C const& self, size_t index) assumptious {//TODO optimize with cookie
          LglsAssumeDev(self.GetReserved(), "Invalid reserve");
          LglsAssumeDev(self.GetCoverageTableInner(), "Invalid coverage table");
 
@@ -126,26 +136,23 @@ namespace Langulus::Annies::Component
          auto const tableEnd = tableBeg + reserved;
          auto table = tableBeg;
          while (table < tableEnd) {
-            auto enabled_bits = ::std::popcount(*table);
+            const size_t enabled_bits = ::std::popcount(*table);
             if (enabled_bits) {
-               if (index < BitsPerCell) {
-                  if (enabled_bits == 1) {
-                     LglsAssumeDev(index == 0);
-                     mask = *table;
+               if (index < enabled_bits) {
+                  TableType temp = *table;
+                  size_t offset = ::std::countr_zero(temp);
+                  while (index > 0) {
+                     temp &= ~::std::bit_floor(temp);
+                     offset = ::std::countr_zero(temp);
+                     --index;
                   }
-                  else {
-                     TableType temp = *table;
-                     while (index > 0) {
-                        temp &= ~::std::bit_floor(temp);
-                        --index;
-                     }
-                     LglsAssumeDev(::std::has_single_bit(temp));
-                     mask = temp;
-                  }
-                  return table - tableBeg;
+                  LglsAssumeDev(::std::has_single_bit(temp));
+                  return (table - tableBeg) * BitsPerCell + offset;
                }
-               index -= BitsPerCell;
+
+               index -= enabled_bits;
             }
+
             ++table;
          }
 
@@ -157,10 +164,9 @@ namespace Langulus::Annies::Component
       /// Convert an index to an offset.                                      
       /// Special indices will be contextualized.                             
       ///   @param index the index to simplify                                
-      ///   @param mask [out] mask showing the exact bit of the table         
       ///   @return a simple element offset into contiguous memory            
       template<CT::Container C, CT::Index INDEX>
-      constexpr size_t SimplifyIndex(this C const& self, INDEX index, TableType& mask) {
+      constexpr size_t SimplifyIndex(this C const& self, INDEX index) {
          LglsAssumeDev(not self.IsEmpty(), "Container can't be empty");
 
          if constexpr      (::std::same_as<INDEX, Index::Inner::All>)
@@ -186,11 +192,11 @@ namespace Langulus::Annies::Component
          else if constexpr (::std::same_as<INDEX, Index::Inner::Random>)
             return self.GetIndexRandom();
          else if constexpr (::std::same_as<INDEX, Index::Inner::First>)
-            return ThisCom::BrowseTable(0, mask);
+            return ThisCom::BrowseTable(0);
          else if constexpr (::std::same_as<INDEX, Index::Inner::Last>) {
             const auto c = self.GetCount();
             LglsAssert(c > 0, "Can't get last index");
-            return ThisCom::BrowseTable(c - 1, mask);
+            return ThisCom::BrowseTable(c - 1);
          }
          else if constexpr (requires { index.index; }) {
             // If index is negative, wrap it around (if in range)       
@@ -198,12 +204,12 @@ namespace Langulus::Annies::Component
             if (index.index < 0) {
                LglsAssert(c + index.index < c and c + index.index >= 0,
                   "Integer index out of range");
-               return ThisCom::BrowseTable(c + index.index, mask);
+               return ThisCom::BrowseTable(c + index.index);
             }
 
             LglsAssert(index.index < c,
                "Integer index out of range");
-            return ThisCom::BrowseTable(index.index, mask);
+            return ThisCom::BrowseTable(index.index);
          }
          else {
             static_assert(CT::Integer<INDEX>, "Unsupported index type");
@@ -220,7 +226,7 @@ namespace Langulus::Annies::Component
                   "use Index::At for reverse indices instead"
                );
             }
-            return ThisCom::BrowseTable(index, mask);
+            return ThisCom::BrowseTable(index);
          }
       }
    };

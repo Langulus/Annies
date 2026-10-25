@@ -595,58 +595,44 @@ namespace Langulus::Annies
 
 /// MARK: Morphisms                                                           
 /// Convert std::string_view -> Text                                          
-LANGULUS_MORPHISM(std::string_view, Langulus::Annies::Text);
+LANGULUS_MORPHISM(std::string_view, Annies::Text);
 
 /// Convert Serial::Operator -> Text                                          
 //LANGULUS_MORPHISM(Langulus::Serial::Operator, Langulus::Annies::Text);
 
 /// Convert bool -> Text                                                      
-LANGULUS_MORPHISM_CUSTOM(bool, { return from ? "yes" : "no"; }, 
-   Langulus::Annies::Text
-);
+LANGULUS_MORPHISM_CUSTOM(bool, { return from ? "yes" : "no"; }, Annies::Text);
 
 /// Convert Byte -> Text                                                      
-LANGULUS_MORPHISM_CUSTOM(Langulus::Byte, { return Annies::Text::Hex(from); }, 
-   Langulus::Annies::Text
-);
+LANGULUS_MORPHISM_CUSTOM(Byte, { return Annies::Text::Hex(from); }, Annies::Text);
 
 /// Convert Hash -> Text                                                      
-LANGULUS_MORPHISM_CUSTOM(Langulus::Hash, { return Annies::Text::Hex(from.value); }, 
-   Langulus::Annies::Text
-);
+LANGULUS_MORPHISM_CUSTOM(Hash, { return Annies::Text::Hex(from.value); }, Annies::Text);
 
 /// Convert Number -> Text                                                    
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::BuiltinNumberUnambiguously, {
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::BuiltinNumberUnambiguously, {
       return Annies::Text::FromNumber(from);
    },
-   Langulus::Annies::Text
+   Annies::Text
 );
 
 /// Convert DMeta -> Text                                                     
-LANGULUS_MORPHISM_CUSTOM(Langulus::RTTI::DMeta, { return from.GetName(); }, 
-   Langulus::Annies::Text
-);
+LANGULUS_MORPHISM_CUSTOM(RTTI::DMeta, { return from.GetName(); }, Annies::Text);
 
 /// Convert TMeta -> Text                                                     
-LANGULUS_MORPHISM_CUSTOM(Langulus::RTTI::TMeta, { return from.GetName(); }, 
-   Langulus::Annies::Text
-);
+LANGULUS_MORPHISM_CUSTOM(RTTI::TMeta, { return from.GetName(); }, Annies::Text);
 
 /// Convert CMeta -> Text                                                     
-LANGULUS_MORPHISM_CUSTOM(Langulus::RTTI::CMeta, { return from.GetName(); }, 
-   Langulus::Annies::Text
-);
+LANGULUS_MORPHISM_CUSTOM(RTTI::CMeta, { return from.GetName(); }, Annies::Text);
 
 /// Convert VMeta -> Text                                                     
-LANGULUS_MORPHISM_CUSTOM(Langulus::RTTI::VMeta, { return from.GetCppName(); }, 
-   Langulus::Annies::Text
-);
+LANGULUS_MORPHISM_CUSTOM(RTTI::VMeta, { return from.GetCppName(); }, Annies::Text);
 
 /// Convert Literal -> Text                                                   
-LANGULUS_MORPHISM_CONCEPT(Langulus::CT::Literal, Langulus::Annies::Text);
+LANGULUS_MORPHISM_CONCEPT(CT::Literal, Annies::Text);
 
 /// Convert Character -> Text                                                 
-LANGULUS_MORPHISM_CONCEPT(Langulus::CT::Character, Langulus::Annies::Text);
+LANGULUS_MORPHISM_CONCEPT(CT::Character, Annies::Text);
 
 /// Map all pointers as convertible to text                                   
 /*LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {

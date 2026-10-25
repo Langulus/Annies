@@ -36,6 +36,14 @@ namespace Langulus::Annies::Component
       template<Cid SID>
       static constexpr bool Relevant = Id::template Contains<SID>;
 
+      /// Check if hash table slot is occupied                                
+      template<Cid SID = ID> requires Relevant<SID>
+      constexpr bool IsSlotOccupied(this auto const& self, size_t slot) noexcept {
+         if (ThisCom::GetHashTableInner())
+            return ThisCom::GetHashTableInner()[slot] != 0;
+         return false;
+      }
+
       /// Get the start of the hash table                                     
       template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetHashTable(this auto const& self) noexcept -> TableType const* {

@@ -200,7 +200,7 @@ namespace Langulus::Annies
          }
          else {
             // Only interface data, reference if able to and if desired 
-            if constexpr (CT::Array<T>)
+            if constexpr (::std::is_bounded_array_v<T>)
                this->SetHeapInner(static_cast<const void*>( data));
             else
                this->SetHeapInner(static_cast<const void*>(&data));

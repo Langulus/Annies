@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -19,7 +19,7 @@ namespace Langulus::Annies
    ///                                                                        
    ///   Default iteration                                                    
    ///                                                                        
-   /// Used by default when doing `for(auto i : container)`.                  
+   ///   Used by default when doing `for(auto i : container)`.                
    /// When container is type-erased, or mutable and sparse, 'i' will be a    
    /// handle. Otherwise, 'i' will be a direct reference to the element.      
    template<bool REVERSE, class C>
@@ -387,26 +387,12 @@ namespace Langulus::Annies
                   "Can't increment invalid iterator");
 
                if constexpr (REVERSE) {
-                  /*IF_SAFE(const auto end = mRange->GetHashTable() - 1);
-                  do {*/
-                     --AddHashtable::mTable;
-                     --mIt;
-
-                     /*LglsAssumeDev(AddHashtable::mTable > end,
-                        "Iterator went beyond limits");
-                  }
-                  while (not *AddHashtable::mTable);*/
+                  --AddHashtable::mTable;
+                  --mIt;
                }
                else {
-                  /*IF_SAFE(const auto end = mRange->GetHashTableEnd());
-                  do {*/
-                     ++AddHashtable::mTable;
-                     ++mIt;
-
-                     /*LglsAssumeDev(AddHashtable::mTable < end,
-                        "Iterator went beyond limits");
-                  }
-                  while (not *AddHashtable::mTable);*/
+                  ++AddHashtable::mTable;
+                  ++mIt;
                }
             }
             return *this;
@@ -466,26 +452,12 @@ namespace Langulus::Annies
                   "Can't decrement invalid iterator");
 
                if constexpr (REVERSE) {
-                  /*IF_SAFE(const auto end = mRange->GetHashTableEnd());
-                  do {*/
-                     ++AddHashtable::mTable;
-                     ++mIt;
-
-                     /*LglsAssumeDev(AddHashtable::mTable < end,
-                        "Iterator went beyond limits");
-                  }
-                  while (not *AddHashtable::mTable);*/
+                  ++AddHashtable::mTable;
+                  ++mIt;
                }
                else {
-                  /*IF_SAFE(const auto end = mRange->GetHashTable() - 1);
-                  do {*/
-                     --AddHashtable::mTable;
-                     --mIt;
-
-                     /*LglsAssumeDev(AddHashtable::mTable > end,
-                        "Iterator went beyond limits");
-                  }
-                  while (not *AddHashtable::mTable);*/
+                  --AddHashtable::mTable;
+                  --mIt;
                }
             }
             return *this;

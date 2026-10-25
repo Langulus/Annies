@@ -47,7 +47,7 @@ namespace Langulus::Annies::Component
 
       using CountType   = decltype(COUNT);
       using ReserveType = CountType;
-      using IndexType   = Index::At<CountType>;
+      //using IndexType   = Index::At<CountType>;
       using Dimensions  = Id;
 
       static_assert(COUNT > 0,

@@ -215,7 +215,7 @@ namespace Langulus::Annies
       }
       else {
          // Statically optimized As                                     
-         if constexpr (CT::Same<TYPE, T>) {
+         if constexpr (Same<TYPE, T>) {
             // Notice that this can ignore sparsity                     
             return Get<T>(SimplifyIndex(index));
          }
@@ -780,7 +780,7 @@ namespace Langulus::Annies
    template<class TYPE> template<bool SAFE, CT::Index INDEX> LANGULUS(INLINED)
    size_t Block<TYPE>::SimplifyIndex(const INDEX index) const
    noexcept(not LANGULUS_SAFE() and CT::BuiltinInteger<INDEX>) {
-      if constexpr (CT::Same<INDEX, Index>) {
+      if constexpr (Same<INDEX, Index>) {
          // This is the most safe path, throws on errors                
          if constexpr (SAFE)
             return Constrain(index).GetOffset();

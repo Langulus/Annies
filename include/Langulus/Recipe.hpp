@@ -57,10 +57,18 @@ namespace Langulus::Annies
          this->Destroy();
       }
 
-      /// Create a recipe for a particular target type                        
-      ///   @param type what is the recipe for?                               
+      /// Create a recipe for a particular static target type                 
+      ///   @tparam T what is the recipe for?                                 
       ///   @param arguments... arguments for the descriptor                  
       ///   @return the new recipe instance                                   
+      template<class T>
+      static Recipe For(auto&&...arguments) {
+         Recipe result {LglsFwd(arguments)...};
+         result.SetTarget(MetaDataOf<T>());
+         return Abandon(result);
+      }
+   
+      /// Same as above, but takes a type at runtime                          
       static Recipe Of(DMeta type, auto&&...arguments) {
          Recipe result {LglsFwd(arguments)...};
          result.SetTarget(type);
@@ -68,10 +76,7 @@ namespace Langulus::Annies
       }
    
    #if LANGULUS_FEATURE(MANAGED_REFLECTION)
-      /// Create a recipe for a particular target type from its name (RTTI)   
-      ///   @param type what is the recipe for?                               
-      ///   @param arguments... arguments for the descriptor                  
-      ///   @return the new recipe instance                                   
+      /// Same as above, but chooses target type from reflected token         
       static Recipe Of(Token type, auto&&...arguments) {
          Recipe result {LglsFwd(arguments)...};
          result.SetTarget(RTTI::Registry::GetMetaDataByToken(type));
@@ -79,11 +84,7 @@ namespace Langulus::Annies
       }
    #endif
    
-      /// Create a recipe for a particular target type, by extracting that    
-      /// type from any kind of container.                                    
-      ///   @param typed container to copy type from                          
-      ///   @param arguments... arguments for the descriptor                  
-      ///   @return the new recipe instance                                   
+      /// Same as above, but extracts target from the type of container       
       static Recipe Of(CT::Container auto const& typed, auto&&...arguments) {
          Recipe result {LglsFwd(arguments)...};
          result.SetTarget(typed.GetType());

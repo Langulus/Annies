@@ -36,8 +36,8 @@ namespace Langulus::Annies::Component
       ///   @tparam TAG the tag to set                                        
       ///   @param value the value to assign                                  
       ///   @param force whether to set tag even if it already exists         
-      template<CT::DefineTag TAG>
-      void Set(this auto& self, auto&& value, bool force = false) {
+      template<CT::DefineTag TAG, class D> requires (not CT::DefineTag<D>)
+      void Set(this auto& self, D&& value, bool force = false) {
          bool satisfied = false;
          self.ForEachDeep([&](TAG& tag) {
             if (tag) {
@@ -53,8 +53,28 @@ namespace Langulus::Annies::Component
          if (satisfied)
             return;
 
-         // No Neat was found, so just push one containing the tag      
          self.Compose(TAG {LglsFwd(value)}); //TODO neat should implement compose/insert in its own way
+      }
+
+      /// Same as above but accepts tag as the value                          
+      template<CT::DefineTag TAG>
+      void Set(this auto& self, TAG&& value, bool force = false) {
+         bool satisfied = false;
+         self.ForEachDeep([&](TAG& tag) {
+            if (tag) {
+               // Tag has already been set, no point in searching more  
+               if (force)
+                  tag = LglsFwd(value);
+               satisfied = true;
+               return Loop::Break;
+            }
+            else return Loop::Continue;
+         });
+
+         if (satisfied)
+            return;
+
+         self.Compose(LglsFwd(value)); //TODO neat should implement compose/insert in its own way
       }
 
       /// Extract a tag from the descriptor                                   
@@ -144,8 +164,7 @@ namespace Langulus::Annies::Component
       /// allowed, such as inheritance.                                       
       ///   @tparam type the type requirement                                 
       ///   @return the first type that matches                               
-      template<class TYPE, class SELF>
-      auto FindType(this SELF const& self, RTTI::DMeta type) -> RTTI::DMeta {
+      auto FindType(this auto const& self, RTTI::DMeta type) -> RTTI::DMeta {
          bool ambiguous = false;
          RTTI::DMeta found;
 

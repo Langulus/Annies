@@ -61,9 +61,9 @@ struct HashTest {
 /*template<CT::Dense T, bool = false>
 T CreateElement(auto const& e) {
    T element;
-   if constexpr (CT::Same<T, decltype(e)>)
+   if constexpr (Same<T, decltype(e)>)
       element = e;
-   else if constexpr (not CT::Same<T, Block<>>)
+   else if constexpr (not Same<T, Block<>>)
       element = Decay<T> {e};
    else {
       element = Block<> {};
@@ -87,7 +87,7 @@ T CreateElement(auto const& e) {
       // memory manager. Notice we don't use 'new' operator here,       
       // because it is weakly linked, and can be overriden to use our   
       // memory manager.                                                
-      if constexpr (not CT::Same<T, Block<>>) {
+      if constexpr (not Same<T, Block<>>) {
          element = malloc(sizeof(Decay<T>));
          new (element) Decay<T> {e};
       }
@@ -101,7 +101,7 @@ T CreateElement(auto const& e) {
       // Create a pointer owned by the memory manager                   
       auto& container = BANK.Emplace(IndexBack);
 
-      if constexpr (not CT::Same<T, Block<>>) {
+      if constexpr (not Same<T, Block<>>) {
          container << Decay<T> {e};
          element = container.GetRaw();
       }
@@ -171,13 +171,13 @@ void DestroyPair(auto& pair) {
 
             if constexpr (CT::Sparse<V>) {
                if constexpr (CT::Referencable<Deptr<V>>)
-                  REQUIRE(pair.GetValue()->Reference(-1) == 0);
+                  REQUIRE(pair.GetVal()->Reference(-1) == 0);
                if constexpr (CT::Destroyable<Decay<V>>)
-                  pair.GetValue()->~Decay<V>();
-               free(pair.GetValue());
+                  pair.GetVal()->~Decay<V>();
+               free(pair.GetVal());
             }
             else if constexpr (requires (V v) { v.Reset(); })
-               DecvqCast(pair.GetValue()).Reset();
+               DecvqCast(pair.GetVal()).Reset();
          }
          else {
             if (pair.GetKey().IsSparse()) {
@@ -190,15 +190,15 @@ void DestroyPair(auto& pair) {
             
             DecvqCast(pair.GetKey()).Reset();
 
-            if (pair.GetValue().IsSparse()) {
-               if (pair.GetValue().GetType()->mReference)
-                  REQUIRE(pair.GetValue().GetType()->mReference(*pair.GetValue().template GetRaw<void*>(), -1) == 0);
-               if (pair.GetValue().GetType()->mDestructor)
-                  pair.GetValue().GetType()->mDestructor(*pair.GetValue().template GetRaw<void*>());
-               free(*pair.GetValue().template GetRaw<void*>());
+            if (pair.GetVal().IsSparse()) {
+               if (pair.GetVal().GetType()->mReference)
+                  REQUIRE(pair.GetVal().GetType()->mReference(*pair.GetVal().template GetRaw<void*>(), -1) == 0);
+               if (pair.GetVal().GetType()->mDestructor)
+                  pair.GetVal().GetType()->mDestructor(*pair.GetVal().template GetRaw<void*>());
+               free(*pair.GetVal().template GetRaw<void*>());
             }
             
-            DecvqCast(pair.GetValue()).Reset();
+            DecvqCast(pair.GetVal()).Reset();
          }
       }
       else if constexpr (requires { pair.first; }) {

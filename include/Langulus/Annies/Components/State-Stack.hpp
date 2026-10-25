@@ -87,10 +87,13 @@ namespace Langulus::Annies::Component
       /// Set the current state of the container. Allowed only while          
       /// container is empty.                                                 
       constexpr void SetState(this auto& self, int state) requires HasStates {
-         LglsAssert(self.GetAllocation() == nullptr,
-            "Changing state of an allocated container is not permitted in this way. "
-            "Use Enable/Disable methods one by one instead."
-         );
+         if constexpr (requires { self.GetAllocation(); }) {
+            LglsAssert(self.GetAllocation() == nullptr,
+               "Changing state of an allocated container is not permitted in this way. "
+               "Use Enable/Disable methods one by one instead."
+            );
+         }
+         
          self.SetStateInner(ToInternalState(state));
          LglsAssert(state == 0,
             "There are leftover states after translating to internal representation. "

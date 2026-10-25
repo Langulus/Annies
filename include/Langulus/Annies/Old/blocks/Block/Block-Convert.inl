@@ -724,13 +724,13 @@ namespace Langulus::Annies
       #if LANGULUS_FEATURE(MANAGED_REFLECTION)
          using META = Deref<decltype(result)>;
 
-         if constexpr (CT::Same<META, DMeta>)
+         if constexpr (Same<META, DMeta>)
             result = RTTI::GetMetaData(token);
-         else if constexpr (CT::Same<META, VMeta>)
+         else if constexpr (Same<META, VMeta>)
             result = RTTI::GetMetaVerb(token);
-         else if constexpr (CT::Same<META, TMeta>)
+         else if constexpr (Same<META, TMeta>)
             result = RTTI::GetMetaTrait(token);
-         else if constexpr (CT::Same<META, CMeta>)
+         else if constexpr (Same<META, CMeta>)
             result = RTTI::GetMetaConstant(token);
          else
             static_assert(false, "Unsupported meta deserialization");

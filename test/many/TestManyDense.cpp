@@ -103,7 +103,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
             REQUIRE(pack.GetUses() == element.GetUses());
             REQUIRE(pack.GetUses() == 2);
@@ -154,7 +154,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
 
             REQUIRE(pack.GetUses() == element.GetUses());
@@ -202,7 +202,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
 
             REQUIRE(pack.GetUses() == 0);
@@ -253,7 +253,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
 
             REQUIRE(pack.GetUses() == 2);
@@ -989,7 +989,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(*pack.template As<E*>() == element);
          REQUIRE(pack.GetUses() == 2);
       }
-      else if constexpr (CT::Same<E, T>) {
+      else if constexpr (Same<E, T>) {
          Any_Helper_TestSame(pack, element);
          Any_Helper_TestSame(pack, source);
          REQUIRE(pack.GetUses() == 3);
@@ -1035,7 +1035,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(*pack.template As<E*>() == element);
          REQUIRE(pack.GetUses() == 1);
       }
-      else if constexpr (CT::Same<E, T>) {
+      else if constexpr (Same<E, T>) {
          Any_Helper_TestSame(pack, element);
          REQUIRE(pack.GetUses() == 2);
       }
@@ -1077,7 +1077,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
             REQUIRE(pack.GetUses() == element.GetUses());
             REQUIRE(pack.GetUses() == 2);
@@ -1127,7 +1127,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
             REQUIRE(pack.GetUses() == 2);
             REQUIRE(pack.IsStatic() == element.IsStatic());
@@ -1172,7 +1172,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
             REQUIRE(pack.GetUses() == 0);
             REQUIRE(pack.IsStatic());
@@ -1221,7 +1221,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(*pack.template As<E*>() == element);
             REQUIRE(pack.GetUses() == 1);
          }
-         else if constexpr (CT::Same<E, T>) {
+         else if constexpr (Same<E, T>) {
             Any_Helper_TestSame(pack, element);
             REQUIRE(pack.GetUses() == 2);
             REQUIRE(pack.IsStatic() == element.IsStatic());
@@ -1294,8 +1294,8 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          Any_Helper_TestSame(pack, packbackup);
 
          REQUIRE(pack.IsTypeConstrained() == CT::Typed<T>);
-         REQUIRE(pack.GetUses() == (CT::Deep<E> and CT::Same<T, E> ? 3 : 2));
-         REQUIRE(pack.IsDeep() == (CT::Deep<Decay<E>> and not CT::Same<T, E>));
+         REQUIRE(pack.GetUses() == (CT::Deep<E> and Same<T, E> ? 3 : 2));
+         REQUIRE(pack.IsDeep() == (CT::Deep<Decay<E>> and not Same<T, E>));
          REQUIRE(pack.IsAllocated());
 
       #ifdef LANGULUS_STD_BENCHMARK
@@ -1336,7 +1336,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(*pack.template As<E*>() == element);
          REQUIRE(pack.GetUses() == 1);
       }
-      else if constexpr (CT::Same<E, T>) {
+      else if constexpr (Same<E, T>) {
          Any_Helper_TestSame(pack, element);
          REQUIRE(pack.GetUses() == 2);
          REQUIRE(pack.IsStatic() == element.IsStatic());
@@ -1400,7 +1400,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(*pack.template As<E*>() == element);
          REQUIRE(pack.GetUses() == 1);
       }
-      else if constexpr (CT::Same<E, T>) {
+      else if constexpr (Same<E, T>) {
          Any_Helper_TestSame(pack, element);
          REQUIRE(pack.GetUses() == 0);
          REQUIRE(pack.IsStatic());
@@ -1468,7 +1468,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(*pack.template As<E*>() == element);
          REQUIRE(pack.GetUses() == 1);
       }
-      else if constexpr (CT::Same<E, T>) {
+      else if constexpr (Same<E, T>) {
          Any_Helper_TestSame(pack, element);
 
          REQUIRE(pack.GetUses() == 2);
@@ -1574,7 +1574,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>)
+            if constexpr (Same<E, int>)
                REQUIRE(pack.GetRaw() == memory);
          #endif
          
@@ -1615,7 +1615,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>)
+            if constexpr (Same<E, int>)
                REQUIRE(pack.GetRaw() == memory);
          #endif
          
@@ -1656,7 +1656,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -1693,7 +1693,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -2207,7 +2207,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
       }
 
       #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         if constexpr (CT::Same<E, int>) {
+         if constexpr (Same<E, int>) {
             // Works only if E doesn't move entries around
             WHEN("Pack is reset, then immediately allocated again") {
                pack.Reset();
@@ -2343,7 +2343,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[5] == darray2[3]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>)
+            if constexpr (Same<E, int>)
                REQUIRE(pack.GetRaw() == memory);
          #endif
          
@@ -2379,7 +2379,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-1]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>)
+            if constexpr (Same<E, int>)
                REQUIRE(pack.GetRaw() == memory);
          #endif
          
@@ -2416,7 +2416,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
          REQUIRE(pack[5] == darray2[3]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>)
+            if constexpr (Same<E, int>)
                REQUIRE(pack.GetRaw() == memory);
          #endif
          
@@ -2453,7 +2453,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-1]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>)
+            if constexpr (Same<E, int>)
                REQUIRE(pack.GetRaw() == memory);
          #endif
          
@@ -2523,7 +2523,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
 
          REQUIRE(static_cast<unsigned>(it) == foreachit);
 
-         if constexpr (CT::Same<E, Text>)
+         if constexpr (Same<E, Text>)
             REQUIRE(it == 0);
          else
             REQUIRE(static_cast<unsigned>(it) == pack.GetCount());
@@ -2549,7 +2549,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
 
          REQUIRE(static_cast<unsigned>(it) == foreachit);
 
-         if constexpr (CT::Same<E, Text>)
+         if constexpr (Same<E, Text>)
             REQUIRE(it == 0);
          else
             REQUIRE(static_cast<unsigned>(it) == pack.GetCount());
@@ -2575,7 +2575,7 @@ TEMPLATE_TEST_CASE("Dense Many/TMany", "[many]",
 
          REQUIRE(static_cast<unsigned>(it) == foreachit);
 
-         if constexpr (CT::Same<E, Text>)
+         if constexpr (Same<E, Text>)
             REQUIRE(it == 0);
          else
             REQUIRE(static_cast<unsigned>(it) == pack.GetCount());

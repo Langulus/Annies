@@ -394,7 +394,7 @@ namespace Langulus::Annies
             coalescedVals.Reserve(asFrom->GetCount());
             for (auto pair : *asFrom) {
                coalescedVals.template InsertInner<void, false>(
-                  IndexBack, SS::Nest(*pair.GetValue()));
+                  IndexBack, SS::Nest(*pair.GetVal()));
             }
 
             // We're using Handle::Create, instead of CreateWithIntent  
@@ -458,7 +458,7 @@ namespace Langulus::Annies
             coalescedVals.Reserve(asFrom->GetCount());
             for (auto pair : *asFrom) {
                coalescedVals.template InsertBlockInner<void, false>(
-                  IndexBack, SS::Nest(*pair.GetValue()));
+                  IndexBack, SS::Nest(*pair.GetVal()));
             }
 
             const_cast<Allocation*>(coalescedVals.mEntry)
@@ -535,7 +535,7 @@ namespace Langulus::Annies
             coalescedVals.Reserve(asFrom->GetCount());
             for (auto pair : *asFrom) {
                coalescedVals.template InsertInner<void, false>(
-                  IndexBack, SS::Nest(*pair.GetValue()));
+                  IndexBack, SS::Nest(*pair.GetVal()));
             }
 
             const_cast<Allocation*>(coalescedVals.mEntry)
@@ -596,7 +596,7 @@ namespace Langulus::Annies
             coalescedVals.Reserve(asFrom->GetCount());
             for (auto pair : *asFrom) {
                coalescedVals.template InsertBlockInner<void, false>(
-                  IndexBack, SS::Nest(*pair.GetValue()));
+                  IndexBack, SS::Nest(*pair.GetVal()));
             }
 
             const_cast<Allocation*>(coalescedVals.mEntry)

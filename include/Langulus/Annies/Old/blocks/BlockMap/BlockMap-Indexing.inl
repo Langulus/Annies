@@ -21,7 +21,7 @@ namespace Langulus::Annies
    template<CT::Map THIS, CT::Index INDEX> LANGULUS(INLINED)
    size_t BlockMap::SimplifyIndex(const INDEX index) const
    noexcept(not LANGULUS_SAFE() and CT::BuiltinInteger<INDEX>) {
-      if constexpr (CT::Same<INDEX, Index>) {
+      if constexpr (Same<INDEX, Index>) {
          // This is the most safe path, throws on errors, but slow      
          if constexpr (CT::Typed<THIS>) {
             const auto result = index.Constrained(GetReserved());

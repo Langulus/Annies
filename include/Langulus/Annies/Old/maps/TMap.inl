@@ -513,11 +513,11 @@ namespace Langulus::Annies
          auto found = Find(pair.GetKey());
          if (found) {
             if constexpr (requires (V& lhs) { lhs += rhs; })
-               GetValue(found) += pair.GetValue();
+               GetValue(found) += pair.GetVal();
             else
                LANGULUS_THROW(Concat, "No concat operator available");
          }
-         else Insert(pair.GetKey(), pair.GetValue()); //TODO use handles instead? or better yed - directly insert pair?
+         else Insert(pair.GetKey(), pair.GetVal()); //TODO use handles instead? or better yed - directly insert pair?
       }
 
       return *this;

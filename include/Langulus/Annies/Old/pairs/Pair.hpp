@@ -85,8 +85,8 @@ namespace Langulus
          auto GetKeyBlock()   const noexcept -> Many const&;
          auto GetKeyBlock()         noexcept -> Many&;
 
-         auto GetValue()      const noexcept -> Many const&;
-         auto GetValue()            noexcept -> Many&;
+         auto GetVal()      const noexcept -> Many const&;
+         auto GetVal()            noexcept -> Many&;
          auto GetValueBlock() const noexcept -> Many const&;
          auto GetValueBlock()       noexcept -> Many&;
 

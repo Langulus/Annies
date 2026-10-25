@@ -253,7 +253,7 @@ void Any_CheckState_ContainsOne(auto const& pack, auto const& e, Allocation* ent
       REQUIRE(*pack.template As<E>() == *e);
       REQUIRE(*pack.template GetRaw<E>() == e);
    }
-   else if constexpr (T::TypeErased or CT::Same<TypeOf<T>, E>) {
+   else if constexpr (T::TypeErased or Same<TypeOf<T>, E>) {
       REQUIRE(pack.template As<E>() == e);
    }
 

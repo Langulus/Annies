@@ -1456,7 +1456,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -1498,7 +1498,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -1540,7 +1540,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             REQUIRE(pack[i] == darray2[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -1577,7 +1577,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-5]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -2112,7 +2112,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
       }
 
       #if LANGULUS_FEATURE(MANAGED_MEMORY)
-         if constexpr (CT::Same<E, int>) {
+         if constexpr (Same<E, int>) {
             // Works only if E doesn't move entries around
             WHEN("Pack is reset, then immediately allocated again") {
                (void) Allocator::CollectGarbage();
@@ -2236,7 +2236,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
          REQUIRE(pack[5] == darray2[3]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -2273,7 +2273,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-1]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -2311,7 +2311,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
          REQUIRE(pack[5] == darray2[3]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif
@@ -2349,7 +2349,7 @@ TEMPLATE_TEST_CASE("Sparse Many/TMany", "[many]",
             REQUIRE(pack[i] == darray1[i-1]);
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            if constexpr (CT::Same<E, int>) {
+            if constexpr (Same<E, int>) {
                REQUIRE(pack.GetRaw() == memory);
             }
          #endif

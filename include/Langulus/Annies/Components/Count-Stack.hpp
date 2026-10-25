@@ -33,7 +33,7 @@ namespace Langulus::Annies::Component
       using Id             = Values<ID, SHARED...>;
 
       using CountType    = T;
-      using IndexType    = Index::At<T>;
+      //using IndexType    = Index::At<T>;
       using StackRequest = T;
       using Dimensions   = Id;
 

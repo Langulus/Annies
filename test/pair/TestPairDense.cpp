@@ -88,7 +88,7 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
          REQUIRE(movablePair != lp);
          REQUIRE(pair == lp);
          REQUIRE(pair.GetKey() == lp.GetKey());
-         REQUIRE(pair.GetValue() == lp.GetValue());
+         REQUIRE(pair.GetVal() == lp.GetVal());
 
          #ifdef LANGULUS_STD_BENCHMARK
             BENCHMARK_ADVANCED("Annies::pair::operator = (single pair copy)") (timer meter) {
@@ -123,7 +123,7 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
 
       REQUIRE(pair == lp);
       REQUIRE(pair.GetKey() == lp.GetKey());
-      REQUIRE(pair.GetValue() == lp.GetValue());
+      REQUIRE(pair.GetVal() == lp.GetVal());
    }
    
    GIVEN("Pair with some items") {
@@ -135,7 +135,7 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
          Pair_CheckState_Default<K, V>(pair);
 
          REQUIRE(pair != lp);
-         REQUIRE(((pair.GetKey() != lp.GetKey()) or (pair.GetValue() != lp.GetValue())));
+         REQUIRE(((pair.GetKey() != lp.GetKey()) or (pair.GetVal() != lp.GetVal())));
       }
 
       WHEN("Pair is reset") {
@@ -152,7 +152,7 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
 
          REQUIRE(copy == pair);
          REQUIRE(copy.GetKey() == pair.GetKey());
-         REQUIRE(copy.GetValue() == pair.GetValue());
+         REQUIRE(copy.GetVal() == pair.GetVal());
       }
 
       WHEN("Pair is cloned") {
@@ -163,7 +163,7 @@ TEMPLATE_TEST_CASE("Dense TPair/Pair", "[pair]",
 
          REQUIRE((clone != pair) == (CT::Sparse<K> or CT::Sparse<V>));
          REQUIRE(clone.GetKey() == pair.GetKey());
-         REQUIRE(clone.GetValue() == pair.GetValue());
+         REQUIRE(clone.GetVal() == pair.GetVal());
       }
 
       WHEN("Pair is move-constructed") {

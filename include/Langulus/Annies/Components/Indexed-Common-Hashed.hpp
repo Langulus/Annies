@@ -69,7 +69,7 @@ namespace Langulus::Annies::Component
       /// map would perform as bad as a conventional one. :)                  
       ///   Some ideas were extracted from: https://arxiv.org/pdf/2501.02305  
       template<CT::Container C>
-      constexpr auto BrowseTable(this C const& self, Count<C> index) assumptious -> Count<C> {
+      constexpr auto BrowseTable(this C const& self, Count<C> index) assumptious -> Count<C> { //TODO optimize with cookie
          LglsAssumeDev(self.GetReserved(),       "Invalid reserve");
          LglsAssumeDev(self.GetHashTableInner(), "Invalid hash table");
 

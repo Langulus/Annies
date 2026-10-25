@@ -174,7 +174,7 @@ namespace Langulus::Annies
          const auto found = mAnythingElse.Find(meta);
 
          if (found)
-            found.GetValue() << S::Nest(item);
+            found.GetVal() << S::Nest(item);
          else
             mAnythingElse.Merge(meta, S::Nest(item));
       }
@@ -184,7 +184,7 @@ namespace Langulus::Annies
          const auto found = mAnythingElse.Find(meta);
 
          if (found)
-            found.GetValue() << Messy {S::Nest(item)};
+            found.GetVal() << Messy {S::Nest(item)};
          else
             mAnythingElse.Merge(meta, Messy {S::Nest(item)});
       }
@@ -383,7 +383,7 @@ namespace Langulus::Annies
          const auto meta = messy->GetTag();
          auto found = mTags/*.BranchOut()*/.Find(meta);
          if (found)
-            found.GetValue() << messy.Forward();
+            found.GetVal() << messy.Forward();
          else
             mTags.Merge(meta, messy.Forward());
       }
@@ -392,7 +392,7 @@ namespace Langulus::Annies
          const auto tag = *messy;
          auto found = mTags/*.BranchOut()*/.Find(tag);
          if (found)
-            found.GetValue() << Tag::From(tag);
+            found.GetVal() << Tag::From(tag);
          else
             mTags.Merge(tag, Tag::From(tag));
       }
@@ -411,7 +411,7 @@ namespace Langulus::Annies
       const auto meta = MetaDataOf<Decay<V>>();
       auto found = mAnythingElse/*.BranchOut()*/.Find(meta);
       if (found)
-         found.GetValue() << verb.Forward();
+         found.GetVal() << verb.Forward();
       else
          mAnythingElse.Merge(meta, verb.Forward());
    }
@@ -428,7 +428,7 @@ namespace Langulus::Annies
          const auto found = mRecipes/*.BranchOut()*/.Find(meta);
 
          if (found)
-            found.GetValue() << messy.Forward();
+            found.GetVal() << messy.Forward();
          else
             mRecipes.Merge(meta, messy.Forward());
       }
@@ -709,7 +709,7 @@ namespace Langulus::Annies
          ++count;
       }
 
-      if (not found.GetValue())
+      if (not found.GetVal())
          mAnythingElse.Erase(found);
       return count;
    }
@@ -795,7 +795,7 @@ namespace Langulus::Annies
 
       bool separator = false;
       for (auto pair : mAnythingElse) {
-         for (auto& group : pair.GetValue()) {
+         for (auto& group : pair.GetVal()) {
             if (separator)
                to += ", ";
 
@@ -808,7 +808,7 @@ namespace Langulus::Annies
       }
 
       for (auto pair : mTags) {
-         for (auto& trait : pair.GetValue()) {
+         for (auto& trait : pair.GetVal()) {
             if (separator)
                to += ", ";
 
@@ -821,7 +821,7 @@ namespace Langulus::Annies
       }
 
       for (auto pair : mRecipes) {
-         for (auto& recipe : pair.GetValue()) {
+         for (auto& recipe : pair.GetVal()) {
             if (separator)
                to += ", ";
 

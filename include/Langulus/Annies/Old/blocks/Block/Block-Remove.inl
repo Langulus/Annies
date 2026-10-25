@@ -131,7 +131,7 @@ namespace Langulus::Annies
    ///   @return 1 if block at that index was removed, 0 otherwise            
    template<class TYPE>
    size_t Block<TYPE>::RemoveIndexDeep(CT::Index auto index) {
-      if constexpr (not CT::Same<decltype(index), Index>) {
+      if constexpr (not Same<decltype(index), Index>) {
          if (not IsDeep())
             return 0;
 
