@@ -9,6 +9,7 @@
 #include "Component.hpp"
 #include "Components/State-Stack.hpp"
 #include <Langulus/IntentOf.hpp>
+#include <Langulus/MetaOf.hpp>
 #include <Langulus/Utils/Sequence.hpp>
 #include <Langulus/HashOf.hpp>
 #include <Langulus/CT/Bool.hpp>
@@ -1118,6 +1119,197 @@ namespace Langulus::Annies::Component
                }
             }
             else static_assert(false, "Indexed scheme not implemented");
+         }
+      }
+
+      /// Get pointer to the first element for the given dimension.           
+      /// This is a lower-level routine that does only sparseness checking.   
+      /// No conversion or copying occurs, only pointer arithmetic.           
+      ///   @attention no type-safety                                         
+      ///   @attention assumes the container is typed                         
+      ///   @attention assumes the container has valid memory                 
+      ///   @tparam AS the type of data we're accessing - use void to use the 
+      ///      type of the container, if statically typed                     
+      ///   @tparam SID can be used to access specific dimension              
+      ///   @return pointer to the first element of the desired dimension     
+      template<class AS = void, Cid SID = 0, CT::Container C>// requires Relevant<SID>
+      auto* Get(this C&& self) {
+         static_assert(not CT::Handle<AS>,    "AS can't be a handle");
+         static_assert(not CT::Reference<AS>, "Strip references first");
+
+         if_constexpr_type_erased(C) {
+            using TH   = Tif<CT::Void<AS>, void, AS>;
+            using THP  = LglsMutIf(C, TH*);
+            void* heap = DecvqAllCast(self.template GetRaw<SID>());
+      
+            const auto T = self.template GetType<SID>();
+            LglsAssumeDev(T, "Block is not typed");
+
+            if constexpr (CT::Void<AS>) {
+               // Unknown type, just return the heap pointer            
+               return heap;
+            }
+            else {
+               // Casting to a desired runtime type                     
+               bool custom_pointer_encountered;
+               const auto indirections = T.GetIndirections(custom_pointer_encountered);
+
+               if (indirections == IndirectsOf<TH>) {
+                  // No difference in indirections                      
+                  return static_cast<THP>(heap);
+               }
+               else if (indirections > IndirectsOf<TH>) {
+                  if (indirections == IndirectsOf<THP> and not custom_pointer_encountered) {
+                     // If we're going to add the same pointer later,   
+                     // then avoid dereferencing altogether.            
+                     // Unfortunately this can't support packed pointers
+                     /*LglsAssert(not custom_pointer_encountered, 
+                        "Custom pointer detected, use Cast instead of As/Get",
+                        ", when trying to convert: ", T, " to ", MetaDataOf<THP>());*/
+                     LglsAssumeDev(T.IsSame(MetaDataOf<THP>()), "Type mismatch",
+                        ": ", T, " not same as ", MetaDataOf<THP>());
+                     return *static_cast<THP*>(heap);
+                  }
+
+                  // We need to dereference. Supports packed pointers   
+                  auto diff = indirections - IndirectsOf<TH>;
+                  auto denser = self.template GetDense<SID>(diff);
+                  return static_cast<THP>(denser.data/*GetRaw()*/);
+               }
+               else {
+                  // We are allowed to add one additional indirection   
+                  LglsAssumeDev(indirections + 1 == IndirectsOf<TH>,
+                     "Too many indirections");
+                  return static_cast<THP>(heap);
+               }
+            }
+         }
+         #if not LANGULUS(FORCE_TYPE_ERASURE)
+         else {
+            using TC   = LglsMutIf(C, TypeOf<C, SID>);
+            using TCP  = LglsMutIf(C, TC*);
+            using TH   = Tif<CT::Void<AS>, TC, AS>;
+            using THP  = LglsMutIf(C, TH*);
+            auto* heap = DecvqAllCast(self.template GetRaw<SID>());
+      
+            // Casting to a desired static type                         
+            if constexpr (IndirectsOf<TC> == IndirectsOf<TH>) {
+               // No difference in indirections                         
+               return const_cast<THP>(static_cast<DecvqAll<THP>>(heap));
+            }
+            else if constexpr (IndirectsOf<TC> > IndirectsOf<TH>) {
+               // We need to dereference. Can be done without a         
+               // reinterpret_cast, and thus be constexpr-friendly.     
+               // Supports packed pointers as well.                     
+               return static_cast<THP>(DenseCast<IndirectsOf<TC> - IndirectsOf<TH>>(heap));
+            }
+            else {
+               // We are allowed to add one additional indirection      
+               static_assert(IndirectsOf<TCP> == IndirectsOf<TH>,
+                  "Too many indirections");
+               static_assert(CT::Sparse<TH>,
+                  "Casting to a dense shouldn't happen here");
+               return static_cast<LglsMutIf(C, TH)>(heap);
+            }
+         }
+         #endif
+      }
+
+      /// Get first element as a handle, or any desired wrapping type.        
+      /// Conversion or copying may occur depending on type.                  
+      ///   @attention will throw if incompatible type is provided            
+      ///   @tparam AS the type we're wrapping in                             
+      ///   @tparam SID can be used to access specific dimension. It is       
+      ///      irrelevant if AS is a handle.                                  
+      ///   @return the element, as a reference if possible                   
+      template<CT::NotVoid AS, Cid SID = 0, CT::Contiguous C>// requires Relevant<SID>
+      decltype(auto) As(this C&& self) {
+         static_assert(not CT::Reference<AS>, "Strip references first");
+
+         if constexpr (CT::Handle<AS>)
+            return self.template GetHandle<AS>();
+         else {
+            // Access directly or wrapped in a container                
+            if constexpr (CT::Pair<AS>) {
+               // User desires a pair, so we give them a pair           
+               //static_assert(Shared, "Indexing must be shared to access as a pair");
+               using AS1 = TypeOf<AS, 0>;
+               using AS2 = TypeOf<AS, 1>;
+               return AS {
+                  self.template As<Decvq<Deref<AS1>>, SID + 0>(),
+                  self.template As<Decvq<Deref<AS2>>, SID + 1>()
+               };
+            }
+            else if_constexpr_type_erased(C) {
+               auto type = self.template GetType<SID>();
+               auto requested = MetaDataOf<AS>();
+               LglsAssert(type.Is(requested), 
+                  "Type mismatch", ": ", type, " not akin to ", requested);
+
+               // Access directly                                       
+               if constexpr (CT::Dense<AS> or CT::CustomPointer<AS>)
+                  return *self.template Get<AS, SID>();
+               else
+                  return self.template Get<Deptr<AS>, SID>();
+            }
+            #if not LANGULUS(FORCE_TYPE_ERASURE)
+            else {
+               using T = TypeOf<C, SID>;
+
+               if constexpr (Akin<T, AS>) {
+                  // Access directly                                    
+                  if constexpr (CT::Dense<AS> or CT::CustomPointer<AS>)
+                     return *self.template Get<AS, SID>();
+                  else
+                     return self.template Get<Deptr<AS>, SID>();
+               }
+               else if constexpr (CT::DerivedFrom<T, AS>) {
+                  // Access by upcast                                   
+                  if constexpr (CT::Dense<AS, T>) {
+                     if constexpr (CT::Mutable<C, AS>)
+                        return DecvqAllCast(static_cast<AS const&>(*self.template Get<T, SID>()));
+                     else
+                        return static_cast<AS const&>(*self.template Get<T, SID>());
+                  }
+                  else {
+                     if constexpr (CT::Mutable<C, Deptr<AS>>)
+                        return DecvqAllCast(static_cast<ConstAll<AS >>(*self.template Get<T, SID>()));
+                     else
+                        return static_cast<ConstAll<AS >>(*self.template Get<T, SID>());
+                  }
+               }
+               else if constexpr (CT::DerivedFrom<AS, T>) {
+                  // Access by downcast                                 
+                  if constexpr (CT::Dense<AS, T>) {
+                     if constexpr (CT::Mutable<C, AS>)
+                        return DecvqAllCast(*dynamic_cast<ConstAll<AS*>>( self.template Get<T, SID>()));
+                     else
+                        return *dynamic_cast<ConstAll<AS*>>( self.template Get<T, SID>());
+                  }
+                  else {
+                     if constexpr (CT::Mutable<C, Deptr<AS>>)
+                        return  DecvqAllCast(dynamic_cast<ConstAll<AS >>(&DenseCast(self.template Get<T, SID>())));
+                     else 
+                        return  dynamic_cast<ConstAll<AS >>(&DenseCast(self.template Get<T, SID>()));
+                  }
+               }
+               else {
+                  // Wrap in a container                                
+                  static_assert(CT::DeepDense<AS>, "Type mismatch");
+                  using H = DecideHandle<C>;
+                  if constexpr (CT::Pair<H> and not CT::Pair<AS>) {
+                     //TODO magic numbers here, use H::PickDimension?
+                     if constexpr (SID == 0)
+                        return Decvq<AS> {Annies::Absorb, self.template As<typename H::KeyHandle, 0>()};
+                     else if constexpr (SID == 1)
+                        return Decvq<AS> {Annies::Absorb, self.template As<typename H::ValHandle, 1>()};
+                     else
+                        static_assert(false, "Unsupported SID");
+                  }
+                  else return Decvq<AS> {Annies::Absorb, self.template As<H, SID>()};
+               }
+            }
+            #endif
          }
       }
 

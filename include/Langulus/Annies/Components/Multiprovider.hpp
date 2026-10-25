@@ -79,8 +79,12 @@ namespace Langulus::Annies::Component
       ///      undefined behavior                                             
       template<Cid SID = 0>
       constexpr auto GetRaw(this auto&& self) noexcept {
-         using C = typename Subcomponents::template At<SID>;
-         return self.C::GetRaw();
+         //WORKAROUND Hit a very weird parsing bug here: SubcomponentAtSID was
+         //WORKAROUND called C, and self was of type C as well. They somehow  
+         //WORKAROUND get mixed up here, so I had to give better local name.  
+         //WORKAROUND keep this in mind, i feel there will be trouble.        
+         using SubcomponentAtSID = typename Subcomponents::template At<SID>;
+         return self.SubcomponentAtSID::GetRaw();
       }
       
       /// Get a direct access to the heap memory as a different type          
@@ -117,11 +121,11 @@ namespace Langulus::Annies::Component
       ///      type of the container, if statically typed                     
       ///   @tparam SID can be used to access specific dimension              
       ///   @return pointer to the first element of the desired dimension     
-      template<class AS = void, Cid SID = 0>
+      /*template<class AS = void, Cid SID = 0>
       auto* Get(this auto&& self) assumptious {
          using C = typename Subcomponents::template At<SID>;
          return self.C::template Get<AS>();
-      }
+      }*/
 
       /// Get first element as a handle, or any desired wrapping type.        
       /// Conversion or copying may occur, depending on type.                 
@@ -129,11 +133,11 @@ namespace Langulus::Annies::Component
       ///   @tparam AS the type we're wrapping in                             
       ///   @tparam SID can be used to access specific dimension              
       ///   @return the element, as a reference if possible                   
-      template<CT::NotVoid AS, Cid SID = 0>
+      /*template<CT::NotVoid AS, Cid SID = 0>
       decltype(auto) As(this auto&& self) {
          using C = typename Subcomponents::template At<SID>;
          return self.C::template As<AS>();
-      }
+      }*/
 
       /// A safe way to get the first sparse entry after being resolved to    
       /// the most concrete type. Available only if container has DeepType.   

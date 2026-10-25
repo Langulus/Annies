@@ -84,13 +84,19 @@ namespace Langulus::Annies
 
    template<CT::Contiguous T>
    Edit(T*) -> Edit<T>;
+}
+
+namespace Langulus
+{
+   using Annies::Edit;
+}
 
 
 
 
-
-
-   /// MARK: Implementation                                                   
+/// MARK: Implementation                                                      
+namespace Langulus::Annies
+{
    /// Select a subpattern                                                    
    ///   @param pattern the pattern to select                                 
    ///   @return a reference to this editor                                   
@@ -255,7 +261,7 @@ namespace Langulus::Annies
    }
 
    /// Insert single element at the start of the selection                    
-   ///   @param other - the element to insert                                 
+   ///   @param other the element to insert                                   
    ///   @return a reference to the editor for chaining                       
    template<CT::Contiguous T>
    auto Edit<T>::operator >> (const CTTI_Typed& other) -> Edit& {
@@ -268,7 +274,7 @@ namespace Langulus::Annies
    /// Replace the selection with a single element                            
    /// After replacement, the selection will collapse to the end of the       
    /// replacement                                                            
-   ///   @param other - the element to use for replacement                    
+   ///   @param other the element to use for replacement                      
    ///   @return a reference to the editor for chaining                       
    template<CT::Contiguous T>
    auto Edit<T>::Replace(const CTTI_Typed& other) -> Edit& {

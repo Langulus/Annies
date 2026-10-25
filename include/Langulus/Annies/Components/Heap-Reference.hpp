@@ -155,7 +155,7 @@ namespace Langulus::Annies::Component
       ///      type of the container, if statically typed                     
       ///   @tparam SID can be used to access specific dimension              
       ///   @return pointer to the first element of the desired dimension     
-      template<class AS = void, Cid SID = Id::First, CT::Container C>// requires Relevant<SID>
+      /*template<class AS = void, Cid SID = Id::First, CT::Container C>// requires Relevant<SID>
       auto* Get(this C&& self) {
          static_assert(not CT::Handle<AS>,    "AS can't be a handle");
          static_assert(not CT::Reference<AS>, "Strip references first");
@@ -186,9 +186,9 @@ namespace Langulus::Annies::Component
                      // If we're going to add the same pointer later,   
                      // then avoid dereferencing altogether.            
                      // Unfortunately this can't support packed pointers
-                     /*LglsAssert(not custom_pointer_encountered, 
+                     *//*LglsAssert(not custom_pointer_encountered, 
                         "Custom pointer detected, use Cast instead of As/Get",
-                        ", when trying to convert: ", T, " to ", MetaDataOf<THP>());*/
+                        ", when trying to convert: ", T, " to ", MetaDataOf<THP>());*//*
                      LglsAssumeDev(T.IsSame(MetaDataOf<THP>()), "Type mismatch",
                         ": ", T, " not same as ", MetaDataOf<THP>());
                      return *static_cast<THP*>(heap);
@@ -197,7 +197,7 @@ namespace Langulus::Annies::Component
                   // We need to dereference. Supports packed pointers   
                   auto diff = indirections - IndirectsOf<TH>;
                   auto denser = ThisCom::template GetDense<SID>(diff);
-                  return static_cast<THP>(denser.data/*GetRaw()*/);
+                  return static_cast<THP>(denser.data*//*GetRaw()*//*);
                }
                else {
                   // We are allowed to add one additional indirection   
@@ -236,16 +236,16 @@ namespace Langulus::Annies::Component
             }
          }
          #endif
-      }
+      }*/
 
       template<CT::NotVoid AS>
       auto* GetKey(this auto&& self) requires Shared {
-         return ThisCom::template Get<AS, 0>();
+         return /*ThisCom::*/self.template Get<AS, 0>();
       }
 
       template<CT::NotVoid AS>
       auto* GetVal(this auto&& self) requires Shared {
-         return ThisCom::template Get<AS, 1>();
+         return /*ThisCom::*/self.template Get<AS, 1>();
       }
 
       /// Get first element as a handle, or any desired wrapping type.        
@@ -255,7 +255,7 @@ namespace Langulus::Annies::Component
       ///   @tparam SID can be used to access specific dimension. It is       
       ///      irrelevant if AS is a handle.                                  
       ///   @return the element, as a reference if possible                   
-      template<CT::NotVoid AS, Cid SID = Id::First, CT::Contiguous C>// requires Relevant<SID>
+      /*template<CT::NotVoid AS, Cid SID = Id::First, CT::Contiguous C>// requires Relevant<SID>
       decltype(auto) As(this C&& self) {
          static_assert(not CT::Reference<AS>, "Strip references first");
 
@@ -344,15 +344,15 @@ namespace Langulus::Annies::Component
             }
             #endif
          }
-      }
+      }*/
 
       template<CT::NotVoid AS>
       decltype(auto) KeyAs(this auto&& self) requires Shared {
-         return ThisCom::template As<AS, 0>();
+         return /*ThisCom::*/self.template As<AS, 0>();
       }
       template<CT::NotVoid AS>
       decltype(auto) ValAs(this auto&& self) requires Shared {
-         return ThisCom::template As<AS, 1>();
+         return /*ThisCom::*/self.template As<AS, 1>();
       }
 
       /// A safe way to get the first sparse entry after being resolved to    
@@ -377,7 +377,7 @@ namespace Langulus::Annies::Component
             if constexpr (CT::Dense<T>)
                return h;
             else {
-               auto& dense_item = DenseCast(self.HeapReference<ENTRY0, ENTRYN...>::template Get<T, SID>());
+               auto& dense_item = DenseCast(/*self.HeapReference<ENTRY0, ENTRYN...>::*/self.template Get<T, SID>());
                if constexpr (CT::Downcastable<Decay<T>>)
                   return dense_item.Downcast();
                else

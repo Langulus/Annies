@@ -67,7 +67,7 @@ namespace Langulus::Annies::Component
       ///      type of the container, if statically typed                     
       ///   @tparam SID can be used to access specific dimension              
       ///   @return pointer to the first element of the desired dimension     
-      template<class AS = void, Cid SID = ID, CT::Container C>// requires (SID == ID)
+      /*template<class AS = void, Cid SID = ID, CT::Container C>// requires (SID == ID)
       auto* Get(this C&& self) assumptious {
          static_assert(not CT::Handle<AS>,    "AS can't be a handle");
          static_assert(not CT::Reference<AS>, "Strip references first");
@@ -97,7 +97,7 @@ namespace Langulus::Annies::Component
                "Casting to a dense shouldn't happen here");
             return static_cast<LglsMutIf(C, TH)>(heap);
          }
-      }
+      }*/
       
       /// Get first element as a handle, or any desired wrapping type.        
       /// Conversion or copying may occur, depending on type.                 
@@ -105,7 +105,7 @@ namespace Langulus::Annies::Component
       ///   @tparam AS the type we're wrapping in                             
       ///   @tparam SID can be used to access specific dimension              
       ///   @return the element, as a reference if possible                   
-      template<CT::NotVoid AS, Cid SID = ID, CT::Container C>// requires (SID == ID)
+      /*template<CT::NotVoid AS, Cid SID = ID, CT::Container C>// requires (SID == ID)
       decltype(auto) As(this C&& self) {
          static_assert(not CT::Reference<AS>, "Strip references first");
 
@@ -167,7 +167,7 @@ namespace Langulus::Annies::Component
             }
             else static_assert(false, "Type mismatch");
          }
-      }
+      }*/
 
       /// A safe way to get the first sparse entry after being resolved to    
       /// the most concrete type. Available only if container has DeepType.   

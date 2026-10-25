@@ -558,6 +558,19 @@ namespace Langulus::Annies
             i = ::std::toupper(i);
          return result;
       }
+
+      /// Fill template arguments using libfmt                                
+      ///   @param format the template string                                 
+      ///   @param args... the arguments                                      
+      ///   @return the resulting text                                        
+      static Text Format(Token const& format, auto&&...args) {
+         const auto size = fmt::formatted_size(fmt::runtime(format), LglsFwd(args)...);
+         Text result;
+         result.AllocateFresh(size);
+         fmt::format_to_n(result.GetRaw(), size, fmt::runtime(format), LglsFwd(args)...);
+         result.GetCountInner() = size;
+         return result;
+      }
    };
    
    static_assert(CT::NotVoid<CT::ReflectedAs<Text>>);

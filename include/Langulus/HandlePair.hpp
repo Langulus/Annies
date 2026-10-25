@@ -450,7 +450,8 @@ namespace Langulus::Annies
 
       decltype(auto) GetKey() const noexcept {
          if constexpr (CT::Constant<K>)
-            return *this->Com::HeapReference<HeapEntry<0, Deref<K>*>>::Get();
+            return *this->template Get<Deref<K>, 0>();
+            //return *this->Com::HeapReference<HeapEntry<0, Deref<K>*>>::Get();
          else
             return GetKeyHandle();
       }
@@ -459,7 +460,8 @@ namespace Langulus::Annies
 
       decltype(auto) GetVal() const noexcept {
          if constexpr (CT::Constant<V>)
-            return *this->Com::HeapReference<HeapEntry<1, Deref<V>*>>::Get();
+            return *this->template Get<Deref<V>, 1>();
+            //return *this->Com::HeapReference<HeapEntry<1, Deref<V>*>>::Get();
          else
             return GetValHandle();
       }

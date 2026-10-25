@@ -33,7 +33,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipDeepEmergent<>,       // Individual references      //TODO temporary
       Com::Emplacement<>,                 // Can be emplaced            
       Com::Assignment<>,                  // Can be reassigned          
-      Com::Comparison<>,                  // Can be compared            
+      Com::Comparison<false, false>,      // Can be compared            
       Com::Removal<>                      // Can be cleared/reset       
    >;
 }
@@ -201,8 +201,8 @@ namespace Langulus::Annies
          }
       }*/
 
-      using Com::Comparison<>::operator <=>;
-      using Com::Comparison<>::operator ==;
+      using Com::Comparison<false, false>::operator <=>;
+      using Com::Comparison<false, false>::operator ==;
 
       /// Three-way comparison                                                
       /*constexpr auto operator <=> (const TRef& rhs) const noexcept {

@@ -105,17 +105,20 @@ namespace Langulus::Annies
       /// Set what this recipe is for                                         
       template<class T>
       void SetTarget() noexcept {
-         *Com::Stack<DMeta, 1>::Get() = MetaDataOf<T>();
+         //*Com::Stack<DMeta, 1>::Get() = MetaDataOf<T>();
+         *Get<DMeta, 1>() = MetaDataOf<T>();
       }
 
       /// Set what this recipe is for                                         
       void SetTarget(DMeta type) noexcept {
-         *Com::Stack<DMeta, 1>::Get() = type;
+         //*Com::Stack<DMeta, 1>::Get() = type;
+         *Get<DMeta, 1>() = type;
       }
 
       /// What is this a recipe for?                                          
       DMeta GetTarget() const noexcept {
-         return *Com::Stack<DMeta, 1>::Get();
+         //return *Com::Stack<DMeta, 1>::Get();
+         return *Get<DMeta, 1>();
       }
    
       /// Get the descriptor for the recipe                                   
