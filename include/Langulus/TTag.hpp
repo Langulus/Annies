@@ -102,6 +102,15 @@ namespace Langulus::Annies
          return result;
       }
 
+      /// Same as above, but copies the tag from another TTag                 
+      static TTag Typed(CT::Tag auto const& source, DMeta type = {}, int states = 0) requires ::std::is_void_v<TAG> {
+         TTag result;
+         result.SetTag(source.GetTag());
+         result.SetType(type);
+         result.SetState(states);
+         return result;
+      }
+
       /// Create a tag by manually specifying the tag ID                      
       static TTag From(TMeta tag, auto&&...arguments) requires ::std::is_void_v<TAG> {
          TTag result {LglsFwd(arguments)...};

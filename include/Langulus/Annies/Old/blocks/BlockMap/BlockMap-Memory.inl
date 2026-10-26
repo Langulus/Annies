@@ -53,7 +53,7 @@ namespace Langulus::Annies
       if (not mValues.mEntry) {
          Allocator::Deallocate(const_cast<Allocation*>(mKeys.mEntry));
          mKeys.mEntry = nullptr;
-         LANGULUS_THROW(Allocate, "Out of memory");
+         throw Exception(Allocate, "Out of memory");
       }
 
       mValues.mRaw = const_cast<Byte*>(mValues.mEntry->GetBlockStart());
@@ -110,7 +110,7 @@ namespace Langulus::Annies
       if (not mValues.mEntry) {
          Allocator::Deallocate(const_cast<Allocation*>(mKeys.mEntry));
          mKeys.mEntry = nullptr;
-         LANGULUS_THROW(Allocate,
+         throw Exception(Allocate,
             "Out of memory on allocating/reallocating values");
       }
 

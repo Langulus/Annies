@@ -6,7 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "../Component.hpp"
+#include "../Container.hpp"
 #include "Langulus/CT/Index.hpp"
 #include "Langulus/CT/Serializer.hpp"
 #include <Langulus/CT/NullTerminated.hpp>

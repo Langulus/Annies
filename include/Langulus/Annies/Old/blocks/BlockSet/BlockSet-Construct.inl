@@ -348,7 +348,7 @@ namespace Langulus::Annies
             const_cast<Allocation*>(mKeys.mEntry)->Free();
             new (this) THIS {Copy(reinterpret_cast<const THIS&>(backup))};
          }
-         else LANGULUS_THROW(Construct,
+         else throw Exception(Construct,
             "Set needs to branch out, but type doesn't support Intent::Copy");
       }
    }

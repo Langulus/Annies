@@ -57,7 +57,7 @@ namespace Langulus::Annies::Component
                else {
                   static_assert(LHS::AttemptConvertOnInsert,
                      "Can't be concatenated - incompatible arguments");
-                  static_assert(CT::Inner::FindMorphism<ITEM, LHS>() >= 0 /*CT::Convertible<ITEM, LHS>*/,
+                  static_assert(/*CT::Inner::FindMorphism<ITEM, LHS>() >= 0*/ CT::Convertible<ITEM, LHS>,
                      "Can't be concatenated - not convertible to LHS");
 
                   for (auto& i : DeintCast(rhs))
@@ -77,7 +77,7 @@ namespace Langulus::Annies::Component
          else {
             static_assert(LHS::AttemptConvertOnInsert,
                "Can't be concatenated - incompatible arguments");
-            static_assert(CT::Inner::FindMorphism<ITEM, LHS>() >= 0 /*CT::Convertible<ITEM, LHS>*/,
+            static_assert(/*CT::Inner::FindMorphism<ITEM, LHS>() >= 0*/ CT::Convertible<ITEM, LHS>,
                "Can't be concatenated - not convertible to LHS");
 
             lhs.Concat(Convert<LHS>(DeintCast(rhs)));

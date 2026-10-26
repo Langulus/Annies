@@ -29,6 +29,7 @@ namespace Langulus::Annies
    /// recipe and are filled by the context (i.e. Tags::Parent(?)).           
    struct Neat {
       using CTTI_Container = Yup;
+      using CTTI_Deep      = Yup;
 
       using RecipeList = TMany<Recipe>;
       using TailList   = TMany<Messy>;

@@ -647,7 +647,7 @@ namespace Langulus::Annies
             new (this) THIS {Copy(reinterpret_cast<const THIS&>(backup))};
             return true;
          }
-         else LANGULUS_THROW(Construct,
+         else throw Exception(Construct,
             "Map needs to branch out, but key/value types don't support Intent::Copy");
       }
 

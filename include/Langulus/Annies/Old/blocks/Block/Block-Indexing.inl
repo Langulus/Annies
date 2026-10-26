@@ -204,7 +204,7 @@ namespace Langulus::Annies
             // All stages of interpretation failed                      
             // Don't log this, because it will spam the crap out of us  
             // That throw is used by ForEach to handle irrelevant types 
-            LANGULUS_THROW(Access, "Type mismatch");
+            throw Exception(Access, "Type mismatch");
          }
 
          // Get base memory of the required element and access          
@@ -228,7 +228,7 @@ namespace Langulus::Annies
             if constexpr (CT::Typed<T>) {
                // Additional check, if T is a typed block               
                if (not result.template IsSame<TypeOf<T>>())
-                  LANGULUS_THROW(Access, "Deep type mismatch");
+                  throw Exception(Access, "Deep type mismatch");
             }
 
             if constexpr (CT::Sparse<T>) {

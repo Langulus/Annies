@@ -408,7 +408,7 @@ namespace Langulus::Annies
             const_cast<Allocation*>(mEntry)->Free();
             new (this) TMany<TYPE> {Copy(reinterpret_cast<const TMany<TYPE>&>(backup))};
          }
-         else LANGULUS_THROW(Construct,
+         else throw Exception(Construct,
             "Block needs to branch out, but type doesn't support Intent::Copy"
          );
       }
@@ -418,7 +418,7 @@ namespace Langulus::Annies
             const_cast<Allocation*>(mEntry)->Free();
             new (this) Many {Copy(reinterpret_cast<Many const&>(backup))};
          }
-         else LANGULUS_THROW(Construct,
+         else throw Exception(Construct,
             "Block needs to branch out, but type doesn't support Intent::Copy"
          );
       }

@@ -110,7 +110,7 @@ namespace Langulus::Annies
                      CreateWithIntent(Abandon(previousBlock));
                      previousBlock.Free();
                   }
-                  else LANGULUS_THROW(Construct,
+                  else throw Exception(Construct,
                      "Memory moved, but T is not move-constructible");
                }
             }
@@ -151,7 +151,7 @@ namespace Langulus::Annies
                Logger::Error("Unable to instantiate ", elements,
                   " elements of abstract type ", mType);
 
-            LANGULUS_THROW(Allocate, "Allocating untyped/abstract/sparse data");
+            throw Exception(Allocate, "Allocating untyped/abstract/sparse data");
          }
 
          if (mReserved >= elements) {

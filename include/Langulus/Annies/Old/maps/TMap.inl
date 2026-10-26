@@ -515,7 +515,7 @@ namespace Langulus::Annies
             if constexpr (requires (V& lhs) { lhs += rhs; })
                GetValue(found) += pair.GetVal();
             else
-               LANGULUS_THROW(Concat, "No concat operator available");
+               throw Exception(Concat, "No concat operator available");
          }
          else Insert(pair.GetKey(), pair.GetVal()); //TODO use handles instead? or better yed - directly insert pair?
       }

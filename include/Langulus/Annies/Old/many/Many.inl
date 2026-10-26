@@ -143,9 +143,9 @@ namespace Langulus::Annies
          if (dmeta)
             result << dmeta;
          else if (not meta)
-            LANGULUS_THROW(Meta, "Missing meta for past filter");
+            throw Exception(Meta, "Missing meta for past filter");
          else
-            LANGULUS_THROW(Meta, "Past filter isn't a data type token");
+            throw Exception(Meta, "Past filter isn't a data type token");
       };
 
       (filter(RTTI::DisambiguateMeta(types)), ...);
@@ -166,9 +166,9 @@ namespace Langulus::Annies
          if (dmeta)
             result << dmeta;
          else if (not meta)
-            LANGULUS_THROW(Meta, "Missing meta for future filter");
+            throw Exception(Meta, "Missing meta for future filter");
          else
-            LANGULUS_THROW(Meta, "Future filter isn't a data type token");
+            throw Exception(Meta, "Future filter isn't a data type token");
       };
 
       (filter(RTTI::DisambiguateMeta(types)), ...);
