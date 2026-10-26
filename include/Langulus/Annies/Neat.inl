@@ -280,11 +280,10 @@ namespace Langulus::Annies
    /// Push and sort anything, with or without intents                        
    ///   @param key the key and intent to add                                 
    ///   @return 1 if pair was inserted, zero otherwise                       
-   template<class T1, class...TN>
-   size_t Neat::Insert(T1&& t1, TN&&...tn) {
+   size_t Neat::Insert(auto&& t1, auto&&...tn) {
       size_t inserted = 0;
-        inserted += UnfoldInsert(Forward<T1>(t1));
-      ((inserted += UnfoldInsert(Forward<TN>(tn))), ...);
+        inserted += UnfoldInsert(LglsFwd(t1));
+      ((inserted += UnfoldInsert(LglsFwd(tn))), ...);
       return inserted;
    }
    
@@ -619,7 +618,7 @@ namespace Langulus::Annies
       if constexpr (CT::Deep<A> and CT::Typed<A>) {
          // Statically typed container provided, extract filter         
          const auto filter = MetaDataOf<Decay<TypeOf<A>>>;
-         const auto found = self.mAnythingElse.FindIt(filter);
+         const auto found = self.mAnythingElse.Find(filter);
          if (not found)
             return 0;
 
@@ -652,7 +651,7 @@ namespace Langulus::Annies
       else {
          // Anything else                                               
          const auto filter = MetaDataOf<Decay<A>>();
-         const auto found = self.mAnythingElse.FindIt(filter);
+         const auto found = self.mAnythingElse.Find(filter);
          if (not found)
             return 0;
 
@@ -660,10 +659,10 @@ namespace Langulus::Annies
          for (auto& data : *found.GetValHandle()) {
             for (auto element : data) {
                if constexpr (CT::Bool<R>) {
-                  if (not call(element.template Get<A>()))
+                  if (not call(*element.template Get<Deref<A>>()))
                      return index + 1;
                }
-               else call(element.template Get<A>());
+               else call(*element.template Get<Deref<A>>());
             }
 
             ++index;

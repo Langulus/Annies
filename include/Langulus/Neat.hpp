@@ -327,8 +327,7 @@ namespace Langulus::Annies
    public:
       ///                                                                     
       ///   Insertion                                                         
-      template<class T1, class...TN>
-      auto  Insert(T1&&, TN&&...) -> size_t;
+      auto Insert(auto&&, auto&&...) -> size_t;
 
       /// Merge another Neat into this one                                    
       ///   @param rhs the container to merge                                 

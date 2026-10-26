@@ -241,6 +241,9 @@ namespace Langulus::Annies::Component
       auto New(this C& self, A&&...arguments) -> DecideHandle<C>
       requires (Relevant<SID> and not CT::HeapAllocated<C> and not Shared) {
          // Need to destroy and overwrite only the first element.       
+         constexpr auto strat = AllocationStrategy::FreshAllocateAllIndirections;
+         using T = Tif<::std::is_void_v<E>, TypeOf<C, SID>, E>;
+         
          auto item = self.GetHandle();
          item.template Free<false>();
          if_available(item.ResetAllEntries());
@@ -249,10 +252,10 @@ namespace Langulus::Annies::Component
          // Emplace a new element on the first position.                
          // Any state change is forbidden - container is full.          
          try {
-            if constexpr (sizeof...(arguments) > 0)
-               ThisCom::template EmplaceConstruct<SID, AllocationStrategy::FreshAllocateAllIndirections, E>(LglsFwd(arguments)...);
-            else
-               ThisCom::template EmplaceDefault<SID, AllocationStrategy::FreshAllocateAllIndirections, E>();
+            //if constexpr (sizeof...(arguments) > 0)
+               ThisCom::template EmplaceConstruct<SID, strat, T>(LglsFwd(arguments)...);
+            //else
+            //   ThisCom::template EmplaceDefault<SID, strat, T>();
          }
          catch (...) {
             // If emplacement fails, we are forced to destroy           
@@ -473,6 +476,98 @@ namespace Langulus::Annies::Component
 
             IntentNew(dst, Clone(*static_cast<Decay<T>*>(static_cast<void*>(src))));
          }
+      }
+
+      /// Instantiate E with the provided arguments, by allocating all        
+      /// indirection layers on the way.                                      
+      /// Assumes all indirections are ordinary pointers, and is thus faster. 
+      ///   @attention works in one dimension at a time!                      
+      template<class E, Cid SID = ID, CT::Container C> requires Relevant<SID>
+      void Instantiate(this C& self, auto&&...args) {
+         constexpr bool has_entries = requires { self.template GetEntriesInner<SID>(); };
+         // If T is Text**, then dst/src are Text***                    
+         void** dst = static_cast<void**>(self.template GetRawVoid<SID>());
+
+         //                                                             
+         // Both sides are statically-typed and we can benefit          
+         // from a lot of compile-time optimizations.                   
+         using T = TypeOf<C, SID>;
+         if constexpr (CT::TypeErased<C>)
+            LglsAssumeDev((self.template IsSame<E, SID>()), "Type mismatch");
+         else
+            static_assert(Same<T, E>, "Type mismatch");
+            
+         constexpr size_t indirects = IndirectsOf<T>;
+         if constexpr (indirects > 0) {
+            // Clone the origin first                                   
+            using originT = Decay<T>;
+            #if LANGULUS_FEATURE(MANAGED_MEMORY)
+               const auto cloned_origin = Allocator::Allocate(
+                  MetaDataOf<originT>(),
+                  pot_t(Roof2(sizeof(originT)))
+               );
+            #else
+               const auto cloned_origin = Allocator::Allocate(
+                  pot_t(alignof(originT)),
+                  pot_t(Roof2(sizeof(originT)))
+               );
+            #endif
+            LglsAssert(cloned_origin, "Out of memory");
+            [[maybe_unused]] Allocation const* const* ent;
+            if constexpr (has_entries)
+               ent = self.template GetEntriesInner<SID>();
+
+            if constexpr (indirects > 1) {
+               // Multiple indirections                                 
+               #if LANGULUS_FEATURE(MANAGED_MEMORY)
+                  const auto cloned_ptrs = Allocator::Allocate(
+                     MetaDataOf<T>(),
+                     pot_t(Roof2(sizeof(T) * (indirects - 1)))
+                  );
+               #else
+                  const auto cloned_ptrs = Allocator::Allocate(
+                     pot_t(alignof(T)),
+                     pot_t(Roof2(sizeof(T) * (indirects - 1)))
+                  );
+               #endif
+               
+               if (not cloned_ptrs) {
+                  Allocator::Deallocate(cloned_origin);
+                  LglsError("Out of memory");
+               }
+               cloned_ptrs->AddRef(indirects - 2);
+
+               // Given dst being Text***, we have:                     
+               //    *dst = cloned_ptrs                                 
+               //   **dst = cloned_origin                               
+               //  ***dst = ***src                                      
+               void** ptr = static_cast<void**>(static_cast<void*>(cloned_ptrs->GetBlockStart()));
+               *dst = ptr;
+               if constexpr (has_entries)
+                  DecvqAllCast(*ent) = cloned_ptrs;
+
+               ForEachIndirection<Deptr<T>>([&dst, &ent, &cloned_ptrs] {
+                  // Chain all intermediate pointers                    
+                  dst = static_cast<void**>(*dst);
+
+                  *dst = dst + 1;
+
+                  if constexpr (has_entries) {
+                     ++ent;
+                     DecvqAllCast(*ent) = cloned_ptrs;
+                  }
+               });
+            }
+            
+            // The last indirection points to the cloned origin         
+            *dst = cloned_origin->GetBlockStart();
+            dst = static_cast<void**>(*dst);
+            if constexpr (has_entries)
+               DecvqAllCast(*ent) = cloned_origin;
+         }
+
+         // Finally, instantiate Decay<E> at the innermost pointer      
+         new (dst) Decay<T> {LglsFwd(args)...};
       }
 
    #if LANGULUS_FEATURE(MANAGED_MEMORY)
@@ -827,7 +922,10 @@ namespace Langulus::Annies::Component
             if_available(self.ResetState());
          }
 
-         if constexpr (CT::TypeErased<C>) {
+         if constexpr (STRAT == AllocationStrategy::FreshAllocateAllIndirections) {
+            ThisCom::Instantiate<E>(LglsFwd(arguments)...);
+         }
+         else if constexpr (CT::TypeErased<C>) {
             //                                                          
             // This container is type-erased                            
             if constexpr (STRAT != AllocationStrategy::DontAllocate) {
