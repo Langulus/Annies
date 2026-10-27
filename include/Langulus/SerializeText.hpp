@@ -200,7 +200,7 @@ namespace Langulus::CTTI
 
       // Iterate all dimensions                                         
       bool first = true;
-      DC::Dimensions::ForEach([&]<unsigned ID> {
+      DC::GetDimensions().ForEach([&]<unsigned ID> {
          if (first) first = false;
          else out += ": ";                // Dimension separator        
 

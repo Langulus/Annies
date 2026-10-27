@@ -27,12 +27,17 @@ namespace Langulus::Annies::Component
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID0, ID1, IDN...>;
+      using CompositeIds   = Id;
 
       static constexpr int ComponentPrecedence = 0;
 
       using IteratorCategory = ::std::bidirectional_iterator_tag;
       static constexpr IndexingStyle Indexed = IndexingStyle::IndexedComposite;
 
+      /*template<class C>
+      constexpr auto GetCompositeProviders(this C const&) noexcept {
+         return C::FindProviders(Id{});
+      }*/
       
       /// Get the composite count                                             
       size_t GetCount(this auto const& self) noexcept {

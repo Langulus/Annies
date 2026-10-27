@@ -45,15 +45,16 @@ namespace Langulus::Annies::Component
                return 1;
             }
             else {
-               static_assert(C::CountHeapFooterRequests() == 0,
+               //TODO probably generalize this for multidimensionals?
+               static_assert(C::template CountHeapFooterRequests<0>() == 0,
                   "ReserveEmergent can't be used in containers with heap footer, "
                   "because it causes a circular dependency - "
                   "reserved count becomes impossible to get without knowing the "
                   "reserved elements beforehand."
                );
 
-               size_t header = C::DefineHeapHeader();
-               using PROVIDER = typename decltype(C::FindProvider())::First;
+               size_t header = C::template DefineHeapHeader<0>();
+               using PROVIDER = typename decltype(C::template FindProvider<0>())::First;
                header = Align(header, self.template GetAlignment<PROVIDER::Id::First>());
                return (al->GetSize() - header) / self.GetStride() - CT::NullTerminated<C>;
             }

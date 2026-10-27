@@ -565,7 +565,7 @@ namespace Langulus::Annies::Component
             return 0;
 
          if constexpr (not CT::TypeErased<C1> and not CT::TypeErased<C2>) {
-            static_assert(C1::Dimensions::Count == 1,
+            static_assert(not CT::Multidimensional<C1>,
                "TODO multidimensional matches");
             static_assert(CT::IndexedLinearly<C1, C2>,
                "TODO nonlinear matches - iterate using handles");
@@ -602,7 +602,7 @@ namespace Langulus::Annies::Component
             return 0;
 
          if constexpr (not CT::TypeErased<C1> and not CT::TypeErased<C2>) {
-            static_assert(C1::Dimensions::Count == 1,
+            static_assert(not CT::Multidimensional<C1>,
                "TODO multidimensional matches");
             static_assert(CT::IndexedLinearly<C1, C2>,
                "TODO nonlinear matches - iterate using handles");

@@ -126,17 +126,27 @@ namespace Langulus::Annies
             // Always prioritize custom handle types if defined         
             using mutbl = typename C::HandleMutType;
             using immut = typename C::HandleType;
-            static_assert(C::Dimensions::Count == mutbl::Dimensions::Count, 
-               "Custom HandleMutType doesn't represent container dimensions properly!"
+            static_assert(CT::Multidimensional<C> == CT::Multidimensional<mutbl>, 
+               "Handle must be of same dimensionality"
             );
-            static_assert(C::Dimensions::Count == immut::Dimensions::Count, 
-               "Custom HandleType doesn't represent container dimensions properly!"
+            static_assert(CT::Multidimensional<C> == CT::Multidimensional<immut>, 
+               "Handle must be of same dimensionality"
             );
+
+            if constexpr (CT::Multidimensional<C>) {
+               static_assert(C::Dimensions::Count == mutbl::Dimensions::Count, 
+                  "Custom HandleMutType doesn't represent container dimensions properly!"
+               );
+               static_assert(C::Dimensions::Count == immut::Dimensions::Count, 
+                  "Custom HandleType doesn't represent container dimensions properly!"
+               );
+            }
+
             return Types<Tmut<C, mutbl, immut>> {};
          }
          else if_constexpr_type_erased(C) {
             // Type-erased handle                                       
-            static_assert(C::Dimensions::Count == 1, 
+            static_assert(not CT::Multidimensional<C>, 
                "Multidimensional containers should result in multidimensional handles! "
                "Define HandleMutType and HandleType!"
             );
@@ -334,6 +344,13 @@ namespace Langulus::Annies::Component
       /// in unions!                                                    
       MakeCompactTuple<decltype(Inner::DefineStack(ComponentList{}))> mStack;
 
+      static consteval auto GetDimensions() {
+         if constexpr (requires { typename Container::Dimensions; })
+            return typename Container::Dimensions {};
+         else
+            return Values<0> {};
+      }
+      
    protected:
       LglsComIterationOperators(friend);
       LglsComTypedStack(friend);
@@ -1081,7 +1098,7 @@ namespace Langulus::Annies::Component
                   ++item;
                }
             }
-            else if constexpr (CT::IndexedHashTable<C> or CT::IndexedCoverage<C>) {
+            else if constexpr (CT::IndexedTable<C>) {
                // Iterate a hash/coverage table - some cells might be   
                // empty, thus container might not be a contiguous array 
                LglsAssumeDev(cookie < self.GetReserved(), "Limp cookie (nonlinear)");

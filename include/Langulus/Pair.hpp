@@ -38,7 +38,7 @@ namespace Langulus::Annies::Inner
       Com::ReserveStatic<1u>,             // Statically reserved to 1   
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
       Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0, 1>,
-      Com::HashEmergent<0, Hash, 1>,      // Hash retrieved from items  
+      Com::HashEmergent<Hash, 0, 1>,      // Hash retrieved from items  
       Com::Emplacement<0, 1>,             // Allows emplacement         
       Com::Assignment<false, 0, 1>,       // Allows assignment          
       Com::Removal<0, 1>,                 // Allows clear/reset         

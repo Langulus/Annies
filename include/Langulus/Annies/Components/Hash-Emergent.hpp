@@ -16,10 +16,10 @@ namespace Langulus::Annies::Component
 {
    ///                                                                        
    /// Doesn't cache hash - recalculates it every time.                       
-   ///   @tparam ID the provider ID whose data will be hashed                 
    ///   @tparam H the hash type used                                         
+   ///   @tparam ID the provider ID whose data will be hashed                 
    ///   @tparam SHARED additional provider IDs that are hashed together      
-   template<Cid ID, class H, Cid...SHARED>
+   template<class H, Cid ID, Cid...SHARED>
    struct HashEmergent {
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
@@ -37,7 +37,7 @@ namespace Langulus::Annies::Component
 
       /// Generate a hash from contiguous data. Allows for batch optimization.
       ///   @attention order matters                                          
-      template<Cid SID = ID, CT::Container C> requires (CT::Contiguous<C> and Relevant<SID>)
+      template<Cid SID = ID, CT::IndexedLinearly C> requires Relevant<SID>
       H HashRecompute(this C const& self) {
          if (self.IsEmpty())
             return {1};
@@ -53,7 +53,7 @@ namespace Langulus::Annies::Component
                static_cast<void const*>(self.template GetRaw<SID>())
             );
 
-            if (self.template GetCount<SID>() == 1) {
+            if (self.GetCount() == 1) {
                // Exactly one element means exactly one hash            
                return hasher(data);
             }
@@ -96,7 +96,7 @@ namespace Langulus::Annies::Component
             using T = TypeOf<C>;
             static_assert(CT::Hashable<T>, "Not hashable");
 
-            if (self.template GetCount<SID>() == 1) {
+            if (self.GetCount() == 1) {
                // Exactly one element means exactly one hash            
                return HashOf(*self.template GetRaw<SID>());
             }
@@ -134,10 +134,10 @@ namespace Langulus::Annies::Component
          }
       }
 
-      /// Generate a hash from discontiguous data. Basically disables batch   
-      /// optimizations.                                                      
+      /// Generate a hash from tables. Basically disables batching due to     
+      /// discontinuity.                                                      
       ///   @attention order matters                                          
-      template<Cid SID = ID, CT::Container C> requires (CT::NotContiguous<C> and Relevant<SID>)
+      template<Cid SID = ID, CT::IndexedTable C> requires Relevant<SID>
       H HashRecompute(this C const& self) {
          if (self.IsEmpty())
             return {1};
@@ -171,6 +171,22 @@ namespace Langulus::Annies::Component
                DefaultHashSeed
             );
          }
+      }
+      
+      /// Generate a hash from composite containers. Basically extracts hashes
+      /// from all subcontainers, and hashes those.                           
+      ///   @attention order matters                                          
+      template<Cid SID = ID, CT::IndexedComposite C> requires Relevant<SID>
+      H HashRecompute(this C const& self) {
+         if (self.IsEmpty())
+            return {1};
+
+         return C::CompositeIds::Expand([&self]<auto...P> {
+            const Hash h[] {
+               self.template GetRaw<P>()->GetHash()...
+            };
+            return HashOf(h);
+         });
       }
       
    protected:

@@ -31,7 +31,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,
                         EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 1>>>,
-      Com::HashHeap<0, Hash, 1>,          // Hash can be cached         
+      Com::HashHeap<Hash, 0, 1>,          // Hash can be cached         
       Com::Merging<false, 0, 1>,          // Only merging for keys      
       Com::Removal<0, 1>,                 // Allows clear/reset of K/V  
       Com::Conversion<0, 1>,              // Allows conversions of K/V  

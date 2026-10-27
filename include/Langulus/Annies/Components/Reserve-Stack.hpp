@@ -27,7 +27,6 @@ namespace Langulus::Annies::Component
       #define ThisCom self.ReserveStack<T>
 
       using StackRequest = T;
-      using Id = typename ReserveEmergent<T>::Id;
 
       /// Get the number of reserved (maybe uninitialized) elements           
       template<class C>
@@ -101,6 +100,7 @@ namespace Langulus::Annies::Component
                   if constexpr (CT::ContainsOne<I>)
                      ThisCom::SetReservedInner(1);
                   else {
+                     //TODO should probably be generalized for multidimensionals
                      const size_t header = from.GetHeapHeaderSize();
                      ThisCom::SetReservedInner((al->GetSize() - header) / self.GetStride());
                   }

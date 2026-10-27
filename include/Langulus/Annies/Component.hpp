@@ -163,9 +163,10 @@ namespace Langulus::CT
    /// Check if two containers/elements have the same dimensions              
    template<class LHS, class RHS>
    concept CompatibleDimensions =
-      (Container<LHS, RHS> and Same<Annies::Component::Dimensions<LHS>, Annies::Component::Dimensions<RHS>>)
-        or (Container<LHS> and not Container<RHS> and Same<Annies::Component::Dimensions<LHS>, Values<Annies::Cid(0)>>)
-        or (Container<RHS> and not Container<LHS> and Same<Annies::Component::Dimensions<RHS>, Values<Annies::Cid(0)>>);
+           (/*Container<LHS, RHS> and*/ not Multidimensional<LHS> and not Multidimensional<RHS>)
+        or (Container<LHS, RHS> and Same<Annies::Component::Dimensions<LHS>, Annies::Component::Dimensions<RHS>>)
+        or (Container<LHS> and not Container<RHS> and Same<Annies::Component::Dimensions<LHS>, Values<Annies::Cid(0)>>) //TODO is it needed?
+        or (Container<RHS> and not Container<LHS> and Same<Annies::Component::Dimensions<RHS>, Values<Annies::Cid(0)>>);//TODO is it needed?
 
    /// Check if listed types are containers with any kind of heap memory      
    template<class...T>
@@ -223,7 +224,7 @@ namespace Langulus::CT
    /// Check if listed types are containers, and are linearly indexed         
    template<class...T>
    concept IndexedLinearly = Container<T...>
-      and ((ShedDeref<T>::Indexed == Annies::Component::IndexingStyle::IndexedLinearly) and ...);
+      and ((ContainsOne<T> or ShedDeref<T>::Indexed == Annies::Component::IndexingStyle::IndexedLinearly) and ...);
 
    /// Check if listed types are containers, and are hash table indexed       
    template<class...T>
@@ -235,7 +236,16 @@ namespace Langulus::CT
    concept IndexedCoverage = Container<T...>
       and ((ShedDeref<T>::Indexed == Annies::Component::IndexingStyle::IndexedCoverage) and ...);
 
-   /// Check if listed types are containers, and are linearly indexed         
+   /// Check if listed types are containers, and are any-table indexed        
+   template<class...T>
+   concept IndexedTable = ((IndexedHashTable<T> or IndexedCoverage<T>) and ...);
+
+   /// Check if listed types are containers, and are composite indexed        
+   template<class...T>
+   concept IndexedComposite = Container<T...>
+      and ((ShedDeref<T>::Indexed == Annies::Component::IndexingStyle::IndexedComposite) and ...);
+
+   /// Makes sure T is a heap entry declaration (for internal use)            
    template<class T>
    concept HeapEntry = requires {
       {T::Id} -> Same<unsigned>;
@@ -499,17 +509,17 @@ namespace Langulus::Annies
          template<unsigned, bool, Cid, Cid...> modifier struct OwnershipDeepHeap
 
       /// Hashing                                                             
-      template<Cid = 0, class H = Hash, Cid...> struct HashEmergent;
+      template<class H = Hash, Cid = 0, Cid...> struct HashEmergent;
       #define LglsComHashEmergent(modifier) \
-         template<Cid, class, Cid...> modifier struct HashEmergent
+         template<class, Cid, Cid...> modifier struct HashEmergent
 
-      template<Cid = 0, class H = Hash, Cid...> struct HashHeap;
+      template<class H = Hash, Cid = 0, Cid...> struct HashHeap;
       #define LglsComHashHeap(modifier) \
-         template<Cid, class, Cid...> modifier struct HashHeap
+         template<class, Cid, Cid...> modifier struct HashHeap
 
-      template<Cid = 0, class H = Hash, Cid...> struct HashStack;
+      template<class H = Hash, Cid = 0, Cid...> struct HashStack;
       #define LglsComHashStack(modifier) \
-         template<Cid, class, Cid...> modifier struct HashStack
+         template<class, Cid, Cid...> modifier struct HashStack
 
       /// Indexing                                                            
       template<Cid = 0, Cid...> struct IndexedCommon;

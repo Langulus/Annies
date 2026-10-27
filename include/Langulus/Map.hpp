@@ -51,7 +51,7 @@ namespace Langulus::Annies::Inner
       Com::IndexedHashHeap<0, Hash, 1>,   // Indexed by hash table      
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
       Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0, 1>,
-      Com::HashHeap<0, Hash, 1>,          // Hash can be cached         
+      Com::HashHeap<Hash, 0, 1>,          // Hash can be cached         
       Com::Merging<false, 0, 1>,          // Only merging for keys      
       //Com::Assignment<false, 1>,        // Assignment of values       
       Com::Removal<0, 1>,                 // Allows clear/reset of K/V  

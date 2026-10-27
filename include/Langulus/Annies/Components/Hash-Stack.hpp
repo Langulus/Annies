@@ -14,19 +14,19 @@ namespace Langulus::Annies::Component
    ///                                                                        
    /// Stores a precomputed hash on the stack.                                
    /// The hash is recomputed if GetHash() is invoked when stored hash is 0.  
-   ///   @tparam ID the provider ID whose data will be hashed                 
    ///   @tparam H the hash type used                                         
+   ///   @tparam ID the provider ID whose data will be hashed                 
    ///   @tparam SHARED additional provider IDs that are hashed together.     
    ///      They will all share the same cached hash variable.                
-   template<Cid ID, class H, Cid...SHARED>
-   struct HashStack : HashEmergent<ID, H, SHARED...> {
+   template<class H, Cid ID, Cid...SHARED>
+   struct HashStack : HashEmergent<H, ID, SHARED...> {
       /// Refers back to this particular component instance through the       
       /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
       /// this file.                                                          
-      #define ThisCom self.HashStack<ID, H, SHARED...>
+      #define ThisCom self.HashStack<H, ID, SHARED...>
 
       using StackRequest = H;
-      using Id = typename HashEmergent<ID, H, SHARED...>::Id;
+      using Id = typename HashEmergent<H, ID, SHARED...>::Id;
 
       template<Cid SID>
       static constexpr bool Relevant = Id::template Contains<SID>;

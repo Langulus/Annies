@@ -38,7 +38,7 @@ namespace Langulus::Annies::Inner
          Com::Stack<TMapUnsorted<DMeta, MessyList>,  2>
       >,
       Com::IndexedComposite<0, 1, 2>,        // Composite indexing      
-      Com::HashEmergent<0, Hash, 1, 2>,      // Emergent hash           
+      Com::HashEmergent<Hash, 0, 1, 2>,      // Emergent hash           
       Com::Assignment<false, 0, 1, 2>,       // Assignment              
       Com::InsertionOperators<>,             // Insertion operators     
       Com::MergingOperators<>,               // Merge operators         

@@ -90,7 +90,7 @@ namespace Langulus::CTTI
          if (std::endian::native == std::endian::big)
             headbyte |= Headbits::BigEndian;
 
-         if (C::Dimensions::Count > 1) {
+         if constexpr (CT::Multidimensional<C>) {
             static_assert(C::Dimensions::Count <= MaxDimensions,
                "Update MaxDimensions for more dimensions. "
                "This is not set to max to save on stack memory"
@@ -103,7 +103,7 @@ namespace Langulus::CTTI
          // First pass goes through all variable-sized counters and     
          // populates the header flags before writing anything.         
          if constexpr (requires { from.GetType(); }) {
-            C::Dimensions::ForEach([&]<Cid D> {
+            C::GetDimensions().ForEach([&]<Cid D> {
                LglsAssert(context,
                   "Context is required for binary serialization of containers");
 
@@ -158,7 +158,7 @@ namespace Langulus::CTTI
 
          // Now write the data                                          
          if constexpr (requires { from.GetType(); }) {
-            C::Dimensions::ForEach([&]<Cid D> {
+            C::GetDimensions().ForEach([&]<Cid D> {
                const uint64_t typeId = context->mDMetaBank.Define(from.template GetType<D>());
                if ((headbyte & Headbits::Large64) == Headbits::Large64) {
                   memcpy(header + progress, &typeId, 8);

@@ -163,8 +163,10 @@ namespace Langulus::Annies
       }
 
       /// Set source                                                          
+      ///   @attention setting source resets verb completion                  
       auto In(auto&&...arguments) -> TVerb& {
          mContext = Many {LglsFwd(arguments)...};
+         Clear();
          return *this;
       }
       
@@ -276,7 +278,10 @@ namespace Langulus::Annies
       }
 
       /// Access outputs                                                      
-      auto* operator -> (this auto&& self) noexcept {
+      ///   @attention will execute the verb if not executed yet              
+      auto* operator -> (this auto&& self) {
+         if (not self.IsDone())
+            LglsAssert(self.Run(), "Execution failed");
          return &self.mOutput;
       }
       

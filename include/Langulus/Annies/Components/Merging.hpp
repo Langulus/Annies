@@ -200,7 +200,7 @@ namespace Langulus::Annies::Component
       ///   @param a1, an elements (and their intents) to insert              
       ///   @attention this is for linearly indexed containers only           
       ///   @return the number of inserted elements (after any conversions)   
-      template<class A1, class...AN, class C> requires (C::Dimensions::Count == 1)
+      template<class A1, class...AN, class C> requires (not CT::Multidimensional<C>)
       auto Merge(this C& self, A1&& a1, AN&&...an) -> size_t {
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
@@ -285,7 +285,7 @@ namespace Langulus::Annies::Component
       ///   @param a1, an elements for each dimension, first being the key    
       ///   @return a multidimensional handle to the inserted/found entry     
       ///   @attention doesn't support arrays or any kind of unfolding        
-      template<class A1, class...AN, CT::IndexedHashTable C> requires (C::Dimensions::Count > 1)
+      template<class A1, class...AN, CT::IndexedHashTable C> requires CT::Multidimensional<C>
       auto Merge(this C& self, A1&& a1, AN&&...an) -> DecideHandle<C> {
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
@@ -330,7 +330,7 @@ namespace Langulus::Annies::Component
       ///   @param conflict custom merge routine in case key already exists   
       ///      Example: [](auto&& old_value, auto&& new_value) { ... }        
       ///   @return the number of inserted elements                           
-      template<CT::Container C> requires (C::Dimensions::Count > 1)
+      template<CT::Multidimensional C>
       auto MergeRange(this C& self, CT::Container auto&& other, auto&& conflict) -> size_t {
          const size_t prev_size = self.GetCount();
          DeintCast(other).Apply([&](auto& h) {
@@ -518,7 +518,7 @@ namespace Langulus::Annies::Component
       /// Inserts 'a' into a hash set at the appropriate bucket. Supports T   
       /// being a bounded array. Does not perform conversion.                 
       ///   @attention designed to work in one-dimensional containers         
-      template<class C, class T> requires (C::Dimensions::Count == 1)
+      template<class C, class T> requires (not CT::Multidimensional<C>)
       void MergeInnerTable1D(this C& self, size_t const*& it, size_t& counter, T&& a) {
          using I  = IntentOf(a);
          using IT = DeextAll<Deint<T>>;
@@ -559,7 +559,7 @@ namespace Langulus::Annies::Component
       /// missing argument are default-initialized, or error out. Does not    
       /// perform conversion.                                                 
       ///   @attention operates on all dimensions at once                     
-      template<class C, class D1, class...DN> requires (C::Dimensions::Count > 1)
+      template<CT::Multidimensional C, class D1, class...DN>
       auto MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C> {
          static_assert(sizeof...(SHARED) >= sizeof...(DN), "Too many arguments");
          static_assert(not CONVERT or Same<TypeOf<C, ID>, DeextAll<Deint<D1>>>,
