@@ -232,7 +232,7 @@ namespace Langulus::Annies::Component
       ///   @attention works in all dimensions simultaneously!                
       template<Cid SID = ID, CT::Container C> requires Relevant<SID>
       void ShiftEntries(this C& self) {
-         const auto reserved = self.template GetReserved<SID>();
+         const auto reserved = self.GetReserved();
          int moves_performed;
          do {
             moves_performed = 0;

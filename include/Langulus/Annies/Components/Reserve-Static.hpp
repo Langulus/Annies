@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -25,16 +25,14 @@ namespace Langulus::Annies::Component
    /// GetAllocationInner - otherwise it is 0. If a non-emergent allocation   
    /// pointer doesn't exist, then the reserve is always SIZE.                
    ///   @tparam SIZE the reserve type and value                              
-   ///   @tparam ID provider ID to keep reserve of                            
-   ///   @tparam SHARED provider IDs that share the same reserve variable     
    ///   @attention when container is CT::NullTerminated, the reserved count  
    ///      will always report one element less, as it is reserved for zero.  
-   template<auto SIZE, Cid ID, Cid...SHARED>
+   ///   @attention only one reserve component is allowed per container       
+   template<auto SIZE>
    struct ReserveStatic {
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using ReserveType    = decltype(SIZE);
-      using Id             = Values<ID, SHARED...>;
 
       static constexpr int  ComponentPrecedence = -1000;
 
@@ -44,13 +42,13 @@ namespace Langulus::Annies::Component
          "Reserve type must be an unsigned integer");
    
       /// Get the number of reserved (maybe uninitialized) elements           
-      template<Cid SID = ID, CT::Container C>
-      constexpr auto GetReserved(this C const& self) noexcept -> ReserveType {
+      template<CT::Container C>
+      constexpr auto GetReserved(this C const& self) noexcept -> size_t {
          static_assert(not CT::NullTerminated<C> or SIZE > 1,
             "Container with static capacity of 1 can't be null-terminated");
 
-         if constexpr (requires { self.template GetAllocationInner<SID>(); })
-            return self.template GetAllocationInner<SID>() ? SIZE - CT::NullTerminated<C> : 0;
+         if constexpr (requires { self.GetAllocationInner(); })
+            return self.GetAllocationInner() ? SIZE - CT::NullTerminated<C> : 0;
          else
             return SIZE - CT::NullTerminated<C>;
       }

@@ -37,10 +37,13 @@ namespace Langulus::Annies
    /// A statically typed stack-based container of size 1.                    
    /// Mainly serves to transfer values and/or pointers on move.              
    /// You can optionally add tags to it. Can be used in unions.              
-   ///   @attention doesn't default initialize fundamentals!                  
+   ///   @attention doesn't hold any other data, so it is safe to avoid       
+   ///      reflecting it as anything beyond the inner type altogether. The   
+   ///      TOwn is simply invisible to the reflection system.                
+   ///   @attention doesn't default-initialize fundamentals!                  
    template<CT::NotVoid T, class...TAGS>
    struct TOwn : Inner::TOwnBase<T> {
-      using CTTI_ReflectAs = TOwn;
+      using CTTI_ReflectAs = T; 
       using CTTI_Deep      = Yup;
       using CTTI_Tagged    = Types<TAGS...>;
       using CTTI_POD       = Maybe<CT::POD<T>>;
@@ -90,6 +93,7 @@ namespace Langulus::Annies
          return static_cast<bool>(Base::GetStackInner());
       }
 
+      /// Implicitly casts to the contained type                              
       constexpr operator T& () noexcept {
          return this->GetStackInner();
       }

@@ -53,7 +53,7 @@ namespace Langulus::Annies::Component
       /// Get the end of the hash table                                       
       template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetHashTableEnd(this auto const& self) noexcept -> TableType const* {
-         return ThisCom::GetHashTableInner() + self.template GetReserved<SID>();
+         return ThisCom::GetHashTableInner() + self.GetReserved();
       }
 
    protected:
@@ -80,7 +80,7 @@ namespace Langulus::Annies::Component
       constexpr void ResetHashTable(this auto& self) noexcept {
          memset(
             ThisCom::GetHashTableInner(), 0,
-            self.template GetReserved<SID>() * sizeof(TableType)
+            self.GetReserved() * sizeof(TableType)
          );
       }
 

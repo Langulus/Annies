@@ -253,7 +253,7 @@ namespace Langulus::Annies::Component
       ///   @return true if the container has at least one executable element 
       template<Cid SID = ID, CT::Container C>
       constexpr bool IsExecutable(this C const& self) noexcept {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return false;
 
          if constexpr (CT::Executable<TYPE>)
@@ -291,7 +291,7 @@ namespace Langulus::Annies::Component
       ///   @return the size of all elements in bytes                         
       template<Cid SID = ID, CT::Container C>
       constexpr size_t GetBytesize(this C const& self) noexcept {
-         return sizeof(TYPE) * self.template GetCount<SID>();
+         return sizeof(TYPE) * self.GetCount();
       }
 
       /// Dereference the first element inside the container                  

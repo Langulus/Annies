@@ -83,7 +83,7 @@ namespace Langulus::Annies::Component
       constexpr void ResetCoverageTable(this auto& self) noexcept {
          memset(
             ThisCom::GetCoverageTableInner(), 0,
-            self.template GetReserved<SID>() * sizeof(TableType)
+            self.GetReserved() * sizeof(TableType)
          );
       }
 

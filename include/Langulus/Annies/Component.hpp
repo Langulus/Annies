@@ -92,11 +92,12 @@ namespace Langulus::Annies::Component
       OnAssign = 2
    };
 
-   enum IndexingStyle {
+   enum class IndexingStyle {
       NotIndexed = 0,
       IndexedLinearly = 1,
       IndexedHashTable = 2,
-      IndexedCoverage = 3
+      IndexedCoverage = 3,
+      IndexedComposite = 4
    };
 
    constexpr unsigned WeakOwnership   = OnAssign;
@@ -130,6 +131,11 @@ namespace Langulus::Annies::Component
 
 namespace Langulus::CT
 {
+   /// Check if listed types are multidimensional containers                  
+   template<class...T>
+   concept Multidimensional = Container<T...>
+       and ((requires { typename ShedDeref<T>::Dimensions; }) and ...);
+
    /// Check if listed types are containers with any kind of Ownership        
    /// component                                                              
    template<class...T>
@@ -212,22 +218,22 @@ namespace Langulus::CT
    /// Check if listed types are containers, and are indexed                  
    template<class...T>
    concept Indexed = Container<T...>
-       and ((ShedDeref<T>::Indexed != Annies::Component::NotIndexed) and ...);
+       and ((ShedDeref<T>::Indexed != Annies::Component::IndexingStyle::NotIndexed) and ...);
 
    /// Check if listed types are containers, and are linearly indexed         
    template<class...T>
    concept IndexedLinearly = Container<T...>
-      and ((ShedDeref<T>::Indexed == Annies::Component::IndexedLinearly) and ...);
+      and ((ShedDeref<T>::Indexed == Annies::Component::IndexingStyle::IndexedLinearly) and ...);
 
    /// Check if listed types are containers, and are hash table indexed       
    template<class...T>
    concept IndexedHashTable = Container<T...>
-      and ((ShedDeref<T>::Indexed == Annies::Component::IndexedHashTable) and ...);
+      and ((ShedDeref<T>::Indexed == Annies::Component::IndexingStyle::IndexedHashTable) and ...);
 
    /// Check if listed types are containers, and are coverage table indexed   
    template<class...T>
    concept IndexedCoverage = Container<T...>
-      and ((ShedDeref<T>::Indexed == Annies::Component::IndexedCoverage) and ...);
+      and ((ShedDeref<T>::Indexed == Annies::Component::IndexingStyle::IndexedCoverage) and ...);
 
    /// Check if listed types are containers, and are linearly indexed         
    template<class T>
@@ -443,29 +449,33 @@ namespace Langulus::Annies
       template<class...> modifier struct Multiprovider
 
       /// Count, reserve, dimensions                                          
-      template<class T = size_t, Cid = 0, Cid...> struct CountHeap;
+      template<class T = size_t> struct CountHeap;
       #define LglsComCountHeap(modifier) \
-         template<class, Cid, Cid...> modifier struct CountHeap
+         template<class> modifier struct CountHeap
 
-      template<class T = size_t, Cid = 0, Cid...> struct CountStack;
+      template<class T = size_t> struct CountStack;
       #define LglsComCountStack(modifier) \
-         template<class, Cid, Cid...> modifier struct CountStack
+         template<class> modifier struct CountStack
 
-      template<auto COUNT = 0u, Cid = 0, Cid...> struct CountStatic;
+      template<auto COUNT = 0u> struct CountStatic;
       #define LglsComCountStatic(modifier) \
-         template<auto, Cid, Cid...> modifier struct CountStatic
+         template<auto> modifier struct CountStatic
 
-      template<class T = size_t, Cid = 0, Cid...> struct ReserveEmergent;
+      template<class T = size_t> struct ReserveEmergent;
       #define LglsComReserveEmergent(modifier) \
-         template<class, Cid, Cid...> modifier struct ReserveEmergent
+         template<class> modifier struct ReserveEmergent
 
-      template<class T = size_t, Cid = 0, Cid...> struct ReserveStack;
+      template<class T = size_t> struct ReserveStack;
       #define LglsComReserveStack(modifier) \
-         template<class, Cid, Cid...> modifier struct ReserveStack
+         template<class> modifier struct ReserveStack
 
-      template<auto COUNT = 0u, Cid = 0, Cid...> struct ReserveStatic;
+      template<auto COUNT = 0u> struct ReserveStatic;
       #define LglsComReserveStatic(modifier) \
-         template<auto, Cid, Cid...> modifier struct ReserveStatic
+         template<auto> modifier struct ReserveStatic
+
+      template<Cid, Cid, Cid...> struct Multidimensional;
+      #define LglsComMultidimensional(modifier) \
+         template<Cid, Cid, Cid...> modifier struct Multidimensional
       
       /// Ownership                                                           
       template<unsigned = StrongOwnership, Cid = 0, Cid...> struct OwnershipEmergent;
@@ -525,6 +535,10 @@ namespace Langulus::Annies
       template<Cid = 0, Cid...> struct IndexedCoverageStack;
       #define LglsComIndexedCoverageStack(modifier) \
          template<Cid, Cid...> modifier struct IndexedCoverageStack
+
+      template<Cid, Cid, Cid...> struct IndexedComposite;
+      #define LglsComIndexedComposite(modifier) \
+         template<Cid, Cid, Cid...> modifier struct IndexedComposite
 
       /// Iteration                                                           
       template<Cid = 0, Cid...> struct IterationForEach;

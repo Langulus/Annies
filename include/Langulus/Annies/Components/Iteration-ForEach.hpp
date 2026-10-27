@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -21,14 +21,14 @@ namespace Langulus::Annies::Component
    namespace Inner
    {
       /// A helper structure that shows how ForEach iteration went            
-      template<CT::Container C>
+      //template<CT::Container C>
       struct ForEachResult {
-         static_assert(CT::Decayed<C>, "Trip all decorations from C first");
+         //static_assert(CT::Decayed<C>, "Trip all decorations from C first");
 
-         using Count = typename Deref<C>::CountType;
+         //using Count = typename Deref<C>::CountType;
 
          // Number of iterations                                        
-         Count count = 0;
+         /*Count*/ size_t count = 0;
 
          // Last loop control return - useful only when you want to     
          // control an outer loop depending on the iteration result     
@@ -36,7 +36,7 @@ namespace Langulus::Annies::Component
 
          // Implicitly cast to the count member, because that's the     
          // most likely use                                             
-         operator Count() const noexcept { return count; }
+         operator /*Count*/ size_t() const noexcept { return count; }
       };
    }
 
@@ -57,12 +57,12 @@ namespace Langulus::Annies::Component
       static constexpr int ComponentPrecedence = 3000;
 
    private:
-      template<CT::Container C>
-      using Count = typename Deref<C>::CountType;
+      //template<CT::Container C>
+      //using Count = typename Deref<C>::CountType;
       template<CT::Container C>
       using Deep = LglsMutIf(C, typename Deref<C>::DeepType&);
-      template<CT::Container C>
-      using ForEachResult = Inner::ForEachResult<Decay<C>>;
+      //template<CT::Container C>
+      using ForEachResult = Inner::ForEachResult;//<Decay<C>>;
 
    public:
       /*template<CT::Container C>
@@ -79,12 +79,12 @@ namespace Langulus::Annies::Component
       ///   @param lambdas all potential functions to iterate with            
       ///   @return the number of executions and the control end code         
       template<CT::Container C, class...F>
-      auto ForEach(this C&& self, F&&...lambdas) -> ForEachResult<C> {
+      auto ForEach(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
          static_assert(sizeof...(F) > 0, "No functions in ForEach");
          if (self.IsEmpty())
             return {};
 
-         ForEachResult<C> result {0, Loop::Break};
+         ForEachResult/*<C>*/ result {0, Loop::Break};
          (void)(... or (Loop::NextLoop != (
             result.control = self.template
                ForEachInner<false>(LglsFwd(lambdas), result.count)
@@ -99,12 +99,12 @@ namespace Langulus::Annies::Component
 
       /// Do it in reverse                                                    
       template<CT::Container C, class...F>
-      auto ForEachRev(this C&& self, F&&...lambdas) -> ForEachResult<C> {
+      auto ForEachRev(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
          static_assert(sizeof...(F) > 0, "No functions in ForEachRev");
          if (self.IsEmpty())
             return {};
 
-         ForEachResult<C> result {0, Loop::Break};
+         ForEachResult/*<C>*/ result {0, Loop::Break};
          (void)(... or (Loop::NextLoop != (
             result.control = self.template
                ForEachInner<true>(LglsFwd(lambdas), result.count)
@@ -127,12 +127,12 @@ namespace Langulus::Annies::Component
       ///   @param lambdas all potential functions to iterate with            
       ///   @return the number of executions                                  
       template<CT::Container C, class...F>
-      auto ForEachDeep(this C&& self, F&&...lambdas) -> ForEachResult<C> {
+      auto ForEachDeep(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeep");
          if (self.IsEmpty())
             return {};
 
-         ForEachResult<C> result {0, Loop::Break};
+         ForEachResult/*<C>*/ result {0, Loop::Break};
          (void)(... or (Loop::Break == (
             result.control = self.template
                ForEachDeepInner<false, true>(LglsFwd(lambdas), result.count)
@@ -147,12 +147,12 @@ namespace Langulus::Annies::Component
 
       /// Do it in reverse                                                    
       template<CT::Container C, class...F>
-      auto ForEachDeepRev(this C&& self, F&&...lambdas) -> ForEachResult<C> {
+      auto ForEachDeepRev(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeepRev");
          if (self.IsEmpty())
             return {};
 
-         ForEachResult<C> result {0, Loop::Break};
+         ForEachResult/*<C>*/ result {0, Loop::Break};
          (void)(... or (Loop::Break == (
             result.control = self.template
                ForEachDeepInner<true, true>(LglsFwd(lambdas), result.count)
@@ -167,10 +167,10 @@ namespace Langulus::Annies::Component
 
       /// Do it without skipping the intermediate containers                  
       template<CT::Container C, class...F>
-      auto ForEachDeepNoskip(this C&& self, F&&...lambdas) -> ForEachResult<C> {
+      auto ForEachDeepNoskip(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeepNoskip");
 
-         ForEachResult<C> result {0, Loop::Break};
+         ForEachResult/*<C>*/ result {0, Loop::Break};
          (void)(... or (Loop::Break == (
             result.control = self.template
                ForEachDeepInner<false, false>(LglsFwd(lambdas), result.count)
@@ -185,10 +185,10 @@ namespace Langulus::Annies::Component
 
       /// Do it without skipping the intermediate containers in reverse       
       template<CT::Container C, class...F>
-      auto ForEachDeepNoskipRev(this C&& self, F&&...lambdas) -> ForEachResult<C> {
+      auto ForEachDeepNoskipRev(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeepNoskipRev");
 
-         ForEachResult<C> result {0, Loop::Break};
+         ForEachResult/*<C>*/ result {0, Loop::Break};
          (void)(... or (Loop::Break == (
             result.control = self.template
                ForEachDeepInner<true, false>(LglsFwd(lambdas), result.count)
@@ -210,7 +210,7 @@ namespace Langulus::Annies::Component
       ///   @param index [out] counts the successful executions               
       ///   @return the last 'f' result - dictates whether loop continues     
       template<bool REVERSE, CT::Container C, class F>
-      LoopControl ForEachInner(this C&& self, F&& f, Count<C>& index) noexcept_if(f) {
+      LoopControl ForEachInner(this C&& self, F&& f, /*Count<C>*/size_t& index) noexcept_if(f) {
          using A = ArgumentOf<F>;
          static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
             "Mutable reference/pointer iterator not allowed for constant container");
@@ -325,7 +325,7 @@ namespace Langulus::Annies::Component
       ///   @param counter [out] counts the successful executions             
       ///   @return the last 'f' result                                       
       template<bool REVERSE, bool SKIP, CT::Container C, class F>
-      LoopControl ForEachDeepInner(this C&& self, F&& f, Count<C>& counter) noexcept_if(f) {
+      LoopControl ForEachDeepInner(this C&& self, F&& f, /*Count<C>*/size_t& counter) noexcept_if(f) {
          using A = ArgumentOf<F>;
          static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
             "Mutable reference/pointer iterator not allowed for constant container");
@@ -389,7 +389,7 @@ namespace Langulus::Annies::Component
 
             if (deep) {
                // Iterate subblocks                                     
-               Count<C> intermediateCounterSink = 0;
+               /*Count<C>*/size_t intermediateCounterSink = 0;
                loop = self.template ForEachInner<REVERSE>(
                   [&counter, &f](D group) {
                      if constexpr (Akin<A, D>) {
@@ -476,7 +476,7 @@ namespace Langulus::Annies::Component
 
             if constexpr (CT::Deep<T>) {
                // Iterate subblocks                                     
-               Count<C> intermediateCounterSink = 0;
+               /*Count<C>*/size_t intermediateCounterSink = 0;
                using SubBlock = LglsMutIf(C, Decay<T>&);
 
                loop = self.template ForEachInner<REVERSE>(
@@ -514,7 +514,7 @@ namespace Langulus::Annies::Component
       ///   @tparam REVERSE direction we're iterating in                      
       ///   @param f the function to call on each item                        
       template<bool REVERSE, CT::Container C, class F>
-      LoopControl IterateInner(this C&& self, Count<C> count, F&& f) noexcept(IsNoexcept<F>) {
+      LoopControl IterateInner(this C&& self, /*Count<C>*/size_t count, F&& f) noexcept(IsNoexcept<F>) {
          using A = ArgumentOf<F>;
          static_assert(CT::Complete<Decay<A>> or CT::Sparse<A>,
             "Can't iterate with incomplete type, use pointer instead");
@@ -573,7 +573,7 @@ namespace Langulus::Annies::Component
                      if (self.GetCount() == 1)
                         return Loop::Discard;
 
-                     const Count<C> idx = raw - data;
+                     const /*Count<C>*/ size_t idx = raw - data;
                      self.EraseAt(idx);
 
                      // Block might BranchOut on RemoveIndex - make     

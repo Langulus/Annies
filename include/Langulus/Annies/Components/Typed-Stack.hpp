@@ -312,7 +312,7 @@ namespace Langulus::Annies::Component
       ///   @return true if the container has at least one executable element 
       template<Cid SID = ID, CT::Container C>
       constexpr bool IsExecutable(this C const& self) noexcept {
-         if (self.template IsEmpty<ID>())
+         if (self.IsEmpty())
             return false;
 
          if constexpr (TypeErased) {
@@ -369,7 +369,7 @@ namespace Langulus::Annies::Component
       ///   @return the size of all elements in bytes                         
       template<Cid SID = ID>
       constexpr size_t GetBytesize(this auto const& self) noexcept {
-         return ThisCom::GetStride() * self.template GetCount<ID>();
+         return ThisCom::GetStride() * self.GetCount();
       }
       
       /// Check if contained data can be interpreted as a given type by doing 
@@ -464,7 +464,7 @@ namespace Langulus::Annies::Component
             else {*/
                // Type is not compatible, but container is not typed, so
                // if it has no constructed elements we can still mutate 
-               LglsAssert(self.template IsEmpty<ID>(), "Can't mutate ", t,
+               LglsAssert(self.IsEmpty(), "Can't mutate ", t,
                   " to incompatible type ", type);
             /*}*/
             

@@ -119,9 +119,9 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID> //requires Relevant<SID>
       constexpr void ResetAllocationInner(this auto&& self) noexcept {
          ThisCom::SetAllocationInner(nullptr);
-         if_available(self.template SetReservedInner<SID>(0));
+         if_available(self.SetReservedInner(0));
          if_available(self.template SetHashTableInner<SID>(nullptr));
-         self.template ResetCount<SID>();
+         self.ResetCount();
       }
 
       /// Same as ResetAllocationInner, but here in case container lacks it   

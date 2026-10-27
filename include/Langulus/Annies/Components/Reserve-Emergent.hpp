@@ -17,16 +17,14 @@ namespace Langulus::Annies::Component
    /// As such, it will not increase container's stack size, but will require 
    /// an indirection (and a division) in order to read it.                   
    ///   @tparam T the reserve type                                           
-   ///   @tparam ID provider ID to keep reserve of                            
-   ///   @tparam SHARED provider IDs that share the same reserve variable     
    ///   @attention when container is CT::NullTerminated, the reserved count  
    ///      will always report one element less, as it is reserved for zero.  
-   template<class T, Cid ID, Cid...SHARED>
+   ///   @attention only one reserve component is allowed per container       
+   template<class T>
    struct ReserveEmergent {
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using ReserveType    = T;
-      using Id             = Values<ID, SHARED...>;
 
       static constexpr int ComponentPrecedence = -1000;
 
@@ -34,10 +32,10 @@ namespace Langulus::Annies::Component
          "Reserve type must be an unsigned integer");
 
       /// Get the number of reserved (maybe uninitialized) elements           
-      template<Cid SID = ID, CT::Container C>
-      constexpr T GetReserved(this const C& self) noexcept {
-         if constexpr (requires { self.template GetAllocation<SID>(); }) {
-            const auto al = self.template GetAllocation<SID>();
+      template<CT::Container C>
+      constexpr size_t GetReserved(this const C& self) noexcept {
+         if constexpr (requires { self.GetAllocation(); }) {
+            const auto al = self.GetAllocation();
             if (not al)
                return 0;
 
@@ -47,17 +45,17 @@ namespace Langulus::Annies::Component
                return 1;
             }
             else {
-               static_assert(C::template CountHeapFooterRequests<SID>() == 0,
+               static_assert(C::CountHeapFooterRequests() == 0,
                   "ReserveEmergent can't be used in containers with heap footer, "
                   "because it causes a circular dependency - "
                   "reserved count becomes impossible to get without knowing the "
                   "reserved elements beforehand."
                );
 
-               size_t header = C::template DefineHeapHeader<SID>();
-               using PROVIDER = typename decltype(C::template FindProvider<SID>())::First;
+               size_t header = C::DefineHeapHeader();
+               using PROVIDER = typename decltype(C::FindProvider())::First;
                header = Align(header, self.template GetAlignment<PROVIDER::Id::First>());
-               return (al->GetSize() - header) / self.template GetStride<SID>() - CT::NullTerminated<C>;
+               return (al->GetSize() - header) / self.GetStride() - CT::NullTerminated<C>;
             }
          }
          else if constexpr (CT::ContainsOne<C>) {
@@ -78,12 +76,12 @@ namespace Langulus::Annies::Component
       /// If reserved data is smaller than currently initialized count, the   
       /// excess elements will be dereferenced/destroyed.                     
       ///   @param reserve number of elements to reserve                      
-      template<Cid SID = ID, CT::ContainsMany C>
+      template<CT::ContainsMany C>
       C& Reserve(this C& self, const T reserve) {
-         if (reserve < self.template GetCount<SID>())
-            self.template AllocateLess<SID>(reserve);
+         if (reserve < self.GetCount())
+            self.AllocateLess(reserve);
          else
-            self.template AllocateMore<SID>(reserve);
+            self.AllocateMore(reserve);
          return self;
       }
    };

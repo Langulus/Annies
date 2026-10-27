@@ -483,7 +483,7 @@ namespace Langulus::Annies::Component
          }
          else {
             using RELEVANT = typename Id::template Intersect<typename RT::Dimensions>;
-            if (self.template GetCount<RELEVANT::First>() != 1)
+            if (self.GetCount() != 1)
                return false;
 
             auto rhs_handle = rhs.GetHandle();
@@ -510,7 +510,7 @@ namespace Langulus::Annies::Component
          using RELEVANT = typename Id::template Intersect<typename RT::Dimensions>;
 
          if_constexpr_type_erased(C, RT) {
-            if (self.template GetCount<RELEVANT::First>() != 1)
+            if (self.GetCount() != 1)
                return Compared::Unordered;
 
             auto result = Compared::Unordered;
@@ -529,7 +529,7 @@ namespace Langulus::Annies::Component
          }
          #if not LANGULUS(FORCE_TYPE_ERASURE)
          else {
-            if (self.template GetCount<RELEVANT::First>() != 1)
+            if (self.GetCount() != 1)
                return ::std::partial_ordering::unordered;
             
             auto result = ::std::partial_ordering::unordered;
@@ -641,7 +641,7 @@ namespace Langulus::Annies::Component
       requires (CT::Contiguous<C> or not REVERSE)
       auto Find(this C&& self, T const& item, size_t cookie = 0) assumptious
       -> DecideHandle<C> {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return {};
 
          if constexpr (CT::TypeErased<C>) {
@@ -689,7 +689,7 @@ namespace Langulus::Annies::Component
       auto FindEx(this C&& self, T const& item, size_t cookie = 0) assumptious
       -> DecideHandle<C> {
          using RELEVANT = typename Id::template Intersect<typename T::Dimensions>;
-         if (self.template IsEmpty<RELEVANT::First>())
+         if (self.IsEmpty())
             return {};
 
          if constexpr (CT::TypeErased<C>) {
@@ -933,7 +933,7 @@ namespace Langulus::Annies::Component
       template<bool REVERSE = false, Cid SID = ID, CT::IndexedLinearly C, CT::NoIntent T>
       auto FindInner(this C&& self, T const& item, size_t cookie) assumptious
       -> DecideHandle<C> requires Relevant<SID> {
-         LglsAssumeDev(not self.template IsEmpty<SID>(),
+         LglsAssumeDev(not self.IsEmpty(),
             "Container is assumed not emtpy");
          
          // Check type compatibility                                    
@@ -1009,7 +1009,7 @@ namespace Langulus::Annies::Component
       ///   @return true if elements are the same                             
       template<Cid SID, class C, CT::NoIntent RT>
       constexpr bool CompareOneEqualInner(this C const& self, const RT& rhs) {
-         LglsAssumeDev(not self.template IsEmpty<SID>(),
+         LglsAssumeDev(not self.IsEmpty(),
             "Container is assumed not empty");
 
          if constexpr (CT::Handle<RT>) {
@@ -1076,7 +1076,7 @@ namespace Langulus::Annies::Component
       ///   @return true if elements are the same                             
       template<Cid SID, class C, CT::NoIntent RT>
       constexpr auto CompareOneInner(this C const& self, const RT& rhs) -> Ordering<C> {
-         LglsAssumeDev(not self.template IsEmpty<SID>(),
+         LglsAssumeDev(not self.IsEmpty(),
             "Container is assumed not empty");
 
          if constexpr (CT::Handle<RT>) {

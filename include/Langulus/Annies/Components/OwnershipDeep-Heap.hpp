@@ -132,12 +132,12 @@ namespace Langulus::Annies::Component
          if constexpr (CT::TypeErased<C>) {
             const auto T = self.template GetType<SID>();
             if (T.IsSparse())
-               count += self.template GetReserved<SID>() * T.GetIndirections();
+               count += self.GetReserved() * T.GetIndirections();
          }
          else {
             using T = TypeOf<C, SID>;
             if constexpr (CT::Sparse<T>)
-               count += self.template GetReserved<SID>() * IndirectsOf<T>;
+               count += self.GetReserved() * IndirectsOf<T>;
          }
 
          memset(ThisCom::template GetEntriesInner<SID>(), 0, count * sizeof(AllocationPtr));

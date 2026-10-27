@@ -16,23 +16,22 @@ namespace Langulus::Annies::Component
    /// A dynamic reserve, stored as a member variable.                        
    /// Will increase container's stack size.                                  
    ///   @tparam T the reserve counter type                                   
-   ///   @tparam ID provider ID to keep reserve of                            
-   ///   @tparam SHARED provider IDs that share the same reserve variable     
    ///   @attention when container is CT::NullTerminated, the reserved count  
    ///      will always report one element less, as it is reserved for zero.  
-   template<class T, Cid ID, Cid...SHARED>
-   struct ReserveStack : ReserveEmergent<T, ID, SHARED...> {
+   ///   @attention only one reserve component is allowed per container       
+   template<class T>
+   struct ReserveStack : ReserveEmergent<T> {
       /// Refers back to this particular component instance through the       
       /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
       /// this file.                                                          
-      #define ThisCom self.ReserveStack<T, ID, SHARED...>
+      #define ThisCom self.ReserveStack<T>
 
       using StackRequest = T;
-      using Id = typename ReserveEmergent<T, ID, SHARED...>::Id;
+      using Id = typename ReserveEmergent<T>::Id;
 
       /// Get the number of reserved (maybe uninitialized) elements           
-      template<Cid SID = ID, class C>
-      constexpr T GetReserved(this C const& self) noexcept {
+      template<class C>
+      constexpr size_t GetReserved(this C const& self) noexcept {
          if constexpr (CT::NullTerminated<C>) {
             T result = ThisCom::GetReservedInner();
             return result ? result - 1 : 0;
@@ -44,12 +43,12 @@ namespace Langulus::Annies::Component
       /// If reserved data is smaller than currently initialized count, the   
       /// excess elements will be dereferenced/destroyed.                     
       ///   @param reserve number of elements to reserve                      
-      template<Cid SID = ID, CT::ContainsMany C>
-      C& Reserve(this C& self, const T reserve) {
-         if (reserve < self.template GetCount<SID>())
-            self.template AllocateLess<SID>(reserve);
+      template<CT::ContainsMany C>
+      C& Reserve(this C& self, const size_t reserve) {
+         if (reserve < self.GetCount())
+            self.AllocateLess(reserve);
          else
-            self.template AllocateMore<SID>(reserve);
+            self.AllocateMore(reserve);
          return self;
       }
 
@@ -64,7 +63,6 @@ namespace Langulus::Annies::Component
       }
       
       /// Set the number of reserved elements                                 
-      template<Cid SID = ID>
       constexpr void SetReservedInner(this auto& self, T c) noexcept {
          ThisCom::GetReservedInner() = c;
       }
@@ -87,14 +85,14 @@ namespace Langulus::Annies::Component
             decltype(auto) from = LglsFwd(intent.what);
          
             // Always propagate custom reserve if available             
-                 if_available(ThisCom::SetReservedInner(from.template GetReservedInner<ID>()))
-            else if_available(ThisCom::SetReservedInner(from.template GetReserved<ID>())) 
+                 if_available(ThisCom::SetReservedInner(from.GetReservedInner()))
+            else if_available(ThisCom::SetReservedInner(from.GetReserved())) 
             else {
                // Otherwise derive reserve from current heap pointer,   
                // the start of the allocation, and by element size.     
                // Note: Same as Com::ReserveEmergent::GetReserved.      
-               if constexpr (requires { from.template GetAllocation<ID>(); }) {
-                  const auto al = from.template GetAllocation<ID>();
+               if constexpr (requires { from.GetAllocation(); }) {
+                  const auto al = from.GetAllocation();
                   if (not al) {
                      ThisCom::SetReservedInner(0);
                      return;
@@ -103,8 +101,8 @@ namespace Langulus::Annies::Component
                   if constexpr (CT::ContainsOne<I>)
                      ThisCom::SetReservedInner(1);
                   else {
-                     const size_t header = from.template GetHeapHeaderSize<ID>();
-                     ThisCom::SetReservedInner((al->GetSize() - header) / self.template GetStride<ID>());
+                     const size_t header = from.GetHeapHeaderSize();
+                     ThisCom::SetReservedInner((al->GetSize() - header) / self.GetStride());
                   }
                }
                else {
@@ -117,7 +115,7 @@ namespace Langulus::Annies::Component
             }
 
             if constexpr (I::ResetsOnMove())
-               if_available(from.template SetReservedInner<ID>(0));
+               if_available(from.SetReservedInner(0));
          }
       }
    };

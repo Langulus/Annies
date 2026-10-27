@@ -92,13 +92,13 @@ namespace Langulus::Annies::Component
             }
             catch (...) {
                // Reset heap count in case 'self' was disowned          
-               if_available(self.template SetReservedInner<SID>(0));
+               if_available(self.SetReservedInner(0));
                if_available(self.template SetHashTableInner<SID>(nullptr));
-               self.template ResetCount<SID>();
+               self.ResetCount();
                throw;
             }
          }
-         else if (self.template IsEmpty<SID>()) {
+         else if (self.IsEmpty()) {
             // The container is empty, but an allocation is available   
             if (a->GetUses() != 1) {
                // We're not the only owner of this memory.              
@@ -164,7 +164,7 @@ namespace Langulus::Annies::Component
                   // all remaining elements as well.                    
                   if constexpr (CT::ContainsMany<C>) {
                      item += 1;
-                     const auto itemsEnd = self.GetHandle() + self.template GetCount<SID>();
+                     const auto itemsEnd = self.GetHandle() + self.GetCount();
                      while (item.GetRaw() != itemsEnd.GetRaw()) {
                         item.template Free<false>();
                         //item.template DestroyElement<true, SID>();
@@ -213,7 +213,7 @@ namespace Langulus::Annies::Component
             // all remaining elements as well.                          
             if constexpr (CT::ContainsMany<C>) {
                item += 1;
-               const auto itemsEnd = self.GetHandle() + self.template GetCount<SID>();
+               const auto itemsEnd = self.GetHandle() + self.GetCount();
                while (item.GetRaw() != itemsEnd.GetRaw()) {
                   item.template Free<false>();
                   ++item;
@@ -262,7 +262,7 @@ namespace Langulus::Annies::Component
             // all remaining elements as well.                          
             if constexpr (CT::ContainsMany<C>) {
                item += 1;
-               const auto itemsEnd = self.GetHandle() + self.template GetCount<SID>();
+               const auto itemsEnd = self.GetHandle() + self.GetCount();
                while (item.GetRaw() != itemsEnd.GetRaw()) {
                   item.template Free<false>();
                   ++item;
@@ -893,12 +893,12 @@ namespace Langulus::Annies::Component
 
          // Update count                                                
          if constexpr (STRAT == AllocationStrategy::FreshAllocate) {
-            if_available(self.template SetCountInner<SID>(1));
+            if_available(self.SetCountInner(1));
          }
          else if constexpr (STRAT == AllocationStrategy::Reallocate
-         and requires { self.template SetCountInner<SID>(1); }) {
-            if (self.template IsEmpty<SID>())
-               self.template SetCountInner<SID>(1);
+         and requires { self.SetCountInner(1); }) {
+            if (self.IsEmpty())
+               self.SetCountInner(1);
          }
 
          // Update hash                                                 
@@ -1057,12 +1057,12 @@ namespace Langulus::Annies::Component
          // might throw, and we wouldn't want to have valid elements if 
          // this happens!                                               
          if constexpr (STRAT == AllocationStrategy::FreshAllocate) {
-            if_available(self.template SetCountInner<SID>(1));
+            if_available(self.SetCountInner(1));
          }
          else if constexpr (STRAT == AllocationStrategy::Reallocate
-         and requires { self.template SetCountInner<SID>(1); }) {
-            if (self.template IsEmpty<SID>())
-               self.template SetCountInner<SID>(1);
+         and requires { self.SetCountInner(1); }) {
+            if (self.IsEmpty())
+               self.SetCountInner(1);
          }
 
          // Update hash                                                 

@@ -162,7 +162,7 @@ namespace Langulus::Annies::Component
          //                                                             
          // If reached, this was the only container that owns the       
          // immediate elements. It is time to destroy them.             
-         if (not self.template IsEmpty<Id::First>()) {
+         if (not self.IsEmpty()) {
             Id::ForEach([&self]<Cid D> {
                if constexpr (CT::TypeErased<C> or not CT::Complete<TypeOf<C, D>>) { //TODO more elegant solution? directly affect CT::TypeErased when incomplete?
                   auto T = self.template GetType<D>();

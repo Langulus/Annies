@@ -39,7 +39,7 @@ namespace Langulus::Annies::Component
       ///   @attention order matters                                          
       template<Cid SID = ID, CT::Container C> requires (CT::Contiguous<C> and Relevant<SID>)
       H HashRecompute(this C const& self) {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return {1};
 
          if constexpr (CT::TypeErased<C>) {
@@ -80,7 +80,7 @@ namespace Langulus::Annies::Component
                // Hash each element, and then combine hashes            
                // @note this is reached only if GetCount() > 1          
                ::std::vector<H> h;
-               h.reserve(self.template GetCount<SID>());
+               h.reserve(self.GetCount());
                for (auto element : self)
                   h.emplace_back(hasher(element.GetRaw()));
 
@@ -122,7 +122,7 @@ namespace Langulus::Annies::Component
                // Hash each element, and then combine hashes            
                // @note this is reached only if GetCount() > 1          
                ::std::vector<H> h;
-               h.reserve(self.template GetCount<SID>());
+               h.reserve(self.GetCount());
                for (T const& element : self)
                   h.emplace_back(HashOf(element));
                
@@ -139,7 +139,7 @@ namespace Langulus::Annies::Component
       ///   @attention order matters                                          
       template<Cid SID = ID, CT::Container C> requires (CT::NotContiguous<C> and Relevant<SID>)
       H HashRecompute(this C const& self) {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return {1};
 
          // Do some assumption checking                                 
@@ -155,7 +155,7 @@ namespace Langulus::Annies::Component
 
          // Hash all elements                                           
          ::std::vector<H> h;
-         h.reserve(self.template GetCount<SID>());
+         h.reserve(self.GetCount());
          self.Apply([&h](auto const& item) {
             h.emplace_back(HashOf(item));
          });

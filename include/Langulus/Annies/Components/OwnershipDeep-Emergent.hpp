@@ -1196,8 +1196,8 @@ namespace Langulus::Annies::Component
 
          const auto indirections = self.template GetIndirections<SID>();
          size_t entries_size;
-         if constexpr (requires { self.template GetReserved<SID>(); })
-            entries_size = sizeof(AllocationPtr) * indirections * self.template GetReserved<SID>();
+         if constexpr (requires { self.GetReserved(); })
+            entries_size = sizeof(AllocationPtr) * indirections * self.GetReserved();
          else
             entries_size = sizeof(AllocationPtr) * indirections;
 

@@ -149,7 +149,7 @@ namespace Langulus::Annies
          #if not LANGULUS(FORCE_TYPE_ERASURE)
          else {
             // Statically-typed handle                                  
-            static_assert(C::Dimensions::Count == 1, 
+            static_assert(not CT::Multidimensional<C>, 
                "Multidimensional containers should result in multidimensional handles! "
                "Define HandleMutType and HandleType!"
             );
@@ -365,6 +365,7 @@ namespace Langulus::Annies::Component
       LglsComIndexedHashHeap(friend);
       LglsComIndexedHashStack(friend);
       LglsComIndexedCoverageStack(friend);
+      LglsComIndexedComposite(friend);
       LglsComStateStack(friend);
       LglsComIndexedCommon(friend);
       LglsComIndexedCommonHashed(friend);
@@ -821,7 +822,7 @@ namespace Langulus::Annies::Component
             // Access footer heap                                       
             if constexpr (R::AllocatedPerDimension) {
                // Local footer, positioned after each dimension data    
-               const size_t reserved = self.template GetReserved<SID>();
+               const size_t reserved = self.GetReserved();
                const size_t indirects = self.template GetIndirections<SID>();
                const size_t stride = self.template GetStride<SID>();
                const size_t offset = GetHeapFooterOffset<PICK, SID>(reserved, indirects);
@@ -833,7 +834,7 @@ namespace Langulus::Annies::Component
                // Global footer, positioned after the last dimension    
                using PROVIDER = typename decltype(FindProvider<SID>())::First;
                constexpr Cid LAST_ID = PROVIDER::Id::Last;
-               const size_t reserved = self.template GetReserved<LAST_ID>();
+               const size_t reserved = self.GetReserved();
                const size_t indirects = self.template GetIndirections<LAST_ID>();
                const size_t stride = self.template GetStride<LAST_ID>();
                const size_t offset_local = DefineHeapFooter<LAST_ID>(reserved, indirects);
@@ -1323,17 +1324,17 @@ namespace Langulus::Annies::Component
 
          decltype(auto) from = DeintCast(rhs);
          // Make sure 'lhs' and 'rhs' are different instances,          
-         // otherwise we lose rhs if we free lhs, and we have to        
+         // otherwise we lose rhs if we free lhs, and we _have_ to      
          // free lhs in order to overwrite it with rhs.                 
          if (static_cast<const void*>(&self) == static_cast<const void*>(&from))
             return self;
 
          // Never modify containers if type-incompatible                
-         self.AssertTypesAreSame(from);
+         if_available(self.AssertTypesAreSame(from));
 
          // Free old data and absorb the new container                  
          self.Free();
-         self.ResetCount(); //TODO not redundant! but why? shouldn't Absorb set it either way?
+         if_available(self.ResetCount()); //TODO not redundant! but why? shouldn't Absorb set it either way?
          self.Absorb(LglsFwd(rhs));
          return self;
       }

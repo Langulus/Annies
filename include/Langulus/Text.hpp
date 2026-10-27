@@ -571,6 +571,21 @@ namespace Langulus::Annies
          result.GetCountInner() = size;
          return result;
       }
+
+      /// Count the number of newline characters                              
+      ///   @return the number of newline characters + 1, or zero if empty    
+      auto GetLineCount() const noexcept -> size_t {
+         if (IsEmpty())
+            return 0;
+
+         size_t lines = 1;
+         for (size_t i = 0; i < GetCount(); ++i) {//TODO can be batch-optimized
+            if ((*this)[i] == '\n')
+               ++lines;
+         }
+
+         return lines;
+      }
    };
    
    static_assert(CT::NotVoid<CT::ReflectedAs<Text>>);

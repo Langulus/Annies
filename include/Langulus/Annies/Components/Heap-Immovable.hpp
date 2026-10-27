@@ -88,17 +88,17 @@ namespace Langulus::Annies::Component
          using IT = Decvq<Deref<Deint<I>>>;
          decltype(auto) from = LglsFwd(intent.what);
 
-         size_t count = from.template GetCount<Id::First>();
+         size_t count = from.GetCount();
          if constexpr (CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>) {
             // Do a copy or clone.                                      
             // Verify that all dimensions are copiable/clonable, and    
             // make sure that 'count' and 'reserve' are consistent      
             // across all dimensions.                                   
             Id::ForEach([&]<Cid D> {
-               LglsAssumeDev(from.template GetCount<D>() == from.template GetCount<Id::First>(),
+               /*LglsAssumeDev(from.template GetCount<D>() == from.template GetCount<Id::First>(),
                   "Inconsistent count across dimensions");
                LglsAssumeDev(from.template GetReserved<D>() == from.template GetReserved<Id::First>(),
-                  "Inconsistent reserve across dimensions");
+                  "Inconsistent reserve across dimensions");*/
 
                if constexpr (CT::TypeErased<IT>) {
                   auto type = from.template GetType<D>();
@@ -134,11 +134,11 @@ namespace Langulus::Annies::Component
             if constexpr (CT::Contiguous<C>)
                ThisCom::AllocateFresh(count > reserve ? count : reserve);
             else {
-               const auto rhs_reserve = from.template GetReserved<Id::First>();
+               const auto rhs_reserve = from.GetReserved();
                ThisCom::AllocateFresh(rhs_reserve > reserve ? rhs_reserve : reserve);
             }
 
-            if_available(self.template SetCountInner<Id::First>(count));
+            if_available(self.SetCountInner(count));
 
             // Copy/Clone items                                         
             if constexpr (CT::TypeErased<C>) {
@@ -186,7 +186,7 @@ namespace Langulus::Annies::Component
                //    1. Allocation responsible for shallow ownership    
                //    2. Count responsible for deep ownership            
                if constexpr (not IT::CanBeDisowned
-               and (not requires { from.template SetCountInner<Id::First>(0); }
+               and (not requires { from.SetCountInner(0); }
                     or IT::CountHeapRequests())
                ) {
                   // Some monocontainers have no variable count, and in 
@@ -219,7 +219,7 @@ namespace Langulus::Annies::Component
          
          ThisCom::SetHeapInner(static_cast<void*>(al->GetBlockStart() + request.mHeaderBytes));
          self.template SetAllocationInner<SID>(al);
-         if_available(self.template SetReservedInner<SID>(request.mReserved));
+         if_available(self.SetReservedInner(request.mReserved));
          Id::ForEach([&self]<Cid D>{
             self.template ConstructHeapRequestPerDimension<D>();
          });
@@ -234,7 +234,7 @@ namespace Langulus::Annies::Component
       template<Cid SID = Id::First, CT::Container C> //requires Relevant<SID>
       void AllocateMore(this C& self, Count<C> elements) {
          static_assert(not CT::Handle<C>, "Handles aren't allowed to reallocate");
-         LglsAssumeDev(elements > self.template GetCount<SID>(), "Bad element count");
+         LglsAssumeDev(elements > self.GetCount(), "Bad element count");
          const auto al = DecvqAllCast(self.template GetAllocation<SID>());
 
          if (not al) {
@@ -251,7 +251,7 @@ namespace Langulus::Annies::Component
 
          const auto request = ThisCom::RequestHeap(elements);
          if constexpr (CT::ContainsMany<C>) {
-            if (self.template GetReserved<SID>() >= request.mReserved)
+            if (self.GetReserved() >= request.mReserved)
                return;
 
             if (request.mTotalBytes <= al->GetSize()) {
@@ -298,7 +298,7 @@ namespace Langulus::Annies::Component
                      });
                   }
                   catch (...) {
-                     self.template SetCountInner<SID>(to - self.GetHandle());
+                     self.SetCountInner(to - self.GetHandle());
                      throw;
                   }
                }
@@ -311,7 +311,8 @@ namespace Langulus::Annies::Component
                   "Allocation pointer should still be the same");
 
                if_available(previous.EnableDisowned())
-               else previous.template SetCountInner<SID>(0);
+               else previous.SetCountInner(0);
+
                self.RemapAllHeapRequests(request.mReserved);
             }
          }
@@ -350,33 +351,33 @@ namespace Langulus::Annies::Component
                });
             }
             catch (...) {
-               self.template SetCountInner<SID>(to - self.GetHandle());
+               self.SetCountInner(to - self.GetHandle());
                throw;
             }
 
             if constexpr (CT::Contiguous<C>) {
-               self.template SetCountInner<SID>(backup.template GetCount<SID>() < desiredReserve
-                  ? backup.template GetCount<SID>()
+               self.SetCountInner(backup.GetCount() < desiredReserve
+                  ? backup.GetCount()
                   : desiredReserve
                );
             }
-            else self.template SetCountInner<SID>(backup.template GetCount<SID>());
+            else self.SetCountInner(backup.GetCount());
             return;
          }
 
-         LglsAssumeDev(desiredReserve <= self.template GetReserved<SID>(),
+         LglsAssumeDev(desiredReserve <= self.GetReserved(),
             "Can't shrink allocation using more elements");
          LglsAssumeDev(al->GetUses() == 1,
             "Can't reuse memory of a block used from multiple places");
 
-         if (self.template GetCount<SID>() > desiredReserve) {
+         if (self.GetCount() > desiredReserve) {
             auto temp = self.SelectInner(desiredReserve);
             temp.template Free<false>();
-            if_available(self.template SetCountInner<SID>(desiredReserve));
+            if_available(self.SetCountInner(desiredReserve));
          }
 
          const auto request = ThisCom::RequestHeap(desiredReserve);
-         if (self.template GetReserved<SID>() == request.mReserved)
+         if (self.GetReserved() == request.mReserved)
             return;
       
          // Memory doesn't move, but reserved count changed so all      
@@ -731,7 +732,7 @@ namespace Langulus::Annies::Component
       template<CT::Container C>
       void RemapAllHeapRequests(this C& self, const size_t newReserved) {
          if constexpr (C::template CountHeapFooterRequests<Id::First>() > 0) {
-            const auto oldReserved = self.template GetReserved<Id::First>();
+            const auto oldReserved = self.GetReserved();
             LglsAssumeDev(newReserved != oldReserved,
                "Should be called only when different");
 
@@ -753,7 +754,7 @@ namespace Langulus::Annies::Component
             }
          }
 
-         if_available(self.template SetReservedInner<Id::First>(newReserved));
+         if_available(self.SetReservedInner(newReserved));
       }
 
       /// MARK: TransferAllHeapRequests                                       
@@ -764,7 +765,7 @@ namespace Langulus::Annies::Component
       template<CT::Container C>
       void TransferAllHeapRequests(this C& self, CT::Container auto const& oldSelf, const size_t newReserved) {
          if constexpr (C::template CountHeapFooterRequests<Id::First>() > 0) {
-            const auto oldReserved = self.template GetReserved<Id::First>();
+            const auto oldReserved = self.GetReserved();
             LglsAssumeDev(newReserved != oldReserved,
                "Should be called only when different");
             LglsAssumeDev(self.GetHeapInner() != oldSelf.GetHeapInner(),
@@ -788,7 +789,7 @@ namespace Langulus::Annies::Component
             }
          }
 
-         if_available(self.template SetReservedInner<Id::First>(newReserved));
+         if_available(self.SetReservedInner(newReserved));
       }
 
       /// MARK: PartialSuccess                                                
@@ -796,9 +797,9 @@ namespace Langulus::Annies::Component
       ///   @param n the number of elements that were actually initialized    
       template<Cid SID = Id::First, CT::Container C> //requires Relevant<SID>
       void PartialSuccess(this C& self, Count<C> n) {
-         if constexpr (requires { self.template SetCountInner<SID>(1); }) {
+         if constexpr (requires { self.SetCountInner(1); }) {
             // Partial success is supported                             
-            self.template SetCountInner<SID>(n);
+            self.SetCountInner(n);
             self.template ResetHash<SID>();
 
             if constexpr (not CT::Contiguous<C>) {
@@ -833,7 +834,7 @@ namespace Langulus::Annies::Component
             return;
          }
 
-         if (self.template IsEmpty<SID>()) {
+         if (self.IsEmpty()) {
             // Empty - do a fresh allocation                            
             ThisCom::AllocateFresh(newReserve);
             return;
@@ -880,7 +881,7 @@ namespace Langulus::Annies::Component
             //TODO badly designed!
             // Partial success                                          
             auto n = dst - self.GetHandle();
-            if constexpr (not requires { self.template SetCountInner<Id::First>(1); }) {
+            if constexpr (not requires { self.SetCountInner(1); }) {
                // Partial success is not allowed - we have to           
                // destroy everything we initialized                     
                while (n) {

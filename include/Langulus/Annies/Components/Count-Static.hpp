@@ -10,7 +10,7 @@
 #include <Langulus/CT/Index.hpp>
 #include <Langulus/CT/Signed.hpp>
 #include <Langulus/CT/Integer.hpp>
-#include <Langulus/Utils/Values.hpp>
+//#include <Langulus/Utils/Values.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -26,29 +26,23 @@ namespace Langulus::Annies::Component
    /// component that has been allocated - otherwise it is 0. If no heap      
    /// component exists or can't be null, then the count is always COUNT.     
    ///   @tparam COUNT the count type and value                               
-   ///   @tparam ID provider ID to keep count of                              
-   ///   @tparam SHARED provider IDs that share the same count variable       
-   template<auto COUNT, Cid ID, Cid...SHARED>
+   ///   @attention only one count component is allowed per container         
+   template<auto COUNT>
    struct CountStatic {
       /// Refers back to this particular component instance through the       
       /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
       /// this file.                                                          
-      #define ThisCom self.CountStatic<COUNT, ID, SHARED...>
+      #define ThisCom self.CountStatic<COUNT>
 
       using CTTI_Component  = Yup;
       using CTTI_ReflectAs  = void;
       using CTTI_Contiguous = Maybe<COUNT == 1>;
-      using Id              = Values<ID, SHARED...>;
 
       static constexpr int  ComponentPrecedence = -1000;
       static constexpr bool ContainsMany = COUNT > 1;
-      //template<Cid SID>
-      //static constexpr bool Relevant = Id::template Contains<SID>;
 
       using CountType   = decltype(COUNT);
       using ReserveType = CountType;
-      //using IndexType   = Index::At<CountType>;
-      using Dimensions  = Id;
 
       static_assert(COUNT > 0,
          "Can't have a container of zero or negative count");
@@ -59,20 +53,18 @@ namespace Langulus::Annies::Component
       /// Equal to COUNT if container has a heap component that has been      
       /// allocated - zero otherwise. If no heap component exists, then the   
       /// count is always COUNT.                                              
-      template<Cid SID = ID> //requires Relevant<SID>
-      constexpr auto GetCount(this auto const& self) noexcept -> CountType {
-         return ThisCom::template GetCountInner<SID>();
+      constexpr auto GetCount(this auto const& self) noexcept -> size_t {
+         return ThisCom::GetCountInner();
       }
       
       /// Check if empty                                                      
-      template<Cid SID = ID> //requires Relevant<SID>
       constexpr bool IsEmpty(this auto const& self) noexcept {
-         return ThisCom::template GetCountInner<SID>() == CountType {0};
+         return ThisCom::GetCountInner() == 0;
       }
 
       /// Explicit boolean conversion to allow using containers in ifs        
       explicit constexpr operator bool(this auto const& self) noexcept {
-         return ThisCom::GetCountInner() != CountType {0};
+         return ThisCom::GetCountInner() != 0;
       }
 
    protected:
@@ -85,10 +77,10 @@ namespace Langulus::Annies::Component
       LglsComConversion(friend);
 
       /// Get count (inner)                                                   
-      template<Cid SID = ID, CT::Container C> //requires Relevant<SID>
+      template<CT::Container C>
       constexpr auto GetCountInner(this C const& self) noexcept -> CountType {
          if constexpr (CT::HasVariableCount<C>)
-            return self.template GetRaw<SID>() ? COUNT : CountType {0};
+            return self.GetRaw() ? COUNT : CountType {0};
          else
             return COUNT;
       }
@@ -104,31 +96,31 @@ namespace Langulus::Annies::Component
       void ConstructFrom(this SELF&, I&& intent) {
          using IT = Decvq<Deref<Deint<I>>>;
          decltype(auto) from = LglsFwd(intent.what);
-         LglsAssumeDev(from.template IsEmpty<ID>() or COUNT <= from.template GetCount<ID>(),
+         LglsAssumeDev(from.IsEmpty() or COUNT <= from.GetCount(),
             "Incompatible count");
 
          // Count is responsible for deep ownership, it has to          
          // be reset on move to disable destruction in 'from'.          
          if constexpr (CT::Moved<I>) {
             // Moving                                                   
-            if_available(from.template SetCountInner<ID>(0));
+            if_available(from.SetCountInner(0));
          }
          else if constexpr (CT::Abandoned<I> and CT::OwnedStrong<I>) {
             // Abandoning                                               
             if constexpr (not IT::CanBeDisowned) {
                // In case source is not disownable, this component      
                // must make sure to reset relevant properties.          
-               if_available(from.template SetCountInner<ID>(0));
+               if_available(from.SetCountInner(0));
             }
          }
       }
 
       /// Reset count (inner)                                                 
-      ///   @attention doesn't destroy elements, only resets hash and count   
-      template<Cid SID = ID> //requires Relevant<SID>
+      ///   @attention doesn't destroy elements, only resets hash and heap    
+      ///   (statically-counted containers are empty only when heap is null)  
       constexpr void ResetCount(this auto& self) noexcept {
-         if_available(self.template SetHeapInner<SID>(nullptr));
-         if_available(self.template SetHashInner<SID>(1));
+         if_available(self.SetHeapInner(nullptr));
+         if_available(self.SetHashEmpty(1));
       }
    };
 

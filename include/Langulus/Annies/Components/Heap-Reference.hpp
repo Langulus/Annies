@@ -88,7 +88,7 @@ namespace Langulus::Annies::Component
             //           + prev_footer                                  
             //           + alignment for next_type                      
             const auto heap     = ThisCom::template GetRawAs<uint8_t, SID - 1>();
-            const auto reserved = self.template GetReserved<SID - 1>();
+            const auto reserved = self.GetReserved();
             const auto size     = self.template GetStride<SID - 1>();
             const auto indirect = self.template GetIndirections<SID - 1>();
             const auto footer   = Deref<C>::template DefineHeapFooter<SID - 1>(reserved, indirect);
@@ -129,15 +129,14 @@ namespace Langulus::Annies::Component
                      + self.template GetBytesize<SID>();
          }
          else {
-            return ThisCom::template GetRaw<SID>()
-                     + self.template GetCount<SID>();
+            return ThisCom::template GetRaw<SID>() + self.GetCount();
          }
       }
     
       /// Get a direct access to the entire heap reserve's end.               
       template<Cid SID = Id::First, CT::Container C>// requires Relevant<SID>
       constexpr auto GetRawReserveEnd(this C&& self) noexcept {
-         const auto reserved = self.template GetReserved<SID>();
+         const auto reserved = self.GetReserved();
          if constexpr (CT::TypeErased<C>) {
             return ThisCom::template GetRawAs<uint8_t, SID>()
                  + reserved * self.template GetStride<SID>();
@@ -361,7 +360,7 @@ namespace Langulus::Annies::Component
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = Id::First, CT::Contiguous C> //requires Relevant<SID>
       auto GetResolved(this C&& self) -> RTTI::Block {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return {};
 
          RTTI::Block h {
@@ -394,7 +393,7 @@ namespace Langulus::Annies::Component
       ///   @note defined in Handle.hpp because it requires HandleDisowned    
       template<Cid SID = Id::First, CT::Contiguous C>// requires Relevant<SID>
       auto GetDense(this C&& self, size_t count = -1) -> RTTI::Block {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return {};
 
          RTTI::Block h {

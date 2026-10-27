@@ -56,7 +56,7 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetHashTableEnd(this auto const& self) noexcept -> TableType const* {
          if (self.template GetAllocationInner<SID>())
-            return ThisCom::GetHashTableInner() + self.template GetReserved<SID>();
+            return ThisCom::GetHashTableInner() + self.GetReserved();
          return nullptr;
       }
 
@@ -78,7 +78,7 @@ namespace Langulus::Annies::Component
       constexpr void ResetHashTable(this auto& self) noexcept {
          memset(
             ThisCom::GetHashTableInner(), 0,
-            self.template GetReserved<SID>() * sizeof(TableType)
+            self.GetReserved() * sizeof(TableType)
          );
       }
 

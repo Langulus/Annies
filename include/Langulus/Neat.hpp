@@ -11,11 +11,46 @@
 #include "TMap.hpp"
 #include "Recipe.hpp"
 #include "TTag.hpp"
+#include "Annies/Components/IndexedComposite.hpp"
 
+
+namespace Langulus::Annies::Inner
+{
+   using RecipeList  = TMany<Recipe>;
+   using MessyList   = TMany<Many>;
+   using TagList     = TMany<Tag>;
+
+   /// MARK: NeatBase                                                         
+   using NeatBase = Com::Container<
+      Com::StateStack<>,                     // No states               
+      Com::Multiprovider<
+         // Tags are ordered first by their tag type, then by their     
+         // order of appearance. Duplicate tag types are allowed.       
+         // Tag contents may or may not also be normalized.             
+         Com::Stack<TMapUnsorted<TMeta, TagList>,    0>,
+         // Subconstructs are sorted first by the recipe target, then   
+         // by their order of appearance. Their contents may or may not 
+         // also be normalized.                                         
+         Com::Stack<TMapUnsorted<DMeta, RecipeList>, 1>,
+         // Any other container that doesn't fit in the above is sorted 
+         // first by its type, then by the order of appearance.         
+         // Contents may or may not be normalized.                      
+         Com::Stack<TMapUnsorted<DMeta, MessyList>,  2>
+      >,
+      Com::IndexedComposite<0, 1, 2>,        // Composite indexing      
+      Com::HashEmergent<0, Hash, 1, 2>,      // Emergent hash           
+      Com::Assignment<false, 0, 1, 2>,       // Assignment              
+      Com::InsertionOperators<>,             // Insertion operators     
+      Com::MergingOperators<>,               // Merge operators         
+      Com::Comparison<false, true, 0, 1, 2>, // Allows comparisons      
+      Com::IterationForEach<0, 1, 2>,        // ForEach iteration       
+      Com::IterationRange<0, 1, 2>,          // Ranged iteration        
+      Com::Descriptor<0, 1, 2>               // Descriptor interface    
+   >;
+}
 
 namespace Langulus::Annies
 {
-   using Messy = Many;
 
    ///                                                                        
    /// MARK: Neat                                                             
@@ -27,45 +62,66 @@ namespace Langulus::Annies
    /// whether an element with the same signature already exists.             
    ///   Elements that are marked missing are never considered part of the    
    /// recipe and are filled by the context (i.e. Tags::Parent(?)).           
-   struct Neat {
-      using CTTI_Container = Yup;
+   struct Neat : Inner::NeatBase {
+      using CTTI_ReflectAs = Neat;
       using CTTI_Deep      = Yup;
 
-      using RecipeList = TMany<Recipe>;
-      using TailList   = TMany<Messy>;
-      using TagList    = TMany<Tag>;
+      using DeepType       = Many;
+      using HandleType     = Handle;
+      using HandleMutType  = Handle;
+      using Pick           = Handle;
+      using PickMut        = Handle;
 
-   private:
-      // The hash of the container.                                     
-      // Kept as first member, in order to quickly access it.           
-      mutable Hash mHash;
+      static constexpr bool ContainsMany = true;
 
-      // Tags are ordered first by their tag type, then by their        
-      // order of appearance. Duplicate tag types are allowed.          
-      // Tag contents may or may not also be normalized.                
-      TMapUnsorted<TMeta, TagList> mTags;
-
-      // Subconstructs are sorted first by the recipe subject, and then 
-      // by their order of appearance. Their contents may or may not    
-      // also be normalized.                                            
-      TMapUnsorted<DMeta, RecipeList> mRecipes;
-
-      // Any other container that doesn't fit in the above is sorted    
-      // first by its type, then by the order of appearance.            
-      // Contents may or may not be normalized.                         
-      TMapUnsorted<DMeta, TailList> mAnythingElse;
-
-   public:
       ///                                                                     
       /// MARK:Construction                                                   
-      constexpr Neat() noexcept = default;
-      constexpr Neat(Neat const&) noexcept = default;
-      constexpr Neat(Neat&&) noexcept = default;
+      constexpr Neat() noexcept {
+         this->ConstructDefault();
+      }
+      constexpr Neat(Neat const& other) {
+         this->Absorb(Refer(other));
+      }
+      constexpr Neat(Neat&& other) noexcept  {
+         this->Absorb(Move(other));
+      }
+      constexpr ~Neat() noexcept {
+         this->Destroy();
+      }
+
+      /// Construction that either absorbs the provided containers, or        
+      /// emplaces all A in the container                                     
+      template<Disambiguate A1, class...AN>
+      constexpr Neat(A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0) {
+            if constexpr (Same<Deint<A1>, Neat>)
+               this->Absorb(LglsFwd(a1));
+            else
+               this->Insert(LglsFwd(a1));
+         }
+         else {
+            this->ConstructDefault();
+            this->Insert(LglsFwd(a1));
+           (this->Insert(LglsFwd(an)), ...);
+         }
+      }
+      
+      /// Construction that absorbs the provided containers                   
+      /*template<class A1, class...AN>
+      constexpr Neat(Inner::Absorb, A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0)
+            this->Absorb(LglsFwd(a1));
+         else {
+            this->ConstructDefault();
+            this->Concat(LglsFwd(a1));
+           (this->Concat(LglsFwd(an)),...);
+         }
+      }*/
 
       /// Construct via intent                                                
-      template<template<class> class I> requires CT::Intent<I<Neat>>
+      /*template<template<class> class I> requires CT::Intent<I<Neat>>
       Neat(I<Neat>&& other)
-         : mHash         {other->mHash}
+         : mHash         {   other->mHash}
          , mTags         {I {other->mTags}}
          , mRecipes      {I {other->mRecipes}}
          , mAnythingElse {I {other->mAnythingElse}} {
@@ -78,11 +134,29 @@ namespace Langulus::Annies
       Neat(A1&& a1, AN&&...an) : Neat {} {
          Insert(LglsFwd(a1));
         (Insert(LglsFwd(an)), ...);
-      }
+      }*/
 
       ///                                                                     
       /// MARK:Assignment                                                     
-      Neat& operator = (Neat const&) = default;
+      constexpr Neat& operator = (Neat const& other) {
+         return this->AssignAbsorb(Refer(other));
+      }
+      constexpr Neat& operator = (Neat&& other) noexcept {
+         return this->AssignAbsorb(Move(other));
+      }
+      
+      template<class A>
+      constexpr Neat& operator = (A&& argument) {
+         if constexpr (Same<Deint<A>, Neat>)
+            return this->AssignAbsorb(LglsFwd(argument));
+         else
+            return this->Assign(LglsFwd(argument));
+      }
+
+      using Com::Comparison<false, true, 0, 1, 2>::operator <=>;
+      using Com::Comparison<false, true, 0, 1, 2>::operator ==;
+
+      /*Neat& operator = (Neat const&) = default;
       Neat& operator = (Neat&&) noexcept = default;
 
       /// Assign via intent                                                   
@@ -110,22 +184,34 @@ namespace Langulus::Annies
          return mTags == rhs.mTags
             and mRecipes == rhs.mRecipes
             and mAnythingElse == rhs.mAnythingElse;
+      }*/
+
+   protected:
+      auto& GetTagsInner(this auto&& self) noexcept {
+         return *self.template Stack<TMapUnsorted<TMeta, Inner::TagList>, 0>::GetRaw();
       }
 
+      auto& GetRecsInner(this auto&& self) noexcept {
+         return *self.template Stack<TMapUnsorted<DMeta, Inner::RecipeList>, 1>::GetRaw();
+      }
+
+      auto& GetMessInner(this auto&& self) noexcept {
+         return *self.template Stack<TMapUnsorted<DMeta, Inner::MessyList>, 2>::GetRaw();
+      }
+
+   public:
       /// Clear the container without deallocating                            
       void Clear() {
-         mHash = {};
-         mTags.Clear();
-         mRecipes.Clear();
-         mAnythingElse.Clear();
+         GetTagsInner().Clear();
+         GetRecsInner().Clear();
+         GetMessInner().Clear();
       }
 
       /// Clear and deallocate the container                                  
       void Reset() {
-         mHash = {};
-         mTags.Reset();
-         mRecipes.Reset();
-         mAnythingElse.Reset();
+         GetTagsInner().Reset();
+         GetRecsInner().Reset();
+         GetMessInner().Reset();
       }
 
       ///                                                                     
@@ -133,7 +219,7 @@ namespace Langulus::Annies
       /// Get the hash of a neat container (and cache it)                     
       ///   @attention missing scopes never participate in hashing/comparison 
       ///   @return the hash                                                  
-      Hash GetHash() const {
+      /*Hash GetHash() const {
          if (mHash)
             return mHash;
 
@@ -142,52 +228,21 @@ namespace Langulus::Annies
          else
             mHash = HashOf(mTags, mRecipes, mAnythingElse);//TODO we can just push/pop xor these, as order doesn't matter here
          return mHash;
-      }
+      }*/
 
-      /// Check if the container is empty                                     
-      ///   @return true if empty                                             
-      bool IsEmpty() const noexcept {
-         return mTags.IsEmpty()
-            and mRecipes.IsEmpty()
-            and mAnythingElse.IsEmpty();
-      }
-
-      /// Check if the container is not empty                                 
-      ///   @return true if not empty                                         
-      explicit constexpr operator bool() const noexcept {
-         return not IsEmpty();
-      }
-
-      /// Check if the container has missing scopes, nested                   
-      ///   @return true if there's at least one missing entry                
-      bool IsMissingDeep() const {
-         return mTags.IsMissingDeep()
-             or mRecipes.IsMissingDeep()
-             or mAnythingElse.IsMissingDeep();
-      }
-
-      /// Check if the container has executable items, nested                 
-      ///   @return true if there's at least one executable entry             
-      bool IsExecutable() const noexcept {
-         return mTags.IsExecutable()
-             or mRecipes.IsExecutable()
-             or mAnythingElse.IsExecutable();
-      }
-
-      /// Get list of tags, corresponding to a static tag                     
+      /// Get list of tags corresponding to a statically specified tag        
       ///   @tparam T tag definition to search for                            
       ///   @return the tag list, or nullptr if no such list exists           
-      ///   @attention the list can be empty, if tag was provided with no     //TODO huh? wdym?
-      ///      contents                                                       
+      ///   @attention the list may be empty, if tag was added as TMeta       
       template<CT::DefineTag T>
       auto GetTags(this auto&& self) {
          return self.GetTags(MetaTagOf<T>());
       }
 
       template<class C>
-      auto GetTags(this C&& self, TMeta t) -> LglsMutIf(C, TagList*) {
+      auto GetTags(this C&& self, TMeta t) -> LglsMutIf(C, Inner::TagList*) {
          LglsAssumeUser(t, "Can't get invalid tag");
-         auto found = self.mTags.Find(t);
+         auto found = self.GetTagsInner().Find(t);
          if (found)
             return &*found.GetValHandle();
          return nullptr;
@@ -219,7 +274,7 @@ namespace Langulus::Annies
       }
 
       template<class C>
-      auto GetData(this C&& self, DMeta d) -> LglsMutIf(C, TailList*) {
+      auto GetData(this C&& self, DMeta d) -> LglsMutIf(C, Inner::MessyList*) {
          auto found = self.mAnythingElse.Find(d ? d.GetOrigin() : d);
          if (found)
             return &*found.GetValHandle();
@@ -235,8 +290,8 @@ namespace Langulus::Annies
       }
 
       template<class C>
-      auto GetRecipes(this auto&& self, DMeta r) -> LglsMutIf(C, RecipeList*) {
-         auto found = self.mRecipes.Find(r ? r.GetOrigin() : r);
+      auto GetRecipes(this auto&& self, DMeta r) -> LglsMutIf(C, Inner::RecipeList*) {
+         auto found = self.GetRecipesInner().Find(r ? r.GetOrigin() : r);
          if (found)
             return &*found.GetValHandle();
          return nullptr;
@@ -245,7 +300,7 @@ namespace Langulus::Annies
       /// Find data in recipe targets or tail, that casts to T                
       ///   @tparam T type requirement                                        
       ///   @return the first type that matches                               
-      template<CT::NotVoid T>
+      /*template<CT::NotVoid T>
       auto FindType() const -> DMeta {
          return FindType(MetaDataOf<T>());
       }
@@ -277,13 +332,13 @@ namespace Langulus::Annies
             "all except the first `", primitive, "` will be ignored"
          );
          return primitive;
-      }
+      }*/
 
       /// Set a default tag, if such wasn't already set                       
       //TODO isn't this like simply merge?? also make merge test only by tag id when merging tags!
       ///   @tparam T tag to set                                              
       ///   @param value the value to assign to the tag                       
-      template<CT::DefineTag T>
+      /*template<CT::DefineTag T>
       void SetDefaultTag (CT::NotVoid auto&& data) {
          auto found = GetTags<T>();
          if (found and *found)
@@ -302,27 +357,27 @@ namespace Langulus::Annies
       }
 
       auto ExtractData   (CT::NotVoid auto&) const -> size_t;
-      auto ExtractDataAs (CT::NotVoid auto&) const -> size_t;
+      auto ExtractDataAs (CT::NotVoid auto&) const -> size_t;*/
 
    protected:
-      template<CT::DefineTag>
+      /*template<CT::DefineTag>
       bool ExtractTagInner(CT::NotVoid auto&...) const;
       template<size_t...IDX>
       bool ExtractTagInner(TagList const&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
       template<size_t>
-      bool ExtractTagInnerInner(TagList const&, CT::NotVoid auto&) const;
+      bool ExtractTagInnerInner(TagList const&, CT::NotVoid auto&) const;*/
 
    public:
       ///                                                                     
       ///   Iteration                                                         
-      size_t ForEach      (this auto&&, auto&&...);
+      /*size_t ForEach      (this auto&&, auto&&...);
       size_t ForEachTag   (this auto&&, auto&&);
       size_t ForEachDeep  (this auto&&, auto&&...);
       size_t ForEachRecipe(this auto&&, auto&&);
       size_t ForEachTail  (this auto&&, auto&&);
 
    protected:
-      size_t ForEachInner (this auto&&, auto&&);
+      size_t ForEachInner (this auto&&, auto&&);*/
 
    public:
       ///                                                                     
@@ -339,16 +394,15 @@ namespace Langulus::Annies
             lhs.Concat(LglsFwd(rhs));
          };
 
-         mTags.MergeRange(rhs.mTags, conflict_resolver);
-         mRecipes.MergeRange(rhs.mRecipes, conflict_resolver);
-         mAnythingElse.MergeRange(rhs.mAnythingElse, conflict_resolver);
-         mHash = {};
+         GetTagsInner().MergeRange(rhs.GetTagsInner(), conflict_resolver);
+         GetRecsInner().MergeRange(rhs.GetRecsInner(), conflict_resolver);
+         GetMessInner().MergeRange(rhs.GetMessInner(), conflict_resolver);
       }
 
-      Neat& SetTag(CT::DefineTag auto&&, size_t = 0);
+      //Neat& SetTag(CT::DefineTag auto&&, size_t = 0);
 
-      Neat& operator <<  (auto&&);
-      Neat& operator <<= (auto&&);
+      //Neat& operator <<  (auto&&);
+      //Neat& operator <<= (auto&&);
 
    protected:
       auto UnfoldInsert (auto&&) -> size_t;
@@ -357,6 +411,7 @@ namespace Langulus::Annies
       void AddTag   (CT::Intent auto&&);
       void AddRecipe(CT::Intent auto&&);
       void AddVerb  (CT::Intent auto&&);
+
 
    public:
       ///                                                                     

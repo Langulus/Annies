@@ -35,7 +35,7 @@ namespace Langulus::Annies::Component
       /// Reset the hash. It will be recomputed on next comparison.           
       template<Cid SID = ID> requires Relevant<SID>
       void ResetHash(this auto& self) noexcept {
-         ThisCom::SetHashInner(self.template IsEmpty<SID>() ? 1 : 0);
+         ThisCom::SetHashInner(self.IsEmpty() ? 1 : 0);
       }
 
       /// Get the hash, recompute it if uninitialized                         

@@ -40,13 +40,13 @@ namespace Langulus::Annies::Component
       /// Reset the hash. It will be recomputed on next comparison.           
       template<Cid SID = ID> requires Relevant<SID>
       void ResetHash(this auto& self) assumptious {
-         ThisCom::SetHashInner(self.template IsEmpty<SID>() ? 1 : 0);
+         ThisCom::SetHashInner(self.IsEmpty() ? 1 : 0);
       }
 
       /// Get the hash, recompute it if uninitialized or of we don't own it.  
       template<Cid SID = ID> requires Relevant<SID>
       H GetHash(this auto const& self) assumptious {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return H {1};
 
          if (self.IsDisowned())
@@ -70,7 +70,7 @@ namespace Langulus::Annies::Component
       /// Get hash (inner) - will never recompute it                          
       template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetHashInner(this auto&& self) noexcept -> H const {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return H {1};
 
          if (self.IsDisowned())
@@ -86,7 +86,7 @@ namespace Langulus::Annies::Component
       ///   @attention will not work for disowned containers                  
       template<Cid SID = ID> requires Relevant<SID>
       constexpr void SetHashInner(this auto& self, H h) assumptious {
-         if (self.template IsEmpty<SID>())
+         if (self.IsEmpty())
             return;
 
          if (self.IsDisowned())

@@ -24,8 +24,9 @@ namespace Langulus::Annies::Inner
       Com::Multitype<Com::TypedStack<DMeta, K, true, 0>,
                      Com::TypedStack<DMeta, V, true, 1>>,
       Com::HeapMovable<8, 2, HeapEntry<0, K*>, HeapEntry<1, V*>>,
-      Com::CountStack<size_t, 0, 1>,      // Dynamically sized          
-      Com::ReserveStack<size_t, 0, 1>,    // Reserve kept as member     
+      Com::Multidimensional<0, 1>,
+      Com::CountStack<>,                  // Dynamically sized          
+      Com::ReserveStack<>,                // Reserve kept as member     
       Com::IndexedHashHeap<0, Hash, 1>,   // Indexed by hash table      
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,

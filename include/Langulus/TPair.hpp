@@ -39,8 +39,9 @@ namespace Langulus::Annies::Inner
                          Com::TypedStatic<DMeta, Deref<V>, 1>>,
       Com::Multiprovider<Com::Stack<K, 0>,
                          Com::Stack<V, 1>>,
-      Com::CountStatic<1u, 0, 1>,         // Statically sized to 1      
-      Com::ReserveStatic<1u, 0, 1>,       // Statically reserved to 1   
+      Com::Multidimensional<0, 1>,
+      Com::CountStatic<1u>,               // Statically sized to 1      
+      Com::ReserveStatic<1u>,             // Statically reserved to 1   
       Com::OwnershipDeepEmergent<Com::StrongOwnership, true, 0, 1>,
       Com::HashEmergent<0, Hash, 1>,      // Hash retrieved from items  
       Com::Emplacement<0, 1>,             // Allows emplacement         
@@ -60,8 +61,9 @@ namespace Langulus::Annies::Inner
       Com::Multitype<Com::TypedStack<DMeta, K, true, 0>,
                      Com::TypedStack<DMeta, V, true, 1>>,
       Com::HeapMovable<0, 0, HeapEntry<0, K*>, HeapEntry<1, V*>>,
-      Com::CountStatic<1u, 0, 1>,         // Statically sized to 1      
-      Com::ReserveStatic<1u, 0, 1>,       // Statically reserved to 1   
+      Com::Multidimensional<0, 1>,
+      Com::CountStatic<1u>,               // Statically sized to 1      
+      Com::ReserveStatic<1u>,             // Statically reserved to 1   
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,
                         EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 1>>>,
