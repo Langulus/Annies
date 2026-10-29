@@ -44,14 +44,16 @@ namespace Langulus::Annies
       Edit(Edit&&) noexcept = default;
       Edit(T* src, size_t start = 0, size_t end = 0) noexcept
          : Edit {*src, start, end} {
-         LglsAssert(src->GetUses() == 1, "Data is shared, and can't be edited from here");
+         LglsAssert(src->GetUses() == 1,
+            "Data is shared, and can't be edited from here");
       }
 
       Edit(T& src, size_t start = 0, size_t end = 0) noexcept
          : mSource {src}
          , mStart  {start}
          , mEnd    {end} {
-         LglsAssert(src->GetUses() == 1, "Data is shared, and can't be edited from here");
+         LglsAssert(src.GetUses() == 1,
+            "Data is shared, and can't be edited from here");
       }
 
       Edit& Select(T const&);

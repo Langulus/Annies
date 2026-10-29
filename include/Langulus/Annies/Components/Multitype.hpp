@@ -278,7 +278,9 @@ namespace Langulus::Annies::Component
 
       /// Returns a pointer to the second dimension, a.k.a get the value      
       /// from a pair. Works only for pairs.                                  
-      template<class C> requires (not CT::TypeErased<C> and Id::Count == 2)
+      template<class C> requires (not CT::TypeErased<C>
+                                  and Id::Count == 2
+                                  and ::std::is_class_v<Decay<TypeOf<C, Id::Second>>>)
       constexpr auto* operator -> (this C&& self) assumptious {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
          return &DenseCast(self.template GetRaw<Id::Second>());

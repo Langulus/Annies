@@ -215,7 +215,7 @@ namespace Langulus::Annies::Component
          static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
             "Mutable reference/pointer iterator not allowed for constant container");
          LglsAssumeDev(not self.IsEmpty(), "Can't iterate empty container");
-         LglsAssumeDev(    self.IsTyped(), "Can't iterate untyped container");
+         //LglsAssumeDev(    self.IsTyped(), "Can't iterate untyped container");
          using R = ReturnOf<F>;
 
          if constexpr (not CT::TypeErased<C>) {
@@ -429,7 +429,7 @@ namespace Langulus::Annies::Component
                // Always execute for intermediate/non-deep *this        
                ++counter;
 
-               decltype(auto) argument = self.template ReinterpretCast<A>();
+               auto& argument = self;//self.template ReinterpretCast<A>();
 
                if constexpr (CT::Bool<R>) {
                   if (not f(argument))

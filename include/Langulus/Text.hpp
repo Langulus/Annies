@@ -586,6 +586,15 @@ namespace Langulus::Annies
 
          return lines;
       }
+
+      /// Extent the text container                                           
+      char* Extend(size_t relative_size) {
+         this->Reserve(this->GetCount() + relative_size);
+         auto new_memory_start = this->GetRaw() + this->GetCount();
+         memset(new_memory_start, 0, relative_size+1);
+         this->GetCountInner() += relative_size;
+         return new_memory_start;
+      }
    };
    
    static_assert(CT::NotVoid<CT::ReflectedAs<Text>>);

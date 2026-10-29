@@ -146,8 +146,15 @@ namespace Langulus::Annies
       }
 
       /// Access the first element inside the container                       
-      constexpr auto& operator -> (this auto&& self) assumptious {
+      constexpr auto& operator -> (this auto&& self) assumptious
+      requires ::std::is_class_v<Decay<T>> {
          return self.GetStackInner();
+      }
+
+      /// Forward New call to the contained type if available                 
+      constexpr decltype(auto) New(auto&&...args)
+      requires requires { Base::GetStackInner().New(LglsFwd(args)...); } {
+         return Base::GetStackInner().New(LglsFwd(args)...);
       }
    };
 

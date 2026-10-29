@@ -411,7 +411,7 @@ namespace Langulus::Annies::Component
 
       /// Access the first element inside the container                       
       constexpr auto* operator -> (this auto&& self) assumptious
-      requires (not TypeErased) {
+      requires (not TypeErased and ::std::is_class_v<Decay<TYPE>>) {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
          return &DenseCast(self.GetRaw());
       }
