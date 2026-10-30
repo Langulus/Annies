@@ -21,9 +21,10 @@ namespace Langulus::Annies
       static constexpr char Separator = '/';
 
       using Text::Text;
+      using Text::operator ==;
       /*using Text::operator +;
       using Text::operator +=;
-      using Text::operator ==;*/
+      */
 
       /// Construction from any kind of text that is an Annies container      
       template<CT::Text T> requires CT::Container<T>

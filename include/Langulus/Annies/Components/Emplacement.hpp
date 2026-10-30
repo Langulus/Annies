@@ -241,7 +241,7 @@ namespace Langulus::Annies::Component
       auto New(this C& self, A&&...arguments) -> DecideHandle<C>
       requires (Relevant<SID> and not CT::HeapAllocated<C> and not Shared) {
          // Need to destroy and overwrite only the first element.       
-         constexpr auto strat = AllocationStrategy::FreshAllocateAllIndirections;
+         //constexpr auto strat = AllocationStrategy::FreshAllocateAllIndirections;
          using T = Tif<::std::is_void_v<E>, TypeOf<C, SID>, E>;
          
          auto item = self.GetHandle();
@@ -253,7 +253,8 @@ namespace Langulus::Annies::Component
          // Any state change is forbidden - container is full.          
          try {
             //if constexpr (sizeof...(arguments) > 0)
-               ThisCom::template EmplaceConstruct<SID, strat, T>(LglsFwd(arguments)...);
+               ThisCom::Instantiate<T, SID>(LglsFwd(arguments)...);
+               //ThisCom::template EmplaceConstruct<SID, strat, T>(LglsFwd(arguments)...);
             //else
             //   ThisCom::template EmplaceDefault<SID, strat, T>();
          }
@@ -922,10 +923,10 @@ namespace Langulus::Annies::Component
             if_available(self.ResetState());
          }
 
-         if constexpr (STRAT == AllocationStrategy::FreshAllocateAllIndirections) {
+         /*if constexpr (STRAT == AllocationStrategy::FreshAllocateAllIndirections) {
             ThisCom::Instantiate<E>(LglsFwd(arguments)...);
          }
-         else if constexpr (CT::TypeErased<C>) {
+         else*/ if constexpr (CT::TypeErased<C>) {
             //                                                          
             // This container is type-erased                            
             if constexpr (STRAT != AllocationStrategy::DontAllocate) {

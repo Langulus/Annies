@@ -32,8 +32,8 @@ namespace Langulus::Annies
          "C can't be a reference");
       static_assert(CT::ContainsMany<C>,
          "C is not iteratable because it contains exactly one element");
-      static_assert(CT::Indexed<C>,
-         "C is not indexed");
+      //static_assert(CT::Indexed<C>,
+      //   "C is not indexed");
 
    protected:
       using Pick = DecidePick<C>;
