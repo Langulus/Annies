@@ -16,6 +16,7 @@
 #include "Annies/Components/Ownership-Stack.hpp"
 #include "Annies/Components/OwnershipDeep-Heap.hpp"
 #include "Annies/Components/Hash-Emergent.hpp"
+#include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Assignment.hpp"
 #include "Annies/Components/Removal.hpp"
@@ -44,6 +45,7 @@ namespace Langulus::Annies::Inner
       Com::ReserveStatic<1u>,             // Statically reserved to 1   
       Com::OwnershipDeepEmergent<Com::StrongOwnership, true, 0, 1>,
       Com::HashEmergent<Hash, 0, 1>,      // Hash retrieved from items  
+      Com::Deepening<Many>,               // Makes container deep       
       Com::Emplacement<0, 1>,             // Allows emplacement         
       Com::Assignment<false, 0, 1>,       // Allows assignment          
       Com::Removal<0, 1>,                 // Allows clear/reset         
@@ -68,6 +70,7 @@ namespace Langulus::Annies::Inner
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,
                         EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 1>>>,
       Com::HashEmergent<Hash, 0, 1>,      // Hash retrieved from items  
+      Com::Deepening<Many>,               // Makes container deep       
       Com::Emplacement<0, 1>,             // Allows emplacement         
       Com::Assignment<false, 0, 1>,       // Allows assignment          
       Com::Removal<0, 1>,                 // Allows clear/reset         
@@ -95,11 +98,8 @@ namespace Langulus::Annies
    template<CT::NotVoid K, CT::NotVoid V>
    struct TPair : Inner::TPairBase<K, V> {
       using CTTI_ReflectAs = TPair;
-      using CTTI_Deep      = Yup;
       using CTTI_Pair      = Yup;
-
       using Base           = Inner::TPairBase<K, V>;
-      using DeepType       = Many;//Any;
 
       #if not LANGULUS(FORCE_TYPE_ERASURE)
          using HandleType    = Tif<CT::NotReference<K, V>,

@@ -49,6 +49,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       Com::OwnershipDeepHeap<>,        // Sparse elements are referenced
       Com::HashHeap<>,                 // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Merging<>,                  // Allows merging                
       Com::MergingOperators<>,         // <<= and >>= merging           
       Com::Assignment<>,               // Allows assignment             
@@ -68,10 +69,8 @@ namespace Langulus::Annies::Inner
    struct Set : SetBase<SORTED> {
       using CTTI_ReflectAs = Set;
       using CTTI_Set       = Yup;
-      using CTTI_Deep      = Yup;
 
       using Base           = SetBase<SORTED>;
-      using DeepType       = Many;
       using HandleType     = Handle;
       using HandleMutType  = Handle;
       using Pick           = Handle;

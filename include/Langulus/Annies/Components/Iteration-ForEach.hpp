@@ -7,7 +7,7 @@
 ///                                                                           
 #pragma once
 #include "Iteration-Range.hpp"
-#include <Langulus/CT/Deep.hpp>
+//#include <Langulus/CT/Deep.hpp>
 #include <Langulus/CT/ReflectAs.hpp>
 #include <Langulus/CT/DefineTag.hpp>
 #include <Langulus/CT/DefineVerb.hpp>
@@ -18,27 +18,24 @@
 
 namespace Langulus::Annies::Component
 {
-   namespace Inner
-   {
-      /// A helper structure that shows how ForEach iteration went            
-      //template<CT::Container C>
-      struct ForEachResult {
-         //static_assert(CT::Decayed<C>, "Trip all decorations from C first");
+   /// A helper structure that shows how ForEach iteration went               
+   //template<CT::Container C>
+   struct ForEachResult {
+      //static_assert(CT::Decayed<C>, "Trip all decorations from C first");
 
-         //using Count = typename Deref<C>::CountType;
+      //using Count = typename Deref<C>::CountType;
 
-         // Number of iterations                                        
-         /*Count*/ size_t count = 0;
+      // Number of iterations                                           
+      /*Count*/ size_t count = 0;
 
-         // Last loop control return - useful only when you want to     
-         // control an outer loop depending on the iteration result     
-         LoopControl control = Loop::Continue;
+      // Last loop control return - useful only when you want to        
+      // control an outer loop depending on the iteration result        
+      LoopControl control = Loop::Continue;
 
-         // Implicitly cast to the count member, because that's the     
-         // most likely use                                             
-         operator /*Count*/ size_t() const noexcept { return count; }
-      };
-   }
+      // Implicitly cast to the count member, because that's the        
+      // most likely use                                                
+      operator /*Count*/ size_t() const noexcept { return count; }
+   };
 
    ///                                                                        
    /// Implements ForEach iteration interface for containers.                 
@@ -59,10 +56,10 @@ namespace Langulus::Annies::Component
    private:
       //template<CT::Container C>
       //using Count = typename Deref<C>::CountType;
-      template<CT::Container C>
-      using Deep = LglsMutIf(C, typename Deref<C>::DeepType&);
       //template<CT::Container C>
-      using ForEachResult = Inner::ForEachResult;//<Decay<C>>;
+      //using Deep = LglsMutIf(C, typename Deref<C>::DeepType&);
+      //template<CT::Container C>
+      //using ForEachResult = Inner::ForEachResult;//<Decay<C>>;
 
    public:
       /*template<CT::Container C>
@@ -117,89 +114,6 @@ namespace Langulus::Annies::Component
          return result;
       }
 
-      /// Execute functions in each sub-block, inclusively.                   
-      /// Unlike the flat variants above, this one reaches deeper.            
-      /// Each function has a distinct argument type, that is tested against  
-      /// the contained type. If argument is compatible with the type, the    
-      /// block is iterated, and F is executed for all elements. None of the  
-      /// provided functions are ignored, unless Loop::Break is returned at   
-      /// some point.                                                         
-      ///   @param lambdas all potential functions to iterate with            
-      ///   @return the number of executions                                  
-      template<CT::Container C, class...F>
-      auto ForEachDeep(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
-         static_assert(sizeof...(F) > 0, "No functions in ForEachDeep");
-         if (self.IsEmpty())
-            return {};
-
-         ForEachResult/*<C>*/ result {0, Loop::Break};
-         (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<false, true>(LglsFwd(lambdas), result.count)
-         )));
-
-         if constexpr (CT::Mutable<C>) {
-            if (result.control == Loop::Discard)
-               self.Reset();
-         }
-         return result;
-      }
-
-      /// Do it in reverse                                                    
-      template<CT::Container C, class...F>
-      auto ForEachDeepRev(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
-         static_assert(sizeof...(F) > 0, "No functions in ForEachDeepRev");
-         if (self.IsEmpty())
-            return {};
-
-         ForEachResult/*<C>*/ result {0, Loop::Break};
-         (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<true, true>(LglsFwd(lambdas), result.count)
-         )));
-
-         if constexpr (CT::Mutable<C>) {
-            if (result.control == Loop::Discard)
-               self.Reset();
-         }
-         return result;
-      }
-
-      /// Do it without skipping the intermediate containers                  
-      template<CT::Container C, class...F>
-      auto ForEachDeepNoskip(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
-         static_assert(sizeof...(F) > 0, "No functions in ForEachDeepNoskip");
-
-         ForEachResult/*<C>*/ result {0, Loop::Break};
-         (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<false, false>(LglsFwd(lambdas), result.count)
-         )));
-
-         if constexpr (CT::Mutable<C>) {
-            if (result.control == Loop::Discard)
-               self.Reset();
-         }
-         return result;
-      }
-
-      /// Do it without skipping the intermediate containers in reverse       
-      template<CT::Container C, class...F>
-      auto ForEachDeepNoskipRev(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
-         static_assert(sizeof...(F) > 0, "No functions in ForEachDeepNoskipRev");
-
-         ForEachResult/*<C>*/ result {0, Loop::Break};
-         (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<true, false>(LglsFwd(lambdas), result.count)
-         )));
-
-         if constexpr (CT::Mutable<C>) {
-            if (result.control == Loop::Discard)
-               self.Reset();
-         }
-         return result;
-      }
 
    protected:
       /// Iterate and execute call for each flat element, counting each       
@@ -315,195 +229,6 @@ namespace Langulus::Annies::Component
             }
             return Loop::NextLoop;
          }
-      }
-      
-      /// Iterate and execute call for each deep element, counting each       
-      /// successfull execution.                                              
-      ///   @tparam REVERSE whether to iterate in reverse                     
-      ///   @tparam SKIP whether to execute call for intermediate blocks      
-      ///   @param f the function to execute for each element of type A       
-      ///   @param counter [out] counts the successful executions             
-      ///   @return the last 'f' result                                       
-      template<bool REVERSE, bool SKIP, CT::Container C, class F>
-      LoopControl ForEachDeepInner(this C&& self, F&& f, /*Count<C>*/size_t& counter) noexcept_if(f) {
-         using A = ArgumentOf<F>;
-         static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
-            "Mutable reference/pointer iterator not allowed for constant container");
-         using R = ReturnOf<F>;
-
-         LoopControl loop = Loop::Continue;
-         if constexpr (CT::TypeErased<C>) {
-            const bool deep = self.IsDeep();
-            using D = Deep<C>;
-
-            if constexpr (CT::Deep<A>) {
-               if (not SKIP or not deep) {
-                  // Always execute for intermediate/non-deep *this     
-                  ++counter;
-
-                  decltype(auto) argument = self.template ReinterpretAs<A>();
-
-                  if constexpr (CT::Bool<R>) {
-                     if (not f(argument))
-                        return Loop::Break;
-                  }
-                  else if constexpr (Exact<R, LoopControl>) {
-                     // Do things depending on the F's return           
-                     R loop = f(argument);
-
-                     while (loop == Loop::Repeat)
-                        loop = f(argument);
-
-                     switch (loop.mControl) {
-                     case LoopControl::Break:
-                     case LoopControl::NextLoop:
-                        return loop;
-                     case LoopControl::Continue:
-                     case LoopControl::Repeat:
-                        break;
-                     case LoopControl::Discard:
-                        if constexpr (CT::Mutable<C>) {
-                           // Discard is allowed only if THIS is mutable
-                           // You can't fully discard the topmost block,
-                           // only reset it. Now, if we reset this      
-                           // block, and then remove it up the chain, if
-                           // branching-out happens to occur, we'll end 
-                           // up with a branch that contains the empty  
-                           // element and that is bad. So defer the     
-                           // reset up the chain instead!               
-                           return Loop::Discard;
-                        }
-                        else {
-                           // ...otherwise it acts like a Loop::Continue
-                           LglsAssumeUserWarn(false,
-                              "Attempting to Loop::Discard while iterating constant container. "
-                              "No discard will be performed."
-                           );
-                           break;
-                        }
-                     }
-                  }
-                  else f(argument);
-               }
-            }
-
-            if (deep) {
-               // Iterate subblocks                                     
-               /*Count<C>*/size_t intermediateCounterSink = 0;
-               loop = self.template ForEachInner<REVERSE>(
-                  [&counter, &f](D group) {
-                     if constexpr (Akin<A, D>) {
-                        // Loop control is available only if iterator   
-                        // is deep, too...                              
-                        return group.template ForEachDeepInner<REVERSE, SKIP>(LglsMov(f), counter);
-                     }
-                     else {
-                        // ... otherwise we have to pass through all    
-                        // deep sub-blocks                              
-                        group.template ForEachDeepInner<REVERSE, SKIP>(LglsMov(f), counter);
-                     }
-                  },
-                  intermediateCounterSink
-               );
-            }
-            /*else if (self.template Is<Neat>()) {
-               // Nest inside normalized subblocks                      
-               using SubNeat = LglsMutIf(C, Neat&);
-
-               loop = self.template ForEachInner<REVERSE>(
-                  [&f](SubNeat neat) {
-                     return neat.ForEachDeep(LglsMov(f));
-                  },
-                  counter
-               );
-            }
-            else*/ if constexpr (not CT::Deep<A>) {
-               // Equivalent to non-deep iteration                      
-               loop = self.template ForEachInner<REVERSE>(LglsMov(f), counter);
-            }
-         }
-         else {
-            using T = TypeOf<C>;
-
-            if constexpr (CT::Deep<A> and (not SKIP or not CT::Deep<T>)) {
-               // Always execute for intermediate/non-deep *this        
-               ++counter;
-
-               auto& argument = self;//self.template ReinterpretCast<A>();
-
-               if constexpr (CT::Bool<R>) {
-                  if (not f(argument))
-                     return Loop::Break;
-               }
-               else if constexpr (Exact<R, LoopControl>) {
-                  // Do things depending on the F's return              
-                  R loop = f(argument);
-
-                  while (loop == Loop::Repeat)
-                     loop = f(argument);
-
-                  switch (loop.mControl) {
-                  case LoopControl::Break:
-                  case LoopControl::NextLoop:
-                     return loop;
-                  case LoopControl::Continue:
-                  case LoopControl::Repeat:
-                     break;
-                  case LoopControl::Discard:
-                     if constexpr (CT::Mutable<C>) {
-                        // Discard is allowed only if THIS is mutable   
-                        // You can't fully discard the topmost block,   
-                        // only reset it. Now, if we reset this block,  
-                        // and then remove it up the chain, if          
-                        // branching-out happens to occur, we'll end up 
-                        // with a branch that contains the empty element
-                        // and that is bad. So defer the reset up the   
-                        // chain instead!                               
-                        return Loop::Discard;
-                     }
-                     else {
-                        // ...otherwise it acts like a Loop::Continue   
-                        LglsAssumeUserWarn(false,
-                           "Attempting to Loop::Discard while iterating constant container. "
-                           "No discard will be performed."
-                        );
-                        break;
-                     }
-                  }
-               }
-               else f(argument);
-            }
-
-            if constexpr (CT::Deep<T>) {
-               // Iterate subblocks                                     
-               /*Count<C>*/size_t intermediateCounterSink = 0;
-               using SubBlock = LglsMutIf(C, Decay<T>&);
-
-               loop = self.template ForEachInner<REVERSE>(
-                  [&counter, &f](SubBlock group) {
-                     return group.template ForEachDeepInner<REVERSE, SKIP>(LglsMov(f), counter);
-                  },
-                  intermediateCounterSink
-               );
-            }
-            /*else if constexpr (Akin<T, Neat>) {
-               // Iterate normalized subblocks                          
-               using SubNeat = LglsMutIf(C, Neat&);
-
-               loop = self.template ForEachInner<REVERSE>(
-                  [&f](SubNeat neat) {
-                     return neat.ForEachDeep(LglsMov(f));
-                  },
-                  counter
-               );
-            }
-            else*/ if constexpr (not CT::Deep<A>) {
-               // Equivalent to non-deep iteration                      
-               loop = self.template ForEachInner<REVERSE>(LglsMov(f), counter);
-            }
-         }
-
-         return loop;
       }
 
       /// Execute a function for each element inside container.               

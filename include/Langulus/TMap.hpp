@@ -32,6 +32,7 @@ namespace Langulus::Annies::Inner
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,
                         EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 1>>>,
       Com::HashHeap<Hash, 0, 1>,          // Hash can be cached         
+      Com::Deepening<Many>,               // Makes container deep       
       Com::Merging<false, 0, 1>,          // Only merging for keys      
       Com::Removal<0, 1>,                 // Allows clear/reset of K/V  
       Com::Conversion<0, 1>,              // Allows conversions of K/V  
@@ -54,11 +55,8 @@ namespace Langulus::Annies
    struct TMap : Inner::TMapBase<K, V, SORT> {
       using CTTI_ReflectAs = Map;
       using CTTI_Map       = Yup;
-      using CTTI_Deep      = Yup;
       using CTTI_POD       = No; //TODO could be, when we implement SVO
-
       using Base           = Inner::TMapBase<K, V, SORT>;
-      using DeepType       = Many;//Any;
 
       #if not LANGULUS(FORCE_TYPE_ERASURE)
          using HandleType     = THandlePair<THandle<ConstAll<K&>>, THandle<ConstAll<V&>>>;

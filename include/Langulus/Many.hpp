@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -14,6 +14,7 @@
 #include "Annies/Components/Reserve-Stack.hpp"
 #include "Annies/Components/OwnershipDeep-Heap.hpp"
 #include "Annies/Components/Hash-Stack.hpp"
+#include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/IndexedLinear.hpp"
 #include "Annies/Components/Insertion.hpp"
@@ -54,6 +55,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       Com::OwnershipDeepHeap<>,        // Sparse elements are referenced
       Com::HashStack<>,                // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Insertion<>,                // Allows insertion              
       Com::InsertionOperators<>,       // << and >> insertion           
       Com::Merging<>,                  // Allows merging                
@@ -80,9 +82,7 @@ namespace Langulus::Annies
    /// using Any instead, for a bit shorter and faster representation.        
    struct Many : Inner::ManyBase {
       using CTTI_ReflectAs = Many;
-      using CTTI_Deep      = Yup;
       using Base           = Inner::ManyBase;
-      using DeepType       = Many;
       
       constexpr Many() noexcept {
          this->ConstructDefault();
@@ -163,18 +163,6 @@ namespace Langulus::Annies
             return result;
          }
       #endif
-
-      template<CT::Container AS>
-      auto ReinterpretAs() const -> AS const& {
-         //TODO perform binary compatiblity check between Many and AS by comparing stack requests in components
-         return reinterpret_cast<AS const&>(*this);
-      }
-   
-      template<CT::Container AS>
-      auto ReinterpretAs() -> AS& {
-         //TODO perform binary compatiblity check between Many and AS by comparing stack requests in components
-         return reinterpret_cast<AS&>(*this);
-      }
    
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     

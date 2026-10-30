@@ -12,8 +12,7 @@
 
 namespace Langulus::Annies::Inner
 {
-   /// Verbs extend the usual type-erased Any, by adding charge and verb ID   
-   /// as members.                                                            
+   /// Tags extend the usual type-erased Many, by adding tag member.          
    template<class TAG>
    using TTagBase = typename ManyBase::template Include<
       Com::TaggedStack<TMeta, TAG>  // Add tag                          
@@ -24,11 +23,12 @@ namespace Langulus::Annies
 {
    /// MARK: TTag                                                             
    ///                                                                        
-   /// A statically-tagged and statically-tagged equivalent of Tag            
+   /// A statically-tagged or dynamically tagged Many container.              
    template<class TAG> 
    struct TTag : Inner::TTagBase<TAG> {
       using CTTI_ReflectAs = Tag;
       using CTTI_Tag       = Yup;
+      using CTTI_Deep      = No;
       using Base           = Inner::TTagBase<TAG>;
 
       constexpr TTag() noexcept {

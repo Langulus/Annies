@@ -20,7 +20,7 @@ namespace Langulus::Annies::Inner
    using HiveBase = Com::Container<
       Com::StateStack<>,                     // No states               
       Com::Stack<TMany<TSlots<T>>>,
-      Com::IndexedComposite<>,               // Composite indexing      
+      Com::IndexedComposite<1>,              // Composite indexing      
       Com::HashEmergent<>,                   // Emergent hash           
       Com::Assignment<>,                     // Assignment              
       Com::InsertionOperators<>,             // Insertion operators     
@@ -81,8 +81,8 @@ namespace Langulus::Annies
             return this->Assign(LglsFwd(argument));
       }
 
-      using Com::Comparison<false, true, 0, 1, 2>::operator <=>;
-      using Com::Comparison<false, true, 0, 1, 2>::operator ==;
+      using Com::Comparison<>::operator <=>;
+      using Com::Comparison<>::operator ==;
    };
 }
 

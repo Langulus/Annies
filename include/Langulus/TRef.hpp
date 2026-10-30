@@ -13,6 +13,7 @@
 #include "Annies/Components/OwnershipDeep-Emergent.hpp"
 #include "Annies/Components/Count-Static.hpp"
 #include "Annies/Components/Reserve-Emergent.hpp"
+#include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Assignment.hpp"
 #include "Annies/Components/Comparison.hpp"
@@ -31,6 +32,7 @@ namespace Langulus::Annies::Inner
       //Com::OwnershipStack<>,              // Allocation is referenced   
       //Com::OwnershipDeepHeap<>,           // Individual references      //TODO what if we initialize heap using some arbitrary pointer and there is no entry data beside it?? OwnershipDeepStack instead? with a static array?
       Com::OwnershipDeepEmergent<>,       // Individual references      //TODO temporary
+      Com::Deepening<Many>,               // Makes container deep       
       Com::Emplacement<>,                 // Can be emplaced            
       Com::Assignment<>,                  // Can be reassigned          
       Com::Comparison<false, false>,      // Can be compared            
@@ -50,7 +52,6 @@ namespace Langulus::Annies
    template<class T, class...TAGS>
    struct TRef : Inner::TRefBase<T> {
       using CTTI_ReflectAs = TRef;
-      using CTTI_Deep      = Yup;
       using CTTI_Tagged    = Types<TAGS...>;
       using Base           = Inner::TRefBase<T>;
       using Pick           = ConstAll<T>;

@@ -23,6 +23,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
       Com::HashEmergent<>,             // Hash is retrieved from item   
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Emplacement<>,              // Allows emplacement            
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
@@ -40,10 +41,8 @@ namespace Langulus::Annies
    template<CT::NotVoid T> 
    struct TAny : Inner::TAnyBase<T> {
       using CTTI_ReflectAs = Any;
-      using CTTI_Deep      = Yup;
       using CTTI_POD       = No; //TODO could be, when we implement SVO
       using Base           = Inner::TAnyBase<T>;
-      using DeepType       = Many;//Any;
 
       constexpr TAny() noexcept {
          this->ConstructDefault();

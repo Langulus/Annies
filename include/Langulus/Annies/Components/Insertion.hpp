@@ -524,22 +524,6 @@ namespace Langulus::Annies::Component
          );
       }
 
-      /// MARK: Deepen                                                        
-      /// Wrap all contained elements inside a sub-block                      
-      ///   @return a reference to the newly created inner container          
-      template<class C> requires (CT::TypeErased<C> or CT::Deep<TypeOf<C>>)
-      auto Deepen(this C& self) -> C& {
-         if constexpr (not CT::TypeErased<C>) {
-            LglsAssert(not self.IsTypeConstrained() or self.IsDeep(),
-               "Can't deepen with incompatible type");
-         }
-      
-         // Allocate a new container and move this one inside of it     
-         C temp {Piecewise, Abandon {self}};
-         self.Swap(temp);
-         return *self.template Get<C>();
-      }
-
       /// Extend the container's memory and return the newly allocated range  
       ///   @attention if extending memory without ownership, the container   
       ///      will diverge into a new allocation and copy the data           
@@ -1097,7 +1081,7 @@ namespace Langulus::Annies::Component
                if (not stateCompliant) {
                   // If container is not or-compliant after insertion,  
                   // we need to add another layer                       
-                  ThisCom::Deepen();
+                  self.Deepen();
                }
 
                return ThisCom::template InsertAt<false>(
@@ -1108,7 +1092,7 @@ namespace Langulus::Annies::Component
             if constexpr (FORCE) {
                // If this is reached, all else failed, but we are       
                // allowed to deepen, so just do it                      
-               ThisCom::Deepen();
+               self.Deepen();
                return ThisCom::template InsertAt<false>(
                   index, Deep<C> {LglsFwd(value)} //TODO are we allowed to absorb here? should we use Piecewise?
                );
@@ -1127,7 +1111,7 @@ namespace Langulus::Annies::Component
                if (not stateCompliant) {
                   // If container is not or-compliant after insertion,  
                   // we need to add another layer                       
-                  ThisCom::Deepen();
+                  self.Deepen();
                }
 
                return ThisCom::template InsertAt<false>(

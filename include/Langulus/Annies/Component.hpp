@@ -546,9 +546,9 @@ namespace Langulus::Annies
       #define LglsComIndexedCoverageStack(modifier) \
          template<Cid, Cid...> modifier struct IndexedCoverageStack
 
-      template<Cid, Cid, Cid...> struct IndexedComposite;
+      template<int = 0, Cid = 0, Cid...> struct IndexedComposite;
       #define LglsComIndexedComposite(modifier) \
-         template<Cid, Cid, Cid...> modifier struct IndexedComposite
+         template<int, Cid, Cid...> modifier struct IndexedComposite
 
       /// Iteration                                                           
       template<Cid = 0, Cid...> struct IterationForEach;
@@ -694,7 +694,11 @@ namespace Langulus::Annies
       #define LglsComConversion(modifier) \
          template<Cid, Cid...> modifier struct Conversion
 
-      /// Emplacement, insertion, merging, concatenation, removal             
+      /// Emplacement, insertion, merging, concatenation, removal, deepening  
+      template<class> struct Deepening;
+      #define LglsComDeepening(modifier) \
+         template<class> modifier struct Deepening
+
       template<Cid = 0, Cid...> struct Emplacement;
       #define LglsComEmplacement(modifier) \
          template<Cid, Cid...> modifier struct Emplacement

@@ -11,6 +11,7 @@
 #include "Annies/Components/Typed-Static.hpp"
 #include "Annies/Components/Stack.hpp"
 #include "Annies/Components/Count-Static.hpp"
+#include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Assignment.hpp"
 #include "Annies/Components/Comparison.hpp"
@@ -25,6 +26,7 @@ namespace Langulus::Annies::Inner
       Com::TypedStatic<DMeta, T>,         // Statically typed           
       Com::Stack<T>,                      // Element on the stack       
       Com::CountStatic<1u>,               // Statically sized           
+      Com::Deepening<Many>,               // Makes container deep       
       Com::Emplacement<>,                 // Can be emplaced            
       Com::Assignment<>,                  // Can be reassigned          
       Com::Comparison<>                   // Can be compared            
@@ -44,7 +46,6 @@ namespace Langulus::Annies
    template<CT::NotVoid T, class...TAGS>
    struct TOwn : Inner::TOwnBase<T> {
       using CTTI_ReflectAs = T; 
-      using CTTI_Deep      = Yup;
       using CTTI_Tagged    = Types<TAGS...>;
       using CTTI_POD       = Maybe<CT::POD<T>>;
       using Base           = Inner::TOwnBase<T>;

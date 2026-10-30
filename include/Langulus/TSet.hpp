@@ -27,6 +27,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
       Com::HashHeap<>,                 // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Merging<>,                  // Allows merging                
       Com::MergingOperators<>,         // <<= and >>= merging           
       Com::Assignment<>,               // Allows assignment             
@@ -49,11 +50,8 @@ namespace Langulus::Annies
    struct TSet : Inner::TSetBase<T, SORT> {
       using CTTI_ReflectAs = Set;
       using CTTI_Set       = Yup;
-      using CTTI_Deep      = Yup;
       using CTTI_POD       = No; //TODO could be, when we implement SVO
-
       using Base           = Inner::TSetBase<T, SORT>;
-      using DeepType       = Many;//Any;
 
       #if LANGULUS(FORCE_TYPE_ERASURE)
          using HandleType     = Handle;

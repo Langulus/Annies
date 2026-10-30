@@ -22,12 +22,11 @@ namespace Langulus::A
    /// A type-erased container specifically designed for fully capsulating    
    /// function calls.                                                        
    struct Verb : Annies::Many, Annies::Components::Charge {
-      using CTTI_POD = No;
-      using CTTI_Nullable = No;
-      using CTTI_Deep = No;
+      using CTTI_POD       = No;
+      using CTTI_Nullable  = No;
+      using CTTI_Deep      = No;
       using CTTI_ReflectAs = Verb;
-      using CTTI_Bases = Types<Annies::Many, Annies::Charge>;
-      static constexpr bool CTTI_Container = true;
+      using CTTI_Bases     = Types<Annies::Many, Annies::Charge>;
 
    protected:
       using Real      = Langulus::Real;

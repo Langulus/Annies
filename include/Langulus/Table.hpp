@@ -15,6 +15,7 @@
 #include "Annies/Components/OwnershipDeep-Heap.hpp"
 #include "Annies/Components/Hash-Stack.hpp"
 #include "Annies/Components/IndexedHash-Stack.hpp"
+#include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Merging.hpp"
 #include "Annies/Components/MergingOperators.hpp"
 #include "Annies/Components/Assignment.hpp"
@@ -46,6 +47,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       Com::OwnershipDeepHeap<>,        // Sparse elements are referenced
       Com::HashStack<>,                // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Merging<>,                  // Allows merging                //TODO emplacement and insertion? tables allow duplicates, right?
       Com::MergingOperators<>,         // <<= and >>= merging           
       Com::Assignment<>,               // Allows assignment             
@@ -66,10 +68,7 @@ namespace Langulus::Annies
    struct Table : Inner::TableBase {
       using CTTI_ReflectAs = Table;
       using CTTI_Table     = Yup;
-      using CTTI_Deep      = Yup;
-
       using Base           = Inner::TableBase;
-      using DeepType       = Many;
 
       constexpr Table() noexcept {
          this->ConstructDefault();

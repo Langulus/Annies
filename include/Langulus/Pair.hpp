@@ -39,6 +39,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
       Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0, 1>,
       Com::HashEmergent<Hash, 0, 1>,      // Hash retrieved from items  
+      Com::Deepening<Many>,               // Makes container deep       
       Com::Emplacement<0, 1>,             // Allows emplacement         
       Com::Assignment<false, 0, 1>,       // Allows assignment          
       Com::Removal<0, 1>,                 // Allows clear/reset         
@@ -54,13 +55,9 @@ namespace Langulus::Annies
    /// A type-erased pair                                                     
    struct Pair : Inner::PairBase {
       using CTTI_ReflectAs = Pair;
-      using CTTI_Deep      = Yup;
       using CTTI_Pair      = Yup;
 
-      //static constexpr bool ReferenceElements = true;
-
       using Base           = Inner::PairBase;
-      using DeepType       = Many;
       using HandleType     = THandlePair<Handle, Handle>;
       using HandleMutType  = THandlePair<HandleMut, HandleMut>;
       using Pick           = HandleType;

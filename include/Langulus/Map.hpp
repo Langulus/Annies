@@ -52,6 +52,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
       Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0, 1>,
       Com::HashHeap<Hash, 0, 1>,          // Hash can be cached         
+      Com::Deepening<Many>,               // Makes container deep       
       Com::Merging<false, 0, 1>,          // Only merging for keys      
       //Com::Assignment<false, 1>,        // Assignment of values       
       Com::Removal<0, 1>,                 // Allows clear/reset of K/V  
@@ -71,9 +72,8 @@ namespace Langulus::Annies::Inner
    struct Map : MapBase<SORTED> {
       using CTTI_ReflectAs = Map;
       using CTTI_Map       = Yup;
-      using CTTI_Deep      = Yup;
       using Base           = MapBase<SORTED>;
-      using DeepType       = Many;
+      
       using HandleType     = THandlePair<Handle, Handle>;
       using HandleMutType  = THandlePair<Handle, HandleMut>;
       using Pick           = HandleType;

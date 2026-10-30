@@ -238,7 +238,7 @@ namespace Langulus::Annies::Component
          bool satisfied = false;
          size_t counter = 0;
 
-         self.ForEachDeep([&](const TAG& tag) {
+         self.ForEachDeep([&](TAG const& tag) {
             if (counter < IDX) {
                // We're only interested in the Nth tag                
                ++counter;

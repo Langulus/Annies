@@ -55,9 +55,6 @@ namespace Langulus::Annies::Component
          return ThisCom::GetCountInner() != 0;
       }
 
-      //T GetCountDeep() const noexcept;
-      //T GetCountItemsDeep() const noexcept;
-
    protected:
       /// MARK: Protected                                                     
       LglsComRemoval(friend);

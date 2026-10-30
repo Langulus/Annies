@@ -14,6 +14,7 @@
 #include "Annies/Components/Reserve-Emergent.hpp"
 #include "Annies/Components/OwnershipDeep-Heap.hpp"
 #include "Annies/Components/Hash-Emergent.hpp"
+#include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Assignment.hpp"
 #include "Annies/Components/Removal.hpp"
@@ -43,6 +44,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       Com::OwnershipDeepHeap<>,        // Sparse elements are referenced
       Com::HashEmergent<>,             // Hash is retrieved from item   
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Emplacement<>,              // Allows emplacement            
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
@@ -62,9 +64,7 @@ namespace Langulus::Annies
    /// elements use Many instead.                                             
    struct Any : Inner::AnyBase {
       using CTTI_ReflectAs = Any;
-      using CTTI_Deep      = Yup;
       using Base           = Inner::AnyBase;
-      using DeepType       = Many;//Any;
 
       constexpr Any() noexcept {
          this->ConstructDefault();
@@ -134,6 +134,7 @@ namespace Langulus::Annies
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
 
+      /// Instantiate a reflected constant                                    
       static Any FromConstant(RTTI::CMeta c) {
          Any result;
          result.SetType(c.GetType());

@@ -15,6 +15,7 @@
 #include <Langulus/CT/Bool.hpp>
 #include <Langulus/CT/Deep.hpp>
 #include <concepts>
+#include <memory>
 
 /// Make the rest of the code aware, that Langulus::Annies has been included 
 #define LANGULUS_LIBRARY_ANYNESS() 1
@@ -373,6 +374,7 @@ namespace Langulus::Annies::Component
       LglsComHashEmergent(friend);
       LglsComDictionaryHeap(friend);
       LglsComComparison(friend);
+      LglsComDeepening(friend);
       LglsComEmplacement(friend);
       LglsComAssignment(friend);
       LglsComInsertion(friend);
@@ -1389,6 +1391,78 @@ namespace Langulus::Annies::Component
          }
          #endif
          return false;
+      }
+
+      /// Interprets the container as another container. Guaranteed to be     
+      /// most efficient when both are binary-compatible. Otherwise, a        
+      /// shallow disowned copy shall occur, resulting in an immutable        
+      /// view of SELF in a temporary instance of AS.                         
+      //TODO use start_lifetime_as when finally available for clang           
+      template<CT::Container AS, class SELF> requires CT::NoIntent<AS>
+      decltype(auto) ReinterpretAs(this SELF&& self) {
+         if constexpr (Same<SELF, AS>) {
+            // Nothing to do                                            
+            return LglsFwd(self);
+         }
+         else if constexpr (Same<CT::ReflectedAs<Decay<SELF>>, CT::ReflectedAs<Decay<AS>>>) {
+            // Containers are binary-compatible, as long as they are    
+            // of the same type                                         
+            if constexpr (CT::TypeErased<AS> and not CT::TypeErased<SELF>) {
+               // Reinterpret to a type-erased equivalent is always     
+               // permitted                                             
+               return *reinterpret_cast<LglsMutIf(SELF, AS*)>(&self);
+               //return *::std::start_lifetime_as<LglsMutIf(SELF, AS*)>(&self);
+            }
+            else if constexpr (CT::TypeErased<SELF>) {
+               // Runtime type checks are required                      
+               static_assert(not CT::TypeErased<AS>,
+                  "Can't interpret to a type-erased equivalent");
+               
+               if constexpr (CT::Multidimensional<SELF>) {
+                  // Multidimensional runtime check                     
+                  static_assert(DimensionMatch<SELF, AS>,
+                     "Dimension mismatch");
+                     
+                  SELF::Dimensions::ForEach([]<Cid D> {//TODO i'm tired of making these checks all over the place, just place them somewhere
+                     static_assert(Same<TypeOf<SELF, D>, TypeOf<AS, D>>,
+                        "Type mismatch in particular dimension"
+                     );
+                  });
+                  return *reinterpret_cast<LglsMutIf(SELF, AS*)>(&self);
+                  //return *::std::start_lifetime_as<LglsMutIf(SELF, AS*)>(&self);
+               }
+               else {
+                  // Simple runtime check                               
+                  static_assert(Same<TypeOf<SELF>, TypeOf<AS>>, "Type mismatch");
+                  return *reinterpret_cast<LglsMutIf(SELF, AS*)>(&self);
+                  //return *::std::start_lifetime_as<LglsMutIf(SELF, AS*)>(&self);
+               }
+            }
+            else if constexpr (CT::Multidimensional<SELF>) {
+               // Multidimensional compile-time check                   
+               static_assert(DimensionMatch<SELF, AS>,
+                  "Dimension mismatch");
+
+               SELF::Dimensions::ForEach([]<Cid D> {
+                  static_assert(Same<TypeOf<SELF, D>, TypeOf<AS, D>>,
+                     "Type mismatch in particular dimension"
+                  );
+               });
+               return *reinterpret_cast<LglsMutIf(SELF, AS*)>(&self);
+               //return *::std::start_lifetime_as<LglsMutIf(SELF, AS*)>(&self);
+            }
+            else {
+               // Simple compile-time check                             
+               static_assert(Same<TypeOf<SELF>, TypeOf<AS>>, "Type mismatch");
+               return *reinterpret_cast<LglsMutIf(SELF, AS*)>(&self);
+               //return *::std::start_lifetime_as<LglsMutIf(SELF, AS*)>(&self);
+            }
+         }
+         else {
+            // Containers aren't binary compatible.                     
+            // Do a disowned shallow copy to represent data.            
+            return Decay<AS> {Annies::Absorb, Disown(self)};
+         }
       }
    };
 }

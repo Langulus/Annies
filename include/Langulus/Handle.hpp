@@ -13,6 +13,7 @@
 #include "Annies/Components/Count-Static.hpp"
 #include "Annies/Components/OwnershipDeep-Reference.hpp"
 #include "Annies/Components/Hash-Emergent.hpp"
+#include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Assignment.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Comparison.hpp"
@@ -28,6 +29,7 @@ namespace Langulus::Annies::Inner
       Com::CountStatic<1u>,
       Com::OwnershipDeepReference<Com::WeakOwnership>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>,
@@ -41,6 +43,7 @@ namespace Langulus::Annies::Inner
       Com::CountStatic<1u>,
       Com::OwnershipDeepReference<Com::WeakOwnership>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Comparison<>,
       Com::IterationOperators<>
    >;
@@ -51,6 +54,7 @@ namespace Langulus::Annies::Inner
       Com::HeapReference<>,
       Com::CountStatic<1u>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>,
@@ -63,6 +67,7 @@ namespace Langulus::Annies::Inner
       Com::HeapReference<>,
       Com::CountStatic<1u>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Comparison<>,
       Com::IterationOperators<>
    >;
@@ -91,6 +96,7 @@ namespace Langulus::Annies::Inner
       Com::ReserveEmergent<>,
       Com::OwnershipStack<Com::WeakOwnership>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>,
@@ -106,6 +112,7 @@ namespace Langulus::Annies::Inner
       Com::CountStatic<1u>,
       Com::OwnershipDeepReference<Com::WeakOwnership>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>,
@@ -122,6 +129,7 @@ namespace Langulus::Annies::Inner
       Com::ReserveEmergent<>,
       Com::OwnershipEmergent<Com::WeakOwnership>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>,
@@ -138,6 +146,7 @@ namespace Langulus::Annies::Inner
       Com::CountStatic<1u>,
       Com::OwnershipDeepEmergent<Com::WeakOwnership>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>,
@@ -152,6 +161,7 @@ namespace Langulus::Annies::Inner
       Com::HeapReference<HeapEntry<0, Deref<T>*>>,
       Com::CountStatic<1u>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>,
@@ -168,6 +178,7 @@ namespace Langulus::Annies::Inner
       Com::Stack<T>,
       Com::CountStatic<1u>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<>,
       Com::Emplacement<>,
       Com::Comparison<>
@@ -185,6 +196,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,
       Com::OwnershipDeepHeap<>,
       Com::HashEmergent<>,
+      Com::Deepening<HandleDisowned>,
       Com::Emplacement<>,
       Com::Assignment<>,
       Com::Comparison<>
@@ -201,10 +213,8 @@ namespace Langulus::Annies
    ///   @attention handles are never (de)referenced upon construction and    
    ///      destruction - only on reassignment                                
    struct HandleMut : Inner::TypeErasedHandleMut {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
-      using DeepType       = HandleDisowned; //TODO why disowned??
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -256,10 +266,8 @@ namespace Langulus::Annies
    /// A type-erased mutable handle without ownership.                        
    /// It refers to a picked element inside a type-erased container.          
    struct HandleDisownedMut : Inner::TypeErasedHandleMutDisowned {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
-      using DeepType       = HandleDisowned; //TODO why disowned??
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -316,10 +324,8 @@ namespace Langulus::Annies
    ///      carries ownership information, so that it can be used on demand   
    ///      instead of sought from the memory manager every time.             
    struct Handle : Inner::TypeErasedHandle {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
-      using DeepType       = HandleDisowned; //TODO why disowned???
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -376,10 +382,8 @@ namespace Langulus::Annies
    /// A type-erased immutable handle without ownership.                      
    /// It refers to a picked element inside a type-erased container.          
    struct HandleDisowned : Inner::TypeErasedHandleDisowned {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
-      using DeepType       = HandleDisowned;
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -445,11 +449,9 @@ namespace Langulus::Annies
    ///   @tparam T the contained type                                         
    template<CT::Reference T> requires (CT::Dense<T> and CT::NotSheddable<T>)
    struct THandle<T> : Inner::THandleEmbeddedDense<T> {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
       using Denser         = THandle;
-      using DeepType       = HandleDisowned; //TODO why disowned??
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -500,11 +502,9 @@ namespace Langulus::Annies
    
    template<CT::Reference T> requires (CT::Sparse<T> and CT::NotSheddable<T>)
    struct THandle<T> : Inner::THandleEmbeddedSparse<T> {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
       using Denser         = THandle<Deptr<T>&>;
-      using DeepType       = HandleDisowned; //TODO why disowned??
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -562,11 +562,9 @@ namespace Langulus::Annies
    ///   @tparam T the contained type                                         
    template<CT::Reference T> requires (CT::Dense<T> and CT::NotSheddable<T>)
    struct THandleEmergent<T> : Inner::THandleEmbeddedDenseEmergent<T> {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
       using Denser         = THandleEmergent;
-      using DeepType       = HandleDisowned; //TODO why disowned??
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -618,11 +616,9 @@ namespace Langulus::Annies
 
    template<CT::Reference T> requires (CT::Sparse<T> and CT::NotSheddable<T>)
    struct THandleEmergent<T> : Inner::THandleEmbeddedSparseEmergent<T> {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
       using Denser         = THandleEmergent<Deptr<T>&>;
-      using DeepType       = HandleDisowned; //TODO why disowned??
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -679,11 +675,9 @@ namespace Langulus::Annies
    ///   @tparam T the contained type                                         
    template<CT::Reference T> requires CT::NotSheddable<T>
    struct THandleDisowned<T> : Inner::THandleDisownedEmbedded<T> {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
       using Denser         = THandle<Deptr<T>&>;
-      using DeepType       = HandleDisowned;
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
 
@@ -738,11 +732,9 @@ namespace Langulus::Annies
    ///   @tparam T the contained type                                         
    template<CT::NotReference T> requires (CT::Dense<T> and CT::NotSheddable<T>)
    struct THandle<T> : Inner::THandleLocalDense<T> {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
       using Denser         = THandle<T&>; // avoids nested local handles (and thus copies) by adding a reference
-      using DeepType       = HandleDisowned; //TODO why disowned??
       using Base           = typename Inner::THandleLocalDense<T>::Base;
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
@@ -823,11 +815,9 @@ namespace Langulus::Annies
    ///   @tparam T the contained sparse type                                  
    template<CT::NotReference T> requires (CT::Sparse<T> and CT::NotSheddable<T>)
    struct THandle<T> : Inner::THandleLocalSparse<T> {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_ReflectAs = void;
       using Denser         = THandle<Deptr<T>&>; // avoids nested local handles (and thus copies) by adding a reference
-      using DeepType       = HandleDisowned; //TODO why disowned??
       using Base           = typename Inner::THandleLocalSparse<T>::Base;
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;

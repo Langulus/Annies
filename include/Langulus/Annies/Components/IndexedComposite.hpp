@@ -16,28 +16,30 @@ namespace Langulus::Annies::Component
    ///                                                                        
    /// Makes all contained deep containers inside relevant stacks/heaps       
    /// accessible from here as if they form a single contiguous container.    
-   ///   @tparam ID1, ID2, IDN... the providers we're indexing                
-   template<Cid ID0, Cid ID1, Cid...IDN>
+   ///   @tparam DEPTH which level inside the shared providers to stitch      
+   ///      together. For example, if you have three stack, each containing   
+   ///      TMany<T>, then using DEPTH of 0 will stitch these TMany containers
+   ///      together. If you use DEPTH of 1, it will stitch all available Ts  
+   ///      (in all available TMany<T>) together, instead. If you use DEPTH   
+   ///      of 2, it will reach further into each T and try to stitch its     
+   ///      contents (or error out if Ts aren't containers).                  
+   ///   @tparam ID0, IDN... the providers we're indexing                     
+   template<int DEPTH, Cid ID0, Cid...IDN>
    struct IndexedComposite {
       /// Refers back to this particular component instance through the       
       /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
       /// this file.                                                          
-      #define ThisCom self.IndexedComposite<ID0, ID1, IDN...>
+      #define ThisCom self.IndexedComposite<DEPTH, ID0, IDN...>
 
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
-      using Id             = Values<ID0, ID1, IDN...>;
+      using Id             = Values<ID0, IDN...>;
       using CompositeIds   = Id;
 
       static constexpr int ComponentPrecedence = 0;
 
       using IteratorCategory = ::std::bidirectional_iterator_tag;
       static constexpr IndexingStyle Indexed = IndexingStyle::IndexedComposite;
-
-      /*template<class C>
-      constexpr auto GetCompositeProviders(this C const&) noexcept {
-         return C::FindProviders(Id{});
-      }*/
       
       /// Get the composite count                                             
       size_t GetCount(this auto const& self) noexcept {
@@ -46,7 +48,7 @@ namespace Langulus::Annies::Component
          ForEach(providers, [&self, &accumulated_count]<class C> noexcept {
             static_assert(CT::Deep<decltype(self.C::GetRaw())>,
                "Non-deep provider marked as relevant: " + CppNameOf<C>());
-            accumulated_count += self.C::GetRaw()->GetCount();
+            accumulated_count += self.C::GetRaw()->GetCountDeep(DEPTH);
          });
          return accumulated_count;
       }
@@ -75,7 +77,7 @@ namespace Langulus::Annies::Component
          return ForEachOr(providers, [&self]<class C> noexcept {
             static_assert(CT::Deep<decltype(self.C::GetRaw())>,
                "Non-deep provider marked as relevant: " + CppNameOf<C>());
-            return self.C::GetRaw()->IsMissingDeep();
+            return self.C::GetRaw()->IsMissingDeep(DEPTH);
          });
       }
 
@@ -86,7 +88,7 @@ namespace Langulus::Annies::Component
          return ForEachOr(providers, [&self]<class C> noexcept {
             static_assert(CT::Deep<decltype(self.C::GetRaw())>,
                "Non-deep provider marked as relevant: " + CppNameOf<C>());
-            return self.C::GetRaw()->IsExecutable();
+            return self.C::GetRaw()->IsExecutable(DEPTH);
          });
       }
 
@@ -95,11 +97,26 @@ namespace Langulus::Annies::Component
          Cid    provider;
          size_t offset;
       };
+      
+
+      /// MARK: BrowseCompositeInner                                          
+      ///   @returns true if we need to continue iterating through contents   
+      template<CT::Container C>
+      static bool BrowseCompositeInner(C const& self, int depth, size_t& index) assumptious {
+         static_assert(CT::Typed<C>, "Subcontent must be typed");
+         static_assert(CT::Deep<TypeOf<C>>, "Subcontent must contain deep items");
+         for (auto const& subcontent : self) {
+            const size_t subcontent_count = subcontent.GetCountDeep(depth);
+            if (subcontent_count and index < subcontent_count)
+               return false;
+            
+            index -= subcontent_count;
+         }
+         return true;
+      }
 
       /// MARK: BrowseComposite                                               
-      /// Browse providers, converting contiguous index into provider index.  
-      ///                                                                     
-      /// Composites are indexed the following way:                           
+      /// If DEPTH is 0, composites are indexed the following way:            
       /// Provider0 has size 5:  [0][1][2][3][4]                              
       /// Provider1 has size 0:  skipped                                      
       /// Provider2 has size 555:[5][6][7][8][9][10][11][12][13][14]...       
@@ -118,13 +135,21 @@ namespace Langulus::Annies::Component
          ForEachAnd(providers, [&self,&index,&selected]<class P> noexcept {
             static_assert(CT::Deep<decltype(self.P::GetRaw())>,
                "Non-deep provider marked as relevant: " + CppNameOf<P>());
-            const size_t provider_count = self.P::GetRaw()->GetCount();
-            if (provider_count and index < provider_count) {
-               selected = P::Id::First;
-               return false;
+
+            if constexpr (DEPTH == 0) {
+               // No need to browse beyond the immediate providers      
+               const size_t provider_count = self.P::GetRaw()->GetCount();
+               if (provider_count and index < provider_count) {
+                  selected = P::Id::First;
+                  return false;
+               }
+               index -= provider_count;
+               return true;
             }
-            index -= provider_count;
-            return true;
+            else {
+               // We need to browse deeper into the provider contents   
+               return BrowseCompositeInner(*self.P::GetRaw(), DEPTH - 1, index);
+            }
          });
          LglsAssumeDev(selected != unsigned(-1), "Index out of range");
          return {selected, index};
@@ -232,7 +257,7 @@ namespace Langulus::Annies::Component
          constexpr auto providers = self.FindProviders(Id{});
          ForEachAnd(providers, [&self,&where,&result]<class P> {
             if (P::Id::First == where.provider) {
-               result = self.P::GetRaw()->template AsAt<AS>(where.offset);
+               result = self.P::GetRaw()->template AsAtDeep<AS>(where.offset, DEPTH);
                return false;
             }
             return true;
@@ -245,10 +270,7 @@ namespace Langulus::Annies::Component
       ///   @return the picked element                                        
       template<CT::Container C>
       decltype(auto) operator[] (this C&& self, CT::Index auto&& idx) assumptious {
-         //if constexpr (CT::TypeErased<C>)
-            return ThisCom::template AsAt<DecidePick<C>>(LglsFwd(idx));
-         //else
-         //   return *ThisCom::GetAt(LglsFwd(idx));
+         return ThisCom::template AsAt<DecidePick<C>>(LglsFwd(idx));
       }
    };
 }

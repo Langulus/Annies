@@ -37,8 +37,9 @@ namespace Langulus::Annies::Inner
          // Contents may or may not be normalized.                      
          Com::Stack<TMapUnsorted<DMeta, MessyList>,  2>
       >,
-      Com::IndexedComposite<0, 1, 2>,        // Composite indexing      
+      Com::IndexedComposite<0, 0, 1, 2>,     // Composite indexing      
       Com::HashEmergent<Hash, 0, 1, 2>,      // Emergent hash           
+      Com::Deepening<Many>,                  // Makes container deep    
       Com::Assignment<false, 0, 1, 2>,       // Assignment              
       Com::InsertionOperators<>,             // Insertion operators     
       Com::MergingOperators<>,               // Merge operators         
@@ -64,9 +65,7 @@ namespace Langulus::Annies
    /// recipe and are filled by the context (i.e. Tags::Parent(?)).           
    struct Neat : Inner::NeatBase {
       using CTTI_ReflectAs = Neat;
-      using CTTI_Deep      = Yup;
 
-      using DeepType       = Many;
       using HandleType     = Handle;
       using HandleMutType  = Handle;
       using Pick           = Handle;

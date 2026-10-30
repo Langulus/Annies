@@ -34,15 +34,14 @@ namespace Langulus::Annies
       Com::MultiownDeep<Com::OwnershipDeepReference<Com::WeakOwnership, true, 0>,
                         Com::OwnershipDeepReference<Com::WeakOwnership, true, 1>>,
       Com::HashEmergent<Hash, 0, 1>,
+      Com::Deepening<HandleDisowned>,
       Com::Comparison<false, true, 0, 1>,
       Com::IterationOperators<0, 1>
    > {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
-      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = Handle;
       using ValHandle = Handle;
 
@@ -120,17 +119,16 @@ namespace Langulus::Annies
       Com::MultiownDeep<Com::OwnershipDeepReference<Com::WeakOwnership, true, 0>,
                         Com::OwnershipDeepReference<Com::WeakOwnership, true, 1>>,
       Com::HashEmergent<Hash, 0, 1>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<false, 0, 1>,
       Com::Emplacement<0, 1>,
       Com::Comparison<false, true, 0, 1>,
       Com::IterationOperators<0, 1>
    > {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
-      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = HandleMut;
       using ValHandle = HandleMut;
 
@@ -206,17 +204,16 @@ namespace Langulus::Annies
       Com::MultiownDeep<Com::OwnershipDeepReference<Com::WeakOwnership, true, 0>,
                         Com::OwnershipDeepReference<Com::WeakOwnership, true, 1>>,
       Com::HashEmergent<Hash, 0, 1>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<false, 1>,
       Com::Emplacement<1>,
       Com::Comparison<false, true, 0, 1>,
       Com::IterationOperators<0, 1>
    > {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
-      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = Handle;
       using ValHandle = HandleMut;
 
@@ -305,16 +302,15 @@ namespace Langulus::Annies
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepEmergent<Com::WeakOwnership, true, 0>>,
                         EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepEmergent<Com::WeakOwnership, true, 1>>>,
       Com::HashEmergent<Hash, 0, 1>,
+      Com::Deepening<HandleDisowned>,
       Com::Comparison<false, true, 0, 1>,
       Com::IterationOperators<0, 1>
    > {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
       using Denser    = THandlePair<typename THandleEmergent<K>::Denser, typename THandleEmergent<V>::Denser>;
-      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = THandleEmergent<K>;
       using ValHandle = THandleEmergent<V>;
 
@@ -402,18 +398,17 @@ namespace Langulus::Annies
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepReference<Com::WeakOwnership, true, 0>>,
                         EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepReference<Com::WeakOwnership, true, 1>>>,
       Com::HashEmergent<Hash, 0, 1>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<false, 0, 1>,
       Com::Emplacement<0, 1>,
       Com::Comparison<false, true, 0, 1>,
       Com::IterationOperators<0, 1>
    > {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
       using Denser    = THandlePair<typename THandle<K>::Denser, typename THandle<V>::Denser>;
-      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = THandle<K>;
       using ValHandle = THandle<V>;
 
@@ -513,17 +508,16 @@ namespace Langulus::Annies
       Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,
                         EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 1>>>,
       Com::HashEmergent<Hash, 0, 1>,
+      Com::Deepening<HandleDisowned>,
       Com::Assignment<false, 0, 1>,
       Com::Emplacement<0, 1>,
       Com::Comparison<false, true, 0, 1>
    > {
-      using CTTI_Deep      = Yup;
       using CTTI_Handle    = Yup;
       using CTTI_Pair      = Yup;
       using CTTI_ReflectAs = void;
 
       using Denser    = THandlePair<typename THandle<K>::Denser, typename THandle<V>::Denser>;
-      using DeepType  = HandleDisowned; //TODO why disowned?
       using KeyHandle = Tif<CT::Sparse<K>, THandle<K&>, THandleEmergent<K&>>;
       using ValHandle = Tif<CT::Sparse<V>, THandle<V&>, THandleEmergent<V&>>;
 

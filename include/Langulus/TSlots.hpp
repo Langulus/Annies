@@ -24,6 +24,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
       Com::HashStack<>,                // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Insertion<>,                // Allows insertion              
       Com::InsertionOperators<>,       // << and >> insertion           
       Com::Merging<>,                  // Allows merging                
@@ -47,10 +48,8 @@ namespace Langulus::Annies
    template<CT::NotVoid T> 
    struct TSlots : Inner::TSlotsBase<T> {
       using CTTI_ReflectAs = TSlots;
-      using CTTI_Deep      = Yup;
       using CTTI_POD       = No; //TODO could be, when we implement SVO
       using Base           = Inner::TSlotsBase<T>;
-      using DeepType       = Many;//Any;
 
       constexpr TSlots() noexcept {
          this->ConstructDefault();

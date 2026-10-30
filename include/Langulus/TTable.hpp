@@ -25,6 +25,7 @@ namespace Langulus::Annies::Inner
       Com::OwnershipStack<>,           // Allocation is referenced      
       EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
       Com::HashStack<>,                // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
       Com::Merging<>,                  // Allows merging                //TODO emplacement and insertion? tables allow duplicates, right?
       Com::MergingOperators<>,         // <<= and >>= merging           
       Com::Assignment<>,               // Allows assignment             
@@ -46,11 +47,8 @@ namespace Langulus::Annies
    struct TTable : Inner::TTableBase<T> {
       using CTTI_ReflectAs = Table;
       using CTTI_Table     = Yup;
-      using CTTI_Deep      = Yup;
       using CTTI_POD       = No; //TODO could be, when we implement SVO
-
       using Base           = Inner::TTableBase<T>;
-      using DeepType       = Many;//Any;
 
       constexpr TTable() noexcept {
          this->ConstructDefault();

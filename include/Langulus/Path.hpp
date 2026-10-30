@@ -106,6 +106,8 @@ namespace Langulus
    Path operator ""_path(const char*, size_t);
 }
 
+/// MARK: Morphisms                                                           
+LANGULUS_MORPHISM(std::string_view, Annies::Text);
 LANGULUS_MORPHISM(Annies::Path, Annies::Text);
 
 namespace Langulus::CTTI
