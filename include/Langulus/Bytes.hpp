@@ -296,6 +296,13 @@ namespace Langulus::Annies
          memset(this->GetRaw() + current_size, 0, nbytes);
          this->GetCountInner() = current_size + nbytes;
       }
+
+      /// Allocate additional 'nbytes' and don't do anything with them        
+      void New(size_t nbytes) {
+         const size_t current_size = this->GetCount();
+         this->AllocateMore(current_size + nbytes);
+         this->GetCountInner() = current_size + nbytes;
+      }
    };
    #pragma pack(pop)
 }

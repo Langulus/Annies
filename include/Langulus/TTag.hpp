@@ -172,5 +172,11 @@ namespace Langulus
       struct T : Annies::TTag<T> { \
          using CTTI_Info = Yes<INFOSTRING>; \
          __VA_ARGS__; \
+         template<class D> static T Typed(int states = 0) { \
+            T result; \
+            result.SetType(MetaDataOf<D>()); \
+            result.SetState(states); \
+            return result; \
+         } \
       }; \
    }

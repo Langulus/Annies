@@ -23,7 +23,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<>,                     // Assignment              
       Com::InsertionOperators<>,             // Insertion operators     
       Com::MergingOperators<>,               // Merge operators         
-      Com::Comparison<>,                     // Allows comparisons      
+      /*Com::Comparison<>,*/                     // Allows comparisons      
       Com::IterationForEach<>,               // ForEach iteration       
       Com::IterationRange<>                  // Ranged iteration        
    >;
@@ -80,8 +80,8 @@ namespace Langulus::Annies
             return this->Assign(LglsFwd(argument));
       }
 
-      using Com::Comparison<>::operator <=>;
-      using Com::Comparison<>::operator ==;
+      //using Com::Comparison<>::operator <=>;
+      //using Com::Comparison<>::operator ==;
    };
 }
 

@@ -112,6 +112,17 @@ namespace Langulus::Annies::Component
          });
       }
 
+      /// Clear all relevant providers                                        
+      template<CT::Container SELF>
+      bool operator == (this SELF const& self, SELF const& other) noexcept {
+         constexpr auto providers = self.FindProviders(Id{});
+         return ForEachAnd(providers, [&self,&other]<class C> noexcept {
+            static_assert(CT::Deep<decltype(self.C::GetRaw())>,
+               "Non-deep provider marked as relevant: " + CppNameOf<C>());
+            return self.C::GetRaw()->CompareEqual(*other.C::GetRaw());
+         });
+      }
+
    protected:
       struct Where {
          Cid    provider;

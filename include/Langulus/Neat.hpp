@@ -48,7 +48,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<false, 0, 1, 2>,       // Assignment              
       Com::InsertionOperators<>,             // Insertion operators     
       Com::MergingOperators<>,               // Merge operators         
-      Com::Comparison<false, true, 0, 1, 2>, // Allows comparisons      
+      /*Com::Comparison<false, true, 0, 1, 2>,*/ // Allows comparisons      
       Com::IterationForEach<0, 1, 2>,        // ForEach iteration       
       Com::IterationRange<0, 1, 2>,          // Ranged iteration        
       Com::Descriptor<0, 1, 2>               // Descriptor interface    
@@ -178,8 +178,8 @@ namespace Langulus::Annies
             return this->Assign(LglsFwd(argument));
       }
 
-      using Com::Comparison<false, true, 0, 1, 2>::operator <=>;
-      using Com::Comparison<false, true, 0, 1, 2>::operator ==;
+      //using Com::Comparison<false, true, 0, 1, 2>::operator <=>;
+      //using Com::Comparison<false, true, 0, 1, 2>::operator ==;
 
       /*Neat& operator = (Neat const&) = default;
       Neat& operator = (Neat&&) noexcept = default;
