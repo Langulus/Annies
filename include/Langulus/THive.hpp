@@ -10,8 +10,6 @@
 #include "TSlots.hpp"
 #include "Annies/Components/IndexedComposite.hpp"
 
-//#include "Annies/Iterators/DefaultHive.hpp"
-
 
 namespace Langulus::Annies::Inner
 {
@@ -40,6 +38,7 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    struct THive : Inner::HiveBase<T> {
       using CTTI_ReflectAs = THive;
+      using CTTI_Hive      = Yup;
 
       //using DeepType       = Many;
       using HandleType     = DecideHandle<const TSlots<T>>;

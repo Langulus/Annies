@@ -883,7 +883,7 @@ namespace Langulus::Annies::Component
 
       /// MARK: <=>                                                           
       ///   @attention compares all shared dimensions at once                 
-      template<CT::Container LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
+      template<CT::NotHandle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
       constexpr auto operator <=> (this LHS const& lhs, RHS const& rhs) assumptious {
          if constexpr (Same<LHS, RHS>)
             return lhs.Compare(rhs);
@@ -900,9 +900,15 @@ namespace Langulus::Annies::Component
          else return lhs.CompareOne(rhs);
       }
 
+      /// Handles compare only their first pointers                           
+      template<CT::Handle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
+      constexpr auto operator <=> (this LHS const& lhs, RHS const& rhs) noexcept {
+         return lhs.GetRaw() <=> rhs.GetRaw();
+      }
+
       /// MARK: ==                                                            
       ///   @attention compares all shared dimensions at once                 
-      template<CT::Container LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
+      template<CT::NotHandle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
       constexpr bool operator == (this LHS const& lhs, RHS const& rhs) assumptious {
          if constexpr (Same<LHS, RHS>)
             return lhs.CompareEqual(rhs);
@@ -917,6 +923,12 @@ namespace Langulus::Annies::Component
             return lhs.CompareEqual(rhs);
          }
          else return lhs.CompareOneEqual(rhs);
+      }
+
+      /// Handles compare only their first pointers                           
+      template<CT::Handle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
+      constexpr bool operator == (this LHS const& lhs, RHS const& rhs) noexcept {
+         return lhs.GetRaw() == rhs.GetRaw();
       }
 
    protected:

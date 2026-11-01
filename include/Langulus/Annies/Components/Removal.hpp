@@ -61,7 +61,7 @@ namespace Langulus::Annies::Component
             using H = DecideHandle<C>;
             H first_reusable;
             self.Apply([&](H& element) {
-               if (element == value) {
+               if (element.CompareOneEqual(value)) {
                   element.Free();
                   if (not removed)
                      first_reusable = element;
@@ -81,7 +81,7 @@ namespace Langulus::Annies::Component
             C shallow_clone;
             shallow_clone.Reserve(self.GetCountInner());
             self.Apply([&](auto const& element) {
-               if (element == value) 
+               if (element.CompareOneEqual(value)) 
                   ++removed;
                else
                   shallow_clone.Insert(element);

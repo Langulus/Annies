@@ -52,7 +52,9 @@ namespace Langulus::Annies::Component
             size_t const inner_depth = depth == size_t(-1) ? depth : depth - 1;
             size_t const* const invoke_args[] {&inner_depth};
             auto method = type.GetMethod("GetCountDeep");
-            LglsAssumeDev(method, "Deep container has no reflected GetCountDeep method");
+            LglsAssumeDev(method,
+               "Deep container has no reflected GetCountDeep method");
+
             self.Apply([&accumulated_count,&method,&invoke_args](auto const& item) noexcept {
                size_t sub_count;
                method->invoke(item.GetDense().data, invoke_args, &sub_count);
@@ -63,10 +65,11 @@ namespace Langulus::Annies::Component
          else {
             using T = TypeOf<C>;
             if constexpr (CT::Deep<T>) {
-               for (auto const& item : self) {
-                  accumulated_count += DenseCast(item)
-                     .GetCountDeep(depth == size_t(-1) ? depth : depth - 1);
-               }
+               self.Apply([&accumulated_count,&depth](auto const& item) noexcept {
+                  accumulated_count += item->GetCountDeep(
+                     depth == size_t(-1) ? depth : depth - 1
+                  );
+               });
             }
             else return self.GetCount();
          }
@@ -74,6 +77,64 @@ namespace Langulus::Annies::Component
          return accumulated_count;
       }
       
+      /// Get Nth deep item using a deep index                                
+      ///   @attention ignores sparseness                                     
+      ///   @param idx the deep index                                         
+      ///   @return a pointer to the first deep item, or nullptr if not deep  
+      /*template<class AS = void, CT::Container C>
+      auto GetAtDeep(this C&& self, CT::Index auto&&) noexcept {
+         using D = Tif<CT::Void<AS>, LglsMutIf(C, Deep<C>*), LglsMutIf(C, AS*)>;
+         if (self.IsEmpty() or not self.IsDeep())
+            return D {nullptr};
+         return self.template As<D>();
+      }*/
+
+   protected:
+      /// Get Nth element as an RTTI::Block                                   
+      /*template<CT::Container C>
+      RTTI::Block GetDeep(this C&& self, size_t idx) assumptious {
+         if constexpr (CT::TypeErased<C>) {
+            LglsAssumeDev(IsDeep(), "Block is not deep");
+            return Get<Block<>>(idx);
+         }
+         else {
+            static_assert(CT::Deep<Decay<TYPE>>, "Block is not deep");
+            return DenseCast(GetRaw() + idx);
+         }
+      }*/
+
+   public:
+      /// Get Nth element as a handle, or any desired wrapping type.          
+      /// Conversion or copying may occur depending on type.                  
+      ///   @attention will throw if incompatible type is provided            
+      ///   @tparam AS the type we're wrapping in                             
+      ///   @tparam SID can be used to access specific dimension. It is       
+      ///      irrelevant if AS is a handle.                                  
+      ///   @param deep_idx the deep index                                    
+      ///   @param depth the depth at which container becomes flat            
+      ///   @return the element, as a reference if possible                   
+      template<CT::NotVoid AS, Cid SID = 0, CT::Container C>
+      decltype(auto) AsAtDeep(this C&& self, size_t deep_idx, const size_t depth = -1) {
+         if (not self.IsDeep() or depth == 0)
+            return self.template AsAt<AS, SID>(deep_idx);
+
+         AS result;
+         self.Apply([&deep_idx,&depth,&result](auto& handle) {
+            const size_t deep_count = handle.GetCountDeep(depth);
+            if (deep_idx < deep_count) {
+               result = handle.template AsAtDeep<AS, SID>(
+                  deep_idx, depth == size_t(-1) ? -1 : depth - 1
+               );
+               return false;
+            }
+            else {
+               deep_idx -= deep_count;
+               return true;
+            }
+         });
+         return result;
+      }
+
       /// MARK: Deepen                                                        
       /// Wrap all contained elements inside a sub-block                      
       ///   @return a reference to the newly created inner container          
@@ -106,8 +167,9 @@ namespace Langulus::Annies::Component
 
          ForEachResult result {0, Loop::Break};
          (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<false, true>(-1, LglsFwd(lambdas), result.count)
+            result.control = self.template ForEachDeepInner<false, true>(
+               -1, LglsFwd(lambdas), result.count
+            )
          )));
 
          if constexpr (CT::Mutable<C>) {
@@ -126,8 +188,9 @@ namespace Langulus::Annies::Component
 
          ForEachResult result {0, Loop::Break};
          (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<true, true>(-1, LglsFwd(lambdas), result.count)
+            result.control = self.template ForEachDeepInner<true, true>(
+               -1, LglsFwd(lambdas), result.count
+            )
          )));
 
          if constexpr (CT::Mutable<C>) {
@@ -144,8 +207,9 @@ namespace Langulus::Annies::Component
 
          ForEachResult result {0, Loop::Break};
          (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<false, false>(-1, LglsFwd(lambdas), result.count)
+            result.control = self.template ForEachDeepInner<false, false>(
+               -1, LglsFwd(lambdas), result.count
+            )
          )));
 
          if constexpr (CT::Mutable<C>) {
@@ -162,8 +226,9 @@ namespace Langulus::Annies::Component
 
          ForEachResult result {0, Loop::Break};
          (void)(... or (Loop::Break == (
-            result.control = self.template
-               ForEachDeepInner<true, false>(-1, LglsFwd(lambdas), result.count)
+            result.control = self.template ForEachDeepInner<true, false>(
+               -1, LglsFwd(lambdas), result.count
+            )
          )));
 
          if constexpr (CT::Mutable<C>) {

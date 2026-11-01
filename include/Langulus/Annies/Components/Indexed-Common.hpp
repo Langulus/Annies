@@ -224,16 +224,10 @@ namespace Langulus::Annies::Component
                else if constexpr (CT::DeepDense<AS>) {
                   // Wrap in a container                                
                   using H = DecideHandle<C>;
-                  if constexpr (CT::Pair<H> and not CT::Pair<AS>) {
-                     //TODO magic numbers here, use H::PickDimension?
-                     if constexpr (SID == 0)
-                        return Decvq<AS> {Absorb, ThisCom::template AsAt<typename H::KeyHandle, 0>(LglsFwd(idx))};
-                     else if constexpr (SID == 1)
-                        return Decvq<AS> {Absorb, ThisCom::template AsAt<typename H::ValHandle, 1>(LglsFwd(idx))};
-                     else
-                        static_assert(false, "Unsupported SID");
-                  }
-                  else return Decvq<AS> {Absorb, ThisCom::template AsAt<H, SID>(LglsFwd(idx))};
+                  if constexpr (CT::Multidimensional<H> and not CT::Multidimensional<AS>)
+                     return Decvq<AS> {Slice<SID>, ThisCom::template AsAt<H>(LglsFwd(idx))};
+                  else
+                     return Decvq<AS> {Absorb, ThisCom::template AsAt<H, SID>(LglsFwd(idx))};
                }
                else static_assert(false, "Type mismatch");
             }
@@ -247,18 +241,6 @@ namespace Langulus::Annies::Component
       template<CT::NotVoid AS>
       decltype(auto) ValAsAt(this auto&& self, CT::Index auto&& idx) requires Shared {
          return ThisCom::template AsAt<AS, 1>(LglsFwd(idx));
-      }
-
-      /// Get Nth deep item using a deep index                                
-      ///   @attention ignores sparseness                                     
-      ///   @param idx the deep index                                         
-      ///   @return a pointer to the first deep item, or nullptr if not deep  
-      template<class AS = void, CT::Container C>
-      auto GetDeepAt(this C&& self, CT::Index auto&&) noexcept {
-         using D = Tif<CT::Void<AS>, LglsMutIf(C, Deep<C>*), LglsMutIf(C, AS*)>;
-         if (self.IsEmpty() or not self.IsDeep())
-            return D {nullptr};
-         return self.template As<D>();
       }
 
       /// Get Nth element after being resolved to the most concrete type.     

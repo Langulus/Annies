@@ -478,7 +478,7 @@ namespace Langulus::Annies::Component
          }
       }
       
-      /// Set all contained data types by copying them from another container 
+      /// Set all contained data types by copying them from another container.
       /// This is still used if statically typed - checks if types are        
       /// compatible in constructors and assigners.                           
       ///   @attention intents like Clone and Copy will strip constness       

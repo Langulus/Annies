@@ -12,6 +12,7 @@
 #include "Recipe.hpp"
 #include "TTag.hpp"
 #include "Annies/Components/IndexedComposite.hpp"
+//#include <Langulus/IntentOf.hpp>
 
 
 namespace Langulus::Annies::Inner
@@ -20,6 +21,10 @@ namespace Langulus::Annies::Inner
    using MessyList   = TMany<Many>;
    using TagList     = TMany<Tag>;
 
+   using RecipeMap   = TMapUnsorted<DMeta, RecipeList>;
+   using MessyMap    = TMapUnsorted<DMeta, MessyList>;
+   using TagMap      = TMapUnsorted<TMeta, TagList>;
+
    /// MARK: NeatBase                                                         
    using NeatBase = Com::Container<
       Com::StateStack<>,                     // No states               
@@ -27,15 +32,15 @@ namespace Langulus::Annies::Inner
          // Tags are ordered first by their tag type, then by their     
          // order of appearance. Duplicate tag types are allowed.       
          // Tag contents may or may not also be normalized.             
-         Com::Stack<TMapUnsorted<TMeta, TagList>,    0>,
+         Com::Stack<TagMap,    0>,
          // Subconstructs are sorted first by the recipe target, then   
          // by their order of appearance. Their contents may or may not 
          // also be normalized.                                         
-         Com::Stack<TMapUnsorted<DMeta, RecipeList>, 1>,
+         Com::Stack<RecipeMap, 1>,
          // Any other container that doesn't fit in the above is sorted 
          // first by its type, then by the order of appearance.         
          // Contents may or may not be normalized.                      
-         Com::Stack<TMapUnsorted<DMeta, MessyList>,  2>
+         Com::Stack<MessyMap,  2>
       >,
       Com::IndexedComposite<0, 0, 1, 2>,     // Composite indexing      
       Com::HashEmergent<Hash, 0, 1, 2>,      // Emergent hash           
@@ -65,6 +70,7 @@ namespace Langulus::Annies
    /// recipe and are filled by the context (i.e. Tags::Parent(?)).           
    struct Neat : Inner::NeatBase {
       using CTTI_ReflectAs = Neat;
+      using CTTI_Neat      = Yup;
 
       using HandleType     = Handle;
       using HandleMutType  = Handle;
@@ -73,6 +79,20 @@ namespace Langulus::Annies
 
       static constexpr bool ContainsMany = true;
 
+   protected:
+      auto& GetTagsInner(this auto&& self) noexcept {
+         return *self.template Stack<Inner::TagMap, 0>::GetRaw();
+      }
+
+      auto& GetRecsInner(this auto&& self) noexcept {
+         return *self.template Stack<Inner::RecipeMap, 1>::GetRaw();
+      }
+
+      auto& GetMessInner(this auto&& self) noexcept {
+         return *self.template Stack<Inner::MessyMap, 2>::GetRaw();
+      }
+
+   public:
       ///                                                                     
       /// MARK:Construction                                                   
       constexpr Neat() noexcept {
@@ -106,16 +126,22 @@ namespace Langulus::Annies
       }
       
       /// Construction that absorbs the provided containers                   
-      /*template<class A1, class...AN>
+      template<class A1, class...AN>
       constexpr Neat(Inner::Absorb, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0)
-            this->Absorb(LglsFwd(a1));
+         if constexpr (sizeof...(AN) == 0) {
+            if constexpr (Same<Deint<A1>, Neat>)
+               this->Absorb(LglsFwd(a1));
+            else {
+               this->ConstructDefault();
+               this->AbsorbPartial(LglsFwd(a1));
+            }
+         }
          else {
             this->ConstructDefault();
-            this->Concat(LglsFwd(a1));
-           (this->Concat(LglsFwd(an)),...);
+            this->AbsorbPartial(LglsFwd(a1));
+           (this->AbsorbPartial(LglsFwd(an)), ...);
          }
-      }*/
+      }
 
       /// Construct via intent                                                
       /*template<template<class> class I> requires CT::Intent<I<Neat>>
@@ -184,19 +210,6 @@ namespace Langulus::Annies
             and mRecipes == rhs.mRecipes
             and mAnythingElse == rhs.mAnythingElse;
       }*/
-
-   protected:
-      auto& GetTagsInner(this auto&& self) noexcept {
-         return *self.template Stack<TMapUnsorted<TMeta, Inner::TagList>, 0>::GetRaw();
-      }
-
-      auto& GetRecsInner(this auto&& self) noexcept {
-         return *self.template Stack<TMapUnsorted<DMeta, Inner::RecipeList>, 1>::GetRaw();
-      }
-
-      auto& GetMessInner(this auto&& self) noexcept {
-         return *self.template Stack<TMapUnsorted<DMeta, Inner::MessyList>, 2>::GetRaw();
-      }
 
    public:
       /// Clear the container without deallocating                            
@@ -407,14 +420,116 @@ namespace Langulus::Annies
       auto UnfoldInsert (auto&&) -> size_t;
       void InsertInner  (auto&&);
 
-      void AddTag   (CT::Intent auto&&);
-      void AddRecipe(CT::Intent auto&&);
-      void AddVerb  (CT::Intent auto&&);
-
+      /// Absorb some part of the neat                                        
+      ///   @attention assumes container has been initialized                 
+      template<class T>
+      void AbsorbPartial(T&& a) {
+         if constexpr (Same<Deint<T>, Inner::TagMap>)
+            this->GetTagsInner().Absorb(LglsFwd(a));
+         else if constexpr (Same<Deint<T>, Inner::MessyMap>)
+            this->GetMessInner().Absorb(LglsFwd(a));
+         else if constexpr (Same<Deint<T>, Inner::RecipeMap>)
+            this->GetRecsInner().Absorb(LglsFwd(a));
+         else if constexpr (Same<Deint<T>, Inner::TagList>) {
+            for (auto& tag : DeintCast(a))
+               this->AddTag(NestIntentOf(a, tag));
+         }
+         else if constexpr (Same<Deint<T>, Inner::RecipeList>) {
+            for (auto& recipe : DeintCast(a))
+               this->AddRecipe(NestIntentOf(a, recipe));
+         }
+         else if constexpr (Same<Deint<T>, Inner::MessyList>) {
+            for (auto& messy : DeintCast(a))
+               this->AddData(NestIntentOf(a, messy));
+         }
+         else this->Insert(LglsFwd(a));
+      }
 
    public:
       ///                                                                     
-      ///   Removal                                                           
+      /// MARK: Insertion                                                     
+      /// Add tag to the tag map                                              
+      template<CT::Intent T>
+      void AddTag(T&& tag) {
+         if constexpr (Same<Deint<T>, TMeta>)
+            this->GetTagsInner().Merge(LglsFwd(tag));
+         else {
+            static_assert(CT::Tag<T>, "Must be a tag container");
+            if (not tag->IsValid()) {
+               this->GetTagsInner().Merge(tag->GetTag());
+               return;
+            }
+
+            auto found = this->GetTagsInner().Find(tag->GetTag());
+            if (found) {
+               found.GetVal()->Insert(
+                  NestIntentOf(tag, tag->template ReinterpretAs<Tag>())
+               );
+            }
+            else this->GetTagsInner().Merge(
+               tag->GetTag(),
+               NestIntentOf(tag, tag->template ReinterpretAs<Tag>())
+            );
+         }
+      }
+
+      /// Add recipe to the recipe map                                        
+      template<CT::Intent T>
+      void AddRecipe(T&& recipe) {
+         if constexpr (Same<Deint<T>, DMeta>)
+            this->GetRecsInner().Merge(recipe->GetOrigin());
+         else {
+            static_assert(CT::Recipe<T>, "Must be a recipe container");
+            const auto meta = recipe->GetTarget().GetOrigin();
+            if (not recipe->IsValid()) {
+               this->GetRecsInner().Merge(meta);
+               return;
+            }
+
+            auto found = this->GetRecsInner().Find(meta);
+            if (found)
+               found.GetVal()->Insert(LglsFwd(recipe));
+            else
+               this->GetRecsInner().Merge(meta, LglsFwd(recipe));
+         }
+      }
+
+      /// Add verb/data to the data map                                       
+      template<CT::Intent T>
+      void AddData(T&& data) {
+         static_assert(not CT::Tag<T>);
+         static_assert(not CT::Recipe<T>);
+         using AS = CT::ReflectedAs<Decvq<Deref<Deint<T>>>>;
+
+         if constexpr (CT::Container<AS> and not CT::Multidimensional<AS>) {
+            // Push a one-dimensional container                         
+            const auto meta = data->GetType();
+            if (not data->IsValid()) {
+               this->GetMessInner().Merge(meta);
+               return;
+            }
+
+            auto found = this->GetMessInner().Find(meta);
+            if (found) {
+               found.GetVal()->Insert(Many {Annies::Absorb, LglsFwd(data)});
+            }
+            else this->GetMessInner().Merge(
+               meta, Many {Annies::Absorb, LglsFwd(data)}
+            );
+         }
+         else {
+            // Push any other raw data/map                              
+            const auto meta = MetaDataOf<AS>();
+            auto found = this->GetMessInner().Find(meta);
+            if (found) {
+               found.GetVal()->Insert(Many {LglsFwd(data)});
+            }
+            else this->GetMessInner().Merge(meta, Many {LglsFwd(data)});
+         }
+      }
+
+      ///                                                                     
+      /// MARK: Removal                                                       
       template<CT::NotVoid, bool EMPTY_TOO = false>
       size_t RemoveData();
       template<CT::NotVoid>

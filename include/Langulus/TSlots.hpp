@@ -48,6 +48,7 @@ namespace Langulus::Annies
    template<CT::NotVoid T> 
    struct TSlots : Inner::TSlotsBase<T> {
       using CTTI_ReflectAs = TSlots;
+      using CTTI_Slots     = Yup;
       using CTTI_POD       = No; //TODO could be, when we implement SVO
       using Base           = Inner::TSlotsBase<T>;
 

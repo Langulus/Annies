@@ -1091,7 +1091,7 @@ namespace Langulus::Annies::Component
                LglsAssumeDev(cookie < self.GetCount(), "Limp cookie (linear)");
                auto const end = item + (self.GetCount() - cookie);
 
-               while (item.GetRaw() != end.GetRaw()) {
+               while (item != end) {
                   if constexpr (CT::Bool<decltype(lambda(item))>) {
                      if (not lambda(item))
                         return;
@@ -1112,7 +1112,7 @@ namespace Langulus::Annies::Component
                auto table = tableBeg;*/
                [[maybe_unused]] size_t scanned = 0;
                [[maybe_unused]] const size_t scannedMax = self.GetCount();
-               while (item.GetRaw() != end.GetRaw()) {
+               while (item != end) {
                   if (self.IsSlotOccupied(item - beg)) {
                      if constexpr (CT::Bool<decltype(lambda(item))>) {
                         if (not lambda(item))

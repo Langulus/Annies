@@ -53,7 +53,7 @@ Iterate all elements, regardless of hierarchy:
 data.ForEachDeep(
    [](const int& i) { /**/ },   // Will be executed for 42 and 24
                                 // If no integers exist, will move to next function
-   [](const Thing& t) { /**/ }, // Will be executed for the pushed object pointer
+   [](Thing const& t) { /**/ }, // Will be executed for the pushed object pointer
                                 // Notice how we can retrieve it by reference instead
                                 // If no Thing(s) exist, will move to next function
    [](const float& i) { /**/ }  // Will be executed for 5.0f

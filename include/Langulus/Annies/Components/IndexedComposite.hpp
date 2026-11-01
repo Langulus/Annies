@@ -92,12 +92,31 @@ namespace Langulus::Annies::Component
          });
       }
 
+      /// Reset all relevant providers                                        
+      void Reset(this auto& self) noexcept {
+         constexpr auto providers = self.FindProviders(Id{});
+         ForEach(providers, [&self]<class C> noexcept {
+            static_assert(CT::Deep<decltype(self.C::GetRaw())>,
+               "Non-deep provider marked as relevant: " + CppNameOf<C>());
+            return self.C::GetRaw()->Reset();
+         });
+      }
+
+      /// Clear all relevant providers                                        
+      void Clear(this auto& self) noexcept {
+         constexpr auto providers = self.FindProviders(Id{});
+         ForEach(providers, [&self]<class C> noexcept {
+            static_assert(CT::Deep<decltype(self.C::GetRaw())>,
+               "Non-deep provider marked as relevant: " + CppNameOf<C>());
+            return self.C::GetRaw()->Clear();
+         });
+      }
+
    protected:
       struct Where {
          Cid    provider;
          size_t offset;
       };
-      
 
       /// MARK: BrowseCompositeInner                                          
       ///   @returns true if we need to continue iterating through contents   
@@ -148,6 +167,7 @@ namespace Langulus::Annies::Component
             }
             else {
                // We need to browse deeper into the provider contents   
+               (void) selected;
                return BrowseCompositeInner(*self.P::GetRaw(), DEPTH - 1, index);
             }
          });
@@ -225,6 +245,30 @@ namespace Langulus::Annies::Component
          }
       }
 
+      /// Helper for nesting into deep composites                             
+      template<CT::NotVoid AS, int LOCAL_DEPTH>
+      static AS AsAtInner(auto&& where, size_t at) {
+         if constexpr (LOCAL_DEPTH == 0) {
+            LglsAssumeDev(at < where.GetCount());
+            return where.template AsAt<AS>(at);
+         }
+         else {
+            AS result;
+            where.Apply([&at,&result](auto h) {
+               const size_t deep_count = h.GetCountDeep();
+               if (at < deep_count) {
+                  result = AsAtInner<AS, LOCAL_DEPTH-1>(*h.Get(), at);
+                  return false;
+               }
+               else {
+                  at -= deep_count;
+                  return true;
+               }
+            });
+            return result;
+         }
+      }
+
    public:
       /// Get pointer to Nth element of a specific dimension.                 
       /// This is a lower-level routine that does only sparseness checking.   
@@ -241,7 +285,7 @@ namespace Langulus::Annies::Component
       auto* GetAt(this C&& self, CT::Index auto&& idx) assumptious {
          auto where = self.SimplifyIndex(idx);
       }*/
-
+      
       /// Get Nth element as a handle, or any desired wrapping type.          
       /// Conversion or copying may occur depending on type.                  
       ///   @attention will throw if incompatible type is provided            
@@ -252,12 +296,12 @@ namespace Langulus::Annies::Component
       ///   @return the element, as a reference if possible                   
       template<CT::NotVoid AS, CT::Container C>
       AS AsAt(this C&& self, CT::Index auto&& idx) {
-         auto where = self.SimplifyIndex(idx);
+         auto deep_idx = self.SimplifyIndex(idx);
          AS result;
          constexpr auto providers = self.FindProviders(Id{});
-         ForEachAnd(providers, [&self,&where,&result]<class P> {
-            if (P::Id::First == where.provider) {
-               result = self.P::GetRaw()->template AsAtDeep<AS>(where.offset, DEPTH);
+         ForEachAnd(providers, [&self,&deep_idx,&result]<class P> {
+            if (P::Id::First == deep_idx.provider) {
+               result = AsAtInner<AS, DEPTH>(*self.P::GetRaw(), deep_idx.offset);
                return false;
             }
             return true;

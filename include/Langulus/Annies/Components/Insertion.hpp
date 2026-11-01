@@ -84,8 +84,8 @@ namespace Langulus::Annies::Component
          const size_t moved = lhs_count - offset;
          auto src = start + (moved - 1);
          auto dst = src + rhs_count;
-         auto const end = (src - moved).GetRaw();
-         while (src.GetRaw() != end) {
+         auto const end = src - moved;
+         while (src != end) {
             Id::ForEach([&]<Cid D>{
                dst.template EmplaceWithIntent<D>(Abandon {src});
             });
@@ -98,8 +98,8 @@ namespace Langulus::Annies::Component
       template<CT::Handle H1, CT::Handle H2>
       static void CopyRegion(H1& src, H2& dst, size_t count) {
          //TODO batch optimization for PODs
-         auto const end = (DeintCast(src) + count).GetRaw();
-         while (src.GetRaw() != end) {
+         auto const end = DeintCast(src) + count;
+         while (src != end) {
             Id::ForEach([&]<Cid D>{
                dst.template EmplaceWithIntent<D>(Refer(src));
             });

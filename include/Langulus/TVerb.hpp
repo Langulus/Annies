@@ -45,8 +45,9 @@ namespace Langulus::Annies
       //TODO and just keep everything else on the stack?
       //TODO well, we have composable containers, so we can seamlessly test that out and 
       //TODO measure compile-time and runtime speed. let's try it once we pass all current tests
-      using CTTI_ReflectAs = Verb;
-      using DeepType       = Many;
+      using CTTI_ReflectAs  = Verb;
+      using CTTI_Executable = Yup;
+      using DeepType        = Many;
       
    private:
       // The number of successful executions                            

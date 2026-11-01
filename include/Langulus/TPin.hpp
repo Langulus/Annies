@@ -15,6 +15,7 @@
 #include "Annies/Components/Assignment.hpp"
 #include "Annies/Components/Comparison.hpp"
 #include "Annies/States/Pinned.hpp"
+#include <Langulus/CT/Pinnable.hpp>
 
 
 namespace Langulus::Annies::Inner
@@ -46,6 +47,7 @@ namespace Langulus::Annies
       using CTTI_ReflectAs = TPin;
       using CTTI_POD       = Maybe<CT::POD<T>>;
       using CTTI_Tagged    = Types<TAGS...>;
+      using CTTI_Pinnable  = Yup;
       using Base           = Inner::TPinBase<T>;
 
       constexpr  TPin() noexcept {
@@ -159,8 +161,8 @@ namespace Langulus::Annies
       }
    };
 
-   template<CT::NotVoid T>
-   using Pin = TPin<T>;
+   template<class...T>
+   using Pin = TPin<T...>;
 }
 
 namespace Langulus

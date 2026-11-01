@@ -142,30 +142,30 @@ namespace Langulus::Annies
       using S = IntentOf(item);
       using T = Deint<S>;
 
-      if constexpr (CT::DefineTag<T>) {
+      if constexpr (CT::Tag<T>) {
          // Insert tag to its bucket                                    
          AddTag(S::Nest(item));
       }
       else if constexpr (Same<T, RTTI::CMeta>) {
          // Expand the constant, and push it.                           
          // The expanded constant can be anything, so make sure it is   
-         // inserted properly. Might end up in a bucket.                
+         // inserted properly. Might end up in list different than tail.
          InsertInner(Any::FromConstant(DeintCast(item)));
       }
-      else if constexpr (CT::Recipe<T>) {
+      else if constexpr (CT::Recipe<T> or Same<T, RTTI::DMeta>) {
          // Forward a recipe                                            
          AddRecipe(S::Nest(item));
       }
-      else if constexpr (CT::Executable<T>) {
+      else /*if constexpr (CT::Executable<T>)*/ {
          // Verbs have to respect their precedences, they all go into   
          // the same mAnythingElse[Verb] bucket                         
-         AddVerb(S::Nest(item));
+         AddData(S::Nest(item));
       }
       /*else if constexpr (CT::Owned<T>) {
          // Make sure we strip any owning handle away                   
          InsertInner(S::Nest(*DeintCast(item)));
       }*/
-      else if constexpr (CT::Deep<T>) {
+      /*else if constexpr (CT::Deep<T> and not CT::Multidimensional<T>) {
          // Pushing an entire pack, make sure we flatten it, if it is   
          // allowed                                                     
          auto& deep = DeintCast(item);
@@ -175,20 +175,19 @@ namespace Langulus::Annies
 
          const auto found = GetMessInner().Find(meta);
          if (found)
-            *found.GetVal() << S::Nest(item);
+            found.GetVal()->Insert(Many {Annies::Absorb, S::Nest(item)});
          else
-            GetMessInner().Merge(meta, S::Nest(item));
+            GetMessInner().Merge(meta, Many {Annies::Absorb, S::Nest(item)});
       }
       else {
          // RHS is nothing special, just add it as it is                
          const auto meta = MetaDataOf<Decay<T>>();
-
          const auto found = GetMessInner().Find(meta);
          if (found)
             *found.GetVal() << Many {S::Nest(item)};
          else
             GetMessInner().Merge(meta, Many {S::Nest(item)});
-      }
+      }*/
    }
 
    /// Insert an element, array of elements, or another set                   
@@ -371,14 +370,14 @@ namespace Langulus::Annies
    /// Push a tag to the appropriate bucket                                   
    ///   @attention this is an inner function that doesn't affect the hash    
    ///   @param messy the tag and intent to insert                            
-   void Neat::AddTag(CT::Intent auto&& messy) {
+   /*void Neat::AddTag(CT::Intent auto&& messy) {
       using S = IntentOf(messy);
       using T = Deint<S>;
 
       if constexpr (CT::DefineTag<T>) {
          // Insert a tag with contents                                  
          const auto meta = messy->GetTag();
-         auto found = GetTagsInner()/*.BranchOut()*/.Find(meta);
+         auto found = GetTagsInner().BranchOut().Find(meta);
          if (found)
             found.GetVal() << messy.Forward();
          else
@@ -387,42 +386,42 @@ namespace Langulus::Annies
       else if constexpr (Exact<T, TMeta>) {
          // Insert tag without contents                                 
          const auto tag = *messy;
-         auto found = GetTagsInner()/*.BranchOut()*/.Find(tag);
+         auto found = GetTagsInner().BranchOut().Find(tag);
          if (found)
             found.GetVal() << Tag::From(tag);
          else
             GetTagsInner().Merge(tag, Tag::From(tag));
       }
       else static_assert(false, "Can't insert tag");
-   }
+   }*/
    
    /// Push verbs to the appropriate bucket                                   
    ///   @attention this is an inner function that doesn't affect the hash    
    ///   @param verb the verb (and intent) to insert                          
-   void Neat::AddVerb(CT::Intent auto&& verb) {
+   /*void Neat::AddVerb(CT::Intent auto&& verb) {
       using S = IntentOf(verb);
       using V = Deint<S>;
       static_assert(CT::Executable<V>, "V isn't a verb");
 
       // Insert deep data - we have to flatten it                       
       const auto meta = MetaDataOf<Decay<V>>();
-      auto found = GetMessInner()/*.BranchOut()*/.Find(meta);
+      auto found = GetMessInner().BranchOut().Find(meta);
       if (found)
          found.GetVal() << verb.Forward();
       else
          GetMessInner().Merge(meta, verb.Forward());
-   }
+   }*/
 
    /// Push a recipe to the appropriate bucket                                
    ///   @attention this is an inner function that doesn't affect the hash    
    ///   @param messy the recipe and intent to insert                         
-   void Neat::AddRecipe(CT::Intent auto&& messy) {
+   /*void Neat::AddRecipe(CT::Intent auto&& messy) {
       using S = IntentOf(messy);
       using T = Deint<S>;
 
       if constexpr (CT::Recipe<T>) {
          const auto meta = messy->GetType().GetOrigin();
-         const auto found = GetRecsInner()/*.BranchOut()*/.Find(meta);
+         const auto found = GetRecsInner().BranchOut().Find(meta);
 
          if (found)
             found.GetVal() << messy.Forward();
@@ -430,7 +429,7 @@ namespace Langulus::Annies
             GetRecsInner().Merge(meta, messy.Forward());
       }
       else static_assert(false, "Can't insert recipe");
-   }
+   }*/
 
    /// Iterate through all relevant bucketed items.                           
    /// Depending on F's arguments, different portions of the container will   

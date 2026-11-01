@@ -165,7 +165,7 @@ namespace Langulus::Annies::Component
                   if constexpr (CT::ContainsMany<C>) {
                      item += 1;
                      const auto itemsEnd = self.GetHandle() + self.GetCount();
-                     while (item.GetRaw() != itemsEnd.GetRaw()) {
+                     while (item != itemsEnd) {
                         item.template Free<false>();
                         //item.template DestroyElement<true, SID>();
                         ++item;
@@ -264,7 +264,7 @@ namespace Langulus::Annies::Component
             if constexpr (CT::ContainsMany<C>) {
                item += 1;
                const auto itemsEnd = self.GetHandle() + self.GetCount();
-               while (item.GetRaw() != itemsEnd.GetRaw()) {
+               while (item != itemsEnd) {
                   item.template Free<false>();
                   ++item;
                }

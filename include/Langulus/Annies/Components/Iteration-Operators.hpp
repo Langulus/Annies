@@ -205,5 +205,29 @@ namespace Langulus::Annies::Component
       }
    };
 
+
+   /// Get the element difference between two iterators                       
+   ///   @attention very usafe - assumes rhs's pointer is part of the same    
+   ///      container                                                         
+   ///   @param rhs the other iterator (as a pointer)                         
+   ///   @return the difference in number of elements                         
+   template<CT::Handle C>
+   constexpr auto operator - (C const& lhs, ConstAll<TypeOf<C>*> rhs) -> ::std::ptrdiff_t {
+      if constexpr (CT::TypeErased<C>) {
+         const auto diff = lhs.template GetRawAs<uint8_t>() - rhs;
+         return diff / lhs.GetStride();
+      }
+      else return lhs.GetRaw() - rhs;
+   }
+   
+   template<CT::Handle C>
+   constexpr auto operator - (ConstAll<TypeOf<C>*> lhs, C const& rhs) -> ::std::ptrdiff_t {
+      if constexpr (CT::TypeErased<C>) {
+         const auto diff = lhs - rhs.template GetRawAs<uint8_t>();
+         return diff / rhs.GetStride();
+      }
+      else return lhs - rhs.GetRaw();
+   }
+   
    #undef ThisCom
 }

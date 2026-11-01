@@ -20,7 +20,6 @@ namespace Langulus::Annies
    /// MARK: H/H                                                              
    ///                                                                        
    /// Type-erased immutable handle                                           
-   ///                                                                        
    template<>
    struct THandlePair<Handle, Handle> : Com::Container<
       Com::StateStack<>,
@@ -105,7 +104,6 @@ namespace Langulus::Annies
    /// MARK: HMut/HMut                                                        
    ///                                                                        
    /// Type-erased mutable handle                                             
-   ///                                                                        
    template<>
    struct THandlePair<HandleMut, HandleMut> : Com::Container<
       Com::StateStack<>,
@@ -286,7 +284,6 @@ namespace Langulus::Annies
    /// MARK: HE/HE                                                            
    ///                                                                        
    /// Statically typed emergent handles                                      
-   ///                                                                        
    template<CT::Reference K, CT::Reference V> requires CT::NotSheddable<K, V>
    struct THandlePair<THandleEmergent<K>, THandleEmergent<V>> : Com::Container<
       Com::StateStack<>,
@@ -382,7 +379,6 @@ namespace Langulus::Annies
    /// MARK: HT/HT                                                            
    ///                                                                        
    /// Statically typed embedded handles                                      
-   ///                                                                        
    template<CT::Reference K, CT::Reference V> requires CT::NotSheddable<K, V>
    struct THandlePair<THandle<K>, THandle<V>> : Com::Container<
       Com::StateStack<>,
@@ -490,7 +486,6 @@ namespace Langulus::Annies
    /// MARK: HTL/HTL                                                          
    ///                                                                        
    /// Statically typed local handles                                         
-   ///                                                                        
    template<CT::NotReference K, CT::NotReference V> requires (CT::NotSheddable<K, V> and CT::NotHandle<K, V>)
    struct THandlePair<THandle<K>, THandle<V>> : Com::Container<
       Com::StateStack<>,
