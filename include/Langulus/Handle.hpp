@@ -454,6 +454,8 @@ namespace Langulus::Annies
       using Denser         = THandle;
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
+            template<CT::NotVoid> friend struct THive;
+
 
       constexpr THandle() noexcept {
          this->ConstructDefault();
@@ -507,6 +509,8 @@ namespace Langulus::Annies
       using Denser         = THandle<Deptr<T>&>;
 
       template<CT::Handle, CT::Handle> friend struct THandlePair;
+            template<CT::NotVoid> friend struct THive;
+
 
       constexpr THandle() noexcept {
          this->ConstructDefault();

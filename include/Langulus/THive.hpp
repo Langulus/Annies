@@ -39,6 +39,8 @@ namespace Langulus::Annies
    struct THive : Inner::HiveBase<T> {
       using CTTI_ReflectAs = THive;
       using CTTI_Hive      = Yup;
+      using CTTI_Typed     = T;
+      static constexpr bool TypeErased = false;
 
       //using DeepType       = Many;
       using HandleType     = DecideHandle<const TSlots<T>>;
@@ -82,6 +84,55 @@ namespace Langulus::Annies
 
       //using Com::Comparison<>::operator <=>;
       //using Com::Comparison<>::operator ==;
+
+   protected:
+      LglsComEmplacement(friend);
+
+      auto Get() -> TMany<TSlots<T>>* {
+         return this->Com::Stack<TMany<TSlots<T>>>::GetRaw();
+      }
+
+   public:
+      /// Emplaces an element of T at a free spot in the hive.                
+      /// No elements are guaranteed to move.                                 
+      ///   @return a handle to the newly emplaced element                    
+      auto Emplace(auto&&...arguments) -> THandle<T&> {
+         for (TSlots<T>& slots : *this->Get()) {
+            if (slots.GetCount() < slots.GetReserved()) {
+               // Free slot available                                   
+               size_t it = 0;
+               size_t const end = slots.GetReserved();
+               while(it != end) {
+                  if (not slots.IsSlotOccupied(it)) {
+                     // Emplace                                         
+                     THandle<T&> result = slots.GetHandle() + it;
+                     result.EmplaceConstruct(LglsFwd(arguments)...);
+                     slots.GetCountInner() += 1;
+                     slots.EnableSlot(it);
+                     return result;
+                  }
+                  ++it;
+               }
+            }
+            else {
+               //TODO since we have full control of the memory manager, we can reallocate and guarantee that memory doesn't move
+               //TODO and just reuse memory of a single TSlots until a move is required
+            }
+         }
+
+         // If reached, then all slots are filled and we need a new     
+         // immovable frame                                             
+         LglsAssert(this->Get()->InsertDefault());
+         TSlots<T>* new_frame = this->Get()->GetAt(Index::Last);
+         new_frame->Reserve(this->GetReserved());
+
+         // Emplace                                                     
+         THandle<T&> result = new_frame->GetHandle();
+         result.EmplaceConstruct(LglsFwd(arguments)...);
+         new_frame->GetCountInner() = 1;
+         new_frame->EnableSlot(0);
+         return result;
+      }
    };
 }
 

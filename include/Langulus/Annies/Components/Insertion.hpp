@@ -400,7 +400,7 @@ namespace Langulus::Annies::Component
       /// inserted elements will be nullified.                                
       ///   @param count the number of elements to insert                     
       template<CT::IndexedLinearly C>
-      auto InsertNulled(this C&, size_t count) -> size_t;
+      auto InsertNulled(this C&, size_t count = 1) -> size_t;
 
       /// MARK: InsertDefault                                                 
       /// Insert a number of elements at the performance-optimal position.    
@@ -408,7 +408,7 @@ namespace Langulus::Annies::Component
       /// inserted elements will be default-constructed.                      
       ///   @param count the number of elements to insert                     
       template<CT::IndexedLinearly C>
-      auto InsertDefault(this C& self, size_t count) -> size_t {
+      auto InsertDefault(this C& self, size_t count = 1) -> size_t {
          const auto previousCount = self.GetCount();
          self.AllocateMore(previousCount + count);
 

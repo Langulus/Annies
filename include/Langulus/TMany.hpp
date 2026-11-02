@@ -54,6 +54,9 @@ namespace Langulus::Annies
       using CTTI_POD       = No; //TODO could be, when we implement SVO
       using Base           = Inner::TManyBase<T>;
 
+      template<CT::NotVoid> friend struct THive;
+      friend struct Neat;
+
       constexpr TMany() noexcept {
          this->ConstructDefault();
       }

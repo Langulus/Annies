@@ -70,6 +70,7 @@ namespace Langulus::Annies
       using PickMut        = HandleMutType;
 
       //static constexpr bool ReferenceElements = true;
+      friend struct Neat;
 
       constexpr TMap() noexcept {
          this->ConstructDefault();

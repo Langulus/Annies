@@ -284,6 +284,7 @@ namespace Langulus::Annies::Component
       LglsComIndexedCommonHashed(friend);
       
       template<CT::Handle, CT::Handle> friend struct THandlePair;
+      template<CT::NotVoid> friend struct THive;
 
       /// Clone the 'rhs'.                                                    
       /// Assumes all indirections are ordinary pointers, and is thus faster. 

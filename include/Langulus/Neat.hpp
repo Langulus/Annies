@@ -99,10 +99,16 @@ namespace Langulus::Annies
          this->ConstructDefault();
       }
       constexpr Neat(Neat const& other) {
-         this->Absorb(Refer(other));
+         this->ConstructDefault();
+         this->GetTagsInner().Absorb(Refer(other.GetTagsInner()));
+         this->GetRecsInner().Absorb(Refer(other.GetRecsInner()));
+         this->GetMessInner().Absorb(Refer(other.GetMessInner()));
       }
       constexpr Neat(Neat&& other) noexcept  {
-         this->Absorb(Move(other));
+         this->ConstructDefault();
+         this->GetTagsInner().Absorb( Move(other.GetTagsInner()));
+         this->GetRecsInner().Absorb( Move(other.GetRecsInner()));
+         this->GetMessInner().Absorb( Move(other.GetMessInner()));
       }
       constexpr ~Neat() noexcept {
          this->Destroy();
@@ -112,14 +118,17 @@ namespace Langulus::Annies
       /// emplaces all A in the container                                     
       template<Disambiguate A1, class...AN>
       constexpr Neat(A1&& a1, AN&&...an) {
+         this->ConstructDefault();
+
          if constexpr (sizeof...(AN) == 0) {
-            if constexpr (Same<Deint<A1>, Neat>)
-               this->Absorb(LglsFwd(a1));
-            else
-               this->Insert(LglsFwd(a1));
+            if constexpr (Same<Deint<A1>, Neat>) {
+               this->GetTagsInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetTagsInner()));
+               this->GetRecsInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetRecsInner()));
+               this->GetMessInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetMessInner()));
+            }
+            else this->Insert(LglsFwd(a1));
          }
          else {
-            this->ConstructDefault();
             this->Insert(LglsFwd(a1));
            (this->Insert(LglsFwd(an)), ...);
          }
@@ -128,54 +137,50 @@ namespace Langulus::Annies
       /// Construction that absorbs the provided containers                   
       template<class A1, class...AN>
       constexpr Neat(Inner::Absorb, A1&& a1, AN&&...an) {
+         this->ConstructDefault();
+
          if constexpr (sizeof...(AN) == 0) {
-            if constexpr (Same<Deint<A1>, Neat>)
-               this->Absorb(LglsFwd(a1));
-            else {
-               this->ConstructDefault();
-               this->AbsorbPartial(LglsFwd(a1));
+            if constexpr (Same<Deint<A1>, Neat>) {
+               this->GetTagsInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetTagsInner()));
+               this->GetRecsInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetRecsInner()));
+               this->GetMessInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetMessInner()));
             }
+            else this->AbsorbPartial(LglsFwd(a1));
          }
          else {
-            this->ConstructDefault();
             this->AbsorbPartial(LglsFwd(a1));
            (this->AbsorbPartial(LglsFwd(an)), ...);
          }
       }
 
-      /// Construct via intent                                                
-      /*template<template<class> class I> requires CT::Intent<I<Neat>>
-      Neat(I<Neat>&& other)
-         : mHash         {   other->mHash}
-         , mTags         {I {other->mTags}}
-         , mRecipes      {I {other->mRecipes}}
-         , mAnythingElse {I {other->mAnythingElse}} {
-         if constexpr (I<Neat>::ResetsOnMove())
-            other->mHash = {};
-      }
-
-      /// Construct by tidying up some data                                   
-      template<class A1, class...AN>
-      Neat(A1&& a1, AN&&...an) : Neat {} {
-         Insert(LglsFwd(a1));
-        (Insert(LglsFwd(an)), ...);
-      }*/
-
       ///                                                                     
       /// MARK:Assignment                                                     
       constexpr Neat& operator = (Neat const& other) {
-         return this->AssignAbsorb(Refer(other));
+         this->GetTagsInner().AssignAbsorb(Refer(other.GetTagsInner()));
+         this->GetRecsInner().AssignAbsorb(Refer(other.GetRecsInner()));
+         this->GetMessInner().AssignAbsorb(Refer(other.GetMessInner()));
+         return *this;
       }
+
       constexpr Neat& operator = (Neat&& other) noexcept {
-         return this->AssignAbsorb(Move(other));
+         this->GetTagsInner().AssignAbsorb( Move(other.GetTagsInner()));
+         this->GetRecsInner().AssignAbsorb( Move(other.GetRecsInner()));
+         this->GetMessInner().AssignAbsorb( Move(other.GetMessInner()));
+         return *this;
       }
       
       template<class A>
       constexpr Neat& operator = (A&& argument) {
-         if constexpr (Same<Deint<A>, Neat>)
-            return this->AssignAbsorb(LglsFwd(argument));
-         else
-            return this->Assign(LglsFwd(argument));
+         if constexpr (Same<Deint<A>, Neat>) {
+            this->GetTagsInner().AssignAbsorb(NestIntentOf(argument, DeintCast(argument).GetTagsInner()));
+            this->GetRecsInner().AssignAbsorb(NestIntentOf(argument, DeintCast(argument).GetRecsInner()));
+            this->GetMessInner().AssignAbsorb(NestIntentOf(argument, DeintCast(argument).GetMessInner()));
+         }
+         else {
+            this->Clear();
+            this->Insert(LglsFwd(argument));
+         }
+         return *this;
       }
 
       //using Com::Comparison<false, true, 0, 1, 2>::operator <=>;

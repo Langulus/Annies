@@ -53,6 +53,18 @@ namespace Langulus::Annies::Component
          return accumulated_count;
       }
 
+      /// Get the composite reserve                                           
+      size_t GetReserved(this auto const& self) noexcept {
+         constexpr auto providers = self.FindProviders(Id{});
+         size_t accumulated_reserve = 0;
+         ForEach(providers, [&self, &accumulated_reserve]<class C> noexcept {
+            static_assert(CT::Deep<decltype(self.C::GetRaw())>,
+               "Non-deep provider marked as relevant: " + CppNameOf<C>());
+            accumulated_reserve += self.C::GetRaw()->GetReservedDeep(DEPTH);
+         });
+         return accumulated_reserve;
+      }
+
       /// Check if the container is empty                                     
       ///   @return true if empty                                             
       bool IsEmpty(this auto const& self) noexcept {

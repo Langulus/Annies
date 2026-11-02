@@ -77,6 +77,50 @@ namespace Langulus::Annies::Component
          return accumulated_count;
       }
       
+      /// MARK: GetReservedDeep                                               
+      /// Get the sum of the allocated non-deep elements in all sub-blocks    
+      ///   @param depth the depth at which to go (-1 for infinite depth)     
+      ///   @attention depth == 0 acts as GetReserved()                       
+      ///   @return the number of reserved non-deep elements                  
+      template<class C>
+      constexpr size_t GetReservedDeep(this C const& self, size_t depth = -1) noexcept {
+         if (depth == 0)
+            return self.GetReserved();
+
+         size_t accumulated_reserve = 0;
+         if_constexpr_type_erased(C) {
+            auto const type = self.GetType().GetOrigin();
+            if (not type.IsDeep())
+               return self.GetReserved();
+
+            size_t const inner_depth = depth == size_t(-1) ? depth : depth - 1;
+            size_t const* const invoke_args[] {&inner_depth};
+            auto method = type.GetMethod("GetReservedDeep");
+            LglsAssumeDev(method,
+               "Deep container has no reflected GetReservedDeep method");
+
+            self.Apply([&accumulated_reserve,&method,&invoke_args](auto const& item) noexcept {
+               size_t sub_reserve;
+               method->invoke(item.GetDense().data, invoke_args, &sub_reserve);
+               accumulated_reserve += sub_reserve;
+            });
+         }
+         #if not LANGULUS(FORCE_TYPE_ERASURE)
+         else {
+            using T = TypeOf<C>;
+            if constexpr (CT::Deep<T>) {
+               self.Apply([&accumulated_reserve,&depth](auto const& item) noexcept {
+                  accumulated_reserve += item->GetReservedDeep(
+                     depth == size_t(-1) ? depth : depth - 1
+                  );
+               });
+            }
+            else return self.GetReserved();
+         }
+         #endif
+         return accumulated_reserve;
+      }
+      
       /// Get Nth deep item using a deep index                                
       ///   @attention ignores sparseness                                     
       ///   @param idx the deep index                                         

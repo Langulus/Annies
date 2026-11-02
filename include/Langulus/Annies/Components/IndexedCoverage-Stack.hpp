@@ -66,6 +66,8 @@ namespace Langulus::Annies::Component
       LglsComMerging(friend);
       LglsComRemoval(friend);
 
+      template<CT::NotVoid T> friend struct THive;
+
       /// Get coverage table (inner)                                          
       template<Cid SID = ID> requires Relevant<SID>
       constexpr auto& GetCoverageTableInner(this auto&& self) noexcept {
@@ -85,6 +87,24 @@ namespace Langulus::Annies::Component
             ThisCom::GetCoverageTableInner(), 0,
             self.GetReserved() * sizeof(TableType)
          );
+      }
+
+      /// Occupy a coverage table slot                                        
+      template<Cid SID = ID> requires Relevant<SID>
+      constexpr void EnableSlot(this auto& self, size_t slot) assumptious {
+         LglsAssumeDev(ThisCom::GetCoverageTableInner());
+         const size_t idx = slot / BitsPerCell;
+         const size_t bit = size_t {1} << (slot - idx);
+         ThisCom::GetCoverageTableInner()[idx] |= bit;
+      }
+
+      /// Free a coverage table slot                                          
+      template<Cid SID = ID> requires Relevant<SID>
+      constexpr void DisableSlot(this auto& self, size_t slot) assumptious {
+         LglsAssumeDev(ThisCom::GetCoverageTableInner());
+         const size_t idx = slot / BitsPerCell;
+         const size_t bit = size_t {1} << (slot - idx);
+         ThisCom::GetCoverageTableInner()[idx] &= ~bit;
       }
 
       /// Default-initialize hash table to zero                               

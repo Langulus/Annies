@@ -66,6 +66,9 @@ namespace Langulus::Annies::Component
       LglsComHeapMovable(friend);
       LglsComConversion(friend);
 
+            template<CT::NotVoid> friend struct THive;
+
+
       /// Get count (inner)                                                   
       constexpr auto& GetCountInner(this auto&& self) noexcept {
          return self.template AccessStack<CountStack>();
