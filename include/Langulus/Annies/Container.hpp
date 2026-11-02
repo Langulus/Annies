@@ -353,7 +353,7 @@ namespace Langulus::Annies::Component
       }
       
    protected:
-      LglsComIterationOperators(friend);
+      LglsComStateStack(friend);
       LglsComTypedStack(friend);
       LglsComVerbedStack(friend);
       LglsComTaggedStack(friend);
@@ -374,7 +374,6 @@ namespace Langulus::Annies::Component
       LglsComHashEmergent(friend);
       LglsComDictionaryHeap(friend);
       LglsComComparison(friend);
-      LglsComDeepening(friend);
       LglsComEmplacement(friend);
       LglsComAssignment(friend);
       LglsComInsertion(friend);
@@ -385,13 +384,17 @@ namespace Langulus::Annies::Component
       LglsComIndexedHashStack(friend);
       LglsComIndexedCoverageStack(friend);
       LglsComIndexedComposite(friend);
-      LglsComStateStack(friend);
       LglsComIndexedCommon(friend);
       LglsComIndexedCommonHashed(friend);
       LglsComIndexedLinear(friend);
       LglsComRemoval(friend);
       LglsComIterationOperators(friend);
       LglsComChargedStack(friend);
+      LglsComDescriptor(friend);
+      LglsComDeepening(friend);
+      LglsComIterationForEach(friend);
+      LglsComIterationRange(friend);
+      LglsComIterationOperators(friend);
 
       /// Default constructor doesn't initialize anything.                    
       /// Your container needs to call ConstructDefault manually.             

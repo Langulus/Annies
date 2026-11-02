@@ -241,9 +241,7 @@ namespace Langulus::Annies::Component
       auto New(this C& self, A&&...arguments) -> DecideHandle<C>
       requires (Relevant<SID> and not CT::HeapAllocated<C> and not Shared) {
          // Need to destroy and overwrite only the first element.       
-         //constexpr auto strat = AllocationStrategy::FreshAllocateAllIndirections;
          using T = Tif<::std::is_void_v<E>, TypeOf<C, SID>, E>;
-         
          auto item = self.GetHandle();
          item.template Free<false>();
          if_available(item.ResetAllEntries());
@@ -251,13 +249,7 @@ namespace Langulus::Annies::Component
 
          // Emplace a new element on the first position.                
          // Any state change is forbidden - container is full.          
-         try {
-            //if constexpr (sizeof...(arguments) > 0)
-               ThisCom::Instantiate<T, SID>(LglsFwd(arguments)...);
-               //ThisCom::template EmplaceConstruct<SID, strat, T>(LglsFwd(arguments)...);
-            //else
-            //   ThisCom::template EmplaceDefault<SID, strat, T>();
-         }
+         try { ThisCom::Instantiate<T, SID>(LglsFwd(arguments)...); }
          catch (...) {
             // If emplacement fails, we are forced to destroy           
             // all remaining elements as well.                          
@@ -924,10 +916,7 @@ namespace Langulus::Annies::Component
             if_available(self.ResetState());
          }
 
-         /*if constexpr (STRAT == AllocationStrategy::FreshAllocateAllIndirections) {
-            ThisCom::Instantiate<E>(LglsFwd(arguments)...);
-         }
-         else*/ if constexpr (CT::TypeErased<C>) {
+         if constexpr (CT::TypeErased<C>) {
             //                                                          
             // This container is type-erased                            
             if constexpr (STRAT != AllocationStrategy::DontAllocate) {
@@ -1048,10 +1037,11 @@ namespace Langulus::Annies::Component
                   "Use " + LastCppNameOf<C>() + "::New method instead of Emplace?"
                );
 
-               if constexpr (requires { Decvq<T> {LglsFwd(arguments)...}; } )
+               ThisCom::Instantiate<T>(LglsFwd(arguments)...);
+               /*if constexpr (requires { Decvq<T> {LglsFwd(arguments)...}; } )
                   ThisCom::template EmplaceWithIntent<SID>(Abandon {Decvq<T> {LglsFwd(arguments)...}});
                else
-                  ThisCom::template EmplaceWithIntent<SID>(Abandon {Decvq<T> {LglsFwd(arguments.what)...}});
+                  ThisCom::template EmplaceWithIntent<SID>(Abandon {Decvq<T> {LglsFwd(arguments.what)...}});*/
             }
          }
          

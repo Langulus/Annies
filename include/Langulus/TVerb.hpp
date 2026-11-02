@@ -22,7 +22,7 @@ namespace Langulus::Annies::Inner
    /// TVerbs extend the usual type-erased Any, by adding charge and verb ID  
    /// as members.                                                            
    template<class V>
-   using TVerbBase = typename ManyBase::template Include<
+   using TVerbBase = typename ManyBase::template Include<//TODO consider using Com::Composite with Many on the stack, so we can take easy reference of the argument!
       Com::VerbedStack<VMeta, V>,  // Add verb, make executable         
       Com::ChargedStack<>          // Add charge                        
    >;
@@ -41,10 +41,6 @@ namespace Langulus::Annies
    ///   Cool, huh?                                                           
    template<class V>
    struct TVerb : Inner::TVerbBase<V> {
-      //TODO hmm, should we just inherit Many, so that we can easily get a reference to it? 
-      //TODO and just keep everything else on the stack?
-      //TODO well, we have composable containers, so we can seamlessly test that out and 
-      //TODO measure compile-time and runtime speed. let's try it once we pass all current tests
       using CTTI_ReflectAs  = Verb;
       using CTTI_Executable = Yup;
       using DeepType        = Many;

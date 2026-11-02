@@ -57,7 +57,6 @@ namespace Langulus::Annies::Inner
 
 namespace Langulus::Annies
 {
-
    ///                                                                        
    /// MARK: Neat                                                             
    ///                                                                        
@@ -541,6 +540,257 @@ namespace Langulus::Annies
       size_t RemoveRecipes();
       template<CT::DefineTag, bool EMPTY_TOO = false>
       size_t RemoveTag();
+
+   protected:
+      LglsComDeepening(friend);
+      LglsComDescriptor(friend);
+
+      /// MARK: ForEach                                                       
+      template<class C, class F>
+      LoopControl InvokeF(this C&& self, F&& f, CT::Handle auto&& handle) noexcept_if(f) {
+         using A = Deref<ArgumentOf<F>>;
+         using R = ReturnOf<F>;
+
+         if constexpr (CT::Bool<R>) {
+            // Execute and consider 'f' returning true/false            
+            if (not f(*handle.template Get<A>()))
+               return Loop::NextLoop;
+         }
+         else if constexpr (Exact<R, LoopControl>) {
+            // Execute and consider 'f' returning LoopControl           
+            const R loop = f(*handle.template Get<A>());
+            switch (loop.mControl) {
+               case LoopControl::Repeat:
+                  --handle;
+                  break;
+               case LoopControl::Discard:
+                  if constexpr (CT::Mutable<C>) {
+                     // Discard is allowed only if THIS is mutable.     
+                     // Why bother removing, when there's only one      
+                     // element? Just propagate discard instead! The    
+                     // pack should be reset from above.                
+                     if (self.GetCount() == 1)
+                        return Loop::Discard;
+
+                     // Otherwise just erase and continue               
+                     handle = self.Erase(handle);
+                     --handle;
+                     return Loop::Continue;
+                  }
+                  else {
+                     LglsAssumeUserWarn(false,
+                        "Attempting to discard while iterating constant container. "
+                        "No discard will be performed."
+                     );
+                     return Loop::Continue;
+                  }
+                  break;
+               default: return loop;
+            }
+         }
+         else {
+            // Just execute, always loop through everything             
+            f(*handle.template Get<A>());
+         }
+         return Loop::Continue;
+      }
+
+   public://TODO figure out why i can't access it from Deepening
+      /// Iterate and execute call for each flat element, counting each       
+      /// successfull execution. Custom inner routine designed specifically   
+      /// for Neat, searching in a specific bucket depending on lambda.       
+      ///   @attention assumes neat is non-empty                              
+      ///   @tparam REVERSE whether to iterate in reverse                     
+      ///   @param f the function to execute for each element of type A       
+      ///   @param index [out] counts the successful executions               
+      ///   @return the last 'f' result - dictates whether loop continues     
+      template<bool REVERSE, class C, class F>//TODO reverse not implemented here
+      LoopControl ForEachInner(this C&& self, F&& f, size_t& index) noexcept_if(f) {
+         using A = ArgumentOf<F>;
+
+         static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
+            "Mutable reference/pointer iterator not allowed for constant container");
+         LglsAssumeDev(not self.IsEmpty(), "Can't iterate empty container");
+
+         LoopControl loop = Loop::Continue;
+         if constexpr (CT::Deep<A>) {
+            //TODO definitely need a better binary-compatibility check lmao
+            static_assert(sizeof(Decay<A>) == sizeof(Many));
+
+            if constexpr (CT::TypeErased<A>) {
+               // Deep argument, which is also type-erased, and this    
+               // means we travel through _all_ buckets                 
+               self.GetTagsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+                  ++index;
+                  auto bucket = pair.GetValHandle();
+                  auto& as_type_erased = reinterpret_cast<THandle<Decay<A>&>&>(bucket);
+                  loop = self.InvokeF(LglsFwd(f), as_type_erased);
+                  return loop == Loop::Continue;
+               });
+               if (loop != Loop::Continue)
+                  return loop;
+
+               self.GetRecsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+                  ++index;
+                  auto bucket = pair.GetValHandle();
+                  auto& as_type_erased = reinterpret_cast<THandle<Decay<A>&>&>(bucket);
+                  loop = self.InvokeF(LglsFwd(f), as_type_erased);
+                  return loop == Loop::Continue;
+               });
+               if (loop != Loop::Continue)
+                  return loop;
+
+               self.GetMessInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+                  ++index;
+                  auto bucket = pair.GetValHandle();
+                  auto& as_type_erased = reinterpret_cast<THandle<Decay<A>&>&>(bucket);
+                  loop = self.InvokeF(LglsFwd(f), as_type_erased);
+                  return loop == Loop::Continue;
+               });
+            }
+            else {
+               // We are interested only in buckets of the same static  
+               // type as the iterator.                                 
+               using AType = TypeOf<A>;
+
+               if constexpr (CT::DefineTag<AType>) {
+                  auto found = self.GetTagsInner().Find(MetaTagOf<AType>());
+                  if (not found)
+                     return Loop::NextLoop;
+                  ++index;
+                  return self.InvokeF(LglsFwd(f), found.GetValHandle());
+               }
+               else if constexpr (CT::Tag<AType>) {
+                  self.GetTagsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+                     ++index;
+                     loop = self.InvokeF(LglsFwd(f), pair.GetValHandle());
+                     return loop == Loop::Continue;
+                  });
+               }
+               else if constexpr (CT::Recipe<AType>) {
+                  self.GetRecsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+                     ++index;
+                     loop = self.InvokeF(LglsFwd(f), pair.GetValHandle());
+                     return loop == Loop::Continue;
+                  });
+               }
+               else {
+                  auto found = self.GetMessInner().Find(MetaDataOf<AType>());
+                  if (not found)
+                     return Loop::NextLoop;
+
+                  found.GetValHandle()->Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+                     ++index;
+                     loop = self.InvokeF(LglsFwd(f), pair);
+                     return loop == Loop::Continue;
+                  });
+               }
+            }
+         }
+         else if constexpr (Same<A, DMeta>) {
+            // We are interested only in empty recipes with the given   
+            // target type.                                             
+            self.GetRecsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+               pair.GetValHandle()->Apply([&loop,&f,&self,&index](auto& recipe) noexcept_if(f) {
+                  if (not recipe->GetDescriptor().IsValid())
+                     return true;
+
+                  ++index;
+                  loop = self.InvokeF(LglsFwd(f), recipe);
+                  return loop == Loop::Continue;
+               });
+               return loop == Loop::Continue;
+            });
+         }
+         else if constexpr (Same<A, TMeta>) {
+            // We are interested only in empty tags with the given tag  
+            self.GetTagsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+               pair.GetValHandle()->Apply([&loop,&f,&self,&index](auto& tag) noexcept_if(f) {
+                  if (not tag->GetData().IsValid())
+                     return true;
+
+                  ++index;
+                  loop = self.InvokeF(LglsFwd(f), tag);
+                  return loop == Loop::Continue;
+               });
+               return loop == Loop::Continue;
+            });
+         }
+         else if constexpr (CT::Recipe<A>) {
+            // We are interested in all recipes                         
+            self.GetRecsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+               pair.GetValHandle()->Apply([&loop,&f,&self,&index](auto& recipe) noexcept_if(f) {
+                  ++index;
+                  loop = self.InvokeF(LglsFwd(f), recipe);
+                  return loop == Loop::Continue;
+               });
+               return loop == Loop::Continue;
+            });
+         }
+         else if constexpr (CT::DefineTag<A>) {
+            // We are interested in specific tags                       
+            auto found = self.GetTagsInner().Find(MetaTagOf<A>());
+            if (not found)
+               return Loop::NextLoop;
+
+            using TAG_BUCKET = LglsMutIf(C, TMany<Decay<A>>&);
+            auto& specific_tags = reinterpret_cast<TAG_BUCKET>(*found.GetValHandle());
+            specific_tags.Apply([&loop,&f,&self,&index](auto& tag) noexcept_if(f) {
+               ++index;
+               loop = self.InvokeF(LglsFwd(f), tag);
+               return loop == Loop::Continue;
+            });
+         }
+         else if constexpr (CT::Tag<A>) {
+            // We are interested in all tags                            
+            self.GetTagsInner().Apply([&loop,&f,&self,&index](auto& pair) noexcept_if(f) {
+               pair.GetValHandle()->Apply([&loop,&f,&self,&index](auto& tag) noexcept_if(f) {
+                  ++index;
+                  loop = self.InvokeF(LglsFwd(f), tag);
+                  return loop == Loop::Continue;
+               });
+               return loop == Loop::Continue;
+            });
+         }
+         else {
+            // We are interested in all data of the given type          
+            auto found = self.GetMessInner().Find(MetaDataOf<A>());
+            if (not found)
+               return Loop::NextLoop;
+
+            found.GetValHandle()->Apply([&loop,&f,&self,&index](auto& data) noexcept_if(f) {
+               data->Apply([&loop,&f,&self,&index](auto& element) noexcept_if(f) {
+                  ++index;
+                  loop = self.InvokeF(LglsFwd(f), element);
+                  return loop == Loop::Continue;
+               });
+               return loop == Loop::Continue;
+            });
+         }
+
+         return loop;
+      }
+      
+      /// Iterate and execute call for each deep element, counting each       
+      /// successfull execution. Custom inner routine designed specifically   
+      /// for Neat. Neat is generally considered a flattened container, but   
+      /// that is true only if there are no OR/MISSING states. If there are   
+      /// such states, then we can nest deep into those.                      
+      ///   @tparam REVERSE whether to iterate in reverse                     
+      ///   @tparam SKIP whether to execute call for intermediate blocks      
+      ///   @param f the function to execute for each element of type A       
+      ///   @param index [out] counts the successful executions               
+      ///   @return the last 'f' result                                       
+      template<bool REVERSE, bool SKIP, CT::Container C, class F> //TODO reverse not implemented here
+      LoopControl ForEachDeepInner(this C&& self, size_t depth, F&& f, size_t& index) noexcept_if(f) {
+         // First do the conventional thing, and then if there's        
+         // depth, delve into messy Many with states.                   
+         return self.template ForEachInner<REVERSE>(LglsFwd(f), index);
+
+         //TODO delve into messy Many with states - it's the only place where nesting can happen
+         //TODO if user pushed some deep containers with states
+         (void) depth;
+      }
    };
 }
 

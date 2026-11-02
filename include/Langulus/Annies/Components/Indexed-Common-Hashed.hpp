@@ -669,11 +669,9 @@ namespace Langulus::Annies::Component
       }
       
       /// MARK: TableSearchInner                                              
-      /// Table insertion function for e specific cascade level.              
-      /// Doesn't move anything around, as it only seeks an empty spot that   
-      /// can be easily filled.                                               
+      /// Table search function for e specific cascade level.                 
       ///   @attention works in all dimensions simultaneously!                
-      ///   @return the offset at which item was inserted                     
+      ///   @return the handle at the match, empty handle if no match         
       template<Cid SID = ID, class C, CT::NoIntent H> requires Relevant<SID>
       auto TableSearchInner(
          this C const& self,
@@ -725,6 +723,25 @@ namespace Langulus::Annies::Component
 
          // If reached, then item wasn't found                          
          return {};
+      }
+      
+   public:
+      /// Subscript operator for accessing value at a specific key in maps.   
+      /// Usable only when map is mutable. Use Find otherwise.                
+      ///   @param key the key to search for                                  
+      ///   @attention the value will be default-constructed if key didn't    
+      ///      exist before calling this operator. Use Find if you don't want 
+      ///      this to happen.                                                
+      ///   @return a reference to the value                                  
+      template<CT::Multidimensional C, CT::NoIntent K> requires (not CT::TypeErased<C>)
+      auto& operator[] (this C& self, K const& key) assumptious {
+         auto found = self.TableSearch(key);
+         if (found)
+            return *found.GetKeyHandle();
+
+         // Add the key                                                 
+         found = self.Merge(key);
+         return *found.GetKeyHandle();
       }
    };
 

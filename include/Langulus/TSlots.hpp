@@ -60,6 +60,12 @@ namespace Langulus::Annies
       constexpr TSlots(TSlots const& other) {
          this->Absorb(Refer(other));
       }
+      /*constexpr TSlots(Copy<TSlots>&& other) requires CT::ReferConstructible<T> {
+         this->Absorb(LglsFwd(other));
+      }
+      constexpr TSlots(Clone<TSlots>&& other) requires CT::CloneConstructible<T> {
+         this->Absorb(LglsFwd(other));
+      }*///TODO doesn't seem to have an effect, problem is elsewhere
       constexpr TSlots(TSlots&& other) noexcept {
          this->Absorb(Move(other));
       }

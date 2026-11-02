@@ -7,34 +7,27 @@
 ///                                                                           
 #pragma once
 #include "Iteration-Range.hpp"
-//#include <Langulus/CT/Deep.hpp>
 #include <Langulus/CT/ReflectAs.hpp>
 #include <Langulus/CT/DefineTag.hpp>
 #include <Langulus/CT/DefineVerb.hpp>
 #include <Langulus/Lambda.hpp>
 #include <Langulus/Assume.hpp>
-//#include <Langulus/MetaOf.hpp>
 
 
 namespace Langulus::Annies::Component
 {
    /// A helper structure that shows how ForEach iteration went               
-   //template<CT::Container C>
    struct ForEachResult {
-      //static_assert(CT::Decayed<C>, "Trip all decorations from C first");
-
-      //using Count = typename Deref<C>::CountType;
-
       // Number of iterations                                           
-      /*Count*/ size_t count = 0;
+      size_t count = 0;
 
       // Last loop control return - useful only when you want to        
-      // control an outer loop depending on the iteration result        
+      // control an outer loop depending on the inner result            
       LoopControl control = Loop::Continue;
 
       // Implicitly cast to the count member, because that's the        
       // most likely use                                                
-      operator /*Count*/ size_t() const noexcept { return count; }
+      operator size_t() const noexcept { return count; }
    };
 
    ///                                                                        
@@ -53,20 +46,6 @@ namespace Langulus::Annies::Component
 
       static constexpr int ComponentPrecedence = 3000;
 
-   private:
-      //template<CT::Container C>
-      //using Count = typename Deref<C>::CountType;
-      //template<CT::Container C>
-      //using Deep = LglsMutIf(C, typename Deref<C>::DeepType&);
-      //template<CT::Container C>
-      //using ForEachResult = Inner::ForEachResult;//<Decay<C>>;
-
-   public:
-      /*template<CT::Container C>
-      auto ForEachElement(this C&&, auto&&...) -> ForEachResult<C>;
-      template<CT::Container C>
-      auto ForEachElementRev(this C&&, auto&&...) -> ForEachResult<C>;*/ //TODO just use Apply now?
-
       /// Execute functions for each element inside container.                
       /// Each function has a distinct argument type, that is tested against  
       /// the contained type. If argument is compatible with the type, the    
@@ -76,12 +55,12 @@ namespace Langulus::Annies::Component
       ///   @param lambdas all potential functions to iterate with            
       ///   @return the number of executions and the control end code         
       template<CT::Container C, class...F>
-      auto ForEach(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
+      auto ForEach(this C&& self, F&&...lambdas) -> ForEachResult {
          static_assert(sizeof...(F) > 0, "No functions in ForEach");
          if (self.IsEmpty())
             return {};
 
-         ForEachResult/*<C>*/ result {0, Loop::Break};
+         ForEachResult result {0, Loop::Break};
          (void)(... or (Loop::NextLoop != (
             result.control = self.template
                ForEachInner<false>(LglsFwd(lambdas), result.count)
@@ -96,12 +75,12 @@ namespace Langulus::Annies::Component
 
       /// Do it in reverse                                                    
       template<CT::Container C, class...F>
-      auto ForEachRev(this C&& self, F&&...lambdas) -> ForEachResult/*<C>*/ {
+      auto ForEachRev(this C&& self, F&&...lambdas) -> ForEachResult {
          static_assert(sizeof...(F) > 0, "No functions in ForEachRev");
          if (self.IsEmpty())
             return {};
 
-         ForEachResult/*<C>*/ result {0, Loop::Break};
+         ForEachResult result {0, Loop::Break};
          (void)(... or (Loop::NextLoop != (
             result.control = self.template
                ForEachInner<true>(LglsFwd(lambdas), result.count)
@@ -118,13 +97,14 @@ namespace Langulus::Annies::Component
    protected:
       /// Iterate and execute call for each flat element, counting each       
       /// successfull execution.                                              
+      ///   @attention may be overriden for some special containers           
       ///   @attention assumes block is typed and non empty                   
       ///   @tparam REVERSE whether to iterate in reverse                     
       ///   @param f the function to execute for each element of type A       
       ///   @param index [out] counts the successful executions               
       ///   @return the last 'f' result - dictates whether loop continues     
       template<bool REVERSE, CT::Container C, class F>
-      LoopControl ForEachInner(this C&& self, F&& f, /*Count<C>*/size_t& index) noexcept_if(f) {
+      LoopControl ForEachInner(this C&& self, F&& f, size_t& index) noexcept_if(f) {
          using A = ArgumentOf<F>;
          static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
             "Mutable reference/pointer iterator not allowed for constant container");
@@ -231,6 +211,7 @@ namespace Langulus::Annies::Component
          }
       }
 
+      //TODO i think this func is no longer needed due to Container::Apply
       /// Execute a function for each element inside container.               
       /// Lowest-level element iteration function (for internal use only).    
       ///   @attention assumes A is binary compatible with the contained type 
@@ -239,7 +220,7 @@ namespace Langulus::Annies::Component
       ///   @tparam REVERSE direction we're iterating in                      
       ///   @param f the function to call on each item                        
       template<bool REVERSE, CT::Container C, class F>
-      LoopControl IterateInner(this C&& self, /*Count<C>*/size_t count, F&& f) noexcept(IsNoexcept<F>) {
+      LoopControl IterateInner(this C&& self, size_t count, F&& f) noexcept_if(f) {
          using A = ArgumentOf<F>;
          static_assert(CT::Complete<Decay<A>> or CT::Sparse<A>,
             "Can't iterate with incomplete type, use pointer instead");

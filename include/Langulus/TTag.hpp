@@ -14,7 +14,7 @@ namespace Langulus::Annies::Inner
 {
    /// Tags extend the usual type-erased Many, by adding tag member.          
    template<class TAG>
-   using TTagBase = typename ManyBase::template Include<
+   using TTagBase = typename ManyBase::template Include<//TODO consider using Com::Composite with Many on the stack, so we can take easy reference of the data!
       Com::TaggedStack<TMeta, TAG>  // Add tag                          
    >;
 }

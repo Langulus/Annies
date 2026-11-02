@@ -17,7 +17,7 @@ namespace Langulus::Annies::Inner
    /// Recipe extends the usual type-erased Many, by adding charge and        
    /// type as members.                                                       
    using RecipeBase = typename ManyBase::template Include<
-      Com::Stack<DMeta, 1>,         // Add the constructed type         
+      Com::Stack<DMeta, 1>,         // Add the constructed type         //TODO consider using Com::Composite with Many on the stack, so we can take easy reference of the descriptor!
       Com::ChargedStack<>           // Add charge                       
    >;
 }

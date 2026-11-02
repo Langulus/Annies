@@ -336,6 +336,7 @@ namespace Langulus::Annies::Component
 
       /// Iterate and execute call for each deep element, counting each       
       /// successfull execution.                                              
+      ///   @attention may be overriden for some special containers           
       ///   @tparam REVERSE whether to iterate in reverse                     
       ///   @tparam SKIP whether to execute call for intermediate blocks      
       ///   @param f the function to execute for each element of type A       
