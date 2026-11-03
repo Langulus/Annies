@@ -33,7 +33,7 @@ namespace Langulus::Annies::Component
       /// Insert `rhs` at the back. Supports bounded arrays.                  
       template<CT::ContainsMany LHS, CT::NotContainer RHS>
       LHS& operator += (this LHS& lhs, RHS&& rhs) {
-         using ITEM = DeextAll<Deint<RHS>>;
+         using ITEM = ::std::remove_all_extents_t<Deint<RHS>>;
 
          if constexpr (CT::Array<RHS>) {
             if constexpr (requires { LHS {LglsFwd(rhs)}; }) {
@@ -90,7 +90,7 @@ namespace Langulus::Annies::Component
       /// Supports bounded arrays.                                            
       template<CT::ContainsMany LHS, CT::Container RHS>
       LHS& operator += (this LHS& lhs, RHS&& rhs) {
-         using ITEM = DeextAll<Deint<RHS>>;
+         using ITEM = ::std::remove_all_extents_t<Deint<RHS>>;
 
          if constexpr (CT::Array<RHS>) {
             using I = IntentOf(rhs);
@@ -119,7 +119,7 @@ namespace Langulus::Annies
    template<CT::NotContainer LHS, CT::Container RHS>
    requires (CT::NoIntent<LHS, RHS> and Com::HasInsertionOperatorsConcatEnabled<RHS>)
    RHS operator + (LHS const& lhs, RHS const& rhs) {
-      using ITEM = DeextAll<LHS>;
+      using ITEM = ::std::remove_all_extents_t<LHS>;
       RHS temp;
 
       if constexpr (CT::Array<LHS>) {
@@ -172,7 +172,7 @@ namespace Langulus::Annies
    template<CT::Container LHS, CT::NotContainer RHS>
    requires (CT::NoIntent<LHS, RHS> and Com::HasInsertionOperatorsConcatEnabled<LHS>)
    LHS operator + (LHS const& lhs, RHS const& rhs) {
-      using ITEM = DeextAll<RHS>;
+      using ITEM = ::std::remove_all_extents_t<RHS>;
       LHS temp;
 
       if constexpr (CT::Array<RHS>) {

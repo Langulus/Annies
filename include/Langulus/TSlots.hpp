@@ -60,22 +60,26 @@ namespace Langulus::Annies
       constexpr TSlots(TSlots const& other) {
          this->Absorb(Refer(other));
       }
-      /*constexpr TSlots(Copy<TSlots>&& other) requires CT::ReferConstructible<T> {
-         this->Absorb(LglsFwd(other));
-      }
-      constexpr TSlots(Clone<TSlots>&& other) requires CT::CloneConstructible<T> {
-         this->Absorb(LglsFwd(other));
-      }*///TODO doesn't seem to have an effect, problem is elsewhere
       constexpr TSlots(TSlots&& other) noexcept {
          this->Absorb(Move(other));
       }
       constexpr ~TSlots() noexcept {
          this->Destroy();
       }
+
+      template<class A1, class...AN>
+      static consteval bool ConstructibleWith() {
+         if constexpr      (sizeof...(AN) == 0 and CT::Copied<A1> and Same<TSlots, Deint<A1>>)
+            return CT::ReferConstructible<T>;
+         else if constexpr (sizeof...(AN) == 0 and CT::Cloned<A1> and Same<TSlots, Deint<A1>>)
+            return CT::CloneConstructible<T>;
+         else
+            return true;
+      }
       
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
-      template<class A1, class...AN>
+      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
       constexpr TSlots(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (Same<Deint<A1>, TSlots>) {
@@ -97,7 +101,7 @@ namespace Langulus::Annies
       }
       
       /// Construction that absorbs the provided container                    
-      template<class A1, class...AN>
+      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
       constexpr TSlots(Inner::Absorb, A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0)
             this->Absorb(LglsFwd(a1));
@@ -126,7 +130,7 @@ namespace Langulus::Annies
          return this->AssignAbsorb(Move(other));
       }
 
-      template<class A>
+      template<class A> requires (ConstructibleWith<A>())
       constexpr TSlots& operator = (A&& argument) {
          if constexpr (Same<Deint<A>, TSlots>) {
             /*LglsAssumeUser(not SameAsOneOf<T, TMany, Many>,

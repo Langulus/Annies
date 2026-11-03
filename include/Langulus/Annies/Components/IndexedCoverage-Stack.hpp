@@ -48,13 +48,13 @@ namespace Langulus::Annies::Component
       }
 
       /// Get the start of the coverage table                                 
-      /*template<Cid SID = ID> requires Relevant<SID>
+      template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetCoverageTable(this auto const& self) noexcept -> TableType const* {
          return ThisCom::GetCoverageTableInner();
       }
 
       /// Get the end of the coverage table                                   
-      template<Cid SID = ID> requires Relevant<SID>
+      /*template<Cid SID = ID> requires Relevant<SID>
       constexpr auto GetCoverageTableEnd(this auto const& self) noexcept -> TableType const* {
          return ThisCom::GetCoverageTableInner() + self.template GetReserved<SID>();
       }*/

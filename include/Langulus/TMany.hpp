@@ -69,10 +69,20 @@ namespace Langulus::Annies
       constexpr ~TMany() noexcept {
          this->Destroy();
       }
-      
+
+      template<class A1, class...AN>
+      static consteval bool ConstructibleWith() {
+         if constexpr      (sizeof...(AN) == 0 and CT::Copied<A1> and Same<TMany, Deint<A1>>)
+            return CT::ReferConstructible<T>;
+         else if constexpr (sizeof...(AN) == 0 and CT::Cloned<A1> and Same<TMany, Deint<A1>>)
+            return CT::CloneConstructible<T>;
+         else
+            return true;
+      }
+
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
-      template<class A1, class...AN>
+      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
       constexpr TMany(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0) {
             if constexpr (SameAsOneOf<Deint<A1>, TMany, Many>) {
@@ -94,7 +104,7 @@ namespace Langulus::Annies
       }
       
       /// Construction that absorbs the provided container                    
-      template<class A1, class...AN>
+      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
       constexpr TMany(Inner::Absorb, A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0)
             this->Absorb(LglsFwd(a1));

@@ -95,12 +95,12 @@ namespace Langulus::Annies::Component
 
       /// Check if the container has executable items, nested                 
       ///   @return true if there's at least one executable entry             
-      bool IsExecutable(this auto const& self) noexcept {
+      bool IsExecutable(this auto const& self, size_t depth) noexcept {
          constexpr auto providers = self.FindProviders(Id{});
-         return ForEachOr(providers, [&self]<class C> noexcept {
+         return ForEachOr(providers, [&self,&depth]<class C> noexcept {
             static_assert(CT::Deep<decltype(self.C::GetRaw())>,
                "Non-deep provider marked as relevant: " + CppNameOf<C>());
-            return self.C::GetRaw()->IsExecutable(DEPTH);
+            return self.C::GetRaw()->IsExecutable(depth + DEPTH);
          });
       }
 

@@ -429,6 +429,21 @@ namespace Langulus::Annies
          return result;
       }
 
+      /// Generates token from last name of a named constant                  
+      template<CT::HasNamedValues T>
+      static Text NamedLast(T const& constant) {
+         constexpr auto named_values = CT::Inner::GetNamedValueList<T>();
+         Text result;
+         ForEachOr(named_values, [&result, &constant]<class V> {
+            if (V::Constant == constant) {
+               result = RTTI::Inner::ToLastToken(V::Token);
+               return true;
+            }
+            else return false;
+         });
+         return result;
+      }
+
       /// Interpret text container as a std::string_view                      
       ///   @attention the string is null-terminated only after Terminate()   
       constexpr operator Token() const noexcept {

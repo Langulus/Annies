@@ -50,7 +50,8 @@ namespace Langulus
       }
 
       /// Get the downcasted type                                             
-      RTTI::DMeta GetType() const noexcept { return mClassType; }
+      auto GetType()  const noexcept -> RTTI::DMeta { return mClassType; }
+      auto GetToken() const noexcept -> Token { return mClassType.GetName(); }
 
       /// Test if downcasted type matches another type                        
       template<class T>

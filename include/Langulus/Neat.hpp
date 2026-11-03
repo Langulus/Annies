@@ -791,6 +791,57 @@ namespace Langulus::Annies
          //TODO if user pushed some deep containers with states
          (void) depth;
       }
+      
+      /// Iterate all other types of data - skips iterating tags and recipes. 
+      /// You can provide a TMany iterator, to filter based on data type.     
+      ///   @param f the function to execute for each block.                  
+      ///      If `f` returns bool, you can decide when to break the loop by  
+      ///      simply returning Flow::Break (or just false).                  
+      ///   @return the number of executions of 'f'                           
+      template<CT::Container C, class F>
+      size_t ForEachData(this C&& self, F&& f) {
+         using A = ArgumentOf<F>;
+
+         static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
+            "Mutable reference/pointer iterator not allowed for constant container");
+         
+         if (self.GetMessInner().IsEmpty())
+            return 0;
+
+         size_t index = 0;
+         if constexpr (CT::Deep<A>) {
+            //TODO definitely need a better binary-compatibility check lmao
+            static_assert(sizeof(Decay<A>) == sizeof(Many));
+
+            if constexpr (CT::TypeErased<A>) {
+               // Deep argument, which is also type-erased, and this    
+               // means we travel through _all_ messy buckets           
+               self.GetMessInner().Apply([&f,&self,&index](auto& pair) noexcept_if(f) {
+                  ++index;
+                  auto bucket = pair.GetValHandle();
+                  auto& as_type_erased = reinterpret_cast<THandle<Decay<A>&>&>(bucket);
+                  auto loop = self.InvokeF(LglsFwd(f), as_type_erased);
+                  return loop == Loop::Continue;
+               });
+            }
+            else {
+               // We are interested only in buckets of the same static  
+               // type as the iterator.                                 
+               using AType = TypeOf<A>;
+               auto found = self.GetMessInner().Find(MetaDataOf<AType>());
+               if (not found)
+                  return 0;
+
+               found.GetValHandle()->Apply([&f,&self,&index](auto& pair) noexcept_if(f) {
+                  ++index;
+                  auto loop = self.InvokeF(LglsFwd(f), pair);
+                  return loop == Loop::Continue;
+               });
+            }
+         }
+         else self.ForEachInner(LglsFwd(f), index);
+         return index;
+      }
    };
 }
 

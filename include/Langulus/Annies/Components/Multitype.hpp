@@ -489,17 +489,17 @@ namespace Langulus::Annies::Component
       ///   @attention this is a deep check!                                  
       ///   @return true if the container has at least one executable element 
       template<Cid SID = 0>
-      constexpr bool IsExecutable(this auto const& self) noexcept {
+      constexpr bool IsExecutable(this auto const& self, size_t depth = -1) noexcept {
          using C = typename Subcomponents::template At<SID>;
-         return self.C::IsExecutable();
+         return self.C::IsExecutable(depth);
       }
-      constexpr bool IsKeyExecutable(this auto const& self) noexcept {
+      constexpr bool IsKeyExecutable(this auto const& self, size_t depth = -1) noexcept {
          using C = typename Subcomponents::First;
-         return self.C::IsExecutable();
+         return self.C::IsExecutable(depth);
       }
-      constexpr bool IsValExecutable(this auto const& self) noexcept {
+      constexpr bool IsValExecutable(this auto const& self, size_t depth = -1) noexcept {
          using C = typename Subcomponents::Second;
-         return self.C::IsExecutable();
+         return self.C::IsExecutable(depth);
       }
 
       /// Get the size of the type times the contained elements               

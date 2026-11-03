@@ -149,7 +149,7 @@ namespace Langulus::Annies::Component
             "Container should support multiple elements");
 
          if constexpr (CONVERT
-         and not Same<TypeOf<C>, DeextAll<Deint<A1>>, DeextAll<Deint<AN>>...>) {
+         and not Same<TypeOf<C>, ::std::remove_all_extents_t<Deint<A1>>, ::std::remove_all_extents_t<Deint<AN>>...>) {
             // Conversion to AS required.                               
             const size_t initial_count = self.GetCountInner();
             size_t offset = self.SimplifyIndex(idx);
@@ -912,7 +912,7 @@ namespace Langulus::Annies::Component
       template<CT::IndexedLinearly C, class T>
       void ConvertInsertInner(this C& self, size_t& at, T&& a) {
          using I  = IntentOf(a);
-         using IT = DeextAll<Deint<I>>;
+         using IT = ::std::remove_all_extents_t<Deint<I>>;
          static_assert(CONVERT and not Same<TypeOf<C>, IT>,
             "Use InsertInner instead");
    
@@ -954,7 +954,7 @@ namespace Langulus::Annies::Component
          using I  = IntentOf(a);
          
          if constexpr (CONVERT) {
-            LglsAssumeDev(to.template IsSame<DeextAll<Deint<T>>>(),
+            LglsAssumeDev(to.template IsSame<::std::remove_all_extents_t<Deint<T>>>(),
                "Use ConvertInsertInner instead");
          }
 

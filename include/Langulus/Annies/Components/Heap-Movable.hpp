@@ -111,6 +111,7 @@ namespace Langulus::Annies::Component
                      );
                   }
                   else {
+                     //static_assert(CT::Copied<I>);
                      LglsAssert(type.GetReferConstructor(),
                         "Can't refer-construct elements"
                         " - no refer-constructor was reflected for type ",
@@ -127,6 +128,7 @@ namespace Langulus::Annies::Component
                      );
                   }
                   else {
+                     //static_assert(CT::Copied<I>);
                      static_assert(CT::ReferConstructible<T>,
                         "Contained type is not refer-constructible: "
                         + NameOf<T>()

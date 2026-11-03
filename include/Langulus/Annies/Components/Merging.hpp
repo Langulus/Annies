@@ -452,7 +452,7 @@ namespace Langulus::Annies::Component
       template<class C, class T>
       void ConvertMergeInner(this C& self, size_t& at, T&& a) {
          using I  = IntentOf(a);
-         using IT = DeextAll<Deint<I>>;
+         using IT = ::std::remove_all_extents_t<Deint<I>>;
          static_assert(CONVERT and not Same<TypeOf<C>, IT>,
             "Use MergeInnerLinear instead");
       
@@ -476,7 +476,7 @@ namespace Langulus::Annies::Component
       template<CT::Handle H, class T>
       static void MergeInnerLinear(H& to, size_t const*& it, size_t& counter, T&& a) {
          using I  = IntentOf(a);
-         using IT = DeextAll<Deint<T>>;
+         using IT = ::std::remove_all_extents_t<Deint<T>>;
          static_assert(not CONVERT or Same<TypeOf<H>, IT>,
             "Use ConvertMergeInner instead");
 
@@ -521,7 +521,7 @@ namespace Langulus::Annies::Component
       template<class C, class T> requires (not CT::Multidimensional<C>)
       void MergeInnerTable1D(this C& self, size_t const*& it, size_t& counter, T&& a) {
          using I  = IntentOf(a);
-         using IT = DeextAll<Deint<T>>;
+         using IT = ::std::remove_all_extents_t<Deint<T>>;
          static_assert(not CONVERT or Same<TypeOf<C>, IT>,
             "Use ConvertMergeInnerTable1D instead"); //TODO function not implemented yet
 
@@ -562,7 +562,7 @@ namespace Langulus::Annies::Component
       template<CT::Multidimensional C, class D1, class...DN>
       auto MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C> {
          static_assert(sizeof...(SHARED) >= sizeof...(DN), "Too many arguments");
-         static_assert(not CONVERT or Same<TypeOf<C, ID>, DeextAll<Deint<D1>>>,
+         static_assert(not CONVERT or Same<TypeOf<C, ID>, ::std::remove_all_extents_t<Deint<D1>>>,
             "Use ConvertMergeInnerTableMD instead" //TODO function not implemented yet
          ); 
 
@@ -580,7 +580,7 @@ namespace Langulus::Annies::Component
          // Emplace available                                           
          LglsSequence(overlapped_count, {
             static_assert(not CONVERT
-               or ((Same<TypeOf<C, Id::template At<I+1>>, DeextAll<Deint<DN>>>) and ...),
+               or ((Same<TypeOf<C, Id::template At<I+1>>, ::std::remove_all_extents_t<Deint<DN>>>) and ...),
                "Use ConvertMergeInnerTableMD instead" //TODO function not implemented yet
             );
             (h.template EmplaceWithIntent<Id::template At<I+1>>(FWDIntent(dn)), ...);

@@ -261,10 +261,10 @@ namespace Langulus::Annies
       ///   @param data data to wrap, assumed valid, supports arrays          
       ///   @param count number of bytes inside 'data' to use                 
       ///   @return the raw bytes wrapped inside a Bytes container            
-      template<CT::NoIntent T> requires CT::POD<DeextAll<T>>
+      template<CT::NoIntent T> requires CT::POD<::std::remove_all_extents_t<T>>
       static Bytes FromPOD(T&& data) noexcept {
          Bytes result;
-         if constexpr (CT::Array<T>)
+         if constexpr (::std::is_bounded_array_v<T>)
             result.SetHeapInner(static_cast<const void*>( data));
          else
             result.SetHeapInner(static_cast<const void*>(&data));

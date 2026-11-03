@@ -311,7 +311,7 @@ namespace Langulus::Annies::Component
       ///   @attention this is a deep check!                                  
       ///   @return true if the container has at least one executable element 
       template<Cid SID = ID, CT::Container C>
-      constexpr bool IsExecutable(this C const& self) noexcept {
+      constexpr bool IsExecutable(this C const& self, size_t depth = -1) noexcept {
          if (self.IsEmpty())
             return false;
 
@@ -320,29 +320,21 @@ namespace Langulus::Annies::Component
             const auto T = ThisCom::GetTypeInner();
             if (T.IsExecutable())
                return true;
-            else if (T.IsDeep()) {
+            
+            if (T.IsDeep() and depth > 0) {
+               if (depth != size_t(-1))
+                  depth -= 1;
+
                bool result = false;
-               self.Apply([&result](auto const& item) noexcept {
-                  if (item.template Get<typename C::DeepType const, SID>()->template IsExecutable<ID>()) {
+               self.Apply([&result,&depth](auto const& item) noexcept {
+                  auto* d = item.template Get<typename C::DeepType const, SID>();
+                  if (d->template IsExecutable<ID>(depth)) {
                      result = true;
                      return false;
                   }
                   else return true;
                });
                return result;
-
-               /*if constexpr (CT::ContainsMany<C>) {
-                  bool result = false;
-                  self.ForEach([&result](typename C::DeepType const& inner) noexcept {
-                     if (inner.template IsExecutable<ID>()) {
-                        result = true;
-                        return Loop::Break;
-                     }
-                     return Loop::Continue;
-                  });
-                  return result;
-               }
-               else return self.template As<typename C::DeepType const>().template IsExecutable<ID>();*/
             }
             else return false;
          }
@@ -351,9 +343,15 @@ namespace Langulus::Annies::Component
             if constexpr (CT::Executable<TYPE>)
                return true;
             else if constexpr (CT::Deep<TYPE>) {
+               if (depth == 0)
+                  return false;
+
+               if (depth != size_t(-1))
+                  depth -= 1;
+
                bool result = false;
-               self.Apply([&result](auto const& item) noexcept {
-                  if (item.template Get<Decay<TYPE>, SID>()->template IsExecutable<ID>()) {
+               self.Apply([&result,&depth](auto const& item) noexcept {
+                  if (item.template Get<Decay<TYPE>, SID>()->template IsExecutable<ID>(depth)) {
                      result = true;
                      return false;
                   }
@@ -512,7 +510,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::Handle<A>)
             ThisCom::template AbsorbType<0>(Copy(a));
          else
-            ThisCom::template SetType<Decvq<DeextAll<Deref<Deint<A>>>>>();
+            ThisCom::template SetType<Decvq<::std::remove_all_extents_t<Deref<Deint<A>>>>>();
       }
 
    protected:

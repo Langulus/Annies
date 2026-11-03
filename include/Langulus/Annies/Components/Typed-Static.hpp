@@ -9,6 +9,7 @@
 #include "../Component.hpp"
 //#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Deep.hpp>
+#include <Langulus/CT/Executable.hpp>
 
 
 namespace Langulus::Annies
@@ -252,16 +253,22 @@ namespace Langulus::Annies::Component
       ///   @attention this is a deep check!                                  
       ///   @return true if the container has at least one executable element 
       template<Cid SID = ID, CT::Container C>
-      constexpr bool IsExecutable(this C const& self) noexcept {
+      constexpr bool IsExecutable(this C const& self, size_t depth = -1) noexcept {
          if (self.IsEmpty())
             return false;
 
          if constexpr (CT::Executable<TYPE>)
             return true;
          else if constexpr (CT::Deep<TYPE>) {
+            if (depth == 0)
+               return false;
+
+            if (depth != size_t(-1))
+               depth -= 1;
+
             // Dig deeper                                               
             for (TYPE const& inner : self) {
-               if (inner.template IsExecutable<SID>())
+               if (inner.template IsExecutable<SID>(depth))
                   return true;
             }
             return false;
@@ -359,7 +366,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::Handle<A>)
             AbsorbType<0>(Copy(a));
          else
-            SetType<Decvq<DeextAll<Deref<Deint<A>>>>>();
+            SetType<Decvq<::std::remove_all_extents_t<Deref<Deint<A>>>>>();
       }
    };
 }
