@@ -24,7 +24,7 @@ TEMPLATE_TEST_CASE("Map corner cases", "[map]",
    (MapTest<OrderedMap, DMeta, Text>),
    (MapTest<UnorderedMap, DMeta, Text>),
    (MapTest<TMapUnsorted<DMeta, Text>, DMeta, Text>),
-   (MapTest<TOrderedMap<DMeta, Text>, DMeta, Text>)
+   (MapTest<TMapSorted<DMeta, Text>, DMeta, Text>)
 ) {
    using T = typename TestType::Container;
    using K = typename TestType::Key;

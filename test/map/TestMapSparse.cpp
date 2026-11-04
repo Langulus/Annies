@@ -24,16 +24,16 @@
    (MapTest<TMapUnsorted<Many*, RT*>, Many*, RT*, MANAGED>), \
    (MapTest<TMapUnsorted<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
-   (MapTest<TOrderedMap<Text, int*>, Text, int*, MANAGED>), \
-   (MapTest<TOrderedMap<Text, Tag*>, Text, Tag*, MANAGED>), \
-   (MapTest<TOrderedMap<Text, Tags::Count*>, Text, Tags::Count*, MANAGED>), \
-   (MapTest<TOrderedMap<Text, Many*>, Text, Many*, MANAGED>), \
-   (MapTest<TOrderedMap<Text, RT*>, Text, RT*, MANAGED>), \
+   (MapTest<TMapSorted<Text, int*>, Text, int*, MANAGED>), \
+   (MapTest<TMapSorted<Text, Tag*>, Text, Tag*, MANAGED>), \
+   (MapTest<TMapSorted<Text, Tags::Count*>, Text, Tags::Count*, MANAGED>), \
+   (MapTest<TMapSorted<Text, Many*>, Text, Many*, MANAGED>), \
+   (MapTest<TMapSorted<Text, RT*>, Text, RT*, MANAGED>), \
  \
-   (MapTest<TOrderedMap<Tag*, RT*>, Tag*, RT*, MANAGED>), \
-   (MapTest<TOrderedMap<Tags::Count*, RT*>, Tags::Count*, RT*, MANAGED>), \
-   (MapTest<TOrderedMap<Many*, RT*>, Many*, RT*, MANAGED>), \
-   (MapTest<TOrderedMap<RT*, RT*>, RT*, RT*, MANAGED>), \
+   (MapTest<TMapSorted<Tag*, RT*>, Tag*, RT*, MANAGED>), \
+   (MapTest<TMapSorted<Tags::Count*, RT*>, Tags::Count*, RT*, MANAGED>), \
+   (MapTest<TMapSorted<Many*, RT*>, Many*, RT*, MANAGED>), \
+   (MapTest<TMapSorted<RT*, RT*>, RT*, RT*, MANAGED>), \
  \
    (MapTest<UnorderedMap, Text, Tag*, MANAGED>), \
    (MapTest<UnorderedMap, Text, Tags::Count*, MANAGED>), \
@@ -55,18 +55,18 @@
    (MapTest<OrderedMap, RT*, RT*, MANAGED>)
 
 
-/// The main test for TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap       
+/// The main test for TMapSorted/TMapUnsorted/OrderedMap/UnorderedMap       
 /// containers, with all kinds of items, from sparse to dense, from trivial   
 /// to complex, from flat to deep                                             
 #if LANGULUS_FEATURE(MANAGED_MEMORY)
 TEMPLATE_TEST_CASE(
-   "Sparse TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
+   "Sparse TMapSorted/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    //TODO MAP_TESTS(true),
    MAP_TESTS(false)
 ) {
 #else
 TEMPLATE_TEST_CASE(
-   "Sparse TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
+   "Sparse TMapSorted/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    MAP_TESTS(false)
 ) {
 #endif
@@ -872,29 +872,29 @@ TEMPLATE_TEST_CASE("Sparse templated map stress test", "[map]",
    (MapTest<TMapUnsorted<int, Tags::Count*>, int, Tags::Count*>),
    (MapTest<TMapUnsorted<int, Many*>, int, Many*>),
 
-   (MapTest<TOrderedMap<int, int*>, int, int*>),
-   (MapTest<TOrderedMap<int, Tag*>, int, Tag*>),
-   (MapTest<TOrderedMap<int, Tags::Count*>, int, Tags::Count*>),
-   (MapTest<TOrderedMap<int, Many*>, int, Many*>),
+   (MapTest<TMapSorted<int, int*>, int, int*>),
+   (MapTest<TMapSorted<int, Tag*>, int, Tag*>),
+   (MapTest<TMapSorted<int, Tags::Count*>, int, Tags::Count*>),
+   (MapTest<TMapSorted<int, Many*>, int, Many*>),
 
    (MapTest<TMapUnsorted<int*, int>, int*, int>),
    (MapTest<TMapUnsorted<int*, Tags::Count>, int*, Tags::Count>),
    (MapTest<TMapUnsorted<int*, Many>, int*, Many>),
 
-   (MapTest<TOrderedMap<int*, int>, int*, int>),
-   (MapTest<TOrderedMap<int*, Tag>, int*, Tag>),
-   (MapTest<TOrderedMap<int*, Tags::Count>, int*, Tags::Count>),
-   (MapTest<TOrderedMap<int*, Many>, int*, Many>),
+   (MapTest<TMapSorted<int*, int>, int*, int>),
+   (MapTest<TMapSorted<int*, Tag>, int*, Tag>),
+   (MapTest<TMapSorted<int*, Tags::Count>, int*, Tags::Count>),
+   (MapTest<TMapSorted<int*, Many>, int*, Many>),
 
    (MapTest<TMapUnsorted<int*, int*>, int*, int*>),
    (MapTest<TMapUnsorted<int*, Tag*>, int*, Tag*>),
    (MapTest<TMapUnsorted<int*, Tags::Count*>, int*, Tags::Count*>),
    (MapTest<TMapUnsorted<int*, Many*>, int*, Many*>),
 
-   (MapTest<TOrderedMap<int*, int*>, int*, int*>),
-   (MapTest<TOrderedMap<int*, Tag*>, int*, Tag*>),
-   (MapTest<TOrderedMap<int*, Tags::Count*>, int*, Tags::Count*>),
-   (MapTest<TOrderedMap<int*, Many*>, int*, Many*>)
+   (MapTest<TMapSorted<int*, int*>, int*, int*>),
+   (MapTest<TMapSorted<int*, Tag*>, int*, Tag*>),
+   (MapTest<TMapSorted<int*, Tags::Count*>, int*, Tags::Count*>),
+   (MapTest<TMapSorted<int*, Many*>, int*, Many*>)
 ) {
    static Allocator::State memoryState;
 

@@ -8,11 +8,11 @@
 #include "TestMapCommon.hpp"
 
 
-/// The main test for TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap       
+/// The main test for TMapSorted/TMapUnsorted/OrderedMap/UnorderedMap       
 /// containers, with all kinds of items, from sparse to dense, from trivial   
 /// to complex, from flat to deep                                             
 TEMPLATE_TEST_CASE(
-   "Dense TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
+   "Dense TMapSorted/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    (MapTest<UnorderedMap, Text, int>),
 
    (MapTest<TMapUnsorted<Text, int>, Text, int>),
@@ -20,10 +20,10 @@ TEMPLATE_TEST_CASE(
    (MapTest<TMapUnsorted<Text, Tags::Count>, Text, Tags::Count>),
    (MapTest<TMapUnsorted<Text, Many>, Text, Many>),
 
-   (MapTest<TOrderedMap<Text, int>, Text, int>),
-   (MapTest<TOrderedMap<Text, Tag>, Text, Tag>),
-   (MapTest<TOrderedMap<Text, Tags::Count>, Text, Tags::Count>),
-   (MapTest<TOrderedMap<Text, Many>, Text, Many>),
+   (MapTest<TMapSorted<Text, int>, Text, int>),
+   (MapTest<TMapSorted<Text, Tag>, Text, Tag>),
+   (MapTest<TMapSorted<Text, Tags::Count>, Text, Tags::Count>),
+   (MapTest<TMapSorted<Text, Many>, Text, Many>),
 
    (MapTest<UnorderedMap, Text, Tag>),
    (MapTest<UnorderedMap, Text, Tags::Count>),
@@ -819,10 +819,10 @@ TEMPLATE_TEST_CASE("Dense templated map stress test", "[map]",
    (MapTest<TMapUnsorted<int, Tags::Count>, int, Tags::Count>),
    (MapTest<TMapUnsorted<int, Many>, int, Many>),
 
-   (MapTest<TOrderedMap<int, int>, int, int>),
-   (MapTest<TOrderedMap<int, Tag>, int, Tag>),
-   (MapTest<TOrderedMap<int, Tags::Count>, int, Tags::Count>),
-   (MapTest<TOrderedMap<int, Many>, int, Many>)
+   (MapTest<TMapSorted<int, int>, int, int>),
+   (MapTest<TMapSorted<int, Tag>, int, Tag>),
+   (MapTest<TMapSorted<int, Tags::Count>, int, Tags::Count>),
+   (MapTest<TMapSorted<int, Many>, int, Many>)
 ) {
    static Allocator::State memoryState;
 

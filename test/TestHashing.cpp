@@ -44,7 +44,7 @@ SCENARIO("Hashing different kinds of containers", "[hash]") {
 
 /// Cross-container consistency tests                                         
 TEMPLATE_TEST_CASE(
-   "Cross-container consistency tests for TOrderedMap/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
+   "Cross-container consistency tests for TMapSorted/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
    (HashTest<Text, Tag*>),
 
    (HashTest<Text, int>),
@@ -67,7 +67,7 @@ TEMPLATE_TEST_CASE(
 
       TMapUnsorted<K, V> uset1 {pair};
       UnorderedMap uset2 {pair};
-      TOrderedMap<K, V> oset1 {pair};
+      TMapSorted<K, V> oset1 {pair};
       OrderedMap oset2 {pair};
 
       WHEN("Their hashes are taken") {

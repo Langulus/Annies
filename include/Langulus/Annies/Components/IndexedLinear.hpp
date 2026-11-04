@@ -76,7 +76,7 @@ namespace Langulus::Annies::Component
          }
          else if constexpr (requires { index.index; }) {
             // If index is negative, wrap it around (if in range)       
-            const auto c = self.GetCount();
+            size_t const c = self.GetCount();
             if (index.index < 0) {
                LglsAssert(c + index.index < c and c + index.index >= 0,
                   "Integer index out of range");
