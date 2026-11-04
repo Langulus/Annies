@@ -112,7 +112,7 @@ namespace Langulus::Annies::Component
                    and value.GetRawEnd() <= self.GetRawEnd(),
             "Handle doesn't belong to this container");
 
-         const size_t offset = value - self.GetHandle();
+         size_t const offset = value - self.GetHandle();
          if (not self.IsDisowned() and self.GetUses() == 1) {
             // No need to branch-out                                    
             value.ForceMutable().Free();
@@ -148,16 +148,36 @@ namespace Langulus::Annies::Component
       }
 
       /// Erase a key from a non-linearly indexed container                   
-      ///   @param key the key to search for                                  
-      ///   @return the number of removed elements                            
+      ///   @param key the key to search for, use a pointer to an element     
+      ///      to reduce the search to a memory check.                        
+      ///   @return 1 if the element was found and removed, 0 otherwise       
       template<CT::ContainsMany C, CT::NoIntent A>
       requires (not CT::IndexedLinearly<C> and not CT::Handle<A>)
       auto Erase(this C& self, A const& key) -> size_t {
          if (self.IsEmpty())
             return 0;
 
-         auto h = self.Find(key).ForceMutable();
-         ThisCom::EraseFromTable(h);
+         DecideHandle<C> found;
+         if constexpr (CT::Sparse<A>) {
+            // We are allowed to generate a handle if key is a pointer  
+            // that's pointing to an element of this container          
+            if constexpr (CT::TypeErased<C>) {
+               if (self.template IsSame<Deptr<A>>())
+                  found = self.GetHandleFromPointer(key);
+               else
+                  found = self.Find(key);
+            }
+            else if constexpr (Same<TypeOf<C>, Deptr<A>>)
+               found = self.GetHandleFromPointer(key);
+            else
+               found = self.Find(key);
+         }
+         else found = self.Find(key);
+
+         if (not found)
+            return 0;
+
+         ThisCom::EraseFromTable(found.ForceMutable());
          return 1;
       }
 
@@ -379,9 +399,9 @@ namespace Langulus::Annies::Component
       /// Erases an element at a specific index from a hash table             
       ///   @attention assumes that index points to a valid element           
       ///   @attention operates on all dimensions at once                     
-      ///   @param index the index to remove                                  
+      ///   @param h the handle to erase (intentionally by copy)              
       template<CT::ContainsMany C> requires CT::IndexedHashTable<C>
-      void EraseFromTable(this C& self, CT::Handle auto& h) assumptious {
+      void EraseFromTable(this C& self, CT::Handle auto h) assumptious {
          const auto tableBeg = DecvqAllCast(self.template GetHashTable<ID>()); //TODO what if different tables per dimension?
          auto psl = tableBeg + (h - self.GetHandle());
          LglsAssumeDev(*psl,
@@ -438,6 +458,23 @@ namespace Langulus::Annies::Component
          }
 
          // Success                                                     
+         --self.GetCountInner();
+      }
+
+      /// Erases an element at a specific index from a coverage table         
+      ///   @attention assumes that index points to a valid element           
+      ///   @attention operates on all dimensions at once                     
+      ///   @param h the handle to erase                                      
+      template<CT::ContainsMany C> requires CT::IndexedCoverage<C>
+      void EraseFromTable(this C& self, CT::Handle auto const& h) assumptious {
+         size_t slot = h - self.GetHandle();
+         LglsAssumeDev(self.IsSlotOccupied(slot),
+            "Removing an invalid key");
+         LglsAssumeDev(self.GetUses() == 1,
+            "Must branch-out before calling this method");
+
+         h.Free();
+         self.DisableSlot(slot);
          --self.GetCountInner();
       }
    };

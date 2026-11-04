@@ -134,7 +134,7 @@ namespace Langulus::Annies
    ///   @param i - the offset to use                                         
    ///   @return the element, wrapped in a Block                              
    template<CT::Set THIS> LANGULUS(INLINED)
-   decltype(auto) BlockSet::GetRaw(const size_t i) IF_UNSAFE(noexcept) {
+   decltype(auto) BlockSet::GetRaw(size_t const i) IF_UNSAFE(noexcept) {
       LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing set",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");
@@ -150,7 +150,7 @@ namespace Langulus::Annies
    }
 
    template<CT::Set THIS> LANGULUS(INLINED)
-   decltype(auto) BlockSet::GetRaw(const size_t i) const IF_UNSAFE(noexcept) {
+   decltype(auto) BlockSet::GetRaw(size_t const i) const IF_UNSAFE(noexcept) {
       return const_cast<BlockSet*>(this)->template GetRaw<THIS>(i);
    }
 
@@ -159,7 +159,7 @@ namespace Langulus::Annies
    ///   @param i - the offset to use                                         
    ///   @return the element, wrapped in a Block                              
    template<CT::Set THIS> LANGULUS(INLINED)
-   decltype(auto) BlockSet::GetRef(const size_t i) IF_UNSAFE(noexcept) {
+   decltype(auto) BlockSet::GetRef(size_t const i) IF_UNSAFE(noexcept) {
       if constexpr (CT::Typed<THIS>)
          return *GetRaw<THIS>(i);
       else
@@ -167,7 +167,7 @@ namespace Langulus::Annies
    }
 
    template<CT::Set THIS> LANGULUS(INLINED)
-   decltype(auto) BlockSet::GetRef(const size_t i) const IF_UNSAFE(noexcept) {
+   decltype(auto) BlockSet::GetRef(size_t const i) const IF_UNSAFE(noexcept) {
       return const_cast<BlockSet*>(this)->template GetRef<THIS>(i);
    }
 
@@ -176,7 +176,7 @@ namespace Langulus::Annies
    ///   @param value - the value to hash                                     
    ///   @return the bucket index                                             
    LANGULUS(INLINED)
-   size_t BlockSet::GetBucket(const size_t mask, const CT::NoIntent auto& value) noexcept {
+   size_t BlockSet::GetBucket(size_t const mask, const CT::NoIntent auto& value) noexcept {
       return HashOf(value).mHash & mask;
    }
    
@@ -185,7 +185,7 @@ namespace Langulus::Annies
    ///   @param value - the value to hash, wrapped in a block                 
    ///   @return the bucket index                                             
    LANGULUS(INLINED)
-   size_t BlockSet::GetBucketUnknown(const size_t mask, const Block<>& value) noexcept {
+   size_t BlockSet::GetBucketUnknown(size_t const mask, const Block<>& value) noexcept {
       return value.GetHash().mHash & mask;
    }
 
@@ -194,7 +194,7 @@ namespace Langulus::Annies
    ///   @param i - the key index                                             
    ///   @return the handle                                                   
    template<CT::Set THIS> LANGULUS(INLINED)
-   auto BlockSet::GetHandle(const size_t i) IF_UNSAFE(noexcept) {
+   auto BlockSet::GetHandle(size_t const i) IF_UNSAFE(noexcept) {
       LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing set",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");

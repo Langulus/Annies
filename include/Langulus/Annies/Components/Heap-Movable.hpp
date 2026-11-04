@@ -35,7 +35,7 @@ namespace Langulus::Annies::Component
       /// Refers back to this particular component instance through the       
       /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
       /// this file.                                                          
-      #define ThisCom self.HeapMovable<INITIAL_SIZE, GROWTH_FACTOR, ENTRY0, ENTRYN...>
+      #define ThisCom self.HeapMovable<INITIAL_SIZE, GROWTH_FACTOR, ENTRY0, ENTRYN...> //TODO special care should be taken when ThisCom is used in here, because HeapImmovable inherits this one, and they could get mixed up
 
       using Id = typename HeapReference<ENTRY0, ENTRYN...>::Id;
       using HeapProvider = Id;
@@ -92,15 +92,10 @@ namespace Langulus::Annies::Component
          size_t count = from.GetCount();
          if constexpr (CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>) {
             // Do a copy or clone.                                      
-            // Verify that all dimensions are copiable/clonable, and    
-            // make sure that 'count' and 'reserve' are consistent      
-            // across all dimensions.                                   
+            // Verify that all dimensions are copiable/clonable         
+            // Count and reserve are always consistent across dimensions
+            // because only one such component is allowed per container.
             Id::ForEach([&]<Cid D> {
-               /*LglsAssumeDev(from.template GetCount<D>() == from.template GetCount<Id::First>(),
-                  "Inconsistent count across dimensions");
-               LglsAssumeDev(from.template GetReserved<D>() == from.template GetReserved<Id::First>(),
-                  "Inconsistent reserve across dimensions");*/
-
                if constexpr (CT::TypeErased<IT>) {
                   auto type = from.template GetType<D>();
                   if constexpr (CT::Cloned<I>) {
@@ -111,7 +106,9 @@ namespace Langulus::Annies::Component
                      );
                   }
                   else {
-                     //static_assert(CT::Copied<I>);
+                     /// @attention this branch may not be reached by   
+                     /// copy intent alone - stack->heap transfers end  
+                     /// up here as well!                               
                      LglsAssert(type.GetReferConstructor(),
                         "Can't refer-construct elements"
                         " - no refer-constructor was reflected for type ",
@@ -128,7 +125,9 @@ namespace Langulus::Annies::Component
                      );
                   }
                   else {
-                     //static_assert(CT::Copied<I>);
+                     /// @attention this branch may not be reached by   
+                     /// copy intent alone - stack->heap transfers end  
+                     /// up here as well!                               
                      static_assert(CT::ReferConstructible<T>,
                         "Contained type is not refer-constructible: "
                         + NameOf<T>()
@@ -335,8 +334,9 @@ namespace Langulus::Annies::Component
       /// When MANAGED_MEMORY is enabled we have a strong guarantee that      
       /// allocations never move when shrinking.                              
       ///   @attention works on all relevant dimensions at once               
+      ///   @attention designed for linearly allocated containers only        
       ///   @param desiredReserve number of elements to reserve               
-      template<Cid SID = Id::First, CT::Container C>
+      template<Cid SID = Id::First, CT::IndexedLinearly C>
       void AllocateLess(this C& self, const Count<C> desiredReserve) {
          static_assert(not CT::Handle<C>,
             "Handles aren't allowed to reallocate");
@@ -415,7 +415,7 @@ namespace Langulus::Annies::Component
       /// Helper function that navigates to the start of the local heap       
       /// footer of a given dimension and custom reserve count                
       template<Cid SID, CT::Container C>
-      auto* GetLocalHeap(this C&& self, const size_t reserved) assumptious {
+      auto* GetLocalHeap(this C&& self, size_t const reserved) assumptious {
          auto to_footer = self.template GetRawAs<uint8_t, Id::First>();
          Id::ForEachConstOr([&]<Cid i>{
             size_t indirections;
@@ -447,7 +447,7 @@ namespace Langulus::Annies::Component
       /// Helper function that navigates to the start of the global heap      
       /// footer for a custom reserve count                                   
       template<CT::Container C>
-      auto* GetGlobalHeap(this C&& self, const size_t reserved) assumptious {
+      auto* GetGlobalHeap(this C&& self, size_t const reserved) assumptious {
          auto to_footer = self.template GetLocalHeap<Id::Last>(reserved);
          auto indirections = self.template GetIndirections<Id::Last>();
          to_footer += Decay<C>::template DefineHeapFooter<Id::Last>(reserved, indirections);
@@ -480,7 +480,7 @@ namespace Langulus::Annies::Component
       ///   @param newReserved the newly reserved number of elements          
       ///   @attention works on all relevant dimensions at once!              
       template<bool SHRINKING, CT::Container C>
-      void RemapGlobalHeapRequests(this C& self, const size_t oldReserved, const size_t newReserved) {
+      void RemapGlobalHeapRequests(this C& self, size_t const oldReserved, size_t const newReserved) {
          size_t from[C::template CountHeapFooterRequests<Id::First>() + 1];
          size_t to  [C::template CountHeapFooterRequests<Id::First>() + 1];
          size_t idx = 1;
@@ -548,7 +548,7 @@ namespace Langulus::Annies::Component
       //TODO this will nullify a new hash table, but it doesn't call SetHashTableInner to move the pointer if kept on the stack!! 
       //TODO i've worked around this by using IndexedHashHeap instead of IndexedHashStack for sets and maps, for now
       template<Cid SID, bool SHRINKING, CT::Container C>
-      void RemapLocalHeapRequests(this C& self, const size_t oldReserved, const size_t newReserved) {
+      void RemapLocalHeapRequests(this C& self, size_t const oldReserved, size_t const newReserved) {
          [[maybe_unused]]
          const auto indirect = self.template GetIndirections<SID>();
 
@@ -625,7 +625,7 @@ namespace Langulus::Annies::Component
       ///   @param newReserved the newly reserved number of elements          
       ///   @attention works on all relevant dimensions at once!              
       template<bool SHRINKING, CT::Container C>
-      void TransferGlobalHeapRequests(this C& self, CT::Container auto const& oldSelf, const size_t oldReserved, const size_t newReserved) {
+      void TransferGlobalHeapRequests(this C& self, CT::Container auto const& oldSelf, size_t const oldReserved, size_t const newReserved) {
          size_t from[C::template CountHeapFooterRequests<Id::First>() + 1];
          size_t to  [C::template CountHeapFooterRequests<Id::First>() + 1];
          size_t idx = 1;
@@ -680,7 +680,7 @@ namespace Langulus::Annies::Component
       //TODO this will nullify a new hash table, but it doesn't call SetHashTableInner to move the pointer if kept on the stack!! 
       //TODO i've worked around this by using IndexedHashHeap instead of IndexedHashStack for sets and maps, for now
       template<Cid SID, bool SHRINKING, CT::Container C>
-      void TransferLocalHeapRequests(this C& self, CT::Container auto const& oldSelf, const size_t oldReserved, const size_t newReserved) {
+      void TransferLocalHeapRequests(this C& self, CT::Container auto const& oldSelf, size_t const oldReserved, size_t const newReserved) {
          [[maybe_unused]]
          const auto indirect = self.template GetIndirections<SID>();
 
@@ -741,7 +741,7 @@ namespace Langulus::Annies::Component
       ///   @attention works on all dimensions at once                        
       ///   @attention changes the reserved count (if changeable)             
       template<CT::Container C>
-      void RemapAllHeapRequests(this C& self, const size_t newReserved) {
+      void RemapAllHeapRequests(this C& self, size_t const newReserved) {
          if constexpr (C::template CountHeapFooterRequests<Id::First>() > 0) {
             const auto oldReserved = self.GetReserved();
             LglsAssumeDev(newReserved != oldReserved,
@@ -774,7 +774,7 @@ namespace Langulus::Annies::Component
       ///   @attention works on all dimensions at once                        
       ///   @attention changes the reserved count (if changeable)             
       template<CT::Container C>
-      void TransferAllHeapRequests(this C& self, CT::Container auto const& oldSelf, const size_t newReserved) {
+      void TransferAllHeapRequests(this C& self, CT::Container auto const& oldSelf, size_t const newReserved) {
          if constexpr (C::template CountHeapFooterRequests<Id::First>() > 0) {
             const auto oldReserved = self.GetReserved();
             LglsAssumeDev(newReserved != oldReserved,
@@ -949,8 +949,8 @@ namespace Langulus::Annies::Component
          //TODO just copy these along with elements in the above Id::ForEach if oldReserved and newReserved are the same
          if constexpr (C1::template CountHeapFooterRequests<Id::First>() > 0
          and           C2::template CountHeapFooterRequests<Id::First>() > 0) {
-            const size_t oldReserved = from.GetReserved();
-            const size_t newReserved = self.GetReserved();
+            size_t const oldReserved = from.GetReserved();
+            size_t const newReserved = self.GetReserved();
             Id::ForEach([&]<Cid D> {
                self.template TransferLocalHeapRequests<D, false>(from, oldReserved, newReserved);
             });

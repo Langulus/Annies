@@ -747,8 +747,8 @@ namespace Langulus::Annies::Component
       requires (CT::NoIntent<T> and CT::IndexedLinearly<C, T>)
       auto FindRange(this C const& self, T const& range, size_t cookie = 0) assumptious 
       -> DecideHandle<C> {
-         const size_t pool_size = self.GetCount() - cookie;
-         const size_t range_size = range.GetCount();
+         size_t const pool_size = self.GetCount() - cookie;
+         size_t const range_size = range.GetCount();
          if (not range_size or range_size > pool_size)
             return {};
 
@@ -759,7 +759,7 @@ namespace Langulus::Annies::Component
             return {};
          else {
             [[maybe_unused]] RTTI::DefinitionData::FCompareEqual comparer;
-            [[maybe_unused]] const size_t bytesize = range.template GetBytesize<SID>();
+            [[maybe_unused]] size_t const bytesize = range.template GetBytesize<SID>();
 
             if constexpr (CT::TypeErased<C> or CT::TypeErased<T>) {
                // Runtime type check                                    

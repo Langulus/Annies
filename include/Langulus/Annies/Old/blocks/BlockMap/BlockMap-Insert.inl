@@ -272,7 +272,7 @@ namespace Langulus::Annies
    ///   @return the requested byte size                                      
    template<CT::Map THIS> LANGULUS(INLINED)
    size_t BlockMap::RequestKeyAndInfoSize(
-      const size_t request, size_t& infoStart
+      size_t const request, size_t& infoStart
    ) const IF_UNSAFE(noexcept) {
       size_t keymemory;
       if constexpr (CT::Typed<THIS>) {
@@ -296,7 +296,7 @@ namespace Langulus::Annies
    ///   @param count - number of values to allocate                          
    ///   @return the requested byte size                                      
    LANGULUS(INLINED)
-   size_t BlockMap::RequestValuesSize(const size_t count) const IF_UNSAFE(noexcept) {
+   size_t BlockMap::RequestValuesSize(size_t const count) const IF_UNSAFE(noexcept) {
       LglsAssumeDev(mValues.mType, "Value type was not set");
       auto valueByteSize = count * mValues.mType->mSize;
       if (mValues.mType->mIsSparse)
@@ -314,7 +314,7 @@ namespace Langulus::Annies
    ///   @param oldVals - source of values (use nullptr to reuse the current) 
    ///   @return true if map requires another resize and rehash (very rare)   
    template<CT::Map THIS, class KEY_SOURCE, class VAL_SOURCE>
-   bool BlockMap::Rehash(const InfoType* oldInfo, const size_t oldCount, KEY_SOURCE& oldKeys, VAL_SOURCE& oldVals) {
+   bool BlockMap::Rehash(const InfoType* oldInfo, size_t const oldCount, KEY_SOURCE& oldKeys, VAL_SOURCE& oldVals) {
       LglsAssumeDev(mKeys.mReserved > oldCount,
          "New count is not larger than oldCount");
       LglsAssumeDev(IsPowerOfTwo(mKeys.mReserved),
@@ -395,7 +395,7 @@ namespace Langulus::Annies
          }
 
          // Where does the pair want to move after a rehash?            
-         const size_t current = info - mInfo;
+         size_t const current = info - mInfo;
          auto key = [&] {
             if constexpr (ReusingKeys) return GetKeyHandle<THIS>(current);
             else return oldKeys.template GetKeyHandle<THIS>(current);
@@ -478,7 +478,7 @@ namespace Langulus::Annies
          }
 
          // Where does the pair want to move after a rehash?            
-         const size_t current = info - mInfo;
+         size_t const current = info - mInfo;
          auto key = GetKeyHandle<THIS>(current);
          auto val = GetValHandle<THIS>(current);
          size_t moveTo = 0;
@@ -533,7 +533,7 @@ namespace Langulus::Annies
                else psl = mInfo;
             }
 
-            const size_t index = psl - GetInfo();
+            size_t const index = psl - GetInfo();
             LglsAssumeDev(current != index,
                "Shouldn't ever happen, but better safe than sorry");
 
@@ -565,7 +565,7 @@ namespace Langulus::Annies
          while (oldInfo != newInfoEnd) {
             if (*oldInfo > 1) {
                // Entry can be moved by *oldInfo - 1 cells to the left  
-               const size_t oldIndex = oldInfo - GetInfo();
+               size_t const oldIndex = oldInfo - GetInfo();
 
                // Will loop around if it goes beyond mKeys.mReserved    
                size_t to = mKeys.mReserved + oldIndex - *oldInfo + 1;
@@ -707,7 +707,7 @@ namespace Langulus::Annies
    ///   @return the offset at which pair was inserted                        
    template<CT::Map THIS, bool CHECK_FOR_MATCH, template<class> class S1, template<class> class S2, CT::Block T>
    requires CT::Intent<S1<T>, S2<T>>
-   size_t BlockMap::InsertBlockInner(const size_t start, S1<T>&& key, S2<T>&& val) {
+   size_t BlockMap::InsertBlockInner(size_t const start, S1<T>&& key, S2<T>&& val) {
       BranchOut<THIS>();
 
       // Get the starting index based on the key hash                   
@@ -787,7 +787,7 @@ namespace Langulus::Annies
    ///   @return the number of newly inserted pairs                           
    template<CT::Map THIS, bool CHECK_FOR_MATCH, template<class> class S, CT::Pair T>
    requires CT::Intent<S<T>>
-   size_t BlockMap::InsertPairInner(const size_t hashmask, S<T>&& pair) {
+   size_t BlockMap::InsertPairInner(size_t const hashmask, S<T>&& pair) {
       const auto initialCount = GetCount();
       if constexpr (CT::Typed<T>) {
          // Insert a statically typed pair                              

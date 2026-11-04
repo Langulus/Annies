@@ -56,3 +56,6 @@ namespace Langulus
 
    };
 }
+
+#include <Langulus/Annies/Components/Descriptor.hpp>
+

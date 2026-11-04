@@ -64,6 +64,7 @@ namespace Langulus::Annies::Component
       LglsComIndexedCommon(friend);
       LglsComIndexedLinear(friend);
       LglsComHeapMovable(friend);
+      LglsComHeapImmovable(friend);
       LglsComConversion(friend);
 
             template<CT::NotVoid> friend struct THive;

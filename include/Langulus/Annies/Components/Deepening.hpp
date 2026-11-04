@@ -158,13 +158,13 @@ namespace Langulus::Annies::Component
       ///   @param depth the depth at which container becomes flat            
       ///   @return the element, as a reference if possible                   
       template<CT::NotVoid AS, Cid SID = 0, CT::Container C>
-      decltype(auto) AsAtDeep(this C&& self, size_t deep_idx, const size_t depth = -1) {
+      decltype(auto) AsAtDeep(this C&& self, size_t deep_idx, size_t const depth = -1) {
          if (not self.IsDeep() or depth == 0)
             return self.template AsAt<AS, SID>(deep_idx);
 
          AS result;
          self.Apply([&deep_idx,&depth,&result](auto& handle) {
-            const size_t deep_count = handle.GetCountDeep(depth);
+            size_t const deep_count = handle.GetCountDeep(depth);
             if (deep_idx < deep_count) {
                result = handle.template AsAtDeep<AS, SID>(
                   deep_idx, depth == size_t(-1) ? -1 : depth - 1

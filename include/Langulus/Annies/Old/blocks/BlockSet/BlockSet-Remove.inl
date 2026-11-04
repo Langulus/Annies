@@ -62,7 +62,7 @@ namespace Langulus::Annies
    ///              (aka type-erased)                                         
    ///   @param index - the index to remove                                   
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::RemoveInner(const size_t index) IF_UNSAFE(noexcept) {
+   void BlockSet::RemoveInner(size_t const index) IF_UNSAFE(noexcept) {
       auto psl = GetInfo() + index;
       LglsAssumeDev(*psl, "Removing an invalid key");
       BranchOut<THIS>();

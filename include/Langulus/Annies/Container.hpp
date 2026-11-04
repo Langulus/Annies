@@ -628,8 +628,8 @@ namespace Langulus::Annies::Component
       ///      The footer starts at GetRawReserveEnd<SID>().                  
       template<Cid SID, CT::Typelist L = ComponentList>
       static constexpr size_t DefineHeapFooter(
-         [[maybe_unused]] const size_t count,
-         [[maybe_unused]] const size_t indirects
+         [[maybe_unused]] size_t const count,
+         [[maybe_unused]] size_t const indirects
       ) noexcept {
          size_t bytesize = 0;
          ForEach(L{}, [&bytesize, &indirects, &count]<class C> {
@@ -658,8 +658,8 @@ namespace Langulus::Annies::Component
       ///      to GetRawReserveEnd<SID>().                                    
       template<class PICK, Cid SID, CT::Typelist L>
       static constexpr auto GetHeapFooterOffsetInner(
-         [[maybe_unused]] const size_t count,
-         [[maybe_unused]] const size_t indirects,
+         [[maybe_unused]] size_t const count,
+         [[maybe_unused]] size_t const indirects,
          size_t& offset
       ) noexcept {
          return ForEachConstOr(L{}, [&offset, &indirects, &count]<class C> {
@@ -684,8 +684,8 @@ namespace Langulus::Annies::Component
 
       template<class PICK, Cid SID>
       static constexpr size_t GetHeapFooterOffset(
-         [[maybe_unused]] const size_t count,
-         [[maybe_unused]] const size_t indirects
+         [[maybe_unused]] size_t const count,
+         [[maybe_unused]] size_t const indirects
       ) noexcept {
          static_assert(requires { typename PICK::HeapRequest; },
             "Component data is not on the heap");
@@ -716,7 +716,7 @@ namespace Langulus::Annies::Component
       ///      GetRawReserveEnd<D>() + DefineHeapFooter<D>                    
       template<Cid SID, CT::Typelist L = ComponentList>
       static constexpr size_t DefineHeapFooterGlobal(
-         [[maybe_unused]] const size_t count
+         [[maybe_unused]] size_t const count
       ) noexcept {
          size_t bytesize = 0;
          ForEach(L{}, [&bytesize, &count]<class C> {
@@ -750,7 +750,7 @@ namespace Langulus::Annies::Component
       ///      GetRawReserveEnd<D>() + DefineHeapFooter<D>                    
       template<class PICK, Cid SID, CT::Typelist L>
       static constexpr auto GetHeapFooterOffsetGlobalInner(
-         [[maybe_unused]] const size_t count, size_t& offset
+         [[maybe_unused]] size_t const count, size_t& offset
       ) noexcept {
          return ForEachConstOr(L{}, [&offset, &count]<class C> {
             if constexpr (requires { typename C::Subcomponents; })
@@ -779,7 +779,7 @@ namespace Langulus::Annies::Component
 
       template<class PICK, Cid SID>
       static constexpr size_t GetHeapFooterOffsetGlobal(
-         [[maybe_unused]] const size_t count
+         [[maybe_unused]] size_t const count
       ) noexcept {
          static_assert(requires { typename PICK::HeapRequest; },
             "Component data is not on the heap");
@@ -844,10 +844,10 @@ namespace Langulus::Annies::Component
             // Access footer heap                                       
             if constexpr (R::AllocatedPerDimension) {
                // Local footer, positioned after each dimension data    
-               const size_t reserved = self.GetReserved();
-               const size_t indirects = self.template GetIndirections<SID>();
-               const size_t stride = self.template GetStride<SID>();
-               const size_t offset = GetHeapFooterOffset<PICK, SID>(reserved, indirects);
+               size_t const reserved = self.GetReserved();
+               size_t const indirects = self.template GetIndirections<SID>();
+               size_t const stride = self.template GetStride<SID>();
+               size_t const offset = GetHeapFooterOffset<PICK, SID>(reserved, indirects);
                const auto heap = self.template GetRawAs<uint8_t, SID>();
                using RC = LglsMutIf(SELF, TypeOf<R>*);
                return reinterpret_cast<RC>(heap + reserved * stride + offset);
@@ -856,11 +856,11 @@ namespace Langulus::Annies::Component
                // Global footer, positioned after the last dimension    
                using PROVIDER = typename decltype(FindProvider<SID>())::First;
                constexpr Cid LAST_ID = PROVIDER::Id::Last;
-               const size_t reserved = self.GetReserved();
-               const size_t indirects = self.template GetIndirections<LAST_ID>();
-               const size_t stride = self.template GetStride<LAST_ID>();
-               const size_t offset_local = DefineHeapFooter<LAST_ID>(reserved, indirects);
-               const size_t offset_global = GetHeapFooterOffsetGlobal<PICK, SID>(reserved);
+               size_t const reserved = self.GetReserved();
+               size_t const indirects = self.template GetIndirections<LAST_ID>();
+               size_t const stride = self.template GetStride<LAST_ID>();
+               size_t const offset_local = DefineHeapFooter<LAST_ID>(reserved, indirects);
+               size_t const offset_global = GetHeapFooterOffsetGlobal<PICK, SID>(reserved);
                const auto heap = self.template GetRawAs<uint8_t, LAST_ID>();
                using RC = LglsMutIf(SELF, TypeOf<R>*);
                return reinterpret_cast<RC>(heap + reserved * stride + offset_local + offset_global);
@@ -1114,7 +1114,7 @@ namespace Langulus::Annies::Component
                const auto tableEnd = tableBeg + (self.GetReserved() - cookie);
                auto table = tableBeg;*/
                [[maybe_unused]] size_t scanned = 0;
-               [[maybe_unused]] const size_t scannedMax = self.GetCount();
+               [[maybe_unused]] size_t const scannedMax = self.GetCount();
                while (item != end) {
                   if (self.IsSlotOccupied(item - beg)) {
                      if constexpr (CT::Bool<decltype(lambda(item))>) {

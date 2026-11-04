@@ -43,16 +43,18 @@ namespace Langulus::Annies::Component
       /// excess elements will be dereferenced/destroyed.                     
       ///   @param reserve number of elements to reserve                      
       template<CT::ContainsMany C>
-      C& Reserve(this C& self, const size_t reserve) {
-         if (reserve < self.GetCount())
-            self.AllocateLess(reserve);
-         else
-            self.AllocateMore(reserve);
+      C& Reserve(this C& self, size_t const reserve) {
+         if (reserve < self.GetCount()) {
+            //TODO non-linearly allocated containers like Slots, Maps, Tables, Sets need special compactifying routines, so reserving less items is disabled for now
+            if_available(self.AllocateLess(reserve));
+         }
+         else self.AllocateMore(reserve);
          return self;
       }
 
    protected:
       LglsComHeapMovable(friend);
+      LglsComHeapImmovable(friend);
       LglsComRemoval(friend);
       LglsComEmplacement(friend);
 
@@ -101,7 +103,7 @@ namespace Langulus::Annies::Component
                      ThisCom::SetReservedInner(1);
                   else {
                      //TODO should probably be generalized for multidimensionals
-                     const size_t header = from.GetHeapHeaderSize();
+                     size_t const header = from.GetHeapHeaderSize();
                      ThisCom::SetReservedInner((al->GetSize() - header) / self.GetStride());
                   }
                }

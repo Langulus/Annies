@@ -95,7 +95,7 @@ namespace Langulus::Annies::Component
 
       /// Check if the container has executable items, nested                 
       ///   @return true if there's at least one executable entry             
-      bool IsExecutable(this auto const& self, size_t depth) noexcept {
+      bool IsExecutable(this auto const& self, size_t depth = -1) noexcept {
          constexpr auto providers = self.FindProviders(Id{});
          return ForEachOr(providers, [&self,&depth]<class C> noexcept {
             static_assert(CT::Deep<decltype(self.C::GetRaw())>,
@@ -148,7 +148,7 @@ namespace Langulus::Annies::Component
          static_assert(CT::Typed<C>, "Subcontent must be typed");
          static_assert(CT::Deep<TypeOf<C>>, "Subcontent must contain deep items");
          for (auto const& subcontent : self) {
-            const size_t subcontent_count = subcontent.GetCountDeep(depth);
+            size_t const subcontent_count = subcontent.GetCountDeep(depth);
             if (subcontent_count and index < subcontent_count)
                return false;
             
@@ -180,7 +180,7 @@ namespace Langulus::Annies::Component
 
             if constexpr (DEPTH == 0) {
                // No need to browse beyond the immediate providers      
-               const size_t provider_count = self.P::GetRaw()->GetCount();
+               size_t const provider_count = self.P::GetRaw()->GetCount();
                if (provider_count and index < provider_count) {
                   selected = P::Id::First;
                   return false;
@@ -278,7 +278,7 @@ namespace Langulus::Annies::Component
          else {
             AS result;
             where.Apply([&at,&result](auto h) {
-               const size_t deep_count = h.GetCountDeep();
+               size_t const deep_count = h.GetCountDeep();
                if (at < deep_count) {
                   result = AsAtInner<AS, LOCAL_DEPTH-1>(*h.Get(), at);
                   return false;

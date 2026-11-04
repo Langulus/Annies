@@ -17,7 +17,7 @@ namespace Langulus::Annies
    ///   @param count - the number of elements to request                     
    ///   @return both the provided byte size and reserved count               
    template<class TYPE> LANGULUS(INLINED)
-   auto Block<TYPE>::RequestSize(const size_t count) const IF_UNSAFE(noexcept)
+   auto Block<TYPE>::RequestSize(size_t const count) const IF_UNSAFE(noexcept)
    -> AllocationRequest {
       if constexpr (TypeErased) {
          LglsAssumeDev(IsTyped(),
@@ -41,7 +41,7 @@ namespace Langulus::Annies
    ///      if you know what you're doing                                     
    ///   @param count - number of elements to reserve                         
    template<class TYPE> template<bool SETSIZE> LANGULUS(INLINED)
-   void Block<TYPE>::Reserve(const size_t count) {
+   void Block<TYPE>::Reserve(size_t const count) {
       if (count < mCount)
          AllocateLess(count);
       else 
@@ -57,7 +57,7 @@ namespace Langulus::Annies
    ///   @tparam SETSIZE - true to set count, despite not constructing        
    ///   @param elements - number of elements to allocate                     
    template<class TYPE> template<bool CREATE, bool SETSIZE>
-   void Block<TYPE>::AllocateMore(const size_t elements) {
+   void Block<TYPE>::AllocateMore(size_t const elements) {
       LglsAssumeDev(elements > mCount, "Bad element count");
 
       if constexpr (not TypeErased) {
@@ -176,7 +176,7 @@ namespace Langulus::Annies
    ///   @attention assumes 'elements' is smaller than the current reserve    
    ///   @param elements - number of elements to allocate                     
    template<class TYPE> LANGULUS(INLINED)
-   void Block<TYPE>::AllocateLess(const size_t elements) {
+   void Block<TYPE>::AllocateLess(size_t const elements) {
       LglsAssumeDev(elements < mReserved, "Bad element count");
 
       if (mCount > elements) {

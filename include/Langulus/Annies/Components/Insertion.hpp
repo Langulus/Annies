@@ -81,7 +81,7 @@ namespace Langulus::Annies::Component
          // We're moving to the right, so make sure we do it in         
          // reverse to avoid any potential overlap                      
          //TODO batch optimization for PODs
-         const size_t moved = lhs_count - offset;
+         size_t const moved = lhs_count - offset;
          auto src = start + (moved - 1);
          auto dst = src + rhs_count;
          auto const end = src - moved;
@@ -151,7 +151,7 @@ namespace Langulus::Annies::Component
          if constexpr (CONVERT
          and not Same<TypeOf<C>, ::std::remove_all_extents_t<Deint<A1>>, ::std::remove_all_extents_t<Deint<AN>>...>) {
             // Conversion to AS required.                               
-            const size_t initial_count = self.GetCountInner();
+            size_t const initial_count = self.GetCountInner();
             size_t offset = self.SimplifyIndex(idx);
             // ConvertInsertInner uses ConcatAt, so any exceptions will 
             // be handled there                                         
@@ -169,7 +169,7 @@ namespace Langulus::Annies::Component
             if (not rhs_count)
                return 0;
             
-            const size_t lhs_count = self.GetCount();
+            size_t const lhs_count = self.GetCount();
             if (lhs_count == 0) {
                self.AssertZeroIndex(idx);
 
@@ -189,7 +189,7 @@ namespace Langulus::Annies::Component
                }
                catch (...) {
                   // Account for throws inside constructors             
-                  const size_t inserted = to - self.GetHandle();
+                  size_t const inserted = to - self.GetHandle();
                   TODO(); //TODO a gap remains, move things back
                   self.SetCountInner(inserted);
 
@@ -205,8 +205,8 @@ namespace Langulus::Annies::Component
             }
 
             // Reallocate/branch out                                    
-            const size_t all_count = lhs_count + rhs_count;
-            const size_t offset    = self.SimplifyIndex(idx);
+            size_t const all_count = lhs_count + rhs_count;
+            size_t const offset    = self.SimplifyIndex(idx);
 
             if (not self.IsDisowned() and self.GetUses() == 1 and not deepened) {
                // No need to branch-out                                 
@@ -220,7 +220,7 @@ namespace Langulus::Annies::Component
                }
                catch (...) {
                   // Account for throws inside constructors             
-                  const size_t inserted = to - self.GetHandle();
+                  size_t const inserted = to - self.GetHandle();
                   TODO(); //TODO a gap remains, move things back
                   self.SetCountInner(inserted);
 
@@ -247,7 +247,7 @@ namespace Langulus::Annies::Component
                }
                catch (...) {
                   // Account for throws inside constructors             
-                  const size_t inserted = dst - self.GetHandle();
+                  size_t const inserted = dst - self.GetHandle();
                   TODO(); //TODO a gap remains, move things back
                   self.SetCountInner(inserted);
 
@@ -348,7 +348,7 @@ namespace Langulus::Annies::Component
 
          if constexpr (CONVERT and not Same<TypeOf<C>, Deint<A1>, Deint<AN>...>) {
             // Conversion to AS required.                               
-            const size_t initial_count = self.GetCountInner();
+            size_t const initial_count = self.GetCountInner();
             size_t offset = initial_count;
             // ConvertInsertInner uses ConcatAt, so any exceptions will 
             // be handled there                                         
@@ -369,8 +369,8 @@ namespace Langulus::Annies::Component
                return 0;
             
             // Reallocate/branch out                                    
-            const size_t lhs_count = self.GetCount();
-            const size_t all_count = lhs_count + rhs_count;
+            size_t const lhs_count = self.GetCount();
+            size_t const all_count = lhs_count + rhs_count;
             self.BranchOut(all_count);
             
             // Insert the new                                           
@@ -381,7 +381,7 @@ namespace Langulus::Annies::Component
             }
             catch (...) {
                // Account for throws inside constructors                
-               const size_t inserted = to - self.GetHandle();
+               size_t const inserted = to - self.GetHandle();
                self.SetCountInner(inserted);
                if constexpr (CT::NullTerminated<C>)
                   memset(to.GetRaw(), 0, 1);
@@ -568,11 +568,11 @@ namespace Langulus::Annies::Component
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
 
-         const size_t rhs_count = DeintCast(data).GetCount();
+         size_t const rhs_count = DeintCast(data).GetCount();
          if (not rhs_count)
             return 0;
          
-         const size_t lhs_count = self.GetCount();
+         size_t const lhs_count = self.GetCount();
          if (lhs_count == 0) {
             self.AssertZeroIndex(idx);
 
@@ -593,7 +593,7 @@ namespace Langulus::Annies::Component
             }
             catch (...) {
                // Account for throws inside constructors                
-               const size_t inserted = dst - self.GetHandle();
+               size_t const inserted = dst - self.GetHandle();
                TODO(); //TODO a gap remains, move things back
                self.SetCountInner(inserted);
 
@@ -609,8 +609,8 @@ namespace Langulus::Annies::Component
          }
 
          // Reallocate/branch out                                       
-         const size_t all_count = lhs_count + rhs_count;
-         const size_t offset    = self.SimplifyIndex(idx);
+         size_t const all_count = lhs_count + rhs_count;
+         size_t const offset    = self.SimplifyIndex(idx);
 
          if (not self.IsDisowned() and self.GetUses() == 1) {
             // No need to branch-out                                    
@@ -623,7 +623,7 @@ namespace Langulus::Annies::Component
             }
             catch (...) {
                // Account for throws inside constructors                
-               const size_t inserted = dst - self.GetHandle();
+               size_t const inserted = dst - self.GetHandle();
                TODO(); //TODO a gap remains, move things back
                self.SetCountInner(inserted);
                if constexpr (CT::NullTerminated<C>)
@@ -648,7 +648,7 @@ namespace Langulus::Annies::Component
             }
             catch (...) {
                // Account for throws inside constructors                
-               const size_t inserted = dst - self.GetHandle();
+               size_t const inserted = dst - self.GetHandle();
                TODO(); //TODO a gap remains, move things back
                self.SetCountInner(inserted);
                if constexpr (CT::NullTerminated<C>)
@@ -692,8 +692,8 @@ namespace Langulus::Annies::Component
             return 0;
          
          // Reallocate/branch out                                       
-         const size_t lhs_count = self.GetCount();
-         const size_t all_count = lhs_count + rhs_count;
+         size_t const lhs_count = self.GetCount();
+         size_t const all_count = lhs_count + rhs_count;
          self.BranchOut(all_count);
          
          // Concatenate all new containers                              
@@ -704,7 +704,7 @@ namespace Langulus::Annies::Component
          }
          catch (...) {
             // Account for throws inside constructors                   
-            const size_t inserted = to - self.GetHandle();
+            size_t const inserted = to - self.GetHandle();
             self.SetCountInner(inserted);
 
             if constexpr (CT::NullTerminated<C>)
@@ -939,7 +939,7 @@ namespace Langulus::Annies::Component
             else Langulus::Serialize(DeintCast(a), converted);
          }
 
-         const size_t offset = converted.GetCount();
+         size_t const offset = converted.GetCount();
          ThisCom::ConcatAt(at, Abandon {converted});
          at += offset;
       }

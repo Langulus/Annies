@@ -28,7 +28,7 @@ namespace Langulus::Annies
    ///   @param count - number of contiguous items to remove                  
    ///   @return the number of removed elements                               
    template<class TYPE>
-   size_t Block<TYPE>::RemoveIndex(CT::Index auto index, const size_t count) {
+   size_t Block<TYPE>::RemoveIndex(CT::Index auto index, size_t const count) {
       using INDEX = Deref<decltype(index)>;
 
       if constexpr (CT::Similar<INDEX, Index>) {
@@ -160,7 +160,7 @@ namespace Langulus::Annies
    ///   @return an iterator pointing to the element at index - 1, or at end  
    ///      if block became empty                                             
    template<class TYPE>
-   auto Block<TYPE>::RemoveIt(const Iterator& index, const size_t count) -> Iterator {
+   auto Block<TYPE>::RemoveIt(const Iterator& index, size_t const count) -> Iterator {
       if (index.mValue >= GetRawEnd())
          return end();
 
@@ -178,7 +178,7 @@ namespace Langulus::Annies
    /// Remove elements at the back                                            
    ///   @param count - the new count                                         
    template<class TYPE>
-   void Block<TYPE>::Trim(const size_t count) {
+   void Block<TYPE>::Trim(size_t const count) {
       if (count >= mCount)
          return;
 

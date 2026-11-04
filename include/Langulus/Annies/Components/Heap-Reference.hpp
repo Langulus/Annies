@@ -404,6 +404,28 @@ namespace Langulus::Annies::Component
          return h.GetDense(count); //TODO lacks statically-typed routine
       }
 
+      /// Get a handle from a pointer to an element                           
+      template<CT::Container C>
+      auto GetHandleFromPointer(this C&& self, CT::Sparse auto ptr) -> DecideHandle<C> {
+         const auto memory_start = ThisCom::GetRaw();
+         if (ptr < memory_start)
+            return {};
+
+         const auto memory_end = ThisCom::GetRawReserveEnd();
+         if (ptr >= memory_end)
+            return {};
+
+         size_t offset;
+         if constexpr (CT::TypeErased<C>) {
+            offset = reinterpret_cast<uint8_t const*>(ptr)
+                   - static_cast<uint8_t const*>(memory_start);
+            offset /= self.GetStride();
+         }
+         else offset = ptr - memory_start;
+
+         return self.GetHandle() + offset;
+      }
+
    protected:
       /// Get the heap pointer (inner)                                        
       template<Cid SID = Id::First>// requires Relevant<SID>

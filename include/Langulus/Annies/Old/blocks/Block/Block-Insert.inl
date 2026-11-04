@@ -20,7 +20,7 @@ namespace Langulus::Annies
    /// which would be slower, than batch zeroing                              
    ///   @param count - number of elements to zero-construct                  
    template<class TYPE> LANGULUS(INLINED)
-   void Block<TYPE>::Null(const size_t count) {
+   void Block<TYPE>::Null(size_t const count) {
       if constexpr (not TypeErased) {
          if constexpr (CT::Nullifiable<TYPE>) {
             if (count < mReserved)
@@ -41,7 +41,7 @@ namespace Langulus::Annies
    ///   @param count - the number of elements to extend by                   
    ///   @return a container that represents only the extended part           
    template<class TYPE> template<CT::Block THIS> LANGULUS(INLINED)
-   THIS Block<TYPE>::Extend(const size_t count) {
+   THIS Block<TYPE>::Extend(size_t const count) {
       const auto previousCount = mCount;
       AllocateMore<true>(mCount + count);
       const auto newRegion = CropInner(previousCount, count);
@@ -53,7 +53,7 @@ namespace Langulus::Annies
    ///   @param count - number of elements to construct                       
    ///   @return the number of new elements                                   
    template<class TYPE> LANGULUS(INLINED)
-   size_t Block<TYPE>::New(const size_t count)
+   size_t Block<TYPE>::New(size_t const count)
    requires (TypeErased or CT::Defaultable<TYPE>) {
       BranchOut();
       AllocateMore(mCount + count);
@@ -69,7 +69,7 @@ namespace Langulus::Annies
    ///      for each instance of T                                            
    ///   @return the number of new elements                                   
    template<class TYPE> template<class...A> LANGULUS(INLINED)
-   size_t Block<TYPE>::New(const size_t count, A&&...arguments)
+   size_t Block<TYPE>::New(size_t const count, A&&...arguments)
    requires (TypeErased or ::std::constructible_from<TYPE, A...>) {
       LglsAssumeUser(count, "Zero count not allowed");
       BranchOut();

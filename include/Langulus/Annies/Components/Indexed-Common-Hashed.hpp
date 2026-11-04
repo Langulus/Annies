@@ -311,7 +311,7 @@ namespace Langulus::Annies::Component
          size_t occupied = self.GetCount();
          size_t reserved_table = C::InitialSize;
          size_t reserved_total = C::InitialSize;
-         const size_t absoluteReserved = self.GetReserved();
+         size_t const absoluteReserved = self.GetReserved();
          TableType* const absoluteTableBeg = self.template GetHashTableInner<SID>();
          TableType* tableBeg = absoluteTableBeg;
 
@@ -652,7 +652,7 @@ namespace Langulus::Annies::Component
       
          // First attempt failed, try other tables                      
          size_t reserved_total = C::InitialSize;
-         const size_t max_reserved = self.GetReserved();
+         size_t const max_reserved = self.GetReserved();
          while (reserved_total < max_reserved) {
             tableBeg += reserved_table;
             reserved_table *= C::GrowthFactor;
@@ -677,7 +677,7 @@ namespace Langulus::Annies::Component
          this C const& self,
          size_t const start,
          TableType const* const tableBeg,
-         const size_t reserved,
+         size_t const reserved,
          H const& item,
          [[maybe_unused]] RTTI::DefinitionData::FCompareEqual comparer
       ) -> DecideHandle<C> {
@@ -737,11 +737,11 @@ namespace Langulus::Annies::Component
       auto& operator[] (this C& self, K const& key) assumptious {
          auto found = self.TableSearch(key);
          if (found)
-            return *found.GetKeyHandle();
+            return *found.GetValHandle();
 
          // Add the key                                                 
          found = self.Merge(key);
-         return *found.GetKeyHandle();
+         return *found.GetValHandle();
       }
    };
 

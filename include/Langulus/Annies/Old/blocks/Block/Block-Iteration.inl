@@ -590,7 +590,7 @@ namespace Langulus::Annies
                   if (mCount == 1)
                      return Loop::Discard;
 
-                  const size_t idx = raw - data;
+                  size_t const idx = raw - data;
                   const_cast<Block*>(this)->RemoveIndex(idx);
 
                   /*if (IsDeep() and mCount == 1) { //TODO this is quite experimental and not fully working right now. can be achieved by Optimize() after the loop for now

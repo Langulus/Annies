@@ -291,7 +291,7 @@ namespace Langulus::Annies
 
       /// Allocate additional 'nbytes' and zero them                          
       void Null(size_t nbytes) {
-         const size_t current_size = this->GetCount();
+         size_t const current_size = this->GetCount();
          this->AllocateMore(current_size + nbytes);
          memset(this->GetRaw() + current_size, 0, nbytes);
          this->GetCountInner() = current_size + nbytes;
@@ -299,7 +299,7 @@ namespace Langulus::Annies
 
       /// Allocate additional 'nbytes' and don't do anything with them        
       void New(size_t nbytes) {
-         const size_t current_size = this->GetCount();
+         size_t const current_size = this->GetCount();
          this->AllocateMore(current_size + nbytes);
          this->GetCountInner() = current_size + nbytes;
       }

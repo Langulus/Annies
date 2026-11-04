@@ -6,134 +6,183 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "TMany.hpp"
-#include "TSlots.hpp"
-#include "Annies/Components/IndexedComposite.hpp"
+#include "Many.hpp"
+#include "Annies/Components/IndexedCoverage-Stack.hpp"
+#include "Annies/Components/Heap-Immovable.hpp"
 
 
 namespace Langulus::Annies::Inner
 {
-   /// MARK: HiveBase                                                         
-   template<CT::NotVoid T>
-   using HiveBase = Com::Container<
-      Com::StateStack<>,                     // No states               
-      Com::Stack<TMany<TSlots<T>>>,
-      Com::IndexedComposite<1>,              // Composite indexing      
-      Com::HashEmergent<>,                   // Emergent hash           
-      Com::Assignment<>,                     // Assignment              
-      Com::InsertionOperators<>,             // Insertion operators     
-      Com::MergingOperators<>,               // Merge operators         
-      /*Com::Comparison<>,*/                     // Allows comparisons      
-      Com::IterationForEach<>,               // ForEach iteration       
-      Com::IterationRange<>                  // Ranged iteration        
+   template<CT::NotVoid T> requires (CT::NotHandle<T> and CT::NotReference<T>)
+   using THiveBase = Com::Container<
+      Com::State::Compressed<>,        // Toggle compression            
+      Com::State::Encrypted<>,         // Toggle encrypted              
+      Com::TypedStack<DMeta, T>,       // Type-constrained              
+      Com::HeapImmovable<8, 2, HeapEntry<0, T*>>,
+      Com::CountStack<>,               // Dynamically sized             
+      Com::ReserveStack<>,             // Reserve kept as member        
+      Com::IndexedCoverageStack<>,     // Indexed by coverage mask      
+      Com::OwnershipStack<>,           // Allocation is referenced      
+      EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
+      Com::HashStack<>,                // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
+      Com::Emplacement<>,              // Allows emplacement            
+      Com::Assignment<>,               // Allows assignment             
+      Com::Removal<>,                  // Allows clear/reset            
+      Com::Conversion<>,               // Allows conversions            
+      Com::Comparison<>,               // Allows comparisons            
+      Com::IterationForEach<>,         // ForEach iteration             
+      Com::IterationRange<>            // Ranged iteration              
    >;
 }
 
 namespace Langulus::Annies
 {
+   /// MARK: TSlots                                                           
    ///                                                                        
-   /// A statically-typed non-continuous unordered container of variable size 
-   /// that guarantees elements will _never_ move from the memory they were   
-   /// first instantiated in.                                                 
-   template<CT::NotVoid T>
-   struct THive : Inner::HiveBase<T> {
+   /// A statically-typed non-contiguous container of constant size, capable  
+   /// of reusing empty cells.                                                
+   template<CT::NotVoid T> 
+   struct THive : Inner::THiveBase<T> {
       using CTTI_ReflectAs = THive;
       using CTTI_Hive      = Yup;
-      using CTTI_Typed     = T;
-      static constexpr bool TypeErased = false;
+      using CTTI_POD       = No; //TODO could be, when we implement SVO
+      using Base           = Inner::THiveBase<T>;
 
-      //using DeepType       = Many;
-      using HandleType     = DecideHandle<const TSlots<T>>;
-      using HandleMutType  = DecideHandle<      TSlots<T>>;
-      using Pick           = DecidePick  <const TSlots<T>>;
-      using PickMut        = DecidePick  <      TSlots<T>>;
-
-      static constexpr bool ContainsMany = true;
-
-      ///                                                                     
-      /// MARK:Construction                                                   
       constexpr THive() noexcept {
          this->ConstructDefault();
       }
       constexpr THive(THive const& other) {
          this->Absorb(Refer(other));
       }
-      constexpr THive(THive&& other) noexcept  {
+      constexpr THive(THive&& other) noexcept {
          this->Absorb(Move(other));
       }
       constexpr ~THive() noexcept {
          this->Destroy();
       }
 
-      ///                                                                     
-      /// MARK:Assignment                                                     
+      template<class A1, class...AN>
+      static consteval bool ConstructibleWith() {
+         if constexpr      (sizeof...(AN) == 0 and CT::Copied<A1> and Same<THive, Deint<A1>>)
+            return CT::ReferConstructible<T>;
+         else if constexpr (sizeof...(AN) == 0 and CT::Cloned<A1> and Same<THive, Deint<A1>>)
+            return CT::CloneConstructible<T>;
+         else
+            return true;
+      }
+      
+      /// Construction that either absorbs the provided containers, or        
+      /// emplaces all A in the container                                     
+      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
+      constexpr THive(A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0) {
+            if constexpr (Same<Deint<A1>, THive>) {
+               /*LglsAssumeUser(not SameAsOneOf<T, TMany, Many>,
+                  "Ambiguous use of construction "
+                  "- you should use tag-dispatch with first argument either Absorb "
+                  "(if you want to overwrite the container itself) or Piecewise "
+                  "(if you want to overwrite the first item) in order to clearly "
+                  "state your intent. Absorb will be used by default!"
+               );*/
+               this->Absorb(LglsFwd(a1));
+            }
+            else this->EmplaceConstruct(LglsFwd(a1));
+         }
+         else {
+            this->ConstructDefault();
+            this->Insert(LglsFwd(a1), LglsFwd(an)...);
+         }
+      }
+      
+      /// Construction that absorbs the provided container                    
+      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
+      constexpr THive(Inner::Absorb, A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0)
+            this->Absorb(LglsFwd(a1));
+         else {
+            this->ConstructDefault();
+            this->Concat(LglsFwd(a1), LglsFwd(an)...);
+         }
+      }
+      
+      /// Construction that emplaces all arguments inside                     
+      template<class A1, class...AN>
+      constexpr THive(Inner::Piecewise, A1&& a1, AN&&...an) {
+         if constexpr (sizeof...(AN) == 0)
+            this->EmplaceConstruct(LglsFwd(a1));
+         else {
+            this->ConstructDefault();
+            this->Insert(LglsFwd(a1), LglsFwd(an)...);
+         }
+      }
+
+      /// Assignment                                                          
       constexpr THive& operator = (THive const& other) {
          return this->AssignAbsorb(Refer(other));
       }
       constexpr THive& operator = (THive&& other) noexcept {
          return this->AssignAbsorb(Move(other));
       }
-      
-      template<class A>
+
+      template<class A> requires (ConstructibleWith<A>())
       constexpr THive& operator = (A&& argument) {
-         if constexpr (Same<Deint<A>, THive>)
+         if constexpr (Same<Deint<A>, THive>) {
+            /*LglsAssumeUser(not SameAsOneOf<T, TMany, Many>,
+               "Ambiguous use of assignment "
+               "- you should use either AssignAbsorb (if you want to overwrite "
+               "the container itself) or Assign (if you want to overwrite the "
+               "first item) in order to clearly state your intent. "
+               "AssignAbsorb will be used by default!"
+            );*/
             return this->AssignAbsorb(LglsFwd(argument));
-         else
-            return this->Assign(LglsFwd(argument));
+         }
+         else return this->Assign(LglsFwd(argument));
       }
+      
+      using Com::Comparison<>::operator <=>;
+      using Com::Comparison<>::operator ==;
+      using Com::IterationRange<>::begin;
+      using Com::IterationRange<>::end;
+      using Com::IterationRange<>::rbegin;
+      using Com::IterationRange<>::rend;
 
-      //using Com::Comparison<>::operator <=>;
-      //using Com::Comparison<>::operator ==;
-
-   protected:
-      LglsComEmplacement(friend);
-
-      auto Get() -> TMany<TSlots<T>>* {
-         return this->Com::Stack<TMany<TSlots<T>>>::GetRaw();
-      }
-
-   public:
+      
       /// Emplaces an element of T at a free spot in the hive.                
-      /// No elements are guaranteed to move.                                 
+      /// There's a strong guarantee that no elements will move.              
+      ///   @param arguments... constructor arguments for T                   
       ///   @return a handle to the newly emplaced element                    
       auto Emplace(auto&&...arguments) -> THandle<T&> {
-         for (TSlots<T>& slots : *this->Get()) {
-            if (slots.GetCount() < slots.GetReserved()) {
-               // Free slot available                                   
-               size_t it = 0;
-               size_t const end = slots.GetReserved();
-               while(it != end) {
-                  if (not slots.IsSlotOccupied(it)) {
-                     // Emplace                                         
-                     THandle<T&> result = slots.GetHandle() + it;
-                     result.EmplaceConstruct(LglsFwd(arguments)...);
-                     slots.GetCountInner() += 1;
-                     slots.EnableSlot(it);
-                     return result;
-                  }
-                  ++it;
-               }
-            }
-            else {
-               //TODO since we have full control of the memory manager, we can reallocate and guarantee that memory doesn't move
-               //TODO and just reuse memory of a single TSlots until a move is required
-            }
+         if (this->GetCount() == this->GetReserved())
+            this->AllocateMore(this->GetReserved() + 1);
+
+         // Free slot available                                         
+         size_t it = 0;
+         size_t const end = this->GetReserved();
+         while(it != end) {
+            if (not this->IsSlotOccupied(it))//TODO checks bit by bit, but we can batch it and make it super fast
+               break;
+            ++it;
          }
 
-         // If reached, then all slots are filled and we need a new     
-         // immovable frame                                             
-         LglsAssert(this->Get()->InsertDefault());
-         TSlots<T>* new_frame = this->Get()->GetAt(Index::Last);
-         new_frame->Reserve(this->GetReserved());
-
          // Emplace                                                     
-         THandle<T&> result = new_frame->GetHandle();
+         THandle<T&> result = this->GetHandle() + it;
          result.EmplaceConstruct(LglsFwd(arguments)...);
-         new_frame->GetCountInner() = 1;
-         new_frame->EnableSlot(0);
+         this->GetCountInner() += 1;
+         this->EnableSlot(it);
          return result;
       }
    };
+
+   /// MARK: CTAD                                                             
+   template<CT::NotVoid T>
+   THive(T&&) -> THive<Decvq<Deref<Deint<T>>>>;
+
+   template<CT::NotVoid T>
+   THive(Inner::Absorb, T&&) -> THive<TypeOf<T>>;
+
+   template<CT::NotVoid T>
+   THive(Inner::Piecewise, T&&) -> THive<Decvq<Deref<Deint<T>>>>;
 }
 
 namespace Langulus

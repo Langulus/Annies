@@ -243,12 +243,12 @@ namespace Langulus::Annies
    ///   @param count - number of elements                                    
    ///   @return the container                                                
    LANGULUS(INLINED)
-   Many Many::Select(const size_t start, const size_t count) IF_UNSAFE(noexcept) {
+   Many Many::Select(size_t const start, size_t const count) IF_UNSAFE(noexcept) {
       return Base::Select<Many>(start, count);
    }
 
    LANGULUS(INLINED)
-   Many Many::Select(const size_t start, const size_t count) const IF_UNSAFE(noexcept) {
+   Many Many::Select(size_t const start, size_t const count) const IF_UNSAFE(noexcept) {
       return Base::Select<Many>(start, count);
    }
 

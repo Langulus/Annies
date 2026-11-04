@@ -312,7 +312,7 @@ namespace Langulus::Annies
    ///   @return the requested byte size                                      
    template<CT::Set THIS> LANGULUS(INLINED)
    size_t BlockSet::RequestKeyAndInfoSize(
-      const size_t request, size_t& infoStart
+      size_t const request, size_t& infoStart
    ) const IF_UNSAFE(noexcept) {
       size_t keymemory;
       if constexpr (CT::Typed<THIS>) {
@@ -337,7 +337,7 @@ namespace Langulus::Annies
    ///   @attention assumes count > oldCount                                  
    ///   @param oldCount - the old number of pairs                            
    template<CT::Set THIS>
-   void BlockSet::Rehash(const size_t oldCount) {
+   void BlockSet::Rehash(size_t const oldCount) {
       LglsAssumeDev(mKeys.mReserved > oldCount,
          "New count is not larger than oldCount");
       LglsAssumeDev(IsPowerOfTwo(mKeys.mReserved),
@@ -355,7 +355,7 @@ namespace Langulus::Annies
       while (oldInfo != oldInfoEnd) {
          if (*oldInfo) {
             // Rehash and check if hashes match                         
-            const size_t oldIndex = oldInfo - GetInfo();
+            size_t const oldIndex = oldInfo - GetInfo();
             size_t oldBucket = (oldCount + oldIndex) - *oldInfo + 1;
             size_t newBucket = 0;
             if constexpr (CT::TypedSet<THIS>)
@@ -413,7 +413,7 @@ namespace Langulus::Annies
          while (oldInfo != newInfoEnd) {
             if (*oldInfo > 1) {
                // Entry can be moved by *oldInfo - 1 cells to the left  
-               const size_t oldIndex = oldInfo - GetInfo();
+               size_t const oldIndex = oldInfo - GetInfo();
 
                // Might loop around                                     
                size_t to = mKeys.mReserved + oldIndex - *oldInfo + 1;
@@ -452,7 +452,7 @@ namespace Langulus::Annies
    ///   @param key - key and intent to insert                                
    ///   @return the offset at which pair was inserted                        
    template<CT::Set THIS, bool CHECK_FOR_MATCH>
-   size_t BlockSet::InsertInner(const size_t start, auto&& key) {
+   size_t BlockSet::InsertInner(size_t const start, auto&& key) {
       BranchOut<THIS>();
       using S = IntentOf<decltype(key)>;
       auto keyswapper = CreateValHandle<THIS>(S::Nest(key));
@@ -510,7 +510,7 @@ namespace Langulus::Annies
    ///   @return the offset at which pair was inserted                        
    template<CT::Set THIS, bool CHECK_FOR_MATCH, template<class> class S, CT::Block B>
    requires CT::Intent<S<B>>
-   size_t BlockSet::InsertBlockInner(const size_t start, S<B>&& key) {
+   size_t BlockSet::InsertBlockInner(size_t const start, S<B>&& key) {
       BranchOut<THIS>();
 
       // Get the starting index based on the key hash                   

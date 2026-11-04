@@ -147,8 +147,8 @@ namespace Langulus::Annies::Component
       ///   @return the selected disowned contiguous range                    
       template<CT::Container C>
       auto Select(this C&& self, CT::Index auto&& start, CT::Index auto&& count) assumptious -> Decay<C> {
-         const size_t begin = ThisCom::SimplifyIndex(LglsFwd(start));
-         const size_t size  = ThisCom::SimplifyIndex(LglsFwd(count));
+         size_t const begin = ThisCom::SimplifyIndex(LglsFwd(start));
+         size_t const size  = ThisCom::SimplifyIndex(LglsFwd(count));
          return ThisCom::SelectInner(begin, size);
       }
 
@@ -157,8 +157,8 @@ namespace Langulus::Annies::Component
       ///   @return the selected disowned contiguous range                    
       template<CT::Container C>
       auto Select(this C&& self, CT::Index auto&& start) assumptious -> Decay<C> {
-         const size_t begin = ThisCom::SimplifyIndex(LglsFwd(start));
-         const size_t size  = self.GetCount() - begin;
+         size_t const begin = ThisCom::SimplifyIndex(LglsFwd(start));
+         size_t const size  = self.GetCount() - begin;
          return ThisCom::SelectInner(begin, size);
       }
 

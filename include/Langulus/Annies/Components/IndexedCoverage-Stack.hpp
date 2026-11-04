@@ -40,8 +40,8 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID> requires Relevant<SID>
       constexpr bool IsSlotOccupied(this auto const& self, size_t slot) noexcept {
          if (ThisCom::GetCoverageTableInner()) {
-            const size_t idx = slot / BitsPerCell;
-            const size_t bit = size_t {1} << (slot - idx);
+            size_t const idx = slot / BitsPerCell;
+            size_t const bit = size_t {1} << (slot - idx);
             return (ThisCom::GetCoverageTableInner()[idx] & bit) != 0;
          }
          return false;
@@ -93,8 +93,8 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID> requires Relevant<SID>
       constexpr void EnableSlot(this auto& self, size_t slot) assumptious {
          LglsAssumeDev(ThisCom::GetCoverageTableInner());
-         const size_t idx = slot / BitsPerCell;
-         const size_t bit = size_t {1} << (slot - idx);
+         size_t const idx = slot / BitsPerCell;
+         size_t const bit = size_t {1} << (slot - idx);
          ThisCom::GetCoverageTableInner()[idx] |= bit;
       }
 
@@ -102,8 +102,8 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID> requires Relevant<SID>
       constexpr void DisableSlot(this auto& self, size_t slot) assumptious {
          LglsAssumeDev(ThisCom::GetCoverageTableInner());
-         const size_t idx = slot / BitsPerCell;
-         const size_t bit = size_t {1} << (slot - idx);
+         size_t const idx = slot / BitsPerCell;
+         size_t const bit = size_t {1} << (slot - idx);
          ThisCom::GetCoverageTableInner()[idx] &= ~bit;
       }
 
@@ -156,7 +156,7 @@ namespace Langulus::Annies::Component
          auto const tableEnd = tableBeg + reserved;
          auto table = tableBeg;
          while (table < tableEnd) {
-            const size_t enabled_bits = ::std::popcount(*table);
+            size_t const enabled_bits = ::std::popcount(*table);
             if (enabled_bits) {
                if (index < enabled_bits) {
                   TableType temp = *table;

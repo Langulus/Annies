@@ -194,7 +194,7 @@ namespace Langulus::Annies
    ///   @attention assumes that index points to a valid entry                
    ///   @param index - the index to remove                                   
    template<CT::Map THIS>
-   void BlockMap::RemoveInner(const size_t index) {
+   void BlockMap::RemoveInner(size_t const index) {
       BranchOut<THIS>();
       auto psl = GetInfo() + index;
       LglsAssumeDev(*psl, "Removing an invalid pair");

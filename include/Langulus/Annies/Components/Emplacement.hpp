@@ -307,7 +307,7 @@ namespace Langulus::Annies::Component
          }
 
          if constexpr (CT::TypeErased<C>) {
-            const size_t indirects = T.GetIndirections();
+            size_t const indirects = T.GetIndirections();
             if (indirects > 0) {
                // Allocate the origin first                             
                const auto originT = T.GetOrigin();

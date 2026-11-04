@@ -71,6 +71,7 @@ namespace Langulus::Annies::Component
    protected:
       LglsComHeapReference(friend);
       LglsComHeapMovable(friend);
+      LglsComHeapImmovable(friend);
       LglsComRemoval(friend);
       LglsComEmplacement(friend);
       LglsComReserveStatic(friend);

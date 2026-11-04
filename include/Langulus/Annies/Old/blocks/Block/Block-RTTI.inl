@@ -170,7 +170,7 @@ namespace Langulus::Annies
    ///   @param count - the number of elements of T                           
    ///   @return true if contained data is reinterpretable as T               
    template<class TYPE> template<CT::NotVoid T, bool BINARY_COMPATIBLE>
-   LANGULUS(INLINED) bool Block<TYPE>::CastsTo(const size_t count) const {
+   LANGULUS(INLINED) bool Block<TYPE>::CastsTo(size_t const count) const {
       //TODO can be further optimized
       return CastsToMeta<BINARY_COMPATIBLE>(MetaDataOf<Decay<T>>(), count);
    }
@@ -229,9 +229,9 @@ namespace Langulus::Annies
             return B {};
 
          // Find how elements fit from one to another                   
-         const size_t baseBytes = (common.mType->mSize * common.mCount * mCount)
+         size_t const baseBytes = (common.mType->mSize * common.mCount * mCount)
             / pattern.GetStride();
-         const size_t resultSize = pattern.IsEmpty()
+         size_t const resultSize = pattern.IsEmpty()
             ? baseBytes : (baseBytes / pattern.mCount) * pattern.mCount;
 
          // Create a static view of the desired type                    

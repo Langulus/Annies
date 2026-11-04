@@ -16,7 +16,7 @@ namespace Langulus::Annies
    ///   @attention does nothing if reserving less than current reserve       
    ///   @param count - number of elements to allocate                        
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::Reserve(const size_t count) {
+   void BlockSet::Reserve(size_t const count) {
       AllocateInner<THIS>(
          Roof2(count < MinimalAllocation ? MinimalAllocation : count)
       );
@@ -28,7 +28,7 @@ namespace Langulus::Annies
    ///   @attention assumes count is a power-of-two                           
    ///   @param count - the new number of elements                            
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::AllocateFresh(const size_t count) {
+   void BlockSet::AllocateFresh(size_t const count) {
       LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
 
@@ -50,7 +50,7 @@ namespace Langulus::Annies
    ///   @tparam REUSE - true to reallocate, false to allocate fresh          
    ///   @param count - the new number of pairs                               
    template<CT::Set THIS, bool REUSE>
-   void BlockSet::AllocateData(const size_t count) {
+   void BlockSet::AllocateData(size_t const count) {
       LglsAssumeDev(IsPowerOfTwo(count),
          "Table reallocation count is not a power-of-two");
       LglsAssumeDev(mKeys.mType,
@@ -156,7 +156,7 @@ namespace Langulus::Annies
    ///   @attention assumes count is a power-of-two number                    
    ///   @param count - number of pairs to allocate                           
    template<CT::Set THIS> LANGULUS(INLINED)
-   void BlockSet::AllocateInner(const size_t count) {
+   void BlockSet::AllocateInner(size_t const count) {
       // Shrinking is never allowed, you'll have to do it explicitly    
       // via Compact()                                                  
       if (count <= GetReserved())

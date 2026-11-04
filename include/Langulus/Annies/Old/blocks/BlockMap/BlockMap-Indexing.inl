@@ -167,7 +167,7 @@ namespace Langulus::Annies
    ///   @param i - the key index                                             
    ///   @return a reference to the key                                       
    template<CT::Map THIS> LANGULUS(INLINED)
-   decltype(auto) BlockMap::GetRawKey(const size_t i) IF_UNSAFE(noexcept) {
+   decltype(auto) BlockMap::GetRawKey(size_t const i) IF_UNSAFE(noexcept) {
       LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " key",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");
@@ -209,7 +209,7 @@ namespace Langulus::Annies
    ///   @param i - the value index                                           
    ///   @return a reference to the value                                     
    template<CT::Map THIS> LANGULUS(INLINED)
-   decltype(auto) BlockMap::GetRawVal(const size_t i) IF_UNSAFE(noexcept) {
+   decltype(auto) BlockMap::GetRawVal(size_t const i) IF_UNSAFE(noexcept) {
       LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " value",
          ", index ", i, " is beyond the reserved ", GetReserved(), " elements");
@@ -258,7 +258,7 @@ namespace Langulus::Annies
    ///   @param i - the key index                                             
    ///   @return the handle                                                   
    template<CT::Map THIS> LANGULUS(INLINED)
-   auto BlockMap::GetKeyHandle(const size_t i) IF_UNSAFE(noexcept) {
+   auto BlockMap::GetKeyHandle(size_t const i) IF_UNSAFE(noexcept) {
       LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " key, ",
          "index ", i, " is beyond the reserved ", GetReserved(), " elements");
@@ -278,7 +278,7 @@ namespace Langulus::Annies
    }
    
    template<CT::Map THIS> LANGULUS(ALWAYS_INLINED)
-   auto BlockMap::GetKeyHandle(const size_t i) const IF_UNSAFE(noexcept) {
+   auto BlockMap::GetKeyHandle(size_t const i) const IF_UNSAFE(noexcept) {
       if constexpr (CT::Typed<THIS>) {
          return const_cast<BlockMap*>(this)->template
             GetKeyHandle<THIS>(i).MakeConst();
@@ -297,7 +297,7 @@ namespace Langulus::Annies
    ///   @param i - the value index                                           
    ///   @return the handle                                                   
    template<CT::Map THIS> LANGULUS(INLINED)
-   auto BlockMap::GetValHandle(const size_t i) IF_UNSAFE(noexcept) {
+   auto BlockMap::GetValHandle(size_t const i) IF_UNSAFE(noexcept) {
       LglsAssumeDev(i < GetReserved(),
          "Index out of limits when accessing ", NameOf<THIS>(), " value, ",
          "index ", i, " is beyond the reserved ", GetReserved(), " elements");
@@ -331,7 +331,7 @@ namespace Langulus::Annies
    }
 
    template<CT::Map THIS> LANGULUS(ALWAYS_INLINED)
-   auto BlockMap::GetValHandle(const size_t i) const IF_UNSAFE(noexcept) {
+   auto BlockMap::GetValHandle(size_t const i) const IF_UNSAFE(noexcept) {
       if constexpr (CT::Typed<THIS>) {
          return const_cast<BlockMap*>(this)->template
             GetValHandle<THIS>(i).MakeConst();

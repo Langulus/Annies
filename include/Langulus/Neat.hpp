@@ -816,7 +816,7 @@ namespace Langulus::Annies
             if constexpr (CT::TypeErased<A>) {
                // Deep argument, which is also type-erased, and this    
                // means we travel through _all_ messy buckets           
-               self.GetMessInner().Apply([&f,&self,&index](auto& pair) noexcept_if(f) {
+               self.GetMessInner().Apply([&f,&self,&index](auto& pair) /*noexcept_if(f)*/ {
                   ++index;
                   auto bucket = pair.GetValHandle();
                   auto& as_type_erased = reinterpret_cast<THandle<Decay<A>&>&>(bucket);
@@ -832,7 +832,7 @@ namespace Langulus::Annies
                if (not found)
                   return 0;
 
-               found.GetValHandle()->Apply([&f,&self,&index](auto& pair) noexcept_if(f) {
+               found.GetValHandle()->Apply([&f,&self,&index](auto& pair) /*noexcept_if(f)*/ {
                   ++index;
                   auto loop = self.InvokeF(LglsFwd(f), pair);
                   return loop == Loop::Continue;
@@ -841,6 +841,91 @@ namespace Langulus::Annies
          }
          else self.ForEachInner(LglsFwd(f), index);
          return index;
+      }
+      
+      /// MARK: Apply                                                         
+      /// Visit all element's handles and perform a function on them.         
+      /// Specialized for Neat.                                               
+      ///   @param f the function to perform. If the lambda returns bool,     
+      ///      you can end the loop early by returning false.                 
+      ///   @param cookie the element/hash table spot to start off from       
+      ///   @attention this will ignore any ordering                          
+      ///   @attention assumes container isn't empty                          
+      template<CT::Neat C>//TODO reverse?
+      void Apply(this C& self, auto&& f, [[maybe_unused]] size_t cookie = 0) {
+         LglsAssumeDev(not self.IsEmpty(), "Make sure Neat isn't empty");
+
+         bool abort = false;
+         self.GetTagsInner().Apply([&f,&cookie,&abort](auto& pair) /*noexcept_if(f)*/ {
+            const size_t tag_count = pair.GetValHandle()->GetCount();
+            if (cookie >= tag_count) {
+               cookie -= tag_count;
+               return true;
+            }
+
+            auto tag = pair.GetValHandle()->GetHandle();
+            auto const end = tag + (tag_count - cookie);
+            cookie = 0;
+            while(tag != end) {
+               if constexpr (CT::Bool<decltype(f(tag))>) {
+                  if (not f(tag)) {
+                     abort = true;
+                     return false;
+                  }
+               }
+               else f(tag);
+               ++tag;
+            }
+            return true;
+         });
+         if (abort)
+            return;
+
+         self.GetRecsInner().Apply([&f,&cookie,&abort](auto& pair) /*noexcept_if(f)*/ {
+            const size_t recipe_count = pair.GetValHandle()->GetCount();
+            if (cookie >= recipe_count) {
+               cookie -= recipe_count;
+               return true;
+            }
+
+            auto recipe = pair.GetValHandle()->GetHandle();
+            auto const end = recipe + (recipe_count - cookie);
+            cookie = 0;
+            while(recipe != end) {
+               if constexpr (CT::Bool<decltype(f(recipe))>) {
+                  if (not f(recipe)) {
+                     abort = true;
+                     return false;
+                  }
+               }
+               else f(recipe);
+               ++recipe;
+            }
+            return true;
+         });
+         if (abort)
+            return;
+
+         self.GetMessInner().Apply([&f,&cookie](auto& pair) /*noexcept_if(f)*/ {
+            const size_t data_count = pair.GetValHandle()->GetCount();
+            if (cookie >= data_count) {
+               cookie -= data_count;
+               return true;
+            }
+
+            auto data = pair.GetValHandle()->GetHandle();
+            auto const end = data + (data_count - cookie);
+            cookie = 0;
+            while(data != end) {
+               if constexpr (CT::Bool<decltype(f(data))>) {
+                  if (not f(data))
+                     return false;
+               }
+               else f(data);
+               ++data;
+            }
+            return true;
+         });
       }
    };
 }

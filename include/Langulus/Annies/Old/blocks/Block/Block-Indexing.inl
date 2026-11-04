@@ -19,7 +19,7 @@ namespace Langulus::Annies
    ///   @param byteOffset - number of bytes to add                           
    ///   @return pointer to the selected raw data offset                      
    template<class TYPE> LANGULUS(ALWAYS_INLINED) IF_UNSAFE(constexpr)
-   Byte* Block<TYPE>::At(const size_t byteOffset) IF_UNSAFE(noexcept) {
+   Byte* Block<TYPE>::At(size_t const byteOffset) IF_UNSAFE(noexcept) {
       LglsAssumeDev(mRaw, "Invalid memory");
       return mRaw + byteOffset;
    }
@@ -699,7 +699,7 @@ namespace Langulus::Annies
    ///   @param index - the element index                                     
    ///   @return the handle                                                   
    template<class TYPE> template<class T1> LANGULUS(INLINED)
-   auto Block<TYPE>::GetHandle(const size_t index) IF_UNSAFE(noexcept) {
+   auto Block<TYPE>::GetHandle(size_t const index) IF_UNSAFE(noexcept) {
       using T = Decvq<Conditional<CT::Handle<T1>, TypeOf<T1>, T1>>;
 
       if constexpr (not TypeErased) {
@@ -728,7 +728,7 @@ namespace Langulus::Annies
    }
 
    template<class TYPE> template<class T1> LANGULUS(ALWAYS_INLINED)
-   auto Block<TYPE>::GetHandle(const size_t index) const IF_UNSAFE(noexcept) {
+   auto Block<TYPE>::GetHandle(size_t const index) const IF_UNSAFE(noexcept) {
       return const_cast<Block*>(this)->template GetHandle<T1>(index).MakeConst();
    }
 
@@ -739,7 +739,7 @@ namespace Langulus::Annies
    ///   @param count - number of elements                                    
    ///   @return the block representing the region                            
    template<class TYPE> LANGULUS(INLINED)
-   Block<TYPE> Block<TYPE>::CropInner(const size_t start, const size_t count)
+   Block<TYPE> Block<TYPE>::CropInner(size_t const start, size_t const count)
    const IF_UNSAFE(noexcept) {
       LglsAssumeDev(mRaw,
          "Block is not allocated");
