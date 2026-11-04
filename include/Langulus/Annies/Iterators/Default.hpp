@@ -20,8 +20,11 @@ namespace Langulus::Annies
    ///   Default iteration                                                    
    ///                                                                        
    ///   Used by default when doing `for(auto i : container)`.                
-   /// When container is type-erased, or mutable and sparse, 'i' will be a    
-   /// handle. Otherwise, 'i' will be a direct reference to the element.      
+   /// When container is type-erased, iterator will always be a handle.       
+   /// When container is statically-typed sparse, iterator will not be a ref, 
+   /// since container might keep track of shared pointers and you can't just 
+   /// overwrite them.                                                        
+   /// Otherwise, iterator will be a direct reference to the dense element.   
    template<bool REVERSE, class C>
    struct IterateDefault {
       using CTTI_ReflectAs = void;
@@ -31,13 +34,21 @@ namespace Langulus::Annies
       static_assert(CT::NotReference<C>,
          "C can't be a reference");
       static_assert(CT::ContainsMany<C>,
-         "C is not iteratable because it contains exactly one element");
+         "C is not iteratable because it contains exactly one element");//TODO who cares? maybe just drop this for consistency?
       static_assert(CT::Indexed<C>,
          "C is not indexed");
 
    protected:
-      using Pick = DecidePick<C>;
-      using H    = Tif<CT::Reference<Pick>, Deref<Pick>*, Pick>;
+      using T = Tif<CT::Void<TypeOf<C>>, No, TypeOf<C>>;
+      using H = Tif<CT::TypeErased<C> or CT::Multidimensional<C> or CT::Neat<C>, DecideHandle<C>, LglsMutIf(C, T*)>;
+      using Exposed = Tif<CT::Handle<H>, 
+         DecideHandle<C> const&,
+         Tif<CT::Sparse<T>, LglsMutIf(C, T), LglsMutIf(C, T&)>
+      >;
+      using ExposedPtr = Tif<CT::Handle<H>, 
+         DecideHandle<C> const*,
+         Tif<CT::Sparse<T>, LglsMutIf(C, DeptrAll<T>*), LglsMutIf(C, T*)>
+      >;
 
       static_assert(CT::NotReference<H>,
          "Iterator can't be a reference");
@@ -87,7 +98,7 @@ namespace Langulus::Annies
          constexpr Iterator(Iterator const&) noexcept = default;
          constexpr Iterator(Iterator&&) noexcept = default;
 
-         constexpr Iterator(Deptr<H> const& it, C* range) assumptious requires CT::Sparse<H>
+         /*constexpr Iterator(Deptr<H> const& it, C* range) assumptious requires CT::Sparse<H>
             : mIt    {&it}
             , mRange {range} {
             LglsAssumeDev(CheckTable(),
@@ -99,7 +110,7 @@ namespace Langulus::Annies
             , mRange {range} {
             LglsAssumeDev(CheckTable(),
                "Iterators to hash table initialized with an invalid element");
-         }
+         }*/
 
          constexpr Iterator(H&& it, C* range) assumptious
             : mIt    {LglsFwd(it)}
@@ -159,24 +170,15 @@ namespace Langulus::Annies
                return mIt != mRange->GetRawEnd();
          }
 
-         decltype(auto) operator * () noexcept {
-            if constexpr (CT::Handle<H>) return (mIt);
-            else                         return *mIt;
+         auto operator * (this auto&& self) noexcept -> Exposed {
+            if constexpr (CT::Handle<H>) return (self.mIt);
+            else                         return *self.mIt;
          }
 
-         decltype(auto) operator * () const noexcept {
-            if constexpr (CT::Handle<H>) return (mIt);
-            else                         return *mIt;
-         }
-
-         decltype(auto) operator -> () noexcept {
-            if constexpr (CT::Handle<H>) return &mIt;
-            else                         return mIt;
-         }
-
-         decltype(auto) operator -> () const noexcept {
-            if constexpr (CT::Handle<H>) return &mIt;
-            else                         return mIt;
+         auto operator -> (this auto&& self) noexcept -> ExposedPtr {
+            if      constexpr (CT::Handle<H>)   return &self.mIt;
+            else if constexpr (CT::Sparse<H>)   return &DenseCast(self.mIt);
+            else                                return  self.mIt;
          }
 
          auto operator + (difference_type c) const assumptious -> Iterator {
@@ -252,7 +254,7 @@ namespace Langulus::Annies
             return operator += (-c);
          }
 
-         decltype(auto) operator[] (difference_type offset) const assumptious {
+         auto operator[] (difference_type offset) const assumptious -> Exposed {
             LglsAssumeDev(mIt, "Can't access invalid iterator");
             if constexpr (REVERSE)
                offset *= -1;

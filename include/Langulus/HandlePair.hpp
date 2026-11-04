@@ -341,23 +341,26 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair&&) = default;
 
       auto GetKey() const noexcept -> ConstAll<K> {
-         return *this->template Get<0>();
-         //if constexpr (CT::Constant<K>)
-         //   return *this->Com::HeapReference<HeapEntry<0, Deref<K>*>>::Get();
-         //else
-         //   return GetKeyHandle();
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> K requires CT::Dense<K> {
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> Deref<K> requires CT::Sparse<K> {
+         return *this->template GetRaw<0>();
+      }
+
+      auto GetVal() const noexcept -> ConstAll<V> {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> V requires CT::Dense<V> {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> Deref<V> requires CT::Sparse<V> {
+         return *this->template GetRaw<1>();
       }
 
       KeyHandle GetKeyHandle() const noexcept { return {*this}; }
-
-      auto GetVal() const noexcept -> ConstAll<V> {
-         return *this->template Get<1>();
-         //if constexpr (CT::Constant<V>)
-         //   return *this->Com::HeapReference<HeapEntry<1, Deref<V>*>>::Get();
-         //else
-         //   return GetValHandle();
-      }
-
       ValHandle GetValHandle() const noexcept { return {Slice<1>, *this}; }
 
       /// Force the handle to become mutable, so that we have methods like    
@@ -448,27 +451,26 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair&&) = default;
 
       auto GetKey() const noexcept -> ConstAll<K> {
-         return *this->template Get<0>();
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> K requires CT::Dense<K> {
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> Deref<K> requires CT::Sparse<K> {
+         return *this->template GetRaw<0>();
+      }
 
-         //if constexpr (CT::Constant<K>)
-         //   return *this->template Get<Deref<K>, 0>();
-            //return *this->Com::HeapReference<HeapEntry<0, Deref<K>*>>::Get();
-         //else
-         //   return GetKeyHandle();
+      auto GetVal() const noexcept -> ConstAll<V> {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> V requires CT::Dense<V> {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> Deref<V> requires CT::Sparse<V> {
+         return *this->template GetRaw<1>();
       }
 
       KeyHandle GetKeyHandle() const noexcept { return {*this}; }
-
-      auto GetVal() const noexcept -> ConstAll<V> {
-         return *this->template Get<1>();
-
-         //if constexpr (CT::Constant<V>)
-            //return *this->template Get<Deref<V>, 1>();
-            //return *this->Com::HeapReference<HeapEntry<1, Deref<V>*>>::Get();
-         //else
-         //   return GetValHandle();
-      }
-
       ValHandle GetValHandle() const noexcept { return {Slice<1>, *this}; }
 
       /// Force the handle to become mutable, so that we have methods like    
@@ -563,10 +565,27 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair const&) = default;
       THandlePair& operator = (THandlePair&&) = default;
 
-      auto GetKey()       const noexcept -> K const& { return *this->template Get<0>(); }
+      auto GetKey() const noexcept -> ConstAll<K> const& {
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> K& requires CT::Dense<K> {
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> K requires CT::Sparse<K> {
+         return *this->template GetRaw<0>();
+      }
+
+      auto GetVal() const noexcept -> ConstAll<V> const& {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> V& requires CT::Dense<V> {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> V requires CT::Sparse<V> {
+         return *this->template GetRaw<1>();
+      }
+
       auto GetKeyHandle() const noexcept -> KeyHandle { return {*this}; }
-      
-      auto GetVal()       const noexcept -> V const& { return *this->template Get<1>(); }
       auto GetValHandle() const noexcept -> ValHandle { return {Slice<1>, *this}; }
 
       /// Force the handle to become mutable, so that we have methods like    

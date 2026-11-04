@@ -29,10 +29,10 @@ namespace Langulus::Annies::Component
       /// Push back                                                           
       template<CT::ContainsMany C, class A>
       C& operator << (this C& lhs, A&& rhs) {
-         /*if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
+         if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
          and           not Same<Deint<A>, TypeOf<C>>)
             lhs.Insert(TypeOf<C> {LglsFwd(rhs)});
-         else*/
+         else
             lhs.Insert(LglsFwd(rhs));
          return lhs;
       }
@@ -40,10 +40,10 @@ namespace Langulus::Annies::Component
       /// Push front                                                          
       template<CT::ContainsMany C, class A>
       C& operator >> (this C& lhs, A&& rhs) {
-         /*if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
+         if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
          and           not Same<Deint<A>, TypeOf<C>>)
             lhs.InsertAt(Index::Front, TypeOf<C> {LglsFwd(rhs)});
-         else*/
+         else
             lhs.InsertAt(Index::Front, LglsFwd(rhs));
          return lhs;
       }
