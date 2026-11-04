@@ -136,6 +136,14 @@ namespace Langulus::Annies
          return From(source, source.GetRHS());
       }
 
+      /// Partial copy, copies only charge and verb, provides new arguments.  
+      /// Context and output remain empty.                                    
+      ///   @return the partially copied verb                                 
+      template<class SELF>
+      constexpr SELF Fork(this SELF const& self, auto&&...args) {
+         return SELF::From(self, LglsFwd(args)...);
+      }
+
       /// Assignment                                                          
       constexpr TVerb& operator = (TVerb const& other) {
          return this->AssignAbsorb(Refer(other));

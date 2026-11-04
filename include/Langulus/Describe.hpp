@@ -59,3 +59,43 @@ namespace Langulus
 
 #include <Langulus/Annies/Components/Descriptor.hpp>
 
+namespace Langulus::Annies::Component
+{
+   /// Find data in recipes. Only pointer arithmetic casts are allowed.       
+   ///   @tparam type the type requirement                                    
+   ///   @return the first type that matches                                  
+   template<Cid ID, Cid...SHARED> template<class C>
+   auto Descriptor<ID, SHARED...>::FindType(this C const& self, RTTI::DMeta type) -> RTTI::DMeta {
+      bool ambiguous = false;
+      RTTI::DMeta found;
+      
+      self.ForEachDeep(
+         [&type,&found,&ambiguous](Recipe const& recipe) {
+            // For each recipe...                                       
+            if (not recipe.GetTarget().CastsTo(type))
+               return;
+
+            if (not found)
+               found = recipe.GetTarget();
+            else
+               ambiguous = true;
+         },
+         [&type,&found,&ambiguous](RTTI::DMeta const& meta) {
+            // For each type...                                         
+            if (not meta or not meta.CastsTo(type))
+               return;
+
+            if (not found)
+               found = meta;
+            else
+               ambiguous = true;
+         }
+      );
+
+      LglsAssumeUserWarn(not ambiguous,
+         "Multiple types found in descriptor - all except the first `",
+         found, "` will be ignored on FindType"
+      );
+      return found;
+   }
+}

@@ -466,7 +466,7 @@ namespace Langulus::Annies
 
             auto found = this->GetTagsInner().Find(tag->GetTag());
             if (found) {
-               found.GetVal()->Insert(
+               found.GetVal().Insert(
                   NestIntentOf(tag, tag->template ReinterpretAs<Tag>())
                );
             }
@@ -492,7 +492,7 @@ namespace Langulus::Annies
 
             auto found = this->GetRecsInner().Find(meta);
             if (found)
-               found.GetVal()->Insert(LglsFwd(recipe));
+               found.GetVal().Insert(LglsFwd(recipe));
             else
                this->GetRecsInner().Merge(meta, LglsFwd(recipe));
          }
@@ -515,7 +515,7 @@ namespace Langulus::Annies
 
             auto found = this->GetMessInner().Find(meta);
             if (found) {
-               found.GetVal()->Insert(Many {Annies::Absorb, LglsFwd(data)});
+               found.GetVal().Insert(Many {Annies::Absorb, LglsFwd(data)});
             }
             else this->GetMessInner().Merge(
                meta, Many {Annies::Absorb, LglsFwd(data)}
@@ -526,7 +526,7 @@ namespace Langulus::Annies
             const auto meta = MetaDataOf<AS>();
             auto found = this->GetMessInner().Find(meta);
             if (found) {
-               found.GetVal()->Insert(Many {LglsFwd(data)});
+               found.GetVal().Insert(Many {LglsFwd(data)});
             }
             else this->GetMessInner().Merge(meta, Many {LglsFwd(data)});
          }
@@ -546,19 +546,30 @@ namespace Langulus::Annies
       LglsComDescriptor(friend);
 
       /// MARK: ForEach                                                       
-      template<class C, class F>
-      LoopControl InvokeF(this C&& self, F&& f, CT::Handle auto&& handle) noexcept_if(f) {
+      template<class C, class F, CT::Handle H>
+      LoopControl InvokeF(this C&& self, F&& f, H&& handle) noexcept_if(f) {
          using A = Deref<ArgumentOf<F>>;
          using R = ReturnOf<F>;
 
          if constexpr (CT::Bool<R>) {
             // Execute and consider 'f' returning true/false            
-            if (not f(*handle.template Get<A>()))
-               return Loop::NextLoop;
+            if constexpr (Same<DMeta, A> and Same<TypeOf<H>, Recipe>) {
+               if (not f(handle.Get()->GetTarget()))
+                  return Loop::NextLoop;
+            }
+            else {
+               if (not f(*handle.template Get<A>()))
+                  return Loop::NextLoop;
+            }
          }
          else if constexpr (Exact<R, LoopControl>) {
             // Execute and consider 'f' returning LoopControl           
-            const R loop = f(*handle.template Get<A>());
+            LoopControl loop = Loop::Continue;
+            if constexpr (Same<DMeta, A> and Same<TypeOf<H>, Recipe>)
+               loop = f(handle.Get()->GetTarget());
+            else
+               loop = f(*handle.template Get<A>());
+
             switch (loop.mControl) {
                case LoopControl::Repeat:
                   --handle;
@@ -590,7 +601,10 @@ namespace Langulus::Annies
          }
          else {
             // Just execute, always loop through everything             
-            f(*handle.template Get<A>());
+            if constexpr (Same<DMeta, A> and Same<TypeOf<H>, Recipe>)
+               f(handle.Get()->GetTarget());
+            else
+               f(*handle.template Get<A>());
          }
          return Loop::Continue;
       }

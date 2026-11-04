@@ -78,10 +78,10 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair const&) = default;
       THandlePair& operator = (THandlePair&&) = default;
 
-      Handle GetKey()       const noexcept { return {*this}; }
+      //Handle GetKey()       const noexcept { return {*this}; }
       Handle GetKeyHandle() const noexcept { return {*this}; }
       
-      Handle GetVal()       const noexcept { return {Slice<1>, *this}; }
+      //Handle GetVal()       const noexcept { return {Slice<1>, *this}; }
       Handle GetValHandle() const noexcept { return {Slice<1>, *this}; }
 
       /// Force the handle to become mutable, so that we have methods like    
@@ -164,10 +164,10 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair const&) = default;
       THandlePair& operator = (THandlePair&&) = default;
 
-      HandleMut GetKey()       const noexcept { return {*this}; }
+      //HandleMut GetKey()       const noexcept { return {*this}; }
       HandleMut GetKeyHandle() const noexcept { return {*this}; }
       
-      HandleMut GetVal()       const noexcept { return {Slice<1>, *this}; }
+      //HandleMut GetVal()       const noexcept { return {Slice<1>, *this}; }
       HandleMut GetValHandle() const noexcept { return {Slice<1>, *this}; }
 
       /// Already as mutable as it gets                                       
@@ -249,10 +249,10 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair const&) = default;
       THandlePair& operator = (THandlePair&&) = default;
 
-      Handle    GetKey()       const noexcept { return {*this}; }
+      //Handle    GetKey()       const noexcept { return {*this}; }
       Handle    GetKeyHandle() const noexcept { return {*this}; }
       
-      HandleMut GetVal()       const noexcept { return {Slice<1>, *this}; }
+      //HandleMut GetVal()       const noexcept { return {Slice<1>, *this}; }
       HandleMut GetValHandle() const noexcept { return {Slice<1>, *this}; }
 
       /// Force the handle to become mutable, so that we have methods like    
@@ -340,20 +340,22 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair const&) = default;
       THandlePair& operator = (THandlePair&&) = default;
 
-      decltype(auto) GetKey() const noexcept {
-         if constexpr (CT::Constant<K>)
-            return *this->Com::HeapReference<HeapEntry<0, Deref<K>*>>::Get();
-         else
-            return GetKeyHandle();
+      auto GetKey() const noexcept -> ConstAll<K> {
+         return *this->template Get<0>();
+         //if constexpr (CT::Constant<K>)
+         //   return *this->Com::HeapReference<HeapEntry<0, Deref<K>*>>::Get();
+         //else
+         //   return GetKeyHandle();
       }
 
       KeyHandle GetKeyHandle() const noexcept { return {*this}; }
 
-      decltype(auto) GetVal() const noexcept {
-         if constexpr (CT::Constant<V>)
-            return *this->Com::HeapReference<HeapEntry<1, Deref<V>*>>::Get();
-         else
-            return GetValHandle();
+      auto GetVal() const noexcept -> ConstAll<V> {
+         return *this->template Get<1>();
+         //if constexpr (CT::Constant<V>)
+         //   return *this->Com::HeapReference<HeapEntry<1, Deref<V>*>>::Get();
+         //else
+         //   return GetValHandle();
       }
 
       ValHandle GetValHandle() const noexcept { return {Slice<1>, *this}; }
@@ -445,22 +447,26 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair const&) = default;
       THandlePair& operator = (THandlePair&&) = default;
 
-      decltype(auto) GetKey() const noexcept {
-         if constexpr (CT::Constant<K>)
-            return *this->template Get<Deref<K>, 0>();
+      auto GetKey() const noexcept -> ConstAll<K> {
+         return *this->template Get<0>();
+
+         //if constexpr (CT::Constant<K>)
+         //   return *this->template Get<Deref<K>, 0>();
             //return *this->Com::HeapReference<HeapEntry<0, Deref<K>*>>::Get();
-         else
-            return GetKeyHandle();
+         //else
+         //   return GetKeyHandle();
       }
 
       KeyHandle GetKeyHandle() const noexcept { return {*this}; }
 
-      decltype(auto) GetVal() const noexcept {
-         if constexpr (CT::Constant<V>)
-            return *this->template Get<Deref<V>, 1>();
+      auto GetVal() const noexcept -> ConstAll<V> {
+         return *this->template Get<1>();
+
+         //if constexpr (CT::Constant<V>)
+            //return *this->template Get<Deref<V>, 1>();
             //return *this->Com::HeapReference<HeapEntry<1, Deref<V>*>>::Get();
-         else
-            return GetValHandle();
+         //else
+         //   return GetValHandle();
       }
 
       ValHandle GetValHandle() const noexcept { return {Slice<1>, *this}; }
@@ -557,10 +563,10 @@ namespace Langulus::Annies
       THandlePair& operator = (THandlePair const&) = default;
       THandlePair& operator = (THandlePair&&) = default;
 
-      auto GetKey()       const noexcept -> KeyHandle { return {*this}; }
+      auto GetKey()       const noexcept -> K const& { return *this->template Get<0>(); }
       auto GetKeyHandle() const noexcept -> KeyHandle { return {*this}; }
       
-      auto GetVal()       const noexcept -> ValHandle { return {Slice<1>, *this}; }
+      auto GetVal()       const noexcept -> V const& { return *this->template Get<1>(); }
       auto GetValHandle() const noexcept -> ValHandle { return {Slice<1>, *this}; }
 
       /// Force the handle to become mutable, so that we have methods like    

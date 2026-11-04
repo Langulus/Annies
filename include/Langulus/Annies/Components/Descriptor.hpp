@@ -164,7 +164,7 @@ namespace Langulus::Annies::Component
       ///   @tparam type the type requirement                                 
       ///   @return the first type that matches                               
       template<class C>
-      auto FindType(this C const& self, RTTI::DMeta type) -> RTTI::DMeta {
+      auto FindType(this C const& self, RTTI::DMeta type) -> RTTI::DMeta;/* {
          bool ambiguous = false;
          RTTI::DMeta found;
          
@@ -196,7 +196,7 @@ namespace Langulus::Annies::Component
             found, "` will be ignored on FindType"
          );
          return found;
-      }
+      }*/
       
       /// Get a reflected member variable inside the first element by index   
       ///   @param index the member index to search for                       

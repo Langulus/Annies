@@ -239,12 +239,12 @@ namespace Langulus::Annies::Component
 
       template<CT::NotVoid AS>
       auto* GetKey(this auto&& self) requires Shared {
-         return /*ThisCom::*/self.template Get<AS, 0>();
+         return self.template Get<AS, 0>();
       }
 
       template<CT::NotVoid AS>
       auto* GetVal(this auto&& self) requires Shared {
-         return /*ThisCom::*/self.template Get<AS, 1>();
+         return self.template Get<AS, 1>();
       }
 
       /// Get first element as a handle, or any desired wrapping type.        

@@ -41,6 +41,7 @@ namespace Langulus::Annies
    struct Recipe : Inner::RecipeBase {
       using CTTI_ReflectAs = Recipe;
       using CTTI_Recipe    = Yup;
+      using CTTI_Deep      = No;
       using Base           = Inner::RecipeBase;
       using DeepType       = Many;
 
@@ -172,10 +173,10 @@ namespace Langulus::Annies
       }
       
       /// Assignment                                                          
-      constexpr Recipe& operator = (Many const& other) {
+      constexpr Recipe& operator = (Recipe const& other) {
          return this->AssignAbsorb(Refer(other));
       }
-      constexpr Recipe& operator = (Many&& other) noexcept {
+      constexpr Recipe& operator = (Recipe&& other) noexcept {
          return this->AssignAbsorb(Move(other));
       }
       

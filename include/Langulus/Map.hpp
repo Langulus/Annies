@@ -213,8 +213,8 @@ namespace Langulus::Annies::Inner
       /// Equality comparison with pairs                                      
       constexpr bool operator == (CT::Pair auto const& rhs) const assumptious {
          using C = Com::Comparison<false, true, 0, 1>;
-         return C::template CompareOneEqual<0>(rhs.GetKey())
-            and C::template CompareOneEqual<1>(rhs.GetVal());
+         return C::template CompareOneEqual<0>(rhs.GetKeyHandle())
+            and C::template CompareOneEqual<1>(rhs.GetValHandle());
       }
 
       constexpr bool IsKeyConstant() const noexcept {
