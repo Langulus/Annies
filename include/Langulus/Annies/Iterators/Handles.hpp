@@ -422,3 +422,8 @@ namespace Langulus::Annies
       }
    };
 }
+
+namespace Langulus
+{
+   using Annies::IterateHandles;
+}

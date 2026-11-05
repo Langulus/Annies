@@ -24,6 +24,11 @@ add_langulus_library(LangulusAnnies
             $<TARGET_OBJECTS:LangulusRTTI>
             $<$<BOOL:${LANGULUS_OPTION_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
             $<TARGET_OBJECTS:LangulusPercist>
+            source/Text.cpp
+            source/Bytes.cpp
+            source/Many.cpp
+            source/Tag.cpp
+            source/Neat.cpp
 )
 
 target_include_directories(LangulusAnnies

@@ -1,0 +1,908 @@
+///                                                                           
+/// Langulus::Annies                                                          
+/// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
+/// Part of the Langulus framework, see https://langulus.com                  
+///                                                                           
+/// SPDX-License-Identifier: GPL-3.0-or-later                                 
+///                                                                           
+#pragma once
+#include <Langulus/Annies/Components/Comparison.hpp>
+
+#define LglsVerboseEnabled 0 or LANGULUS_META_VERBOSITY_MASTER_SWITCH()
+#include <Langulus/Logger/ToggleVerbose.hpp>
+
+#define TEMPLATE template<bool CONVERT, bool HASH, Cid ID, Cid...SHARED>
+#define LGLSCOM  Comparison<CONVERT, HASH, ID, SHARED...>
+#define ThisCom  self.Comparison<CONVERT, HASH, ID, SHARED...>
+
+
+namespace Langulus::Annies::Component
+{
+   /// MARK: CompareEqual                                                  
+   /// Compare two containers for equality.                                
+   /// This has much greater performance when hashed.                      
+   ///   @attention compares all shared dimensions at once                 
+   ///   @param lhs left container                                         
+   ///   @param rhs right container                                        
+   ///   @return true if the two containers are identical                  
+   TEMPLATE template<Cid SID, CT::Container LHS, CT::Container RHS>
+   requires (LGLSCOM::template Relevant<SID> and CT::NoIntent<RHS>)
+   constexpr bool LGLSCOM::CompareEqual(this LHS const& lhs, RHS const& rhs) {
+      if consteval {
+         // Heap should be empty at compile-time                     
+         //TODO what about stacks??
+         return true;
+      }
+      else {
+         LglsVerboseScoped(Info, "Comparing ",
+            Logger::White, lhs.GetCount(), "x of ", lhs.GetName(),
+            Logger::Reset, " with ",
+            Logger::White, rhs.GetCount(), "x of ", rhs.GetName()
+         );
+
+         IF_NOT_LANGULUS_FORCE_TYPE_ERASURE(if constexpr (CT::TypeErased<LHS> or CT::TypeErased<RHS>)) {
+            //                                                       
+            // Both containers are type-erased - all we can do is    
+            // call the reflected comparison functions               
+            const auto lhs_count = lhs.GetCount();
+            const auto rhs_count = rhs.GetCount();
+            if (lhs_count != rhs_count) {
+               LglsVerbose(Info, Logger::Red, "Different count (type-erased): ",
+                  lhs_count, " != ", rhs_count);
+               return false;
+            }
+
+            if (not lhs_count)
+               return true;   // Both empty                          
+
+            const RTTI::DMeta LT = lhs.template GetType<SID>();
+            const RTTI::DMeta RT = rhs.template GetType<SID>();
+            if (not LT.IsSame(RT)) { //TODO but what if differently typed pointers to the same virtual objects?
+               LglsVerbose(Info, Logger::Red, "Types differ (type-erased): ",
+                  LT, " != ", RT);
+               return false;
+            }
+
+            const auto comparer = LT.GetComparerEqual();
+            if (not comparer) {
+               LglsVerbose(Info, Logger::Red, "Type not comparable (type-erased): ", LT);
+               return false;
+            }
+            
+            const auto raw1 = lhs.GetRaw();
+            const auto raw2 = rhs.GetRaw();
+            if (raw1 == raw2)
+               return true;   // Both point to same memory           
+
+            if constexpr (requires { lhs.CompareHashes(rhs); }) {
+               if (LT.GetHasher() and not lhs.CompareHashes(rhs)) {
+                  // Early failure if valid hashes differ - no point 
+                  // in comparing anything at all                    
+                  LglsVerbose(Info, Logger::Red, "Different hashes (type-erased): ",
+                     Logger::Hex(lhs.GetHash()), " != ", Logger::Hex(rhs.GetHash()));
+                  return false;
+               }
+            }
+
+            if constexpr (CT::Contiguous<LHS, RHS>) {
+               if (LT.IsPOD()) {
+                  // Batch-compare memory if POD or sparse           
+                  const bool same = (0 == ::std::memcmp(raw1, raw2, lhs.GetBytesize()));
+                  if (not same) {
+                     LglsVerbose(Info, Logger::Red,
+                        "Different POD memory after memcmp (type-erased)");
+                     LglsVerbose(Info, Logger::Red,
+                        "Most likely padding bytes filled with junk - pack your struct: ", LT);
+                  }
+                  return same;
+               }
+            }
+
+            // Use comparison operator between all elements          
+            bool result = true;
+            auto t2 = rhs.GetHandle();
+            lhs.template Apply<false>([&](auto&& t1) -> bool {
+               if constexpr (LglsSupported(t1)) {
+                  if constexpr (not CT::Contiguous<RHS>) {
+                     // Make sure hash table spot is valid           
+                     const auto idx = t1 - lhs.GetHandle();
+                     if (not rhs.GetHashTable()[idx]) {
+                        LglsVerbose(Info, Logger::Red,
+                           "Element #", idx, " has no hash table equivalent (typed)");
+                        return (result = false);
+                     }
+                  }
+
+                  if (not comparer (t1.GetRaw(), t2.GetRaw())) {
+                     // Make sure all elements match                 
+                     LglsVerbose(Info, Logger::Red,
+                        "Element #", t1 - lhs.GetHandle(), " differs (typed)");
+                     return (result = false);
+                  }
+               }
+               else if constexpr (not CT::Contiguous<RHS>) {
+                  // Spots on tables must both match                 
+                  const auto idx = t2 - rhs.GetHandle();
+                  if (rhs.GetHashTable()[idx]) {
+                     LglsVerbose(Info, Logger::Red,
+                        "Element #", idx, " has no hash table equivalent (typed)");
+                     return (result = false);
+                  }
+               }
+
+               ++t2;
+               return true;
+            });
+
+            return result;
+         }
+         #if not LANGULUS(FORCE_TYPE_ERASURE)
+         else {
+            //                                                       
+            // Both containers are statically-typed - leverage it by 
+            // using static comparisons                              
+            using LT = TypeOf<LHS>;
+            using RT = TypeOf<RHS>;
+
+            const auto lhs_count = lhs.GetCount();
+            const auto rhs_count = rhs.GetCount();
+            if (lhs_count != rhs_count) {
+               // Early failure if count differs, no point in        
+               // comparing anything at all                          
+               LglsVerbose(Info, Logger::Red, "Different count (typed): ",
+                  lhs.GetCount(), " != ", rhs.GetCount());
+               return false;
+            }
+
+            if (not lhs_count)
+               return true;   // Both empty                          
+
+            if constexpr (not Same<LT, RT>) { //TODO but what if differently typed pointers to the same virtual objects?
+               // Types are different                                
+               LglsVerbose(Info, Logger::Red, "Types differ (typed): ",
+                  NameOf<LT>(), " != ", NameOf<RT>());
+               return false;
+            }
+            else {
+               if constexpr (CT::ComparableEqual<LT, LT>) {
+                  const auto raw1 = lhs.GetRaw();
+                  const auto raw2 = rhs.GetRaw();
+                  if (raw1 == raw2)
+                     return true;   // Both point to same memory     
+
+                  if constexpr (HASH and CT::Hashable<LT, RT>) {
+                     if (not lhs.CompareHashes(rhs)) {
+                        // Early failure if valid hashes differ - no 
+                        // point in comparing anything at all        
+                        LglsVerbose(Info, Logger::Red, "Different hashes (typed): ",
+                           Logger::Hex(lhs.GetHash()), " != ", Logger::Hex(rhs.GetHash()));
+                        return false;
+                     }
+                  }
+
+                  if constexpr (CT::POD<LT> and CT::Contiguous<LHS, RHS>) {
+                     // Batch compare POD data, including pointers   
+                     const bool same = (0 == ::std::memcmp(raw1, raw2, lhs.GetBytesize()));
+                     if (not same) {
+                        LglsVerbose(Info, Logger::Red,
+                           "Different POD memory after memcmp (typed)");
+                        LglsVerbose(Info, Logger::Red,
+                           "Most likely padding bytes filled with junk - pack your struct: ", NameOf<LT>());
+                     }
+                     return same;
+                  }
+
+                  // Use comparison operator between all elements    
+                  bool result = true;
+                  auto t2 = rhs.GetHandle();
+                  lhs.template Apply<false>([&](auto&& t1) -> bool {
+                     if constexpr (LglsSupported(t1)) {
+                        if constexpr (not CT::Contiguous<RHS>) {
+                           // Make sure hash table spot is valid     
+                           const auto idx = t1 - lhs.GetHandle();
+                           if (not rhs.GetHashTable()[idx]) {
+                              LglsVerbose(Info, Logger::Red,
+                                 "Element #", idx, " has no hash table equivalent (typed)");
+                              return (result = false);
+                           }
+                        }
+
+                        if (*t1.GetRaw() != *t2.GetRaw()) {
+                           // Make sure all elements match           
+                           LglsVerbose(Info, Logger::Red,
+                              "Element #", t1 - lhs.GetHandle(), " differs (typed)");
+                           return (result = false);
+                        }
+                     }
+                     else if constexpr (not CT::Contiguous<RHS>) {
+                        // Spots on tables must both match           
+                        const auto idx = t2 - rhs.GetHandle();
+                        if (rhs.GetHashTable()[idx]) {
+                           LglsVerbose(Info, Logger::Red,
+                              "Element #", idx, " has no hash table equivalent (typed)");
+                           return (result = false);
+                        }
+                     }
+
+                     if_available(++t2);
+                     return true;
+                  });
+
+                  return result;
+               }
+               else {
+                  LglsVerbose(Info, Logger::Red, "Type not comparable (typed): ", NameOf<LT>());
+                  return false;
+               }
+            }
+         }
+         #endif
+      }
+   }
+   
+   /// MARK: CompareOneEqual                                               
+   /// Equality-compare with the first contained element                   
+   ///   @attention compares only the main dimension                       
+   ///   @param rhs the value to compare against                           
+   ///   @return true if elements are the same                             
+   TEMPLATE template<CT::Container C, CT::NoIntent RT>
+   constexpr bool LGLSCOM::CompareOneEqual(this C const& self, const RT& rhs) {
+      if consteval {
+         // Heap should be empty at compile-time                     
+         //TODO what about stack-based containers?
+         return false;
+      }
+      else {
+         if (self.GetCount() != 1)
+            return false;
+
+         if constexpr (CT::TypeErased<C>) {
+            if (not self.IsTyped())
+               return false;
+         }
+
+         return self.template CompareOneEqualInner<Id::First>(rhs);
+      }
+   }
+
+   /// MARK: CompareOne                                                    
+   /// Three-way compare with the first contained element                  
+   ///   @attention compares only the main dimension                       
+   ///   @attention this doesn't benefit from hashing                      
+   ///   @param rhs the value to compare against                           
+   ///   @return true if elements are the same                             
+   TEMPLATE template<CT::Container C, CT::NoIntent RT>
+   constexpr auto LGLSCOM::CompareOne(this C const& self, const RT& rhs) -> Ordering<C> {
+      if constexpr (CT::TypeErased<C>) {
+         if (self.GetCount() != 1)
+            return Compared::Unordered;
+
+         if (not self.IsTyped())
+            return Compared::Unordered;
+
+         return self.template CompareOneInner<Id::First>(rhs);
+      }
+      else {
+         if (self.GetCount() != 1)
+            return ::std::partial_ordering::unordered;
+         
+         return self.template CompareOneInner<Id::First>(rhs);
+      }
+   }
+
+   /// MARK: CompareOneEqualEx                                             
+   /// Equality-compare with the first contained element                   
+   ///   @attention compares only the main dimension                       
+   ///   @param rhs the value to compare against                           
+   ///   @return true if elements are the same                             
+   TEMPLATE template<CT::Container C, CT::ContainsOne RT> requires CT::NoIntent<RT>
+   constexpr bool LGLSCOM::CompareOneEqualEx(this C const& self, const RT& rhs) {
+      if consteval {
+         // Heap should be empty at compile-time                     
+         //TODO what about stack-based containers?
+         return false;
+      }
+      else {
+         using RELEVANT = typename Id::template Intersect<typename RT::Dimensions>;
+         if (self.GetCount() != 1)
+            return false;
+
+         auto rhs_handle = rhs.GetHandle();
+         return RELEVANT::ForEachAnd([&self, &rhs_handle]<Cid D> {
+            if constexpr (CT::TypeErased<C> or CT::TypeErased<RT>) {
+               auto type = self.template GetType<D>();
+               return type.IsSame(rhs_handle.template GetType<D>())
+                  and type.GetComparerEqual()
+                  and self.template CompareOneEqualInner<D>(rhs_handle);
+            }
+            else return self.template CompareOneEqualInner<D>(rhs_handle);
+         });
+      }
+   }
+
+   /// MARK: CompareHashes                                                 
+   /// Compare hashes of two containers.                                   
+   /// Most useful when hashes are cached, as it will otherwise force      
+   /// HashRecompute every time this comparison happens.                   
+   ///   @attention compares all shared dimensions at once                 
+   ///   @return true if hashes are the same                               
+   TEMPLATE template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
+   constexpr bool LGLSCOM::CompareHashes(this LHS const& lhs, RHS const& rhs)
+   requires (HASH and requires { lhs.GetHash(); rhs.GetHash(); }) {
+      return lhs.GetHash() == rhs.GetHash();
+   }
+   
+   /// Count the number of matching elements at the front of two containers
+   ///   @param other the container to compare against                     
+   ///   @return the number of matching elements                           
+   TEMPLATE template<CT::Container C1, CT::Container C2> requires CT::NoIntent<C2>
+   auto LGLSCOM::Matches(this const C1& self, const C2& other) noexcept -> size_t {
+      if (self.IsEmpty() or other.IsEmpty())
+         return 0;
+
+      if constexpr (not CT::TypeErased<C1> and not CT::TypeErased<C2>) {
+         static_assert(not CT::Multidimensional<C1>,
+            "TODO multidimensional matches");
+         static_assert(CT::IndexedLinearly<C1, C2>,
+            "TODO nonlinear matches - iterate using handles");
+
+         using T1 = TypeOf<C1>;
+         using T2 = TypeOf<C2>;
+         static_assert(Same<T1, T2>, "Type mistmatch");
+      
+         auto t1 = self.GetRaw();
+         auto t2 = other.GetRaw();
+         const auto t1end = self.GetRawEnd();
+         const auto t2end = other.GetRawEnd();
+         while (t1 != t1end and t2 != t2end and *t1 == *t2) {//TODO POD batch optimization?
+            ++t1;
+            ++t2;
+         }
+         return t1 - self.GetRaw();
+      }
+      else {
+         TODO();
+         return 0;
+      }
+   }
+
+   /// Count the number of matching elements at the front of two containers
+   /// Use a lambda of the form [](auto const& lhs, auto const& rhs) for   
+   /// the comparison.                                                     
+   ///   @param other the container to compare against                     
+   ///   @param compare_func the comparison function                       
+   ///   @return the number of matching elements                           
+   TEMPLATE template<CT::Container C1, CT::Container C2> requires CT::NoIntent<C2>
+   auto LGLSCOM::MatchesExt(this const C1& self, const C2& other, auto&& compare_func) noexcept -> size_t {
+      if (self.IsEmpty() or other.IsEmpty())
+         return 0;
+
+      if constexpr (not CT::TypeErased<C1> and not CT::TypeErased<C2>) {
+         static_assert(not CT::Multidimensional<C1>,
+            "TODO multidimensional matches");
+         static_assert(CT::IndexedLinearly<C1, C2>,
+            "TODO nonlinear matches - iterate using handles");
+
+         auto t1 = self.GetRaw();
+         auto t2 = other.GetRaw();
+         const auto t1end = self.GetRawEnd();
+         const auto t2end = other.GetRawEnd();
+         while (t1 != t1end and t2 != t2end and compare_func(*t1, *t2)) {//TODO POD batch optimization?
+            ++t1;
+            ++t2;
+         }
+         return t1 - self.GetRaw();
+      }
+      else {
+         TODO();
+         return 0;
+      }
+   }
+
+   /*template<CT::Container C1, CT::Container C2>
+   requires (CT::NoIntent<C2> and CT::Character<TypeOf<C1>, TypeOf<C2>>)
+   auto MatchesLoose(this const C1&, const C2&) noexcept -> size_t;
+
+   template<CT::Container C1, CT::Container C2>
+   requires (CT::NoIntent<C2> and CT::Character<TypeOf<C1>, TypeOf<C2>>)
+   bool CompareLoose(this const C1&, const C2&) noexcept;*/
+
+   /// MARK: Find                                                          
+   /// Get a handle to a matching item                                     
+   ///   @attention compares only the chosen dimension                     
+   ///   @param item the item to search for                                
+   ///   @param cookie resume search from a given index                    
+   ///   @return handle of the found item                                  
+   TEMPLATE template<bool REVERSE, Cid SID, CT::ContainsMany C, CT::NoIntent T>
+   requires (CT::Contiguous<C> or not REVERSE)
+   auto LGLSCOM::Find(this C&& self, T const& item, size_t cookie) assumptious
+   -> DecideHandle<C> {
+      if (self.IsEmpty())
+         return {};
+
+      if constexpr (CT::TypeErased<C>) {
+         auto type = self.template GetType<SID>();
+         if (not type.GetComparerEqual())
+            return {};
+
+         if constexpr (CT::Handle<T>) {
+            if (not type.IsSame(item.template GetType<SID>()))
+               return {};
+         }
+         else {
+            if (not type.IsSame(MetaDataOf<T>()))
+               return {};
+         }
+      }
+      
+      if constexpr (CT::IndexedHashTable<C>) {
+         (void) cookie;
+         return self.template TableSearch<SID>(item);
+      }
+      else return self.template FindInner<REVERSE, SID>(item, cookie);
+   }
+
+   /// MARK: FindReverse                                                   
+   /// Get a handle to a matching item in reverse                          
+   ///   @attention compares only the chosen dimension                     
+   ///   @param item the item to search for                                
+   ///   @param cookie resume search from a given index                    
+   ///   @return handle of the found item                                  
+   TEMPLATE template<Cid SID, CT::ContainsMany C, CT::NoIntent T> requires CT::Contiguous<C>
+   auto LGLSCOM::FindReverse(this C&& self, T const& item, size_t cookie) assumptious
+   -> DecideHandle<C> {
+      return self.template Find<true, SID, C, T>(item, cookie);
+   }
+   
+   /// MARK: FindEx                                                        
+   /// Get a handle to a matching multidimensional pattern                 
+   ///   @attention compares all shared dimensions                         
+   ///   @param tuple the multidimensional item to search for              
+   ///   @param cookie resume search from a given index                    
+   ///   @return the handle of the found item                              
+   TEMPLATE template<bool REVERSE, CT::ContainsMany C, CT::NoIntent T>
+   requires (CT::ContainsOne<T> and (CT::Contiguous<C> or not REVERSE))
+   auto LGLSCOM::FindEx(this C&& self, T const& item, size_t cookie) assumptious
+   -> DecideHandle<C> {
+      using RELEVANT = typename Id::template Intersect<typename T::Dimensions>;
+      if (self.IsEmpty())
+         return {};
+
+      if constexpr (CT::TypeErased<C>) {
+         if (not RELEVANT::ForEachAnd([&self,&item]<Cid D> {
+            auto type = self.template GetType<D>();
+            return type.IsSame(item.template GetType<D>())
+               and type.GetComparerEqual();
+         })) return {};
+      }
+
+      // Find the first relevant dimension                           
+      auto first_rhs = item.GetHandle();
+
+      DecideHandle<C> first_lhs;
+      if constexpr (CT::IndexedHashTable<C>) {
+         (void) cookie;
+         first_lhs = self.template TableSearch<RELEVANT::First>(first_rhs);
+      }
+      else first_lhs = self.template FindInner<REVERSE, RELEVANT::First>(first_rhs, cookie);
+
+      if constexpr (RELEVANT::Count == 1)
+         return first_lhs;
+      else if (first_lhs) {
+         // Compare the rest of the dimensions with the first handle 
+         if (RELEVANT::Expand([&first_lhs, &first_rhs]<Cid, Cid...DN> {
+            return (first_lhs.template CompareOneEqualInner<DN>(first_rhs) and ...);
+         }))
+            return first_lhs;
+         else
+            return {};
+      }
+      else return {};
+   }
+
+   /// MARK: FindExReverse                                                 
+   /// Get a handle to a matching multidimensional pattern in reverse      
+   ///   @attention compares all shared dimensions                         
+   ///   @param tuple the multidimensional item to search for              
+   ///   @param cookie resume search from a given index                    
+   ///   @return the handle of the found item                              
+   TEMPLATE template<CT::ContainsMany C, CT::NoIntent T>
+   requires (CT::ContainsOne<T> and CT::Contiguous<C>)
+   auto LGLSCOM::FindExReverse(this C&& self, T const& item, size_t cookie) assumptious
+   -> DecideHandle<C> {
+      return self.template FindEx<true, C, T>(item, cookie);
+   }
+
+   /// Find a matching sequence of one or more matching elements           
+   ///   @attention compares only the chosen dimension                     
+   ///   @tparam REVERSE true to perform search in reverse                 
+   ///   @param range sequence of items to search for                      
+   ///   @param cookie resume search from a given index                    
+   ///   @return handle of the found item                                  
+   TEMPLATE template<bool REVERSE, Cid SID, CT::ContainsMany C, CT::ContainsMany T>
+   requires (CT::NoIntent<T> and CT::IndexedLinearly<C, T>)
+   auto LGLSCOM::FindRange(this C const& self, T const& range, size_t cookie) assumptious 
+   -> DecideHandle<C> {
+      size_t const pool_size = self.GetCount() - cookie;
+      size_t const range_size = range.GetCount();
+      if (not range_size or range_size > pool_size)
+         return {};
+
+      using T1 = TypeOf<C, SID>;
+      using T2 = TypeOf<T, SID>;
+      if constexpr (not CT::TypeErased<C, T> and not CT::ComparableEqual<T1, T2>)
+         // Early exit if statically incompatible                    
+         return {};
+      else {
+         [[maybe_unused]] RTTI::DefinitionData::FCompareEqual comparer;
+         [[maybe_unused]] size_t const bytesize = range.template GetBytesize<SID>();
+
+         if constexpr (CT::TypeErased<C> or CT::TypeErased<T>) {
+            // Runtime type check                                    
+            auto type = self.template GetType<SID>();
+            comparer = type.GetComparerEqual();
+            if (not comparer or not type.IsSame(range.template GetType<SID>()))
+               return {};
+         }
+         
+         const auto head = range.GetHandle();
+         //const auto last = self.GetHandle() + pool_size;
+
+         while(cookie <= pool_size - range_size /*h and h.GetRaw() < last.GetRaw()*/) {
+            const auto h = self.template FindInner<REVERSE, SID>(head, cookie);
+            if (not h)
+               return {};
+
+            cookie = h - self.GetHandle();
+
+            if constexpr (not CT::TypeErased<C> and not CT::TypeErased<T>) {
+               if constexpr (CT::BinaryCompatible<T1, T2> and CT::POD<T1, T2>) {
+                  // We can use batch-compare                        
+                  if (0 == memcmp(h.GetRaw(), range.GetRaw(), bytesize))
+                     return h;               // Found                
+               }
+               else {
+                  // Types are not batch-comparable, so compare them 
+                  // one by one                                      
+                  auto lhs = h;
+                  auto rhs = head;
+                  const auto rhsEnd = head + range_size;
+                  while (rhs.GetRaw() != rhsEnd.GetRaw() and *lhs == *rhs) {
+                     ++lhs;
+                     ++rhs;
+                  }
+
+                  if (rhs == rhsEnd)
+                     return h;               // Found                
+               }
+            }
+            else {
+               if (self.template IsPOD<SID>()) {
+                  // We can use batch-compare                        
+                  if (0 == memcmp(h.GetRaw(), range.GetRaw(), bytesize))
+                     return h;               // Found                
+               }
+               else {
+                  // Types are not batch-comparable, so compare them 
+                  // one by one                                      
+                  auto lhs = h;
+                  auto rhs = head;
+                  const auto rhsEnd = head + range_size;
+                  while (rhs.GetRaw() != rhsEnd.GetRaw() and comparer(rhs.GetRaw(), rhsEnd.GetRaw())) {
+                     ++lhs;
+                     ++rhs;
+                  }
+
+                  if (rhs == rhsEnd)
+                     return h;               // Found                
+               }
+            }
+
+            //h = self.template FindInner<REVERSE, SID>(head, cookie + 1);
+            ++cookie;
+         }
+
+         // If reached, then range wasn't found                      
+         return {};
+      }
+   }
+
+   /// MARK: Contains                                                      
+   /// Check if the container contains an element                          
+   ///   @attention compares only the main dimension                       
+   ///   @param A1 the item to search for                                  
+   ///   @return true if item was found in the main dimension              
+   TEMPLATE template<CT::Container C, CT::NoIntent A1>
+   bool LGLSCOM::Contains(this C const& self, A1 const& a1) {
+      if constexpr (CT::ContainsMany<C>)
+         return static_cast<bool>(self.Find(a1));
+      else
+         return self.CompareOneEqual(a1);
+   }
+
+   /// MARK: ContainsRange                                                 
+   /// Check if the container contains a sequence of elements              
+   ///   @attention compares only the main dimension                       
+   ///   @param A1 the sequence of items to search for                     
+   ///   @return true if item was found in the main dimension              
+   TEMPLATE template<CT::ContainsMany C, CT::NoIntent A1>
+   bool LGLSCOM::ContainsRange(this C const& self, A1 const& a1) {
+      if constexpr (CONVERT) {
+         if constexpr (CT::Serializer<C>) {
+            C converted;
+            Langulus::Serialize(a1, converted);
+            return static_cast<bool>(self.FindRange(converted));
+         }
+         else {
+            const C converted = Langulus::Convert<C>(a1);
+            return static_cast<bool>(self.FindRange(converted));
+         }
+      }
+      else {
+         static_assert(CT::Container<A1>, "Argument must be a container");
+         return static_cast<bool>(self.FindRange(a1));
+      }
+   }
+
+   /// MARK: ContainsEx                                                    
+   /// Check if the container contains an element in each shared dimension 
+   ///   @attention compares all shared dimensions                         
+   ///   @param tuple the items that need to exist together                
+   ///   @return true if all provided dimensions are found together        
+   TEMPLATE template<CT::Container C, CT::NoIntent A> requires CT::ContainsOne<A>
+   bool LGLSCOM::ContainsEx(this C const& self, A const& tuple) {
+      if constexpr (CT::ContainsMany<C>)
+         return static_cast<bool>(self.FindEx(tuple));
+      else
+         return self.CompareOneEqualEx(tuple);
+   }
+
+   /// MARK: ==                                                            
+   ///   @attention compares all shared dimensions at once                 
+   TEMPLATE template<CT::NotHandle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
+   constexpr bool LGLSCOM::operator == (this LHS const& lhs, RHS const& rhs) assumptious {
+      if constexpr (Same<LHS, RHS>)
+         return lhs.CompareEqual(rhs);
+      else if constexpr (CT::DeepDense<RHS>) {
+         LglsAssumeUser((CT::Typed<LHS> and Same<TypeOf<LHS>, TypeOf<RHS>>),
+            "Ambiguous use of equality comparison "
+            "- you should use either CompareEqual (if you want to compare "
+            "containers) or CompareOneEqual (if you want to compare the "
+            "first item) in order to clearly state your intent. "
+            "CompareEqual will be used by default!"
+         );
+         return lhs.CompareEqual(rhs);
+      }
+      else return lhs.CompareOneEqual(rhs);
+   }
+
+   /// Handles compare only their first pointers                           
+   /*TEMPLATE template<CT::Handle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
+   constexpr bool LGLSCOM::operator == (this LHS const& lhs, RHS const& rhs) noexcept {
+      return lhs.GetRaw() == rhs.GetRaw();
+   }*/
+
+   /// MARK: Protected                                                     
+   /// Find a single element's index inside container (inner)              
+   ///   @tparam REVERSE true to perform search in reverse                 
+   ///   @attention assumes container is not empty                         
+   ///   @attention assumes that container is of the same comparable type  
+   ///   @attention operates on a single dimension at a time               
+   ///   @attention works in linearly indexed containers only              
+   ///   @param item the item to search for                                
+   ///   @param cookie resume search from a given index                    
+   ///   @return handle of the found item                                  
+   TEMPLATE template<bool REVERSE, Cid SID, CT::IndexedLinearly C, CT::NoIntent T>
+   auto LGLSCOM::FindInner(this C&& self, T const& item, size_t cookie) assumptious
+   -> DecideHandle<C> requires Relevant<SID> {
+      LglsAssumeDev(not self.IsEmpty(),
+         "Container is assumed not emtpy");
+      
+      // Check type compatibility                                    
+      [[maybe_unused]] RTTI::DefinitionData::FCompareEqual comparer = nullptr;
+      if constexpr (CT::Handle<T>) {
+         if constexpr (CT::TypeErased<C> or CT::TypeErased<T>) {
+            const auto type = self.template GetType<SID>();
+            LglsAssumeDev(type.IsSame(item.template GetType<SID>()),
+               "Type mismatch");
+            comparer = type.GetComparerEqual();
+            LglsAssumeDev(comparer, "Type-erased data not comparable");
+         }
+         else {
+            static_assert(CT::Comparable<TypeOf<C, SID>, TypeOf<T, SID>>,
+               "Type not comparable");
+         }
+      }
+      else {
+         if constexpr (CT::TypeErased<C>) {
+            const auto type = self.template GetType<SID>();
+            LglsAssumeDev(type.IsSame(MetaDataOf<T>()),
+               "Type mismatch");
+            comparer = type.GetComparerEqual();
+            LglsAssumeDev(comparer, "Type-erased data not comparable");
+         }
+         else {
+            static_assert(CT::Comparable<TypeOf<C, SID>, T>,
+               "Type not comparable");
+         }
+      }
+
+      DecideHandle<C> result;
+      self.template Apply<false>([&](auto&& test) -> bool {
+         if constexpr (LglsSupported(test)) {
+            if constexpr (CT::Handle<T>) {
+               if constexpr (CT::TypeErased<C> or CT::TypeErased<T>) {
+                  if (not comparer(test.template GetRaw<SID>(), item.template GetRaw<SID>()))
+                     return true;   // Continue searching            
+               }
+               else {
+                  if (*test.template GetRaw<SID>() != *item.template GetRaw<SID>())
+                     return true;   // Continue searching            
+               }
+            }
+            else {
+               if constexpr (CT::TypeErased<C>) {
+                  if (not comparer(test.template GetRaw<SID>(), &item))
+                     return true;   // Continue searching            
+               }
+               else {
+                  if (*test.template GetRaw<SID>() != item)
+                     return true;   // Continue searching            
+               }
+            }
+
+            //                                                       
+            // If reached, then match found                          
+            new (&result) DecideHandle<C> {test};
+            return false;
+         }
+         else return false;
+         return true;
+      }, cookie);
+
+      //TODO allow hash table to warp back to the beginning
+      return result;
+   }
+
+   /// Equality-compare with the first contained element                   
+   ///   @attention compares one dimension at a time                       
+   ///   @attention assumes container is if type 'RT' and not empty        
+   ///   @param rhs the value to compare against                           
+   ///   @return true if elements are the same                             
+   TEMPLATE template<Cid SID, class C, CT::NoIntent RT>
+   constexpr bool LGLSCOM::CompareOneEqualInner(this C const& self, const RT& rhs) {
+      LglsAssumeDev(not self.IsEmpty(),
+         "Container is assumed not empty");
+
+      if constexpr (CT::Handle<RT>) {
+         LglsAssumeDev(self.template IsSame<SID>(rhs), "Type mismatch");
+
+         if constexpr (CT::TypeErased<C, RT>) {
+            const auto comparer = self.template GetType<SID>().GetComparerEqual();
+            LglsAssumeDev(comparer, "Type not comparable (type-erased): ", self.template GetType<SID>());
+            return comparer(self.template GetRaw<SID>(), rhs.template GetRaw<SID>());
+         }
+         else {
+            using T = Tif<CT::TypeErased<C>, TypeOf<RT, SID>, TypeOf<C, SID>>;
+            return *self.template Get<T, SID>() == *rhs.template Get<T, SID>();
+         }
+      }
+      else if_constexpr_type_erased(C) {
+         //                                                          
+         // THIS is type-erased, do runtime type checks              
+         LglsAssumeDev(self.template IsTyped<SID>(),
+            "Container is assumed typed");
+
+         if constexpr (CT::ComparableEqual<RT, RT>) {
+            // Non-deep element compare                              
+            if (self.template IsSame<RT, SID>()) {
+               if constexpr (CT::Contiguous<C>)
+                  return *self.template Get<RT, SID>() == rhs;
+               else
+                  return *self.template GetAt<RT, SID>(0) == rhs;
+            }
+         
+            if constexpr (CT::Text<RT>) {
+               if (self.template IsSame<Text, SID>()) {
+                  // Implicitly make a text container                
+                  if constexpr (CT::Contiguous<C>)
+                     return *self.template Get<Text, SID>() == Text {Disown(rhs)};
+                  else
+                     return *self.template GetAt<Text, SID>(0) == Text {Disown(rhs)};
+               }
+            }
+         }
+      }
+      #if not LANGULUS(FORCE_TYPE_ERASURE)
+      else {
+         //                                                          
+         // Both sides are statically typed                          
+         using T = TypeOf<C, SID>;
+
+         if constexpr (CT::ComparableEqual<T, RT>) {
+            if constexpr (CT::Contiguous<C>)
+               return *self.template GetRaw<SID>() == rhs;
+            else
+               return *self.template GetAt<T, SID>(0) == rhs;
+         }
+      }
+      #endif
+
+      return false;
+   }
+   
+   /// Equality-compare with the first contained element                   
+   ///   @attention compares one dimension at a time                       
+   ///   @attention assumes container is if type 'RT' and not empty        
+   ///   @param rhs the value to compare against                           
+   ///   @return true if elements are the same                             
+   TEMPLATE template<Cid SID, class C, CT::NoIntent RT>
+   constexpr auto LGLSCOM::CompareOneInner(this C const& self, const RT& rhs) -> Ordering<C> {
+      LglsAssumeDev(not self.IsEmpty(),
+         "Container is assumed not empty");
+
+      if constexpr (CT::Handle<RT>) {
+         LglsAssumeDev(self.template IsSame<SID>(rhs), "Type mismatch");
+
+         if constexpr (CT::TypeErased<C, RT>) {
+            const auto comparer = self.template GetType<SID>().GetComparer();
+            LglsAssumeDev(comparer, "Type not comparable (type-erased): ", self.template GetType<SID>());
+            return comparer(self.template GetRaw<SID>(), rhs.template GetRaw<SID>());
+         }
+         else {
+            using T = Tif<CT::TypeErased<C>, TypeOf<RT, SID>, TypeOf<C, SID>>;
+            return ToPartialOrdering(*self.template Get<T, SID>() <=> *rhs.template Get<T, SID>());
+         }
+      }
+      else if_constexpr_type_erased(C) {
+         //                                                          
+         // THIS is type-erased, do runtime type checks              
+         LglsAssumeDev(self.template IsTyped<SID>(),
+            "Container is assumed typed");
+         
+         if constexpr (CT::Comparable<RT, RT>) {
+            // Non-deep element compare                              
+            if (self.template IsSame<RT, SID>()) {
+               if constexpr (CT::Contiguous<C>)
+                  return FromOrdering(*self.template Get<RT, SID>() <=> rhs);
+               else
+                  return FromOrdering(*self.template GetAt<RT, SID>(0) <=> rhs);
+            }
+
+            if constexpr (CT::Text<RT>) {
+               // Text types can be more loosely compared            
+               if (self.template IsSame<Text, SID>()) {
+                  // Implicitly make a text container                
+                  if constexpr (CT::Contiguous<C>)
+                     return FromOrdering(*self.template Get<Text, SID>() <=> Text{Disown(rhs)});
+                  else
+                     return FromOrdering(*self.template GetAt<Text, SID>(0) <=> Text{Disown(rhs)});
+               }
+            }
+         }
+         
+         return Compared::Unordered;
+      }
+      #if not LANGULUS(FORCE_TYPE_ERASURE)
+      else {
+         //                                                          
+         // Both sides are statically typed                          
+         using T = TypeOf<C, SID>;
+
+         if constexpr (CT::Comparable<T, RT>) {
+            if constexpr (CT::Contiguous<C>)
+               return ToPartialOrdering(*self.template GetRaw<SID>() <=> rhs);
+            else
+               return ToPartialOrdering(*self.template GetAt<T, SID>(0) <=> rhs);
+         }
+         else return ::std::partial_ordering::unordered;
+      }
+      #endif
+   }
+}
+
+#undef TEMPLATE
+#undef LGLSCOM
+#undef ThisCom
+
+#include <Langulus/Logger/DisableVerbose.hpp>

@@ -101,8 +101,6 @@ namespace Langulus::Annies
 
 namespace Langulus
 {
-   using Annies::Path;
-
    Path operator ""_path(const char*, size_t);
 }
 

@@ -222,15 +222,3 @@ namespace Langulus::Annies::Inner
       }
    };
 }
-
-namespace Langulus::Annies
-{
-   using Map         = Inner::Map<StateValue::Variable>;
-   using MapSorted   = Inner::Map<StateValue::Enabled>;
-   using MapUnsorted = Inner::Map<StateValue::Disabled>;
-}
-
-namespace Langulus
-{
-   using Annies::Map;
-}

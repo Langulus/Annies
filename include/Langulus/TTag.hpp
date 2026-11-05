@@ -154,12 +154,8 @@ namespace Langulus::Annies
          return Many {Annies::Absorb, *this};
       }
    };
-}
 
-namespace Langulus
-{
-   using Annies::TTag;
-   using Annies::Tag;
+   extern template struct TTag<void>;
 }
 
 /// Define a tag                                                              

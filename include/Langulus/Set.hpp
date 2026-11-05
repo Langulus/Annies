@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -167,16 +167,4 @@ namespace Langulus::Annies::Inner
          }
       }
    };
-}
-
-namespace Langulus::Annies
-{
-   using Set         = Inner::Set<StateValue::Variable>;
-   using SetSorted   = Inner::Set<StateValue::Enabled>;
-   using SetUnsorted = Inner::Set<StateValue::Disabled>;
-}
-
-namespace Langulus
-{
-   using Annies::Set;
 }

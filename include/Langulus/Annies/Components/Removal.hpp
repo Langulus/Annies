@@ -49,7 +49,7 @@ namespace Langulus::Annies::Component
       ///   @return the number of removed elements that matched the value     
       template<CT::ContainsMany C, CT::NoIntent A>
       requires (CT::IndexedLinearly<C> and not CT::Handle<A>)
-      auto Erase(this C& self, A const& value) -> size_t {
+      auto Erase(this C& self, A const& value) -> size_t; /*{
          if (self.IsEmpty())
             return 0;
 
@@ -94,7 +94,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::NullTerminated<C>)
             memset((self.GetHandle() + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
          return removed;
-      }
+      }*/
 
       /// Erase a handle that belongs to this container.                      
       /// Designed for linearly indexed containers.                           
@@ -105,7 +105,7 @@ namespace Langulus::Annies::Component
       template<CT::ContainsMany C, CT::NoIntent A>
       requires (CT::IndexedLinearly<C> and CT::Handle<A>)
       [[nodiscard("Make sure you reassign your interator if inside loop")]]
-      A Erase(this C& self, A const& value) {
+      A Erase(this C& self, A const& value); /*{
          LglsAssumeDev(not self.IsEmpty(),
             "How can you have a handle from an emtpy container?");
          LglsAssumeDev(value.GetRaw()    >= self.GetRaw()
@@ -145,7 +145,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::NullTerminated<C>)
             memset((result + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
          return (result + offset) - 1;
-      }
+      }*/
 
       /// Erase a key from a non-linearly indexed container                   
       ///   @param key the key to search for, use a pointer to an element     
@@ -153,7 +153,7 @@ namespace Langulus::Annies::Component
       ///   @return 1 if the element was found and removed, 0 otherwise       
       template<CT::ContainsMany C, CT::NoIntent A>
       requires (not CT::IndexedLinearly<C> and not CT::Handle<A>)
-      auto Erase(this C& self, A const& key) -> size_t {
+      auto Erase(this C& self, A const& key) -> size_t; /*{
          if (self.IsEmpty())
             return 0;
 
@@ -179,7 +179,7 @@ namespace Langulus::Annies::Component
 
          ThisCom::EraseFromTable(found.ForceMutable());
          return 1;
-      }
+      }*/
 
       /// Erase a handle from a non-linearly indexed container                
       ///   @param key the handle to erase                                    
@@ -188,7 +188,7 @@ namespace Langulus::Annies::Component
       ///      incremented (when erasing the first element), so be careful.   
       template<CT::ContainsMany C, CT::NoIntent A>
       requires (not CT::IndexedLinearly<C> and CT::Handle<A>)
-      A Erase(this C& self, A const& key) {
+      A Erase(this C& self, A const& key); /*{
          LglsAssumeDev(not self.IsEmpty(),
             "How can you have a handle from an emtpy container?");
          LglsAssumeDev(key.GetRaw()    >= self.GetRaw()
@@ -198,15 +198,15 @@ namespace Langulus::Annies::Component
          auto h = key.ForceMutable();
          ThisCom::EraseFromTable(h);
          return h - 1;
-      }
+      }*/
 
       /// If key is mutable and can be reassigned, we can notify on discard   
       template<CT::ContainsMany C, CT::NoIntent A>
       requires (not CT::IndexedLinearly<C> and CT::Handle<A>)
       [[nodiscard("Make sure you reassign your iterator if inside loop")]]
-      A Erase(this C& self, A& key) {
+      A Erase(this C& self, A& key); /*{
          return self.Erase(const_cast<A const&>(key));
-      }
+      }*/
 
       /// Erase a number of elements starting at a specific position.         
       /// Designed for linearly indexed containers.                           
@@ -214,7 +214,7 @@ namespace Langulus::Annies::Component
       ///   @param count the number of elements to erase (1 by default)       
       ///   @return the number of removed elements                            
       template<CT::ContainsMany C> requires CT::IndexedLinearly<C>
-      auto EraseAt(this C& self, CT::Index auto&& idx, size_t count = 1) -> size_t {
+      auto EraseAt(this C& self, CT::Index auto&& idx, size_t count = 1) -> size_t; /*{
          if (self.IsEmpty())
             return 0;
       
@@ -276,7 +276,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::NullTerminated<C>)
             memset((self.GetHandle() + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
          return count;
-      }
+      }*/
       
       /*template<CT::ContainsMany C>
       auto EraseDeepAt(this C&, CT::Index auto&&) -> size_t;*/
@@ -286,7 +286,7 @@ namespace Langulus::Annies::Component
       ///   @attention never reallocates                                      
       ///   @param desiredCount the new count                                 
       template<CT::ContainsMany C> requires CT::IndexedLinearly<C>
-      void Trim(this C& self, size_t desiredCount) noexcept {
+      void Trim(this C& self, size_t desiredCount) noexcept; /*{
          const auto currentCount = self.GetCount();
          if (desiredCount >= currentCount)
             return;
@@ -328,7 +328,7 @@ namespace Langulus::Annies::Component
             if (desiredCount)
                memset((self.GetHandle() + desiredCount).GetRaw(), 0, 1);//TODO bit farfetched, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
          }
-      }
+      }*/
 
       template<CT::ContainsMany C>
       void Optimize(this C&);
@@ -337,7 +337,7 @@ namespace Langulus::Annies::Component
       /// have to.                                                            
       ///   @attention will never reset state except disownment               
       ///   @attention will never reset type                                  
-      void Clear(this auto& self) {
+      void Clear(this auto& self); /*{
          const auto al = self.GetAllocation();
          if (self.IsEmpty()) {
             // Container is already empty. Just make sure that we're    
@@ -383,17 +383,17 @@ namespace Langulus::Annies::Component
          }
 
          if_available(self.DisableDisowned());
-      }
+      }*/
 
       /// Destroy all elements, deallocate memory and reset state and type.   
       ///   @attention notice that heap pointer is not zeroed here, as it     
       ///      is not a requirement. It is UB if you GetRaw while count is 0! 
-      void Reset(this auto& self) {
+      void Reset(this auto& self); /*{
          if_available(self.Free());
          if_available(self.ResetAllAllocations());
          if_available(self.ResetState());
          if_available(self.ResetAllTypes());
-      }
+      }*/
 
    protected:
       /// Erases an element at a specific index from a hash table             
@@ -401,7 +401,7 @@ namespace Langulus::Annies::Component
       ///   @attention operates on all dimensions at once                     
       ///   @param h the handle to erase (intentionally by copy)              
       template<CT::ContainsMany C> requires CT::IndexedHashTable<C>
-      void EraseFromTable(this C& self, CT::Handle auto h) assumptious {
+      void EraseFromTable(this C& self, CT::Handle auto h) assumptious; /*{
          const auto tableBeg = DecvqAllCast(self.template GetHashTable<ID>()); //TODO what if different tables per dimension?
          auto psl = tableBeg + (h - self.GetHandle());
          LglsAssumeDev(*psl,
@@ -459,14 +459,14 @@ namespace Langulus::Annies::Component
 
          // Success                                                     
          --self.GetCountInner();
-      }
+      }*/
 
       /// Erases an element at a specific index from a coverage table         
       ///   @attention assumes that index points to a valid element           
       ///   @attention operates on all dimensions at once                     
       ///   @param h the handle to erase                                      
       template<CT::ContainsMany C> requires CT::IndexedCoverage<C>
-      void EraseFromTable(this C& self, CT::Handle auto const& h) assumptious {
+      void EraseFromTable(this C& self, CT::Handle auto const& h) assumptious; /*{
          size_t slot = h - self.GetHandle();
          LglsAssumeDev(self.IsSlotOccupied(slot),
             "Removing an invalid key");
@@ -476,7 +476,7 @@ namespace Langulus::Annies::Component
          h.Free();
          self.DisableSlot(slot);
          --self.GetCountInner();
-      }
+      }*/
    };
 
    #undef ThisCom

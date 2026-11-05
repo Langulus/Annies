@@ -180,8 +180,3 @@ namespace Langulus::Annies
 
    static_assert(CT::TypeErased<Pair>);
 }
-
-namespace Langulus
-{
-   using Annies::Pair;
-}

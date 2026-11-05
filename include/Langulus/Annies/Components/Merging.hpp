@@ -58,7 +58,7 @@ namespace Langulus::Annies::Component
       ///   @param a1, an elements or arrays (and their intents) to merge     
       ///   @return the number of inserted elements (after any conversions)   
       template<class A1, class...AN, CT::IndexedLinearly C>
-      auto MergeAt(this C& self, CT::Index auto&& idx, A1&& a1, AN&&...an) -> size_t {
+      auto MergeAt(this C& self, CT::Index auto&& idx, A1&& a1, AN&&...an) -> size_t; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
 
@@ -187,7 +187,7 @@ namespace Langulus::Annies::Component
                memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
             return reduced.size();
          }
-      }
+      }*/
 
       template<CT::IndexedLinearly C>
       auto MergeRangeAt(this C&, CT::Index auto, CT::Container auto&&)
@@ -201,7 +201,7 @@ namespace Langulus::Annies::Component
       ///   @attention this is for linearly indexed containers only           
       ///   @return the number of inserted elements (after any conversions)   
       template<class A1, class...AN, class C> requires (not CT::Multidimensional<C>)
-      auto Merge(this C& self, A1&& a1, AN&&...an) -> size_t {
+      auto Merge(this C& self, A1&& a1, AN&&...an) -> size_t; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
 
@@ -275,7 +275,7 @@ namespace Langulus::Annies::Component
                memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
             return reduced.size();
          }
-      }
+      }*/
 
       /// MARK: Merge inside table                                            
       /// Insert first argument if the elements don't exist in the table yet. 
@@ -286,7 +286,7 @@ namespace Langulus::Annies::Component
       ///   @return a multidimensional handle to the inserted/found entry     
       ///   @attention doesn't support arrays or any kind of unfolding        
       template<class A1, class...AN, CT::IndexedHashTable C> requires CT::Multidimensional<C>
-      auto Merge(this C& self, A1&& a1, AN&&...an) -> DecideHandle<C> {
+      auto Merge(this C& self, A1&& a1, AN&&...an) -> DecideHandle<C>; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
          static_assert(not CT::NullTerminated<C>,
@@ -305,7 +305,7 @@ namespace Langulus::Annies::Component
          found = ThisCom::MergeInnerTableMD(LglsFwd(a1), LglsFwd(an)...);
          self.SetCountInner(all_count);
          return found;
-      }
+      }*/
 
       /// MARK: Merge every entry of one table into another                   
       /// Insert each element if the elements don't exist in the table yet.   
@@ -314,13 +314,13 @@ namespace Langulus::Annies::Component
       ///   @param other container to merge                                   
       ///   @return the number of inserted elements                           
       template<CT::Container C>
-      auto MergeRange(this C& self, CT::Container auto&& other) -> size_t {
+      auto MergeRange(this C& self, CT::Container auto&& other) -> size_t; /*{
          size_t const prev_size = self.GetCount();
          DeintCast(other).Apply([&](auto& h) {
             self.Merge(NestIntentOf(other, h));
          });
          return self.GetCount() - prev_size;
-      }
+      }*/
       
       /// MARK: Merge every entry of one table into another                   
       /// Insert each element if the elements don't exist in the table yet.   
@@ -331,7 +331,7 @@ namespace Langulus::Annies::Component
       ///      Example: [](auto&& old_value, auto&& new_value) { ... }        
       ///   @return the number of inserted elements                           
       template<CT::Multidimensional C>
-      auto MergeRange(this C& self, CT::Container auto&& other, auto&& conflict) -> size_t {
+      auto MergeRange(this C& self, CT::Container auto&& other, auto&& conflict) -> size_t; /*{
          size_t const prev_size = self.GetCount();
          DeintCast(other).Apply([&](auto& h) {
             auto found = self.Find(*h.GetKeyHandle());
@@ -341,7 +341,7 @@ namespace Langulus::Annies::Component
                self.Merge(NestIntentOf(other, h));
          });
          return self.GetCount() - prev_size;
-      }
+      }*/
       
    protected:
       /// MARK: PrepareForMerging                                             
@@ -353,7 +353,7 @@ namespace Langulus::Annies::Component
       ///      searching for it altogether, because it is guaranteed          
       ///      that a new unique pointer will be generated, unless `nullptr`. 
       template<class C, CT::Intent A>
-      void PrepareForMerging(this C& self, A&& a, size_t& counter, ::std::vector<size_t>& out_count) {
+      void PrepareForMerging(this C& self, A&& a, size_t& counter, ::std::vector<size_t>& out_count); /*{
          if constexpr (CT::Handle<A>) {
             // Inserting handles                                        
             if constexpr (CT::Cloned<A>) {
@@ -446,11 +446,11 @@ namespace Langulus::Annies::Component
             out_count.emplace_back(counter);
             ++counter;
          }
-      }
+      }*/
       
       /// MARK: ConvertMergeInner                                             
       template<class C, class T>
-      void ConvertMergeInner(this C& self, size_t& at, T&& a) {
+      void ConvertMergeInner(this C& self, size_t& at, T&& a); /*{
          using I  = IntentOf(a);
          using IT = ::std::remove_all_extents_t<Deint<I>>;
          static_assert(CONVERT and not Same<TypeOf<C>, IT>,
@@ -466,7 +466,7 @@ namespace Langulus::Annies::Component
          size_t const offset = converted.GetCount();
          ThisCom::MergeRangeAt(at, Abandon {converted});
          at += offset;
-      }
+      }*/
 
       /// MARK: MergeInnerLinear                                              
       /// A deeply unsafe function, that places 'a' at handle 'to'            
@@ -474,7 +474,7 @@ namespace Langulus::Annies::Component
       /// Does not perform conversion.                                        
       ///   @attention works in all dimensions at once                        
       template<CT::Handle H, class T>
-      static void MergeInnerLinear(H& to, size_t const*& it, size_t& counter, T&& a) {
+      static void MergeInnerLinear(H& to, size_t const*& it, size_t& counter, T&& a); /*{
          using I  = IntentOf(a);
          using IT = ::std::remove_all_extents_t<Deint<T>>;
          static_assert(not CONVERT or Same<TypeOf<H>, IT>,
@@ -512,14 +512,14 @@ namespace Langulus::Annies::Component
             
             ++counter;
          }
-      }
+      }*/
 
       /// MARK: MergeInnerTable1D                                             
       /// Inserts 'a' into a hash set at the appropriate bucket. Supports T   
       /// being a bounded array. Does not perform conversion.                 
       ///   @attention designed to work in one-dimensional containers         
       template<class C, class T> requires (not CT::Multidimensional<C>)
-      void MergeInnerTable1D(this C& self, size_t const*& it, size_t& counter, T&& a) {
+      void MergeInnerTable1D(this C& self, size_t const*& it, size_t& counter, T&& a); /*{
          using I  = IntentOf(a);
          using IT = ::std::remove_all_extents_t<Deint<T>>;
          static_assert(not CONVERT or Same<TypeOf<C>, IT>,
@@ -551,7 +551,7 @@ namespace Langulus::Annies::Component
             
             ++counter;
          }
-      }
+      }*/
 
       /// MARK: MergeInnerTableMD                                             
       /// Inserts 'd1' into a hash map at the appropriate bucket. Emplaces    
@@ -560,7 +560,7 @@ namespace Langulus::Annies::Component
       /// perform conversion.                                                 
       ///   @attention operates on all dimensions at once                     
       template<CT::Multidimensional C, class D1, class...DN>
-      auto MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C> {
+      auto MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C>; /*{
          static_assert(sizeof...(SHARED) >= sizeof...(DN), "Too many arguments");
          static_assert(not CONVERT or Same<TypeOf<C, ID>, ::std::remove_all_extents_t<Deint<D1>>>,
             "Use ConvertMergeInnerTableMD instead" //TODO function not implemented yet
@@ -591,7 +591,7 @@ namespace Langulus::Annies::Component
             (h.template EmplaceDefault<Id::template At<I+1+overlapped_count>, AllocationStrategy::DontAllocate>(), ...);
          });
          return h;
-      }
+      }*/
    };
 
    #undef ThisCom

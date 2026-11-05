@@ -160,12 +160,4 @@ namespace Langulus::Annies
          return Base::GetStackInner().New(LglsFwd(args)...);
       }
    };
-
-   template<class...T>
-   using Pin = TPin<T...>;
-}
-
-namespace Langulus
-{
-   using Annies::Pin;
 }

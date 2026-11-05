@@ -184,8 +184,3 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    THive(Inner::Piecewise, T&&) -> THive<Decvq<Deref<Deint<T>>>>;
 }
-
-namespace Langulus
-{
-   using Annies::THive;
-}

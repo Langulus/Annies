@@ -261,12 +261,4 @@ namespace Langulus::Annies
          return rhs.IsEmpty();
       }*/
    };
-
-   template<class T>
-   using Ref = TRef<T*>;
-}
-
-namespace Langulus
-{
-   using Annies::Ref;
 }

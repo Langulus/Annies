@@ -164,8 +164,6 @@ namespace Langulus::Annies
 
 namespace Langulus
 {
-   using Annies::TTable;
-
    template<CT::Map MAP> requires (not CT::TypeErased<MAP>)
    auto InValuesOf(MAP& some_map) {
       return TTable<TypeOf<MAP, 1>> {Annies::Slice<1>, some_map};

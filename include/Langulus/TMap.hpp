@@ -194,18 +194,4 @@ namespace Langulus::Annies
          return true;
       }
    };
-
-   /// MARK: CTAD                                                             
-   template<class K, class V>
-   using TMapSorted = TMap<K, V, StateValue::Enabled>;
-
-   template<class K, class V>
-   using TMapUnsorted = TMap<K, V, StateValue::Disabled>;
-}
-
-namespace Langulus
-{
-   using Annies::TMap;
-   using Annies::TMapSorted;
-   using Annies::TMapUnsorted;
 }

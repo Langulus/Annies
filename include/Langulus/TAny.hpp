@@ -125,8 +125,3 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    TAny(Inner::Piecewise, T&&) -> TAny<Decvq<Deref<Deint<T>>>>;
 }
-
-namespace Langulus
-{
-   using Annies::TAny;
-}

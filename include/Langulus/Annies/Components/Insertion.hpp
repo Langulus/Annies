@@ -74,7 +74,7 @@ namespace Langulus::Annies::Component
       /// MARK: MakeGap                                                       
       /// Helper for moving stuff around to make space for more stuff         
       template<CT::Handle H>
-      static void MakeGap(H const& start, size_t offset, size_t lhs_count, size_t rhs_count) {
+      static void MakeGap(H const& start, size_t offset, size_t lhs_count, size_t rhs_count); /*{
          if (offset >= lhs_count)
             return;
       
@@ -91,12 +91,12 @@ namespace Langulus::Annies::Component
             });
             --src; --dst;
          }
-      }
+      }*/
 
       /// MARK: CopyRegion                                                    
       /// Helper for copying data from another place                          
       template<CT::Handle H1, CT::Handle H2>
-      static void CopyRegion(H1& src, H2& dst, size_t count) {
+      static void CopyRegion(H1& src, H2& dst, size_t count); /*{
          //TODO batch optimization for PODs
          auto const end = DeintCast(src) + count;
          while (src != end) {
@@ -105,12 +105,12 @@ namespace Langulus::Annies::Component
             });
             ++dst; ++src;
          }
-      }
+      }*/
       
       /// MARK: CopyContainer                                                 
       /// Helper for copying data from another place                          
       template<CT::Container C1, CT::Handle H2>
-      static void CopyContainer(C1&& src_container, H2& dst) {
+      static void CopyContainer(C1&& src_container, H2& dst); /*{
          //TODO batch optimization for PODs
          using I = IntentOf(src_container);
          auto src = DeintCast(src_container).GetHandle();
@@ -124,7 +124,7 @@ namespace Langulus::Annies::Component
             });
             ++dst; ++src;
          }
-      }
+      }*/
 
    public:
       /// MARK: InsertAt                                                      
@@ -144,7 +144,7 @@ namespace Langulus::Annies::Component
       ///   @param a1, an elements or arrays (and their intents) to insert    
       ///   @return the number of inserted elements (after any conversions)   
       template<bool FORCE = true, class A1, class...AN, CT::IndexedLinearly C>
-      auto InsertAt(this C& self, CT::Index auto&& idx, A1&& a1, AN&&...an) -> size_t {
+      auto InsertAt(this C& self, CT::Index auto&& idx, A1&& a1, AN&&...an) -> size_t; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
 
@@ -268,7 +268,7 @@ namespace Langulus::Annies::Component
                memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
             return rhs_count;
          }
-      }
+      }*/
 
       /// Insert a number of elements at a specific place, nullifying them if 
       /// able to                                                             
@@ -293,7 +293,7 @@ namespace Langulus::Annies::Component
       template<bool CONCAT = true, bool FORCE = true, CT::IndexedLinearly C>
       auto ComposeAt(
          this C& self, CT::Index auto&& idx, auto&& value
-      ) -> size_t {
+      ) -> size_t;/* {
          using I = IntentOf(value);
          using T = Deint<I>;
          auto& other = DeintCast(value);
@@ -326,7 +326,7 @@ namespace Langulus::Annies::Component
          return ThisCom::template ComposeInner<FORCE>(
             stateCompliant, LglsFwd(idx), LglsFwd(value)
          );
-      }
+      }*/
 
       /// MARK: Insert                                                        
       /// Insert one or more elements at the performance-optimal position.    
@@ -342,7 +342,7 @@ namespace Langulus::Annies::Component
       ///   @param a1, an elements (and their intents) to insert              
       ///   @return the number of inserted elements (after any conversions)   
       template<bool FORCE = true, class A1, class...AN, CT::IndexedLinearly C>
-      auto Insert(this C& self, A1&& a1, AN&&...an) -> size_t {
+      auto Insert(this C& self, A1&& a1, AN&&...an) -> size_t; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
 
@@ -393,7 +393,7 @@ namespace Langulus::Annies::Component
                memset(to.GetRaw(), 0, 1);
             return rhs_count;
          }
-      }
+      }*/
 
       /// Insert a number of elements at the performance-optimal position.    
       /// This usually means at the back of a contiguous container. The       
@@ -408,7 +408,7 @@ namespace Langulus::Annies::Component
       /// inserted elements will be default-constructed.                      
       ///   @param count the number of elements to insert                     
       template<CT::IndexedLinearly C>
-      auto InsertDefault(this C& self, size_t count = 1) -> size_t {
+      auto InsertDefault(this C& self, size_t count = 1) -> size_t; /*{
          const auto previousCount = self.GetCount();
          self.AllocateMore(previousCount + count);
 
@@ -477,7 +477,7 @@ namespace Langulus::Annies::Component
          // Complete success                                            
          self.SetCountInner(previousCount + count);
          return count;
-      }
+      }*/
 
       /// MARK: Compose                                                       
       /// Structure-preserving insertion that uses the best approach in order 
@@ -489,7 +489,7 @@ namespace Langulus::Annies::Component
       ///   @param value the value to insert                                  
       ///   @return the number of pushed items (zero if unsuccessful)         
       template<bool CONCAT = true, bool FORCE = true, CT::IndexedLinearly C>
-      auto Compose(this C& self, auto&& value) -> size_t {
+      auto Compose(this C& self, auto&& value) -> size_t; /*{
          using I = IntentOf(value);
          using T = Deint<I>;
          decltype(auto) other = DeintCast(value);
@@ -522,7 +522,7 @@ namespace Langulus::Annies::Component
          return ThisCom::template ComposeInner<FORCE>(
             stateCompliant, Index::Back, LglsFwd(value)
          );
-      }
+      }*/
 
       /// Extend the container's memory and return the newly allocated range  
       ///   @attention if extending memory without ownership, the container   
@@ -564,7 +564,7 @@ namespace Langulus::Annies::Component
       ///      position                                                       
       ///   @return the number of concatenated elements                       
       template<CT::IndexedLinearly C, CT::IndexedLinearly T>
-      auto ConcatAt(this C& self, CT::Index auto&& idx, T&& data) -> size_t {
+      auto ConcatAt(this C& self, CT::Index auto&& idx, T&& data) -> size_t; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
 
@@ -667,7 +667,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::NullTerminated<C>)
             memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
          return rhs_count;
-      }
+      }*/
 
       /// MARK: Concat                                                        
       /// Concatenation at the back.                                          
@@ -678,7 +678,7 @@ namespace Langulus::Annies::Component
       ///      right of 'this'                                                
       ///   @return the number of concatenated elements                       
       template<CT::IndexedLinearly C, CT::Container A1, CT::Container...AN>
-      auto Concat(this C& self, A1&& a1_intent, AN&&...an_intent) -> size_t {
+      auto Concat(this C& self, A1&& a1_intent, AN&&...an_intent) -> size_t; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
 
@@ -716,21 +716,21 @@ namespace Langulus::Annies::Component
          if constexpr (CT::NullTerminated<C>)
             memset(to.GetRaw(), 0, 1);
          return rhs_count;
-      }
+      }*/
          
       /// Gather items from source container, and fill this one               
       ///   @param source container to gather from, type acts as filter       
       ///   @return the number of gathered elements                           
       template<CT::Container C, CT::Container SRC>
-      size_t GatherFrom(this C& self, SRC&& source) {
+      size_t GatherFrom(this C& self, SRC&& source); /*{
          return ThisCom::template GatherInner<false>(FWDIntent(source));
-      }
+      }*/
    
       /// Same as above, but in reverse                                       
       template<CT::Container C, CT::Container SRC>
-      size_t GatherFromReverse(this C& self, SRC&& source) {
+      size_t GatherFromReverse(this C& self, SRC&& source); /*{
          return ThisCom::template GatherInner<true>(FWDIntent(source));
-      }
+      }*/
    
       /// Gather items of specific state from source container, and fill this 
       ///   @tparam D custom deep type to nest in. WIll use C::DeepType if    
@@ -739,21 +739,21 @@ namespace Langulus::Annies::Component
       ///   @param state state filter                                         
       ///   @return the number of gathered elements                           
       template<class D = void, CT::Container C, CT::Container SRC>
-      size_t GatherFrom(this C& self, SRC&& source, auto&& condition) {
+      size_t GatherFrom(this C& self, SRC&& source, auto&& condition); /*{
          using DEEP = Tif<::std::is_void_v<D>, typename C::DeepType, D>;
          return ThisCom::template GatherPolarInner<false, DEEP>(
             FWDIntent(source), LglsFwd(condition)
          );
-      }
+      }*/
 
       /// Same as above, but in reverse                                       
       template<class D = void, CT::Container C, CT::Container SRC>
-      size_t GatherFromReverse(this C& self, SRC&& source, int state) {
+      size_t GatherFromReverse(this C& self, SRC&& source, int state); /*{
          using DEEP = Tif<::std::is_void_v<D>, typename C::DeepType, D>;
          return ThisCom::template GatherPolarInner<true, DEEP>(
             FWDIntent(source), state
          );
-      }
+      }*/
    
    protected:
       /// MARK: Protected                                                     
@@ -765,7 +765,7 @@ namespace Langulus::Annies::Component
       ///   @param source source container and intent                         
       ///   @return the number of gathered elements                           
       template<bool REVERSE, class D, CT::Container C, CT::Container SRC> requires CT::Intent<SRC>
-      size_t GatherInner(this C& self, SRC&& source) {
+      size_t GatherInner(this C& self, SRC&& source); /*{
          if constexpr (not ::std::is_void_v<D>) {
             static_assert(CT::Deep<D> and CT::Decayed<D>, "D is not deep");
             if (source->template Is<D>() and not self.IsDeep()) {
@@ -774,7 +774,7 @@ namespace Langulus::Annies::Component
                size_t count = 0;
                source->Apply([&](auto& i) {//TODO reverse?
                   count += ThisCom::template GatherInner<REVERSE, D>(
-                     NestIntentOf(source, *static_cast<D*>(i.GetDense().data)/*template Get<D>()*/)
+                     NestIntentOf(source, *static_cast<D*>(i.GetDense().data))
                   );
                });
                return count;
@@ -805,7 +805,7 @@ namespace Langulus::Annies::Component
                return ThisCom::Concat(LglsFwd(source));
             }
          }
-      }
+      }*/
    
       /// Gather items of specific phase from input container and fill output 
       ///   @tparam REVERSE are we gathering in reverse?                      
@@ -815,7 +815,7 @@ namespace Langulus::Annies::Component
       ///   @param state the data state filter                                
       ///   @return the number of gathered elements                           
       template<bool REVERSE, class D, CT::Container C, CT::Container SRC> requires CT::Intent<SRC>
-      size_t GatherPolarInner(this C& self, SRC&& source, auto&& condition) {
+      size_t GatherPolarInner(this C& self, SRC&& source, auto&& condition); /*{
          if (not condition(DeintCast(source))) {
             if constexpr (not ::std::is_void_v<D>) {
                static_assert(CT::Deep<D> and CT::Decayed<D>, "D is not deep");  
@@ -855,7 +855,7 @@ namespace Langulus::Annies::Component
          localOutput.template GatherInner<REVERSE, D>(LglsFwd(source));
          localOutput.ResetMissing();
          return ThisCom::Concat(Abandon(localOutput));
-      }
+      }*/
 
       /// Helper function that gathers the number of elements and types.      
       /// An incompatible type will result in 'deepened' being true, and      
@@ -863,7 +863,7 @@ namespace Langulus::Annies::Component
       /// containers.                                                         
       ///   @attention operates in all relevant dimensions simultaneously     
       template<CT::IndexedLinearly C, class A>
-      void PrepareForInsertion(this C& self, A&& a, size_t& out_count, bool& deepened) {
+      void PrepareForInsertion(this C& self, A&& a, size_t& out_count, bool& deepened); /*{
          if constexpr (CT::Handle<A>) {
             // Inserting handles                                        
             if (not deepened) {
@@ -892,25 +892,25 @@ namespace Langulus::Annies::Component
             }
             else ++out_count;
          }
-      }
+      }*/
 
       /// Helper function that gathers the number of elements and types.      
       /// Empty containers can't change this container's type. If one of the  
       /// type changes raises a conflict the function will throw.             
       ///   @attention operates in all relevant dimensions simultaneously     
       template<CT::IndexedLinearly C, CT::Container A>
-      void PrepareForAbsorption(this C& self, A&& a, size_t& out_count) {
+      void PrepareForAbsorption(this C& self, A&& a, size_t& out_count); /*{
          const auto c = DeintCast(a).GetCount();
          if (not c)
             return;
 
          self.AbsorbType(Copy(a));
          out_count += c;
-      }
+      }*/
 
       /// MARK: ConvertInsertInner                                            
       template<CT::IndexedLinearly C, class T>
-      void ConvertInsertInner(this C& self, size_t& at, T&& a) {
+      void ConvertInsertInner(this C& self, size_t& at, T&& a); /*{
          using I  = IntentOf(a);
          using IT = ::std::remove_all_extents_t<Deint<I>>;
          static_assert(CONVERT and not Same<TypeOf<C>, IT>,
@@ -942,7 +942,7 @@ namespace Langulus::Annies::Component
          size_t const offset = converted.GetCount();
          ThisCom::ConcatAt(at, Abandon {converted});
          at += offset;
-      }
+      }*/
 
       /// MARK: InsertInner                                                   
       /// A deeply unsafe function, that places 'a' at handle 'to'            
@@ -950,7 +950,7 @@ namespace Langulus::Annies::Component
       /// Does not perform conversion.                                        
       ///   @attention works in all dimensions at once                        
       template<CT::Handle H, class T>
-      static void InsertInner(H& to, T&& a) {
+      static void InsertInner(H& to, T&& a); /*{
          using I  = IntentOf(a);
          
          if constexpr (CONVERT) {
@@ -981,7 +981,7 @@ namespace Langulus::Annies::Component
 
             ++to;
          }
-      }
+      }*/
       
       /// MARK: CheckState                                                    
       /// Check state compatibility for composition. Rules are:               
@@ -998,7 +998,7 @@ namespace Langulus::Annies::Component
       ///    does not matter at all.                                          
       ///   @param other - the block to check                                 
       ///   @return true if state is compatible                               
-      constexpr bool CheckState(this auto const& self, CT::Container auto const& other) noexcept {
+      constexpr bool CheckState(this auto const& self, CT::Container auto const& other) noexcept; /*{
          // 1.                                                          
          if (not self.IsValid() or not other.IsValid())
             return true;
@@ -1049,7 +1049,7 @@ namespace Langulus::Annies::Component
          }
          
          return true;
-      }
+      }*/
 
       /// Inner composition function                                          
       ///   @tparam FORCE - insert even if types mismatch, by making this     
@@ -1061,7 +1061,7 @@ namespace Langulus::Annies::Component
       template<bool FORCE, CT::IndexedLinearly C>
       auto ComposeInner(
           this C& self, bool stateCompliant, CT::Index auto&& index, auto&& value
-      ) -> size_t {
+      ) -> size_t; /*{
          using I = IntentOf(value);
          using T = Deint<I>;
 
@@ -1120,7 +1120,7 @@ namespace Langulus::Annies::Component
             }
             else return 0;
          }
-      }
+      }*/
    };
 
    #undef ThisCom

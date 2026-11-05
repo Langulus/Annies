@@ -289,6 +289,10 @@ namespace Langulus::Annies
       template<Cid> void GetResolved()         = delete("Nothing to resolve");
       template<Cid> void GetDense(size_t = -1) = delete("Nothing to dereference");
 
+      /*constexpr*/ bool operator == (Bytes const& other) const noexcept; /*{
+         return this->CompareEqual(other);
+      }*/
+
       /// Allocate additional 'nbytes' and zero them                          
       void Null(size_t nbytes) {
          size_t const current_size = this->GetCount();
@@ -311,8 +315,3 @@ namespace Langulus::Annies
 LANGULUS_MORPHISM_CONCEPT(CT::POD, Annies::Bytes);
 
 #include "SerializeBytes.hpp"
-
-namespace Langulus
-{
-   using Annies::Bytes;
-}

@@ -261,8 +261,3 @@ namespace Langulus::Annies
    template<CT::Handle K, CT::Handle V>
    TPair(K&&, V&&) -> TPair<TypeOf<K>, TypeOf<V>>;
 }
-
-namespace Langulus
-{
-   using Annies::TPair;
-}

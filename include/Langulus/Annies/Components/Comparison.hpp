@@ -68,7 +68,7 @@ namespace Langulus::Annies::Component
       ///   @return true if the two containers are identical                  
       template<Cid SID = ID, CT::Container LHS, CT::Container RHS>
       requires (Relevant<SID> and CT::NoIntent<RHS>)
-      constexpr bool CompareEqual(this LHS const& lhs, RHS const& rhs) {
+      constexpr bool CompareEqual(this LHS const& lhs, RHS const& rhs); /*{
          if consteval {
             // Heap should be empty at compile-time                     
             //TODO what about stacks??
@@ -279,7 +279,7 @@ namespace Langulus::Annies::Component
             }
             #endif
          }
-      }
+      }*/
       
       /// MARK: Compare                                                       
       /// Three-way compare two containers                                    
@@ -425,7 +425,7 @@ namespace Langulus::Annies::Component
       ///   @param rhs the value to compare against                           
       ///   @return true if elements are the same                             
       template<CT::Container C, CT::NoIntent RT>
-      constexpr bool CompareOneEqual(this C const& self, const RT& rhs) {
+      constexpr bool CompareOneEqual(this C const& self, const RT& rhs); /*{
          if consteval {
             // Heap should be empty at compile-time                     
             //TODO what about stack-based containers?
@@ -442,7 +442,7 @@ namespace Langulus::Annies::Component
 
             return self.template CompareOneEqualInner<Id::First>(rhs);
          }
-      }
+      }*/
 
       /// MARK: CompareOne                                                    
       /// Three-way compare with the first contained element                  
@@ -451,7 +451,7 @@ namespace Langulus::Annies::Component
       ///   @param rhs the value to compare against                           
       ///   @return true if elements are the same                             
       template<CT::Container C, CT::NoIntent RT>
-      constexpr auto CompareOne(this C const& self, const RT& rhs) -> Ordering<C> {
+      constexpr auto CompareOne(this C const& self, const RT& rhs) -> Ordering<C>; /*{
          if constexpr (CT::TypeErased<C>) {
             if (self.GetCount() != 1)
                return Compared::Unordered;
@@ -467,7 +467,7 @@ namespace Langulus::Annies::Component
             
             return self.template CompareOneInner<Id::First>(rhs);
          }
-      }
+      }*/
 
       /// MARK: CompareOneEqualEx                                             
       /// Equality-compare with the first contained element                   
@@ -475,7 +475,7 @@ namespace Langulus::Annies::Component
       ///   @param rhs the value to compare against                           
       ///   @return true if elements are the same                             
       template<CT::Container C, CT::ContainsOne RT> requires CT::NoIntent<RT>
-      constexpr bool CompareOneEqualEx(this C const& self, const RT& rhs) {
+      constexpr bool CompareOneEqualEx(this C const& self, const RT& rhs); /*{
          if consteval {
             // Heap should be empty at compile-time                     
             //TODO what about stack-based containers?
@@ -497,7 +497,7 @@ namespace Langulus::Annies::Component
                else return self.template CompareOneEqualInner<D>(rhs_handle);
             });
          }
-      }
+      }*/
 
       /// MARK: CompareOneEx                                                  
       /// Three-way compare with the first contained element                  
@@ -552,15 +552,15 @@ namespace Langulus::Annies::Component
       ///   @return true if hashes are the same                               
       template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
       constexpr bool CompareHashes(this LHS const& lhs, RHS const& rhs)
-      requires (HASH and requires { lhs.GetHash(); rhs.GetHash(); }) {
+      requires (HASH and requires { lhs.GetHash(); rhs.GetHash(); }); /*{
          return lhs.GetHash() == rhs.GetHash();
-      }
+      }*/
       
       /// Count the number of matching elements at the front of two containers
       ///   @param other the container to compare against                     
       ///   @return the number of matching elements                           
       template<CT::Container C1, CT::Container C2> requires CT::NoIntent<C2>
-      auto Matches(this const C1& self, const C2& other) noexcept -> size_t {
+      auto Matches(this const C1& self, const C2& other) noexcept -> size_t; /*{
          if (self.IsEmpty() or other.IsEmpty())
             return 0;
 
@@ -588,7 +588,7 @@ namespace Langulus::Annies::Component
             TODO();
             return 0;
          }
-      }
+      }*/
 
       /// Count the number of matching elements at the front of two containers
       /// Use a lambda of the form [](auto const& lhs, auto const& rhs) for   
@@ -597,7 +597,7 @@ namespace Langulus::Annies::Component
       ///   @param compare_func the comparison function                       
       ///   @return the number of matching elements                           
       template<CT::Container C1, CT::Container C2> requires CT::NoIntent<C2>
-      auto MatchesExt(this const C1& self, const C2& other, auto&& compare_func) noexcept -> size_t {
+      auto MatchesExt(this const C1& self, const C2& other, auto&& compare_func) noexcept -> size_t; /*{
          if (self.IsEmpty() or other.IsEmpty())
             return 0;
 
@@ -621,7 +621,7 @@ namespace Langulus::Annies::Component
             TODO();
             return 0;
          }
-      }
+      }*/
 
       /*template<CT::Container C1, CT::Container C2>
       requires (CT::NoIntent<C2> and CT::Character<TypeOf<C1>, TypeOf<C2>>)
@@ -640,7 +640,7 @@ namespace Langulus::Annies::Component
       template<bool REVERSE = false, Cid SID = ID, CT::ContainsMany C, CT::NoIntent T>
       requires (CT::Contiguous<C> or not REVERSE)
       auto Find(this C&& self, T const& item, size_t cookie = 0) assumptious
-      -> DecideHandle<C> {
+      -> DecideHandle<C>; /*{
          if (self.IsEmpty())
             return {};
 
@@ -664,7 +664,7 @@ namespace Langulus::Annies::Component
             return self.template TableSearch<SID>(item);
          }
          else return self.template FindInner<REVERSE, SID>(item, cookie);
-      }
+      }*/
 
       /// MARK: FindReverse                                                   
       /// Get a handle to a matching item in reverse                          
@@ -674,9 +674,9 @@ namespace Langulus::Annies::Component
       ///   @return handle of the found item                                  
       template<Cid SID = ID, CT::ContainsMany C, CT::NoIntent T> requires CT::Contiguous<C>
       auto FindReverse(this C&& self, T const& item, size_t cookie = 0) assumptious
-      -> DecideHandle<C> {
+      -> DecideHandle<C>; /*{
          return self.template Find<true, SID, C, T>(item, cookie);
-      }
+      }*/
       
       /// MARK: FindEx                                                        
       /// Get a handle to a matching multidimensional pattern                 
@@ -687,7 +687,7 @@ namespace Langulus::Annies::Component
       template<bool REVERSE = false, CT::ContainsMany C, CT::NoIntent T>
       requires (CT::ContainsOne<T> and (CT::Contiguous<C> or not REVERSE))
       auto FindEx(this C&& self, T const& item, size_t cookie = 0) assumptious
-      -> DecideHandle<C> {
+      -> DecideHandle<C>; /*{
          using RELEVANT = typename Id::template Intersect<typename T::Dimensions>;
          if (self.IsEmpty())
             return {};
@@ -722,7 +722,7 @@ namespace Langulus::Annies::Component
                return {};
          }
          else return {};
-      }
+      }*/
 
       /// MARK: FindExReverse                                                 
       /// Get a handle to a matching multidimensional pattern in reverse      
@@ -733,9 +733,9 @@ namespace Langulus::Annies::Component
       template<CT::ContainsMany C, CT::NoIntent T>
       requires (CT::ContainsOne<T> and CT::Contiguous<C>)
       auto FindExReverse(this C&& self, T const& item, size_t cookie = 0) assumptious
-      -> DecideHandle<C> {
+      -> DecideHandle<C>; /*{
          return self.template FindEx<true, C, T>(item, cookie);
-      }
+      }*/
 
       /// Find a matching sequence of one or more matching elements           
       ///   @attention compares only the chosen dimension                     
@@ -746,7 +746,7 @@ namespace Langulus::Annies::Component
       template<bool REVERSE = false, Cid SID = ID, CT::ContainsMany C, CT::ContainsMany T>
       requires (CT::NoIntent<T> and CT::IndexedLinearly<C, T>)
       auto FindRange(this C const& self, T const& range, size_t cookie = 0) assumptious 
-      -> DecideHandle<C> {
+      -> DecideHandle<C>; /*{
          size_t const pool_size = self.GetCount() - cookie;
          size_t const range_size = range.GetCount();
          if (not range_size or range_size > pool_size)
@@ -772,7 +772,7 @@ namespace Langulus::Annies::Component
             const auto head = range.GetHandle();
             //const auto last = self.GetHandle() + pool_size;
 
-            while(cookie <= pool_size - range_size /*h and h.GetRaw() < last.GetRaw()*/) {
+            while(cookie <= pool_size - range_size) {
                const auto h = self.template FindInner<REVERSE, SID>(head, cookie);
                if (not h)
                   return {};
@@ -829,7 +829,7 @@ namespace Langulus::Annies::Component
             // If reached, then range wasn't found                      
             return {};
          }
-      }
+      }*/
 
       /// MARK: Contains                                                      
       /// Check if the container contains an element                          
@@ -837,12 +837,12 @@ namespace Langulus::Annies::Component
       ///   @param A1 the item to search for                                  
       ///   @return true if item was found in the main dimension              
       template<CT::Container C, CT::NoIntent A1>
-      bool Contains(this C const& self, A1 const& a1) {
+      bool Contains(this C const& self, A1 const& a1); /*{
          if constexpr (CT::ContainsMany<C>)
             return static_cast<bool>(self.Find(a1));
          else
             return self.CompareOneEqual(a1);
-      }
+      }*/
 
       /// MARK: ContainsRange                                                 
       /// Check if the container contains a sequence of elements              
@@ -850,7 +850,7 @@ namespace Langulus::Annies::Component
       ///   @param A1 the sequence of items to search for                     
       ///   @return true if item was found in the main dimension              
       template<CT::ContainsMany C, CT::NoIntent A1>
-      bool ContainsRange(this C const& self, A1 const& a1) {
+      bool ContainsRange(this C const& self, A1 const& a1); /*{
          if constexpr (CONVERT) {
             if constexpr (CT::Serializer<C>) {
                C converted;
@@ -866,7 +866,7 @@ namespace Langulus::Annies::Component
             static_assert(CT::Container<A1>, "Argument must be a container");
             return static_cast<bool>(self.FindRange(a1));
          }
-      }
+      }*/
 
       /// MARK: ContainsEx                                                    
       /// Check if the container contains an element in each shared dimension 
@@ -874,12 +874,12 @@ namespace Langulus::Annies::Component
       ///   @param tuple the items that need to exist together                
       ///   @return true if all provided dimensions are found together        
       template<CT::Container C, CT::NoIntent A> requires CT::ContainsOne<A>
-      bool ContainsEx(this C const& self, A const& tuple) {
+      bool ContainsEx(this C const& self, A const& tuple); /*{
          if constexpr (CT::ContainsMany<C>)
             return static_cast<bool>(self.FindEx(tuple));
          else
             return self.CompareOneEqualEx(tuple);
-      }
+      }*/
 
       /// MARK: <=>                                                           
       ///   @attention compares all shared dimensions at once                 
@@ -909,7 +909,7 @@ namespace Langulus::Annies::Component
       /// MARK: ==                                                            
       ///   @attention compares all shared dimensions at once                 
       template<CT::NotHandle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
-      constexpr bool operator == (this LHS const& lhs, RHS const& rhs) assumptious {
+      constexpr bool operator == (this LHS const& lhs, RHS const& rhs) assumptious; /*{
          if constexpr (Same<LHS, RHS>)
             return lhs.CompareEqual(rhs);
          else if constexpr (CT::DeepDense<RHS>) {
@@ -923,7 +923,7 @@ namespace Langulus::Annies::Component
             return lhs.CompareEqual(rhs);
          }
          else return lhs.CompareOneEqual(rhs);
-      }
+      }*/
 
       /// Handles compare only their first pointers                           
       template<CT::Handle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
@@ -944,7 +944,7 @@ namespace Langulus::Annies::Component
       ///   @return handle of the found item                                  
       template<bool REVERSE = false, Cid SID = ID, CT::IndexedLinearly C, CT::NoIntent T>
       auto FindInner(this C&& self, T const& item, size_t cookie) assumptious
-      -> DecideHandle<C> requires Relevant<SID> {
+      -> DecideHandle<C> requires Relevant<SID>; /*{
          LglsAssumeDev(not self.IsEmpty(),
             "Container is assumed not emtpy");
          
@@ -1012,7 +1012,7 @@ namespace Langulus::Annies::Component
 
          //TODO allow hash table to warp back to the beginning
          return result;
-      }
+      }*/
 
       /// Equality-compare with the first contained element                   
       ///   @attention compares one dimension at a time                       
@@ -1020,7 +1020,7 @@ namespace Langulus::Annies::Component
       ///   @param rhs the value to compare against                           
       ///   @return true if elements are the same                             
       template<Cid SID, class C, CT::NoIntent RT>
-      constexpr bool CompareOneEqualInner(this C const& self, const RT& rhs) {
+      constexpr bool CompareOneEqualInner(this C const& self, const RT& rhs); /*{
          LglsAssumeDev(not self.IsEmpty(),
             "Container is assumed not empty");
 
@@ -1079,7 +1079,7 @@ namespace Langulus::Annies::Component
          #endif
 
          return false;
-      }
+      }*/
       
       /// Equality-compare with the first contained element                   
       ///   @attention compares one dimension at a time                       
@@ -1087,7 +1087,7 @@ namespace Langulus::Annies::Component
       ///   @param rhs the value to compare against                           
       ///   @return true if elements are the same                             
       template<Cid SID, class C, CT::NoIntent RT>
-      constexpr auto CompareOneInner(this C const& self, const RT& rhs) -> Ordering<C> {
+      constexpr auto CompareOneInner(this C const& self, const RT& rhs) -> Ordering<C>; /*{
          LglsAssumeDev(not self.IsEmpty(),
             "Container is assumed not empty");
 
@@ -1148,7 +1148,7 @@ namespace Langulus::Annies::Component
             else return ::std::partial_ordering::unordered;
          }
          #endif
-      }
+      }*/
    };
 }
 

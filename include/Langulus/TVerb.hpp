@@ -362,12 +362,12 @@ namespace Langulus::Annies
       }
 
       constexpr auto operator *= (Real const& scalar) noexcept -> TVerb& {
-         GetCharge() *= scalar;
+         this->GetCharge() *= scalar;
          return *this;
       }
 
       constexpr auto operator ^= (Real const& scalar) noexcept -> TVerb& {
-         GetCharge() ^= scalar;
+         this->GetCharge() ^= scalar;
          return *this;
       }
 
@@ -407,12 +407,6 @@ namespace Langulus::Annies
       operator Verb&       () noexcept { return reinterpret_cast<Verb      &>(*this); }
       operator Verb const& () noexcept { return reinterpret_cast<Verb const&>(*this); }
    };
-}
-
-namespace Langulus
-{
-   using Annies::TVerb;
-   using Annies::Verb;
 }
 
 /// Define a verb                                                             

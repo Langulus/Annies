@@ -38,7 +38,7 @@ namespace Langulus::Annies::Component
       ///   @param out What are we converting to?                             
       ///   @return 1 on success                                              
       template<CT::Container C, CT::ContainsOne OUT> requires CT::NoIntent<OUT>
-      auto ConvertTo(this C const& self, OUT& out) -> size_t {
+      auto ConvertTo(this C const& self, OUT& out) -> size_t; /*{
          if (self.IsEmpty())
             return 0;
 
@@ -87,13 +87,13 @@ namespace Langulus::Annies::Component
                return 1;
             }
             else {
-               static_assert(CT::Convertible<FROM, TO> /*CT::Inner::FindMorphism<FROM, TO>() >= 0*/, "Not convertible");
+               static_assert(CT::Convertible<FROM, TO>, "Not convertible");
                out.Assign(Langulus::Convert<TO>(*self));
                return 1;
             }
          }
          #endif
-      }
+      }*/
 
       /// Convert block's contents to another block of contents, by iterating 
       /// all elements, and converting them one by one. Each contained item   
@@ -102,7 +102,7 @@ namespace Langulus::Annies::Component
       ///   @return the number of converted elements inserted in 'out'.       
       ///      this will be smaller than self.GetCount() on partial success   
       template<CT::Container C, CT::ContainsMany OUT> requires CT::NoIntent<OUT>
-      auto ConvertTo(this C const& self, OUT& out) -> size_t {
+      auto ConvertTo(this C const& self, OUT& out) -> size_t; /*{
          if (self.IsEmpty())
             return 0;
 
@@ -145,7 +145,7 @@ namespace Langulus::Annies::Component
             // to generate a well inlined routine for conversion        
             using TO   = TypeOf<OUT>;
             using FROM = TypeOf<C>;
-            static_assert(CT::Convertible<FROM, TO> /*CT::Inner::FindMorphism<FROM, TO>() >= 0*/, "Not convertible");
+            static_assert(CT::Convertible<FROM, TO>, "Not convertible");
 
             if constexpr (Same<FROM, TO>)
                return out.Concat(self);
@@ -175,7 +175,7 @@ namespace Langulus::Annies::Component
          out.SetCountInner(out.GetCount() + self.GetCount());
          out.SetHashInner(0);
          return self.GetCount();
-      }
+      }*/
 
       /*template<CT::NotVoid TO, CT::Container C, class OUT = typename C::template Retype<TO>>
       auto ConvertTo(this C const& self) -> OUT {

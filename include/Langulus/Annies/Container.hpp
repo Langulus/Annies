@@ -17,10 +17,6 @@
 #include <concepts>
 #include <memory>
 
-/// Make the rest of the code aware, that Langulus::Annies has been included 
-#define LANGULUS_LIBRARY_ANYNESS() 1
-#define LANGULUS_ANYNESS_VERBOSITY_MASTER_SWITCH() 0
-
 
 namespace Langulus::Annies
 {
@@ -31,59 +27,8 @@ namespace Langulus::Annies
       struct LANGULUS_EBCO Container;
    }
 
-   struct Handle;
-   struct HandleMut;
-   struct HandleDisowned;
-   struct HandleDisownedMut;
-
-   #if not LANGULUS(FORCE_TYPE_ERASURE)
-      template<class> struct THandle;
-      template<class> struct THandleEmergent;
-      template<class> struct THandleDisowned;
-   #endif
-   
-   template<CT::Handle, CT::Handle>
-   struct THandlePair;
-
-   struct Any;
-   struct Bytes;
-   struct Recipe;
-   struct Many;
-   struct Neat;
-   struct Pair;
-   struct Path;
-   struct Text;
-   template<class> 
-   struct TTag;
-   using Tag = TTag<void>;
-   template<class> 
-   struct TVerb;
-   using Verb = TVerb<void>;
-
-   template<CT::NotVoid, class...> struct TOwn;
-   template<class, class...>       struct TRef;
-   template<CT::NotVoid, class...> struct TPin;
-   template<CT::NotVoid> struct TAny;
-   template<CT::NotVoid> struct THive;
-   template<CT::NotVoid> struct TMany;
-
-   template<CT::NotVoid, StateValue SORT = StateValue::Variable>
-   struct TSet;
-
-   template<class, class, StateValue SORT = StateValue::Variable>
-   struct TMap;
-
-   template<CT::NotVoid, CT::NotVoid>
-   struct TPair;
-
    namespace Inner
    {
-      template<StateValue SORT = StateValue::Variable>
-      struct Map;
-
-      template<StateValue SORT = StateValue::Variable>
-      struct Set;
-
       struct DisambiguatorTag {
          using CTTI_Void          = void;
          using CTTI_ReflectAs     = void;

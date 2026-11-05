@@ -55,7 +55,7 @@ namespace Langulus::Annies::Component
       ///   @param lambdas all potential functions to iterate with            
       ///   @return the number of executions and the control end code         
       template<CT::Container C, class...F>
-      auto ForEach(this C&& self, F&&...lambdas) -> ForEachResult {
+      auto ForEach(this C&& self, F&&...lambdas) -> ForEachResult; /*{
          static_assert(sizeof...(F) > 0, "No functions in ForEach");
          if (self.IsEmpty())
             return {};
@@ -71,11 +71,11 @@ namespace Langulus::Annies::Component
                self.Reset();
          }
          return result;
-      }
+      }*/
 
       /// Do it in reverse                                                    
       template<CT::Container C, class...F>
-      auto ForEachRev(this C&& self, F&&...lambdas) -> ForEachResult {
+      auto ForEachRev(this C&& self, F&&...lambdas) -> ForEachResult; /*{
          static_assert(sizeof...(F) > 0, "No functions in ForEachRev");
          if (self.IsEmpty())
             return {};
@@ -91,7 +91,7 @@ namespace Langulus::Annies::Component
                self.Reset();
          }
          return result;
-      }
+      }*/
 
 
    protected:
@@ -104,7 +104,7 @@ namespace Langulus::Annies::Component
       ///   @param index [out] counts the successful executions               
       ///   @return the last 'f' result - dictates whether loop continues     
       template<bool REVERSE, CT::Container C, class F>
-      LoopControl ForEachInner(this C&& self, F&& f, size_t& index) noexcept_if(f) {
+      LoopControl ForEachInner(this C&& self, F&& f, size_t& index) noexcept_if(f); /*{
          using A = ArgumentOf<F>;
          static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
             "Mutable reference/pointer iterator not allowed for constant container");
@@ -143,8 +143,8 @@ namespace Langulus::Annies::Component
             // Container is type-erased. We're NOT iterating with tag.  
             const auto T = self.GetType();
             if (not (CT::Deep<A>       and T.IsDeep())
-            and not (CT::DefineTag<A>  and T.Is(MetaDataOf<A /*Decay<A>*/>()))
-            and not (CT::DefineVerb<A> and T.Is(MetaDataOf<A /*Decay<A>*/>()))
+            and not (CT::DefineTag<A>  and T.Is(MetaDataOf<A>()))
+            and not (CT::DefineVerb<A> and T.Is(MetaDataOf<A>()))
             and not (not CT::Deep<A>   and self.template CastsTo<A>(1, true)))
                return Loop::NextLoop;
 
@@ -156,13 +156,13 @@ namespace Langulus::Annies::Component
                if constexpr (CT::DefineTag<A>) {
                   // We're iterating using a statically defined tag.    
                   // We don't execute in tags that don't match.         
-                  if (DenseCast(element).GetTagInner() != MetaTagOf<A /*Decay<A>*/>())
+                  if (DenseCast(element).GetTagInner() != MetaTagOf<A>())
                      continue;
                }
                if constexpr (CT::DefineVerb<A>) {
                   // We're iterating using a statically defined verb.   
                   // We don't execute in verbs that don't match.        
-                  if (DenseCast(element).GetVerbInner() != MetaVerbOf<A /*Decay<A>*/>())
+                  if (DenseCast(element).GetVerbInner() != MetaVerbOf<A>())
                      continue;
                }
 
@@ -209,7 +209,7 @@ namespace Langulus::Annies::Component
             }
             return Loop::NextLoop;
          }
-      }
+      }*/
 
       //TODO i think this func is no longer needed due to Container::Apply
       /// Execute a function for each element inside container.               
@@ -220,7 +220,7 @@ namespace Langulus::Annies::Component
       ///   @tparam REVERSE direction we're iterating in                      
       ///   @param f the function to call on each item                        
       template<bool REVERSE, CT::Container C, class F>
-      LoopControl IterateInner(this C&& self, size_t count, F&& f) noexcept_if(f) {
+      LoopControl IterateInner(this C&& self, size_t count, F&& f) noexcept_if(f); /*{
          using A = ArgumentOf<F>;
          static_assert(CT::Complete<Decay<A>> or CT::Sparse<A>,
             "Can't iterate with incomplete type, use pointer instead");
@@ -279,7 +279,7 @@ namespace Langulus::Annies::Component
                      if (self.GetCount() == 1)
                         return Loop::Discard;
 
-                     const /*Count<C>*/ size_t idx = raw - data;
+                     const size_t idx = raw - data;
                      self.EraseAt(idx);
 
                      // Block might BranchOut on RemoveIndex - make     
@@ -311,6 +311,6 @@ namespace Langulus::Annies::Component
          }
 
          return Loop::Continue;
-      }
+      }*/
    };
 }

@@ -163,8 +163,3 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    TSlots(Inner::Piecewise, T&&) -> TSlots<Decvq<Deref<Deint<T>>>>;
 }
-
-namespace Langulus
-{
-   using Annies::TSlots;
-}

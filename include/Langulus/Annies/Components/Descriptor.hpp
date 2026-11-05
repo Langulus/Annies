@@ -37,7 +37,7 @@ namespace Langulus::Annies::Component
       ///   @param value the value to assign                                  
       ///   @param force whether to set tag even if it already exists         
       template<CT::DefineTag TAG, class D> requires (not CT::DefineTag<D>)
-      void Set(this auto& self, D&& value, bool force = false) {
+      void Set(this auto& self, D&& value, bool force = false); /*{
          bool satisfied = false;
          self.ForEachDeep([&](TAG& tag) {
             if (tag) {
@@ -54,11 +54,11 @@ namespace Langulus::Annies::Component
             return;
 
          self.Compose(TAG {LglsFwd(value)}); //TODO neat should implement compose/insert in its own way
-      }
+      }*/
 
       /// Same as above but accepts tag as the value                          
       template<CT::DefineTag TAG>
-      void Set(this auto& self, TAG&& value, bool force = false) {
+      void Set(this auto& self, TAG&& value, bool force = false); /*{
          bool satisfied = false;
          self.ForEachDeep([&](TAG& tag) {
             if (tag) {
@@ -75,24 +75,24 @@ namespace Langulus::Annies::Component
             return;
 
          self.Compose(LglsFwd(value)); //TODO neat should implement compose/insert in its own way
-      }
+      }*/
 
       /// Extract a tag from the descriptor                                   
       ///   @tparam TAG... tags we're searching for                           
       ///   @param values [out] where to save the value, if found             
       ///   @return true if any of the values changed                         
       template<CT::DefineTag...TAG>
-      bool ExtractTag(this auto const& self, auto&...values) {
+      bool ExtractTag(this auto const& self, auto&...values); /*{
          bool satisfied = false;
          ((satisfied |= self.template ExtractTagInner<TAG>(values...)), ...);
          return satisfied;
-      }
+      }*/
 
       /// Extract data capable of initializing D. Pointer arithmetic allowed. 
       ///   @param value [out] where to save the value(s), if found           
       ///   @return the number of extracted values (always 1 if not an array) 
       template<class D>
-      auto ExtractData(this auto const& self, D& value) -> size_t {
+      auto ExtractData(this auto const& self, D& value) -> size_t; /*{
          size_t progress = 0;
 
          if constexpr (CT::Array<D>) {
@@ -112,13 +112,13 @@ namespace Langulus::Annies::Component
          }
 
          return progress;
-      }
+      }*/
 
       /// Extract any data that is convertible to D                           
       ///   @param value [out] where to save the value, if found              
       ///   @return the number of extracted values (always 1 if not an array) 
       template<class D, class SELF>
-      auto ExtractDataAs(this SELF const& self, D& value) -> size_t {
+      auto ExtractDataAs(this SELF const& self, D& value) -> size_t; /*{
          size_t progress = 0;
 
          self.ForEachDeep([&](typename SELF::DeepType const& group) {
@@ -149,16 +149,16 @@ namespace Langulus::Annies::Component
          });
 
          return progress;
-      }
+      }*/
 
       /// Find data in recipes or tail. Only pointer arithmetic casts are     
       /// allowed, such as inheritance.                                       
       ///   @tparam T the type requirement                                    
       ///   @return the first type that matches                               
       template<CT::NotVoid T>
-      auto FindType(this auto const& self) -> RTTI::DMeta {
+      auto FindType(this auto const& self) -> RTTI::DMeta; /*{
          return self.FindType(MetaDataOf<T>());
-      }
+      }*/
 
       /// Find data in recipes. Only pointer arithmetic casts are allowed.    
       ///   @tparam type the type requirement                                 
@@ -201,14 +201,14 @@ namespace Langulus::Annies::Component
       /// Get a reflected member variable inside the first element by index   
       ///   @param index the member index to search for                       
       ///   @return type-erased container to the reflected member(s)          
-      auto GetMember(this auto&& self, CT::Index auto&& index) -> RTTI::Block {
+      auto GetMember(this auto&& self, CT::Index auto&& index) -> RTTI::Block; /*{
          if (self.IsEmpty())
             return {};
 
          auto& members = self.GetType().GetMembers();
          //TODO special indices
          return self.GetMemberInner(members[index]);
-      }
+      }*/
 
    protected:
       /// Get handle to a reflected member variable inside the first element  
@@ -216,7 +216,7 @@ namespace Langulus::Annies::Component
       ///   @param member the member reflection to search for                 
       ///   @return type-erased container to the reflected member(s)          
       auto GetMemberInner(this auto&& self, RTTI::DefinitionData::Member const& member)
-      -> RTTI::Block {
+      -> RTTI::Block; /*{
          LglsAssumeDev(not self.IsEmpty(),
             "Getting member from an empty descriptor");
             
@@ -225,16 +225,11 @@ namespace Langulus::Annies::Component
             member.type(),
             member.extent
          };
-         /*return {
-            Annies::Stackwise, Many::StateType{0},
-            member.type(), member.member(const_cast<void*>(self.GetRaw())),
-            member.extent, member.extent, self.GetAllocation(), Hash {0}
-         };*/
-      }
+      }*/
       
       ///                                                                     
       template<CT::DefineTag TAG, size_t IDX, class D>
-      bool ExtractTagInnerInner(this auto const& self, D& value) {
+      bool ExtractTagInnerInner(this auto const& self, D& value); /*{
          bool satisfied = false;
          size_t counter = 0;
 
@@ -256,21 +251,21 @@ namespace Langulus::Annies::Component
          });
 
          return satisfied;
-      }
+      }*/
 
       ///                                                                     
       template<CT::DefineTag TAG, size_t...IDX>
-      bool ExtractTagInner(this auto const& self, ExpandedSequence<IDX...>, auto&...values) {
+      bool ExtractTagInner(this auto const& self, ExpandedSequence<IDX...>, auto&...values); /*{
          return (self.template ExtractTagInnerInner<TAG, IDX>(values) or ...);
-      }
+      }*/
 
       ///                                                                     
       template<CT::DefineTag TAG>
-      bool ExtractTagInner(this auto const& self, auto&...values) {
+      bool ExtractTagInner(this auto const& self, auto&...values); /*{
          return self.template ExtractTagInner<TAG>( 
             Sequence<sizeof...(values)>::Expand,
             values...
          );
-      }
+      }*/
    };
 }

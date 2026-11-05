@@ -36,7 +36,7 @@ namespace Langulus::Annies::Component
       ///   @attention depth == 0 acts as GetCount()                          
       ///   @return the number of contained non-deep elements                 
       template<class C>
-      constexpr size_t GetCountDeep(this C const& self, size_t depth = -1) noexcept {
+      constexpr size_t GetCountDeep(this C const& self, size_t depth = -1) noexcept; /*{
          if (self.IsEmpty())
             return 0;
 
@@ -75,7 +75,7 @@ namespace Langulus::Annies::Component
          }
          #endif
          return accumulated_count;
-      }
+      }*/
       
       /// MARK: GetReservedDeep                                               
       /// Get the sum of the allocated non-deep elements in all sub-blocks    
@@ -83,7 +83,7 @@ namespace Langulus::Annies::Component
       ///   @attention depth == 0 acts as GetReserved()                       
       ///   @return the number of reserved non-deep elements                  
       template<class C>
-      constexpr size_t GetReservedDeep(this C const& self, size_t depth = -1) noexcept {
+      constexpr size_t GetReservedDeep(this C const& self, size_t depth = -1) noexcept; /*{
          if (depth == 0)
             return self.GetReserved();
 
@@ -119,7 +119,7 @@ namespace Langulus::Annies::Component
          }
          #endif
          return accumulated_reserve;
-      }
+      }*/
       
       /// Get Nth deep item using a deep index                                
       ///   @attention ignores sparseness                                     
@@ -158,7 +158,7 @@ namespace Langulus::Annies::Component
       ///   @param depth the depth at which container becomes flat            
       ///   @return the element, as a reference if possible                   
       template<CT::NotVoid AS, Cid SID = 0, CT::Container C>
-      decltype(auto) AsAtDeep(this C&& self, size_t deep_idx, size_t const depth = -1) {
+      decltype(auto) AsAtDeep(this C&& self, size_t deep_idx, size_t const depth = -1); /*{
          if (not self.IsDeep() or depth == 0)
             return self.template AsAt<AS, SID>(deep_idx);
 
@@ -177,13 +177,13 @@ namespace Langulus::Annies::Component
             }
          });
          return result;
-      }
+      }*/
 
       /// MARK: Deepen                                                        
       /// Wrap all contained elements inside a sub-block                      
       ///   @return a reference to the newly created inner container          
       template<class C> requires (CT::TypeErased<C> or CT::Deep<TypeOf<C>>)
-      auto Deepen(this C& self) -> C& {
+      auto Deepen(this C& self) -> C&; /*{
          if constexpr (not CT::TypeErased<C>) {
             LglsAssert(not self.IsTypeConstrained() or self.IsDeep(),
                "Can't deepen with incompatible type");
@@ -193,7 +193,7 @@ namespace Langulus::Annies::Component
          C temp {Piecewise, Abandon {self}};
          self.Swap(temp);
          return *self.template Get<C>();
-      }
+      }*/
       
       /// Execute functions in each sub-block, inclusively.                   
       /// Each function has a distinct argument type, that is tested against  
@@ -204,7 +204,7 @@ namespace Langulus::Annies::Component
       ///   @param lambdas all potential functions to iterate with            
       ///   @return the number of executions                                  
       template<CT::Container C, class...F>
-      auto ForEachDeep(this C&& self, F&&...lambdas) -> ForEachResult {
+      auto ForEachDeep(this C&& self, F&&...lambdas) -> ForEachResult; /*{
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeep");
          if (self.IsEmpty())
             return {};
@@ -221,11 +221,11 @@ namespace Langulus::Annies::Component
                self.Reset();
          }
          return result;
-      }
+      }*/
 
       /// Do it in reverse                                                    
       template<CT::Container C, class...F>
-      auto ForEachDeepRev(this C&& self, F&&...lambdas) -> ForEachResult {
+      auto ForEachDeepRev(this C&& self, F&&...lambdas) -> ForEachResult; /*{
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeepRev");
          if (self.IsEmpty())
             return {};
@@ -242,11 +242,11 @@ namespace Langulus::Annies::Component
                self.Reset();
          }
          return result;
-      }
+      }*/
 
       /// Do it without skipping the intermediate containers                  
       template<CT::Container C, class...F>
-      auto ForEachDeepNoskip(this C&& self, F&&...lambdas) -> ForEachResult {
+      auto ForEachDeepNoskip(this C&& self, F&&...lambdas) -> ForEachResult; /*{
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeepNoskip");
 
          ForEachResult result {0, Loop::Break};
@@ -261,11 +261,11 @@ namespace Langulus::Annies::Component
                self.Reset();
          }
          return result;
-      }
+      }*/
 
       /// Do it without skipping the intermediate containers in reverse       
       template<CT::Container C, class...F>
-      auto ForEachDeepNoskipRev(this C&& self, F&&...lambdas) -> ForEachResult {
+      auto ForEachDeepNoskipRev(this C&& self, F&&...lambdas) -> ForEachResult; /*{
          static_assert(sizeof...(F) > 0, "No functions in ForEachDeepNoskipRev");
 
          ForEachResult result {0, Loop::Break};
@@ -280,12 +280,12 @@ namespace Langulus::Annies::Component
                self.Reset();
          }
          return result;
-      }
+      }*/
 
    protected:
       /// Always execute for intermediate (or non-deep) self                  
       template<class R, class A, CT::Container C, class F>
-      LoopControl ForEachDeepInnerLocal(this C&& self, F&& f, size_t& counter) noexcept_if(f) {
+      LoopControl ForEachDeepInnerLocal(this C&& self, F&& f, size_t& counter) noexcept_if(f); /*{
          ++counter;
 
          decltype(auto) argument = self.template ReinterpretAs<A>();
@@ -332,7 +332,7 @@ namespace Langulus::Annies::Component
          }
          else f(argument);
          return Loop::Continue;
-      }
+      }*/
 
       /// Iterate and execute call for each deep element, counting each       
       /// successfull execution.                                              
@@ -343,7 +343,7 @@ namespace Langulus::Annies::Component
       ///   @param counter [out] counts the successful executions             
       ///   @return the last 'f' result                                       
       template<bool REVERSE, bool SKIP, CT::Container C, class F>
-      LoopControl ForEachDeepInner(this C&& self, size_t depth, F&& f, size_t& counter) noexcept_if(f) {
+      LoopControl ForEachDeepInner(this C&& self, size_t depth, F&& f, size_t& counter) noexcept_if(f); /*{
          using A = ArgumentOf<F>;
          static_assert(CT::Slab<A> or CT::Mutable<C> or CT::ConstantEverywhere<A>,
             "Mutable reference/pointer iterator not allowed for constant container");
@@ -369,7 +369,7 @@ namespace Langulus::Annies::Component
                   return loop;
 
                // Iterate subblocks                                     
-               /*size_t const inner_depth = depth == size_t(-1) ? depth : depth - 1;
+               *//*size_t const inner_depth = depth == size_t(-1) ? depth : depth - 1;
                RTTI::DMeta const arg_type = MetaDataOf<Decay<A>>();
                void const* const invoke_args[] {
                   &inner_depth, &arg_type
@@ -401,7 +401,7 @@ namespace Langulus::Annies::Component
                      );
                   }
                   return true;
-               });*/
+               });*//*
 
                size_t intermediateCounterSink = 0;
                using SubBlock = LglsMutIf(C, Decay<A>&);
@@ -414,14 +414,14 @@ namespace Langulus::Annies::Component
                         return group.template ForEachDeepInner<REVERSE, SKIP>(
                            depth - 1, LglsFwd(f), counter
                         );
-                     /*}
+                     *//*}
                      else {
                         // ... otherwise we just pass through all       
                         // deep sub-blocks                              
                         group.template ForEachDeepInner<REVERSE, SKIP>(
                            depth - 1, LglsFwd(f), counter
                         );
-                     }*/
+                     }*//*
                   },
                   intermediateCounterSink
                );
@@ -462,7 +462,7 @@ namespace Langulus::Annies::Component
          }
          #endif
          return loop;
-      }
+      }*/
    };
 
    #undef ThisCom

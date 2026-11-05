@@ -53,7 +53,7 @@ namespace Langulus::Annies::Component
       ///   @param argument the argument to assign                            
       ///   @return reference to self                                         
       template<CT::Container C, class A>
-      C& Assign(this C& self, A&& argument) {//TODO pinnables
+      C& Assign(this C& self, A&& argument); /*{//TODO pinnables
          if constexpr (not CT::Contiguous<C>) {
             // Assignment for maps/sets falls back to merge             
             self.Clear();
@@ -112,7 +112,7 @@ namespace Langulus::Annies::Component
          }
          
          return self;
-      }
+      }*/
 
       /// MARK: SwapContents                                                  
       /// Swap the value of the first element, if that element is initialized.
@@ -121,7 +121,7 @@ namespace Langulus::Annies::Component
       ///   @param argument the argument to swap with                         
       ///   @return reference to self                                         
       template<CT::ContainsOne C, CT::ContainsOne A> requires CT::NoIntent<A>
-      C& SwapContents(this C& self, A& argument) {//TODO pinnables
+      C& SwapContents(this C& self, A& argument); /*{//TODO pinnables
          LglsAssumeUser(not argument.IsEmpty(),
             "Can't swap with empty container");
 
@@ -146,7 +146,7 @@ namespace Langulus::Annies::Component
             ThisCom::template SwapInner<D>(argument);
          });
          return self;
-      }
+      }*/
 
    protected:
       /// MARK: Protected                                                     
@@ -159,7 +159,7 @@ namespace Langulus::Annies::Component
       ///   @attention for non-handles only, may cause reallocation.          
       ///   @attention operates in all relevant dimensions simultaneously     
       template<CT::HeapAllocated C> requires CT::NotHandle<C>
-      void PrepareForReconstruction(this C& self) {
+      void PrepareForReconstruction(this C& self); /*{
          static_assert(CT::Contiguous<C>,
              "Can be used only for contiguous containers");
 
@@ -216,19 +216,19 @@ namespace Langulus::Annies::Component
             auto alloc = &P::template AllocateFresh<P::Id::First, C>;
             alloc(self, 1);
          });
-      }
+      }*/
 
       /// A helper for clearing and allocating memory before construction.    
       ///   @attention for handles only. releases shared pointers.            
       ///   @attention operates in all relevant dimensions simultaneously     
       template<CT::HeapAllocated C> requires CT::Handle<C>
-      void PrepareForReconstruction(this C& self) {
+      void PrepareForReconstruction(this C& self); /*{
          static_assert(CT::Contiguous<C>,
              "Can be used only for contiguous containers");
 
          // We have to free all shared elements                         
          self.template Free<false>();
-      }
+      }*/
 
       /// MARK: PrepareForReassignment                                        
       /// A helper for clearing and allocating memory before assignment.      
@@ -236,10 +236,10 @@ namespace Langulus::Annies::Component
       ///   @attention operates in all relevant dimensions simultaneously     
       ///   @return true if first element is valid and can be assigned to     
       template<CT::HeapAllocated C>
-      bool PrepareForReassignment(this C& self) {
+      bool PrepareForReassignment(this C& self); /*{
          self.PrepareForReconstruction(); //TODO temporary solution
          return false;
-      }
+      }*/
       /*template<CT::HeapAllocated C> //TODO this is too complex to implement, because each dimension can be of different sparseness, so we have to assign to dimensions that are dense, but deep free dimensions that are sparse
       bool PrepareForReassignment(this C& self) {
          static_assert(CT::Contiguous<C>,
@@ -307,8 +307,8 @@ namespace Langulus::Annies::Component
       ///   @param intent assignment argument. If this container              
       ///      is statically typed, this can be any assignment argument,      
       ///      otherwise it has to be an instance of the contained type.      
-      template<Cid SID = ID, CT::Container C, CT::Intent I> requires Relevant<SID>
-      void AssignWithIntent(this C&& self, I&& intent) {
+      template<Cid SID = ID, CT::Container C, CT::Intent I> 
+      void AssignWithIntent(this C&& self, I&& intent) requires Relevant<SID>; /*{
          //static_assert(CT::ContainsOne<C>,
          //   "Assigning only first element in a container with many. GetHandle() first?");
          static_assert(CT::Contiguous<C>,
@@ -399,7 +399,7 @@ namespace Langulus::Annies::Component
          }
 
          if_available(self.template EmplaceEntries<SID>(LglsFwd(intent)));
-      }
+      }*/
 
       /// MARK: SwapInner                                                     
       /// Swap the first element. Gracefully handling transitions between     
@@ -410,7 +410,7 @@ namespace Langulus::Annies::Component
       ///   @attention Doesn't reallocate any of the containers!              
       ///   @attention Works in one dimension at a time!                      
       template<Cid SID = ID, CT::ContainsOne C, CT::ContainsOne RHS>
-      void SwapInner(this C&& self, RHS& rhs) requires Relevant<SID> {
+      void SwapInner(this C&& self, RHS& rhs) requires Relevant<SID>; /*{
          if constexpr (CT::TypeErased<C, RHS>) {
             auto T = self.template GetType<SID>();
             auto S = T.GetSize();
@@ -567,7 +567,7 @@ namespace Langulus::Annies::Component
                }
             }
          }
-      }
+      }*/
    };
 
    #undef ThisCom

@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
+#include "Catalogue.hpp"
 #include <Langulus/CT/Contiguous.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/CT/Typed.hpp>
@@ -30,7 +31,6 @@ namespace Langulus::CTTI
    template<class T> struct Pair;
    template<class T> struct Neat;
    template<class T> struct Recipe;
-   template<class T> struct Handle;
    template<class T> struct Iterator;
 }
 
@@ -44,7 +44,6 @@ LANGULUS_CTTI_CONCEPT_DECVQ(Tag);
 LANGULUS_CTTI_CONCEPT_DECVQ(Pair);
 LANGULUS_CTTI_CONCEPT_DECVQ(Neat);
 LANGULUS_CTTI_CONCEPT_DECVQ(Recipe);
-LANGULUS_CTTI_CONCEPT_DECVQ(Handle);
 LANGULUS_CTTI_CONCEPT_DECVQ(Iterator);
 
 #define if_available(...) if constexpr (requires { __VA_ARGS__; }) { __VA_ARGS__; }
@@ -255,15 +254,6 @@ namespace Langulus::CT
 
 namespace Langulus::Annies
 {
-   /// Each state can be either dynamically set at runtime, be statically     
-   /// enabled, or statically disabled. Only the 'Variable' value reserves    
-   /// a single bit inside the state component representation.                
-   enum class StateValue {
-      Variable = 0,
-      Enabled  = 1,
-      Disabled = 2
-   };
-
    constexpr auto StateValueIf(bool condition) -> StateValue {
       return condition ? StateValue::Enabled : StateValue::Variable;
    }

@@ -166,8 +166,3 @@ namespace Langulus::Annies
    template<CT::NotVoid T>
    TMany(Inner::Piecewise, T&&) -> TMany<Decvq<Deref<Deint<T>>>>;
 }
-
-namespace Langulus
-{
-   using Annies::TMany;
-}

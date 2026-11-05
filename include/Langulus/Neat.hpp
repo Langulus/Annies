@@ -57,6 +57,17 @@ namespace Langulus::Annies::Inner
 
 namespace Langulus::Annies
 {
+   extern template struct TMany<Recipe>;
+   extern template struct TMany<Many>;
+   extern template struct TMany<Tag>;
+
+   extern template struct TMap<DMeta, Inner::RecipeList, StateValue::Disabled>;
+   extern template struct TMap<DMeta, Inner::MessyList, StateValue::Disabled>;
+   extern template struct TMap<TMeta, Inner::TagList, StateValue::Disabled>;
+}
+
+namespace Langulus::Annies
+{
    ///                                                                        
    /// MARK: Neat                                                             
    ///                                                                        
@@ -944,9 +955,35 @@ namespace Langulus::Annies
    };
 }
 
-namespace Langulus
-{
-   using Annies::Neat;
-}
-
 #include "Annies/Neat.inl"
+
+namespace Langulus::Annies::Component
+{
+   extern template struct Container<
+      Com::StateStack<>,                     // No states               
+      Com::Multiprovider<
+         // Tags are ordered first by their tag type, then by their     
+         // order of appearance. Duplicate tag types are allowed.       
+         // Tag contents may or may not also be normalized.             
+         Com::Stack<Inner::TagMap,    0>,
+         // Subconstructs are sorted first by the recipe target, then   
+         // by their order of appearance. Their contents may or may not 
+         // also be normalized.                                         
+         Com::Stack<Inner::RecipeMap, 1>,
+         // Any other container that doesn't fit in the above is sorted 
+         // first by its type, then by the order of appearance.         
+         // Contents may or may not be normalized.                      
+         Com::Stack<Inner::MessyMap,  2>
+      >,
+      Com::IndexedComposite<0, 0, 1, 2>,     // Composite indexing      
+      Com::HashEmergent<Hash, 0, 1, 2>,      // Emergent hash           
+      Com::Deepening<Many>,                  // Makes container deep    
+      Com::Assignment<false, 0, 1, 2>,       // Assignment              
+      Com::InsertionOperators<>,             // Insertion operators     
+      Com::MergingOperators<>,               // Merge operators         
+      /*Com::Comparison<false, true, 0, 1, 2>,*/ // Allows comparisons      
+      Com::IterationForEach<0, 1, 2>,        // ForEach iteration       
+      Com::IterationRange<0, 1, 2>,          // Ranged iteration        
+      Com::Descriptor<0, 1, 2>               // Descriptor interface    
+   >;
+}

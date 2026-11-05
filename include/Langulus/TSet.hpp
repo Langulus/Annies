@@ -168,17 +168,4 @@ namespace Langulus::Annies
       using Com::IterationRange<>::rbegin;
       using Com::IterationRange<>::rend;
    };
-
-   template<CT::NotVoid T>
-   using TSetSorted = TSet<T, StateValue::Enabled>;
-
-   template<CT::NotVoid T>
-   using TSetUnsorted = TSet<T, StateValue::Disabled>;
-}
-
-namespace Langulus
-{
-   using Annies::TSet;
-   using Annies::TSetSorted;
-   using Annies::TSetUnsorted;
 }

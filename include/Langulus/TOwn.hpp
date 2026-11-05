@@ -102,12 +102,4 @@ namespace Langulus::Annies
          return this->GetStackInner();
       }
    };
-
-   template<CT::NotVoid T, class...TAGS>
-   using Own = TOwn<T, TAGS...>;
-}
-
-namespace Langulus
-{
-   using Annies::Own;
 }
