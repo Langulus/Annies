@@ -90,8 +90,8 @@ namespace Langulus::Annies::Component
       /// Get a direct access to the heap memory as a different type          
       ///   @attention using raw pointer while self.IsEmpty() may lead to     
       ///      undefined behavior                                             
-      template<class T, Cid SID = 0>
-      constexpr auto GetRawAs(this auto&& self) noexcept {
+      template<class T, Cid SID = 0, class SELF>
+      constexpr auto GetRawAs(this SELF&& self) noexcept -> LglsMutIf(SELF, T*) {
          using C = typename Subcomponents::template At<SID>;
          return self.C::template GetRawAs<T>();
       }

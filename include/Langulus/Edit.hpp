@@ -188,7 +188,8 @@ namespace Langulus::Annies
    ///   @return a reference to the editor for chaining                       
    template<CT::Contiguous T>
    auto Edit<T>::operator << (T const& other) -> Edit& {
-      mSource.InsertRangeAt(mEnd, other);
+      mSource.ConcatAt(mEnd, other);
+      //mSource.InsertRangeAt(mEnd, other);
       return *this;
    }
 

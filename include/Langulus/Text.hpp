@@ -700,29 +700,3 @@ LANGULUS_MORPHISM_CONCEPT(CT::Character, Annies::Text);
 );*/ //TODO nah, this is too aggressive - some types ignore sparness, while others don't
      //TODO also, shouldn't be that needed when we have the sparse fmt adapter now
      
-namespace Langulus::Annies::Component
-{
-   extern template struct Container<
-         Com::State::Disowned<>,          // Allows disownment          
-         Com::State::Compressed<>,        // Toggle compression         
-         Com::State::Encrypted<>,         // Toggle encryption          
-         Com::TypedStatic<DMeta, char>,   // Type-constrained           
-         Com::HeapMovable<0, 0, HeapEntry<0, char*>>,
-         Com::CountStack<>,               // Variable count             
-         Com::ReserveEmergent<>,          // Capacity derived from alloc
-         Com::IndexedLinear<>,            // Indexed directly           
-         Com::OwnershipStack<>,           // Allocation is referenced   
-         Com::HashStack<>,                // Variable hash (cached)     
-         Com::Insertion<true>,            // Serialize + insert         
-         Com::InsertionOperators<>,       // << and >> insertion        
-         Com::InsertionOperatorsConcat<>, // + and += concat            
-         Com::Merging<true>,              // Serialize + merge          
-         Com::MergingOperators<>,         // <<= and >>= merging        
-         Com::Removal<>,                  // Allows removal             
-         Com::Assignment<true>,           // Allows assignment          
-         Com::Comparison<true>,           // Allows for comparison      
-         Com::Conversion<>,               // Allows conversion          
-         Com::IterationForEach<>,         // ForEach iteration          
-         Com::IterationRange<>            // Range iteration            
-      >;
-}

@@ -31,7 +31,7 @@ namespace Langulus::Annies::Component
       C& operator << (this C& lhs, A&& rhs) {
          if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
          and           not Same<Deint<A>, TypeOf<C>>)
-            lhs.Insert(TypeOf<C> {LglsFwd(rhs)});
+            lhs.Insert(static_cast<TypeOf<C>>(LglsFwd(rhs)));
          else
             lhs.Insert(LglsFwd(rhs));
          return lhs;
@@ -42,7 +42,7 @@ namespace Langulus::Annies::Component
       C& operator >> (this C& lhs, A&& rhs) {
          if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
          and           not Same<Deint<A>, TypeOf<C>>)
-            lhs.InsertAt(Index::Front, TypeOf<C> {LglsFwd(rhs)});
+            lhs.InsertAt(Index::Front, static_cast<TypeOf<C>>(LglsFwd(rhs)));
          else
             lhs.InsertAt(Index::Front, LglsFwd(rhs));
          return lhs;

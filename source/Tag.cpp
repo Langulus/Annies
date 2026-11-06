@@ -10,6 +10,7 @@
 #include <Langulus/Annies/Functional/Compare.hpp>
 #include <Langulus/Annies/Functional/Remove.hpp>
 
+
 namespace Langulus::Annies
 {
    template struct LANGULUS_API(ANNIES) TTag<void>;

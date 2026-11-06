@@ -8,6 +8,7 @@
 #include <Langulus/Bytes.hpp>
 #include <Langulus/Annies/Functional/Compare.hpp>
 
+
 namespace Langulus::Annies
 {
    bool Bytes::operator == (Bytes const& other) const noexcept {

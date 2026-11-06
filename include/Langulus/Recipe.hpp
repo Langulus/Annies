@@ -30,14 +30,14 @@ namespace Langulus::Annies
    ///   Used to contain creation instructions for any type. It is just a     
    /// type-erased Many - a descriptor - with a charge and a type.            
    /// Optimized for detecting small differences in descriptions.             
-   /// These scripts mean the completely same thing:                          
-   /// 1) create*2(input(name("test")) output(Thing))                         
-   /// 2) create*2 Thing(name("test"))      // memoized as Recipe             
-   /// 3) create Thing*2(name("test"))      // memoized as Recipe             
-   /// 4) create Thing*2("test")            // memoized as Recipe             
-   /// 5) create Recipe*2(type(Thing), input(name("test")))                   
-   /// 6) create*2 Recipe(Thing, name("test"))                                
-   /// After execution all these are replaced by the two created Things       
+   /// For some context, these scripts mean the completely same thing:        
+   ///    1) create*2(input(name("test")) output(Thing))                      
+   ///    2) create*2 Thing(name("test"))      // memoized as Recipe          
+   ///    3) create Thing*2(name("test"))      // memoized as Recipe          
+   ///    4) create Thing*2("test")            // memoized as Recipe          
+   ///    5) create Recipe*2(type(Thing), input(name("test")))                
+   ///    6) create*2 Recipe(Thing, name("test"))                             
+   ///    After execution all these are replaced by the two created Things    
    struct Recipe : Inner::RecipeBase {
       using CTTI_ReflectAs = Recipe;
       using CTTI_Recipe    = Yup;
@@ -196,6 +196,13 @@ namespace Langulus::Annies
       }
 
       using Com::Comparison<>::operator <=>;
-      using Com::Comparison<>::operator ==;
+      //using Com::Comparison<>::operator ==;
+
+      bool operator == (Recipe const& other) const noexcept;
+
+      template<CT::Container C> requires (not Same<C, Recipe>)
+      constexpr bool operator == (C const& other) const noexcept {
+         return this->CompareEqual(other);
+      }
    };
 }

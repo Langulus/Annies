@@ -164,7 +164,7 @@ namespace Langulus::Annies::Component
             for (size_t i = 0; i < toscan; ++i) {
                //TODO can be optimized-out for POD
                try {
-                  value[progress] = group.template As<TypeOf<D>>(i);
+                  value[progress] = group.template AsAt<TypeOf<D>>(i);
                   ++progress;
                }
                catch (...) {}
