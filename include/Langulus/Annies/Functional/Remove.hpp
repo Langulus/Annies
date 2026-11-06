@@ -264,9 +264,9 @@ namespace Langulus::Annies::Component
          return;
 
       // If data doesn't need destructors just reduce count          
-      if constexpr (C::TypeErased) {
+      if constexpr (CT::TypeErased<C>) {
          if (not self.GetType().GetDestructor()) {
-            self.SetCount(desiredCount);
+            self.SetCountInner(desiredCount);
 
             if constexpr (CT::NullTerminated<C>) {
                if (desiredCount)
@@ -277,7 +277,7 @@ namespace Langulus::Annies::Component
       }
       else {
          if constexpr (not CT::Destroyable<TypeOf<C>>) {
-            self.SetCount(desiredCount);
+            self.SetCountInner(desiredCount);
 
             if constexpr (CT::NullTerminated<C>) {
                if (desiredCount)
@@ -293,8 +293,13 @@ namespace Langulus::Annies::Component
       LglsAssert(self.GetAllocation()->GetUses() != 1,
          "Can't trim container used elsewhere");
 
-      self.SelectInner(desiredCount, currentCount - desiredCount).FreeInner(); //TODO doesn't select disown? if so, will FreeInner work? if not, maybe we need HandleRange?
-      self.SetCount(desiredCount);
+      auto handle = self.GetHandle() + desiredCount;
+      const auto end = handle + (currentCount - desiredCount);
+      while (handle != end) {
+         handle.Free();
+         ++handle;
+      }
+      self.SetCountInner(desiredCount);
 
       if constexpr (CT::NullTerminated<C>) {
          if (desiredCount)
@@ -365,7 +370,7 @@ namespace Langulus::Annies::Component
       if_available(self.ResetState());
       if_available(self.ResetAllTypes());
    }
-   
+
    /// Erases an element at a specific index from a hash table             
    ///   @attention assumes that index points to a valid element           
    ///   @attention operates on all dimensions at once                     

@@ -206,3 +206,15 @@ namespace Langulus::Annies
       }
    };
 }
+
+namespace Langulus::Annies::Component
+{
+   extern template void  Inner::RecipeBase::ConstructDefault<Recipe>(this Recipe&& self) noexcept;
+   extern template void  Inner::RecipeBase::Absorb<Recipe, Recipe>(this Recipe& self, Recipe&& from);
+   extern template void  Inner::RecipeBase::Destroy<Recipe>(this Recipe& self);
+   extern template void  Inner::RecipeBase::Free<true, Recipe>(this Recipe& self);
+   extern template void  Inner::RecipeBase::Free<false, Recipe>(this Recipe& self);
+   extern template void  Inner::RecipeBase::Keep<Recipe>(this Recipe& self);
+   extern template Recipe& Inner::RecipeBase::AssignAbsorb<Recipe, Recipe>(this Recipe& self, Recipe&& rhs);
+   extern template bool  Inner::RecipeBase::IsMissingDeep<Recipe>(this Recipe const& self) noexcept;
+}

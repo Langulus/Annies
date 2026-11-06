@@ -19,6 +19,7 @@
 #include "Annies/Components/IndexedLinear.hpp"
 #include "Annies/Components/Insertion.hpp"
 #include "Annies/Components/InsertionOperators.hpp"
+#include "Annies/Components/InsertionOperatorsConcat.hpp"
 #include "Annies/Components/Merging.hpp"
 #include "Annies/Components/MergingOperators.hpp"
 #include "Annies/Components/Assignment.hpp"
@@ -58,6 +59,7 @@ namespace Langulus::Annies::Inner
       Com::Deepening<Many>,            // Makes container deep          
       Com::Insertion<>,                // Allows insertion              
       Com::InsertionOperators<>,       // << and >> insertion           
+      Com::InsertionOperatorsConcat<>,
       Com::Merging<>,                  // Allows merging                
       Com::MergingOperators<>,         // <<= and >>= merging           
       Com::Emplacement<>,              // Allows emplacement            
@@ -250,4 +252,31 @@ namespace Langulus::Annies
          return this->CompareEqual(other);
       }
    };
+}
+
+namespace Langulus::Annies::Component
+{
+   extern template void  Inner::ManyBase::ConstructDefault<Many>(this Many&& self) noexcept;
+   extern template void  Inner::ManyBase::Absorb<Many, Many>(this Many& self, Many&& from);
+   extern template void  Inner::ManyBase::Destroy<Many>(this Many& self);
+   extern template void  Inner::ManyBase::Free<true, Many>(this Many& self);
+   extern template void  Inner::ManyBase::Free<false, Many>(this Many& self);
+   extern template void  Inner::ManyBase::Keep<Many>(this Many& self);
+   extern template Many& Inner::ManyBase::AssignAbsorb<Many, Many>(this Many& self, Many&& rhs);
+   extern template bool  Inner::ManyBase::IsMissingDeep<Many>(this Many const& self) noexcept;
+
+   extern template void  Assignment<false, 0>::PrepareForReconstruction<Many>(this Many&);
+   extern template bool  Assignment<false, 0>::PrepareForReassignment<Many>(this Many&);
+
+   extern template bool   Comparison<false, true, 0>::CompareEqual<0, Many, Many>(this Many const&, Many const&);
+   extern template bool   Comparison<false, true, 0>::CompareHashes<Many, Many>(this Many const&, Many const&);
+   extern template size_t Comparison<false, true, 0>::Matches<Many, Many>(this Many const&, Many const&);
+
+   extern template size_t Deepening<Many>::GetCountDeep<Many>(this Many const&, size_t);
+   extern template size_t Deepening<Many>::GetReservedDeep<Many>(this Many const&, size_t);
+   extern template Many&  Deepening<Many>::Deepen<Many>(this Many&);
+
+   extern template void Removal<0>::Trim<Many>(this Many&, size_t) noexcept;
+   extern template void Removal<0>::Clear<Many>(this Many&);
+   extern template void Removal<0>::Reset<Many>(this Many&);
 }

@@ -30,6 +30,7 @@ namespace Langulus::Annies::Inner
       Com::Deepening<Many>,            // Makes container deep          
       Com::Insertion<>,                // Allows insertion              
       Com::InsertionOperators<>,       // << and >> insertion           
+      Com::InsertionOperatorsConcat<>,
       Com::Merging<>,                  // Allows merging                
       Com::MergingOperators<>,         // <<= and >>= merging           
       Com::Emplacement<>,              // Allows emplacement            

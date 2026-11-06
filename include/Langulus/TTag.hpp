@@ -156,6 +156,18 @@ namespace Langulus::Annies
    };
 }
 
+namespace Langulus::Annies::Component
+{
+   extern template void  Inner::TTagBase<void>::ConstructDefault<Tag>(this Tag&& self) noexcept;
+   extern template void  Inner::TTagBase<void>::Absorb<Tag, Tag>(this Tag& self, Tag&& from);
+   extern template void  Inner::TTagBase<void>::Destroy<Tag>(this Tag& self);
+   extern template void  Inner::TTagBase<void>::Free<true, Tag>(this Tag& self);
+   extern template void  Inner::TTagBase<void>::Free<false, Tag>(this Tag& self);
+   extern template void  Inner::TTagBase<void>::Keep<Tag>(this Tag& self);
+   extern template Tag&  Inner::TTagBase<void>::AssignAbsorb<Tag, Tag>(this Tag& self, Tag&& rhs);
+   extern template bool  Inner::TTagBase<void>::IsMissingDeep<Tag>(this Tag const& self) noexcept;
+}
+
 /// Define a tag                                                              
 ///   @param T the tag, as it appears in namespace Langulus::Tags             
 ///   @param INFOSTRING information about the tag's purpose                   

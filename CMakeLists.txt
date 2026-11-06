@@ -29,6 +29,7 @@ add_langulus_library(LangulusAnnies
             source/Many.cpp
             source/Tag.cpp
             source/Recipe.cpp
+            source/Neat.cpp
 )
 
 target_include_directories(LangulusAnnies

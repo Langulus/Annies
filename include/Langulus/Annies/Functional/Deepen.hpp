@@ -35,7 +35,7 @@ namespace Langulus::Annies::Component
             return self.GetCount();
 
          size_t const inner_depth = depth == size_t(-1) ? depth : depth - 1;
-         size_t const* const invoke_args[] {&inner_depth};
+         void const* const invoke_args[] {&inner_depth};
          auto method = type.GetMethod("GetCountDeep");
          LglsAssumeDev(method,
             "Deep container has no reflected GetCountDeep method");
@@ -79,7 +79,7 @@ namespace Langulus::Annies::Component
             return self.GetReserved();
 
          size_t const inner_depth = depth == size_t(-1) ? depth : depth - 1;
-         size_t const* const invoke_args[] {&inner_depth};
+         void const* const invoke_args[] {&inner_depth};
          auto method = type.GetMethod("GetReservedDeep");
          LglsAssumeDev(method,
             "Deep container has no reflected GetReservedDeep method");
@@ -105,7 +105,7 @@ namespace Langulus::Annies::Component
       #endif
       return accumulated_reserve;
    }
-   
+
    /// Get Nth element as a handle, or any desired wrapping type.          
    /// Conversion or copying may occur depending on type.                  
    ///   @attention will throw if incompatible type is provided            
@@ -141,7 +141,7 @@ namespace Langulus::Annies::Component
    /// Wrap all contained elements inside a sub-block                      
    ///   @return a reference to the newly created inner container          
    TEMPLATE template<class C> requires (CT::TypeErased<C> or CT::Deep<TypeOf<C>>)
-   auto LGLSCOM::Deepen(this C& self) -> C& {
+   auto LGLSCOM::Deepen(this C& self) -> DEEP_TYPE& {
       if constexpr (not CT::TypeErased<C>) {
          LglsAssert(not self.IsTypeConstrained() or self.IsDeep(),
             "Can't deepen with incompatible type");
@@ -150,9 +150,9 @@ namespace Langulus::Annies::Component
       // Allocate a new container and move this one inside of it     
       C temp {Piecewise, Abandon {self}};
       self.Swap(temp);
-      return *self.template Get<C>();
+      return *self.template Get<DEEP_TYPE>();
    }
-   
+
    /// Execute functions in each sub-block, inclusively.                   
    /// Each function has a distinct argument type, that is tested against  
    /// the contained type. If argument is compatible with the type, the    

@@ -155,8 +155,8 @@ namespace Langulus::Annies::Component
    TEMPLATE template<class D, class SELF>
    auto LGLSCOM::ExtractDataAs(this SELF const& self, D& value) -> size_t {
       size_t progress = 0;
-
-      self.ForEachDeep([&](typename SELF::DeepType const& group) {
+      using DeepType = typename SELF::DeepType;
+      self.ForEachDeep([&](DeepType const& group) {
          if constexpr (CT::Array<D>) {
             const auto count  = group.GetCount();
             const auto remain = ExtentOf<D> - progress;
@@ -174,7 +174,7 @@ namespace Langulus::Annies::Component
          }
          else {
             try {
-               value = group.template As<D>();
+               value = DecvqAllCast(group.template As<D>());
                ++progress;
                return Loop::Break;
             }

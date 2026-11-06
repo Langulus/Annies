@@ -203,6 +203,7 @@ namespace Langulus::Annies::Component
       self.PrepareForReconstruction(); //TODO temporary solution
       return false;
    }
+
    /*template<CT::HeapAllocated C> //TODO this is too complex to implement, because each dimension can be of different sparseness, so we have to assign to dimensions that are dense, but deep free dimensions that are sparse
    bool PrepareForReassignment(this C& self) {
       static_assert(CT::Contiguous<C>,

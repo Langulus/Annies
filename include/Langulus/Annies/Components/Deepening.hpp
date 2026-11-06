@@ -183,7 +183,7 @@ namespace Langulus::Annies::Component
       /// Wrap all contained elements inside a sub-block                      
       ///   @return a reference to the newly created inner container          
       template<class C> requires (CT::TypeErased<C> or CT::Deep<TypeOf<C>>)
-      auto Deepen(this C& self) -> C&; /*{
+      auto Deepen(this C& self) -> DEEP_TYPE&; /*{
          if constexpr (not CT::TypeErased<C>) {
             LglsAssert(not self.IsTypeConstrained() or self.IsDeep(),
                "Can't deepen with incompatible type");

@@ -239,7 +239,7 @@ namespace Langulus::Annies::Component
          #endif
       }
    }
-   
+
    /// MARK: CompareOneEqual                                               
    /// Equality-compare with the first contained element                   
    ///   @attention compares only the main dimension                       
@@ -331,7 +331,7 @@ namespace Langulus::Annies::Component
    requires (HASH and requires { lhs.GetHash(); rhs.GetHash(); }) {
       return lhs.GetHash() == rhs.GetHash();
    }
-   
+
    /// Count the number of matching elements at the front of two containers
    ///   @param other the container to compare against                     
    ///   @return the number of matching elements                           

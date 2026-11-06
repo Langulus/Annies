@@ -1025,13 +1025,8 @@ namespace Langulus::Annies::Component
 
             // Construct the first element                              
             using T = TypeOf<C, SID>;
-            if constexpr (sizeof...(A) == 1 and (Same<T, Deint<A>...> or CT::Handle<A...>)) {
-               if constexpr (CT::Copied<IntentOf(arguments)...>)
-                  ThisCom::template EmplaceWithIntent<SID>(Refer(LglsFwd(arguments))...);
-               else
-                  ThisCom::template EmplaceWithIntent<SID>(FWDIntent(arguments)...);
-            }
-            else {
+
+            if constexpr (sizeof...(A) != 1) {
                static_assert(CT::Dense<T>,
                   "Too many arguments for emplacing a sparse instance. "
                   "Use " + LastCppNameOf<C>() + "::New method instead of Emplace?"
@@ -1042,6 +1037,23 @@ namespace Langulus::Annies::Component
                   ThisCom::template EmplaceWithIntent<SID>(Abandon {Decvq<T> {LglsFwd(arguments)...}});
                else
                   ThisCom::template EmplaceWithIntent<SID>(Abandon {Decvq<T> {LglsFwd(arguments.what)...}});*/
+            }
+            else {
+               using A1 = Deint<decltype(arguments...[0])>;
+
+               if constexpr (Same<T, A1> or CT::Handle<A1>) {
+                  if constexpr (CT::Copied<IntentOf(arguments)...>)
+                     ThisCom::template EmplaceWithIntent<SID>(Refer(LglsFwd(arguments))...);
+                  else
+                     ThisCom::template EmplaceWithIntent<SID>(FWDIntent(arguments)...);
+               }
+               else if constexpr (CT::Sparse<A1, T> and CT::DerivedFrom<Deptr<A1>, Deptr<T>>) {
+                  if constexpr (CT::Copied<IntentOf(arguments)...>)
+                     ThisCom::template EmplaceWithIntent<SID>(Refer(static_cast<T>(arguments))...);
+                  else
+                     ThisCom::template EmplaceWithIntent<SID>(NestIntentOf(arguments, static_cast<T>(arguments))...);
+               }
+               else ThisCom::Instantiate<T>(LglsFwd(arguments)...);
             }
          }
          
