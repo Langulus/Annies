@@ -177,6 +177,8 @@ namespace Langulus::Annies::Component
    namespace Langulus::Tags { \
       struct T : Annies::TTag<T> { \
          using CTTI_Info = Yes<INFOSTRING>; \
+         using Annies::TTag<T>::TTag; \
+         using Annies::TTag<T>::operator =; \
          __VA_ARGS__; \
          template<class D> static T Typed(int states = 0) { \
             T result; \

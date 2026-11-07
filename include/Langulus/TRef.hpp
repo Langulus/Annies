@@ -261,4 +261,8 @@ namespace Langulus::Annies
          return rhs.IsEmpty();
       }*/
    };
+
+   /// MARK: CTAD                                                             
+   template<CT::Sparse T>
+   TRef(T&&) -> TRef<Decvq<Deref<Deint<T>>>>;
 }

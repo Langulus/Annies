@@ -40,7 +40,7 @@ namespace Langulus
       auto* operator -> () const noexcept { return &what; }
       explicit operator bool () const noexcept { return static_cast<bool>(what); }
 
-      template<CT::DefineTag>
+      /*template<CT::DefineTag>
       void Set(auto&&, bool force = false);
 
       template<CT::DefineTag...>
@@ -52,7 +52,7 @@ namespace Langulus
       auto FindType() const -> RTTI::DMeta;
 
       template<class TYPE>
-      auto FindType(RTTI::DMeta) const -> RTTI::DMeta;
+      auto FindType(RTTI::DMeta) const -> RTTI::DMeta;*/
 
    };
 }

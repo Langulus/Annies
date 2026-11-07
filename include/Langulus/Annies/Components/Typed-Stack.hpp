@@ -422,7 +422,9 @@ namespace Langulus::Annies::Component
       void SetType(this C& self) {
          static_assert(CT::NotSheddable<T>, "Strip all sheddables first");
          static_assert(CT::NotReference<T>, "Strip all references first");
-         static_assert(TypeErased or Exact<T, TYPE>, "Type mismatch");
+         // Notice that you can convert non-const to const, but not     
+         // vice versa.                                                 
+         static_assert(TypeErased or Exact<T, TYPE> or Exact<ConstAll<T>, TYPE>, "Type mismatch");
          if constexpr (TypeErased)
             ThisCom::SetType(MetaDataOf<T>());
       }
