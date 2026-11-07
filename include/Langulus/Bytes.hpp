@@ -289,9 +289,8 @@ namespace Langulus::Annies
       template<Cid> void GetResolved()         = delete("Nothing to resolve");
       template<Cid> void GetDense(size_t = -1) = delete("Nothing to dereference");
 
-      /*constexpr*/ bool operator == (Bytes const& other) const noexcept; /*{
-         return this->CompareEqual(other);
-      }*/
+      LANGULUS_API(ANNIES)
+      bool operator == (Bytes const& other) const noexcept;
 
       /// Allocate additional 'nbytes' and zero them                          
       void Null(size_t nbytes) {

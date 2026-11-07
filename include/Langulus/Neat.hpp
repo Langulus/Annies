@@ -741,9 +741,9 @@ namespace Langulus::Annies
                return loop == Loop::Continue;
             });
          }
-         else if constexpr (CT::DefineTag<A>) {
+         else if constexpr (CT::DefineTag<Decay<A>>) {
             // We are interested in specific tags                       
-            auto found = self.GetTagsInner().Find(MetaTagOf<A>());
+            auto found = self.GetTagsInner().Find(MetaTagOf<Decay<A>>());
             if (not found)
                return Loop::NextLoop;
 
@@ -946,6 +946,7 @@ namespace Langulus::Annies
 
 #include "Annies/Neat.inl"
 
+#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ANNIES)
 namespace Langulus::Annies::Component
 {
    extern template void  Inner::NeatBase::ConstructDefault<Neat>(this Neat&& self) noexcept;
@@ -1038,3 +1039,105 @@ namespace Langulus::Annies::Component
    extern template void Removal<0>::Clear<TMany<Many>>(this TMany<Many>&);
    extern template void Removal<0>::Reset<TMany<Many>>(this TMany<Many>&);
 }
+#else
+namespace Langulus::Annies::Component
+{
+   template LANGULUS_IMPORT() void  Inner::NeatBase::ConstructDefault<Neat>(this Neat&& self) noexcept;
+   //extern template void  Inner::NeatBase::Absorb<Many, Many>(this Many& self, Many&& from);
+   template LANGULUS_IMPORT() void  Inner::NeatBase::Destroy<Neat>(this Neat& self);
+   template LANGULUS_IMPORT() void  Inner::NeatBase::Free<true, Neat>(this Neat& self);
+   template LANGULUS_IMPORT() void  Inner::NeatBase::Free<false, Neat>(this Neat& self);
+   template LANGULUS_IMPORT() void  Inner::NeatBase::Keep<Neat>(this Neat& self);
+   //extern template Many& Inner::NeatBase::AssignAbsorb<Many, Many>(this Many& self, Many&& rhs);
+   template LANGULUS_IMPORT() bool  Inner::NeatBase::IsMissingDeep<Neat>(this Neat const& self) noexcept;
+}
+
+namespace Langulus::Annies::Component
+{
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Recipe>::ConstructDefault<TMany<Recipe>>(this TMany<Recipe>&& self) noexcept;
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Recipe>::Absorb<TMany<Recipe>, TMany<Recipe>>(this TMany<Recipe>& self, TMany<Recipe>&& from);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Recipe>::Destroy<TMany<Recipe>>(this TMany<Recipe>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Recipe>::Free<true, TMany<Recipe>>(this TMany<Recipe>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Recipe>::Free<false, TMany<Recipe>>(this TMany<Recipe>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Recipe>::Keep<TMany<Recipe>>(this TMany<Recipe>& self);
+   template LANGULUS_IMPORT() TMany<Recipe>& Inner::TManyBase<Recipe>::AssignAbsorb<TMany<Recipe>, TMany<Recipe>>(this TMany<Recipe>& self, TMany<Recipe>&& rhs);
+   template LANGULUS_IMPORT() bool  Inner::TManyBase<Recipe>::IsMissingDeep<TMany<Recipe>>(this TMany<Recipe> const& self) noexcept;
+ 
+   template LANGULUS_IMPORT() void  Assignment<false, 0>::PrepareForReconstruction<TMany<Recipe>>(this TMany<Recipe>&);
+   template LANGULUS_IMPORT() bool  Assignment<false, 0>::PrepareForReassignment<TMany<Recipe>>(this TMany<Recipe>&);
+ 
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareEqual<0, TMany<Recipe>, TMany<Recipe>>(this TMany<Recipe> const&, TMany<Recipe> const&);
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareHashes<TMany<Recipe>, TMany<Recipe>>(this TMany<Recipe> const&, TMany<Recipe> const&);
+   template LANGULUS_IMPORT() size_t Comparison<false, true, 0>::Matches<TMany<Recipe>, TMany<Recipe>>(this TMany<Recipe> const&, TMany<Recipe> const&);
+ 
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetCountDeep<TMany<Recipe>>(this TMany<Recipe> const&, size_t);
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetReservedDeep<TMany<Recipe>>(this TMany<Recipe> const&, size_t);
+   //extern template Many&  Deepening<Many>::Deepen<TMany<Recipe>>(this TMany<Recipe>&);
+
+   template LANGULUS_IMPORT() void Removal<0>::Trim<TMany<Recipe>>(this TMany<Recipe>&, size_t) noexcept;
+   template LANGULUS_IMPORT() void Removal<0>::Clear<TMany<Recipe>>(this TMany<Recipe>&);
+   template LANGULUS_IMPORT() void Removal<0>::Reset<TMany<Recipe>>(this TMany<Recipe>&);
+}
+
+namespace Langulus::Annies::Component
+{
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Tag>::ConstructDefault<TMany<Tag>>(this TMany<Tag>&& self) noexcept;
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Tag>::Absorb<TMany<Tag>, TMany<Tag>>(this TMany<Tag>& self, TMany<Tag>&& from);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Tag>::Destroy<TMany<Tag>>(this TMany<Tag>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Tag>::Free<true, TMany<Tag>>(this TMany<Tag>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Tag>::Free<false, TMany<Tag>>(this TMany<Tag>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Tag>::Keep<TMany<Tag>>(this TMany<Tag>& self);
+   template LANGULUS_IMPORT() TMany<Tag>& Inner::TManyBase<Tag>::AssignAbsorb<TMany<Tag>, TMany<Tag>>(this TMany<Tag>& self, TMany<Tag>&& rhs);
+   template LANGULUS_IMPORT() bool  Inner::TManyBase<Tag>::IsMissingDeep<TMany<Tag>>(this TMany<Tag> const& self) noexcept;
+ 
+   template LANGULUS_IMPORT() void  Assignment<false, 0>::PrepareForReconstruction<TMany<Tag>>(this TMany<Tag>&);
+   template LANGULUS_IMPORT() bool  Assignment<false, 0>::PrepareForReassignment<TMany<Tag>>(this TMany<Tag>&);
+ 
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareEqual<0, TMany<Tag>, TMany<Tag>>(this TMany<Tag> const&, TMany<Tag> const&);
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareHashes<TMany<Tag>, TMany<Tag>>(this TMany<Tag> const&, TMany<Tag> const&);
+   template LANGULUS_IMPORT() size_t Comparison<false, true, 0>::Matches<TMany<Tag>, TMany<Tag>>(this TMany<Tag> const&, TMany<Tag> const&);
+ 
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetCountDeep<TMany<Tag>>(this TMany<Tag> const&, size_t);
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetReservedDeep<TMany<Tag>>(this TMany<Tag> const&, size_t);
+   //extern template Many&  Deepening<Many>::Deepen<TMany<Recipe>>(this TMany<Recipe>&);
+
+   template LANGULUS_IMPORT() void Removal<0>::Trim<TMany<Tag>>(this TMany<Tag>&, size_t) noexcept;
+   template LANGULUS_IMPORT() void Removal<0>::Clear<TMany<Tag>>(this TMany<Tag>&);
+   template LANGULUS_IMPORT() void Removal<0>::Reset<TMany<Tag>>(this TMany<Tag>&);
+}
+
+namespace Langulus::Annies::Component
+{
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Many>::ConstructDefault<TMany<Many>>(this TMany<Many>&& self) noexcept;
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Many>::Absorb<TMany<Many>, TMany<Many>>(this TMany<Many>& self, TMany<Many>&& from);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Many>::Destroy<TMany<Many>>(this TMany<Many>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Many>::Free<true, TMany<Many>>(this TMany<Many>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Many>::Free<false, TMany<Many>>(this TMany<Many>& self);
+   template LANGULUS_IMPORT() void  Inner::TManyBase<Many>::Keep<TMany<Many>>(this TMany<Many>& self);
+   template LANGULUS_IMPORT() TMany<Many>& Inner::TManyBase<Many>::AssignAbsorb<TMany<Many>, TMany<Many>>(this TMany<Many>& self, TMany<Many>&& rhs);
+   template LANGULUS_IMPORT() bool  Inner::TManyBase<Many>::IsMissingDeep<TMany<Many>>(this TMany<Many> const& self) noexcept;
+
+   template LANGULUS_IMPORT() void  Assignment<false, 0>::PrepareForReconstruction<TMany<Many>>(this TMany<Many>&);
+   template LANGULUS_IMPORT() bool  Assignment<false, 0>::PrepareForReassignment<TMany<Many>>(this TMany<Many>&);
+
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareEqual<0, TMany<Many>, TMany<Many>>(this TMany<Many> const&, TMany<Many> const&);
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareHashes<TMany<Many>, TMany<Many>>(this TMany<Many> const&, TMany<Many> const&);
+   template LANGULUS_IMPORT() size_t Comparison<false, true, 0>::Matches<TMany<Many>, TMany<Many>>(this TMany<Many> const&, TMany<Many> const&);
+
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetCountDeep<TMany<Many>>(this TMany<Many> const&, size_t);
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetReservedDeep<TMany<Many>>(this TMany<Many> const&, size_t);
+   template LANGULUS_IMPORT() Many&  Deepening<Many>::Deepen<TMany<Many>>(this TMany<Many>&);
+
+   template LANGULUS_IMPORT() void Removal<0>::Trim<TMany<Many>>(this TMany<Many>&, size_t) noexcept;
+   template LANGULUS_IMPORT() void Removal<0>::Clear<TMany<Many>>(this TMany<Many>&);
+   template LANGULUS_IMPORT() void Removal<0>::Reset<TMany<Many>>(this TMany<Many>&);
+}
+#endif
+
+#include <Langulus/Annies/Functional/Assign.hpp>
+#include <Langulus/Annies/Functional/Deepen.hpp>
+#include <Langulus/Annies/Functional/ForEach.hpp>
+#include <Langulus/Annies/Functional/Compare.hpp>
+#include <Langulus/Annies/Functional/Merge.hpp>
+#include <Langulus/Annies/Functional/Insert.hpp>
+#include <Langulus/Annies/Functional/Remove.hpp>

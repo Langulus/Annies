@@ -198,6 +198,7 @@ namespace Langulus::Annies
       using Com::Comparison<>::operator <=>;
       //using Com::Comparison<>::operator ==;
 
+      LANGULUS_API(ANNIES)
       bool operator == (Recipe const& other) const noexcept;
 
       template<CT::Container C> requires (not Same<C, Recipe>)
@@ -207,6 +208,7 @@ namespace Langulus::Annies
    };
 }
 
+#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ANNIES)
 namespace Langulus::Annies::Component
 {
    extern template void  Inner::RecipeBase::ConstructDefault<Recipe>(this Recipe&& self) noexcept;
@@ -218,3 +220,16 @@ namespace Langulus::Annies::Component
    extern template Recipe& Inner::RecipeBase::AssignAbsorb<Recipe, Recipe>(this Recipe& self, Recipe&& rhs);
    extern template bool  Inner::RecipeBase::IsMissingDeep<Recipe>(this Recipe const& self) noexcept;
 }
+#else
+namespace Langulus::Annies::Component
+{
+   template LANGULUS_IMPORT() void  Inner::RecipeBase::ConstructDefault<Recipe>(this Recipe&& self) noexcept;
+   template LANGULUS_IMPORT() void  Inner::RecipeBase::Absorb<Recipe, Recipe>(this Recipe& self, Recipe&& from);
+   template LANGULUS_IMPORT() void  Inner::RecipeBase::Destroy<Recipe>(this Recipe& self);
+   template LANGULUS_IMPORT() void  Inner::RecipeBase::Free<true, Recipe>(this Recipe& self);
+   template LANGULUS_IMPORT() void  Inner::RecipeBase::Free<false, Recipe>(this Recipe& self);
+   template LANGULUS_IMPORT() void  Inner::RecipeBase::Keep<Recipe>(this Recipe& self);
+   template LANGULUS_IMPORT() Recipe& Inner::RecipeBase::AssignAbsorb<Recipe, Recipe>(this Recipe& self, Recipe&& rhs);
+   template LANGULUS_IMPORT() bool  Inner::RecipeBase::IsMissingDeep<Recipe>(this Recipe const& self) noexcept;
+}
+#endif

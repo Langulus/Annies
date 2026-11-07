@@ -245,6 +245,7 @@ namespace Langulus::Annies
       using Com::Comparison<>::operator <=>;
       //using Com::Comparison<>::operator ==;
 
+      LANGULUS_API(ANNIES)
       bool operator == (Many const& other) const noexcept;
 
       template<CT::Container C> requires (not Same<C, Many>)
@@ -254,6 +255,7 @@ namespace Langulus::Annies
    };
 }
 
+#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ANNIES)
 namespace Langulus::Annies::Component
 {
    extern template void  Inner::ManyBase::ConstructDefault<Many>(this Many&& self) noexcept;
@@ -280,3 +282,31 @@ namespace Langulus::Annies::Component
    extern template void Removal<0>::Clear<Many>(this Many&);
    extern template void Removal<0>::Reset<Many>(this Many&);
 }
+#else
+namespace Langulus::Annies::Component
+{
+   template LANGULUS_IMPORT() void  Inner::ManyBase::ConstructDefault<Many>(this Many&& self) noexcept;
+   template LANGULUS_IMPORT() void  Inner::ManyBase::Absorb<Many, Many>(this Many& self, Many&& from);
+   template LANGULUS_IMPORT() void  Inner::ManyBase::Destroy<Many>(this Many& self);
+   template LANGULUS_IMPORT() void  Inner::ManyBase::Free<true, Many>(this Many& self);
+   template LANGULUS_IMPORT() void  Inner::ManyBase::Free<false, Many>(this Many& self);
+   template LANGULUS_IMPORT() void  Inner::ManyBase::Keep<Many>(this Many& self);
+   template LANGULUS_IMPORT() Many& Inner::ManyBase::AssignAbsorb<Many, Many>(this Many& self, Many&& rhs);
+   template LANGULUS_IMPORT() bool  Inner::ManyBase::IsMissingDeep<Many>(this Many const& self) noexcept;
+
+   template LANGULUS_IMPORT() void  Assignment<false, 0>::PrepareForReconstruction<Many>(this Many&);
+   template LANGULUS_IMPORT() bool  Assignment<false, 0>::PrepareForReassignment<Many>(this Many&);
+
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareEqual<0, Many, Many>(this Many const&, Many const&);
+   template LANGULUS_IMPORT() bool   Comparison<false, true, 0>::CompareHashes<Many, Many>(this Many const&, Many const&);
+   template LANGULUS_IMPORT() size_t Comparison<false, true, 0>::Matches<Many, Many>(this Many const&, Many const&);
+
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetCountDeep<Many>(this Many const&, size_t);
+   template LANGULUS_IMPORT() size_t Deepening<Many>::GetReservedDeep<Many>(this Many const&, size_t);
+   template LANGULUS_IMPORT() Many&  Deepening<Many>::Deepen<Many>(this Many&);
+
+   template LANGULUS_IMPORT() void Removal<0>::Trim<Many>(this Many&, size_t) noexcept;
+   template LANGULUS_IMPORT() void Removal<0>::Clear<Many>(this Many&);
+   template LANGULUS_IMPORT() void Removal<0>::Reset<Many>(this Many&);
+}
+#endif

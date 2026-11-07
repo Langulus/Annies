@@ -39,21 +39,6 @@ namespace Langulus
       auto& operator *  () const noexcept { return  what; }
       auto* operator -> () const noexcept { return &what; }
       explicit operator bool () const noexcept { return static_cast<bool>(what); }
-
-      /*template<CT::DefineTag>
-      void Set(auto&&, bool force = false);
-
-      template<CT::DefineTag...>
-      bool ExtractTag(auto&...) const;
-      auto ExtractData(auto&) const -> size_t;
-      auto ExtractDataAs(auto&) const -> size_t;
-
-      template<CT::NotVoid>
-      auto FindType() const -> RTTI::DMeta;
-
-      template<class TYPE>
-      auto FindType(RTTI::DMeta) const -> RTTI::DMeta;*/
-
    };
 }
 
@@ -71,7 +56,7 @@ namespace Langulus::Annies::Component
    ///   @tparam TAG the tag to set                                        
    ///   @param value the value to assign                                  
    ///   @param force whether to set tag even if it already exists         
-   TEMPLATE template<CT::DefineTag TAG, class D> requires (not CT::DefineTag<D>)
+   TEMPLATE template<CT::DefineTag TAG, class D> requires (not CT::DefineTag<Decay<D>>)
    void LGLSCOM::Set(this auto& self, D&& value, bool force) {
       bool satisfied = false;
       self.ForEachDeep([&](TAG& tag) {

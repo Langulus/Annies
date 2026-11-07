@@ -43,6 +43,7 @@ namespace Langulus::Annies
    struct TVerb : Inner::TVerbBase<V> {
       using CTTI_ReflectAs  = Verb;
       using CTTI_Executable = Yup;
+      using CTTI_Deep       = No;
       using DeepType        = Many;
       
    private:

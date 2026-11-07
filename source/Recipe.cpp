@@ -11,14 +11,14 @@
 
 namespace Langulus::Annies::Component
 {
-   template void  Inner::RecipeBase::ConstructDefault<Recipe>(this Recipe&& self) noexcept;
-   template void  Inner::RecipeBase::Absorb<Recipe, Recipe>(this Recipe& self, Recipe&& from);
-   template void  Inner::RecipeBase::Destroy<Recipe>(this Recipe& self);
-   template void  Inner::RecipeBase::Free<true, Recipe>(this Recipe& self);
-   template void  Inner::RecipeBase::Free<false, Recipe>(this Recipe& self);
-   template void  Inner::RecipeBase::Keep<Recipe>(this Recipe& self);
-   template Recipe& Inner::RecipeBase::AssignAbsorb<Recipe, Recipe>(this Recipe& self, Recipe&& rhs);
-   template bool  Inner::RecipeBase::IsMissingDeep<Recipe>(this Recipe const& self) noexcept;
+   template LANGULUS_EXPORT() void  Inner::RecipeBase::ConstructDefault<Recipe>(this Recipe&& self) noexcept;
+   template LANGULUS_EXPORT() void  Inner::RecipeBase::Absorb<Recipe, Recipe>(this Recipe& self, Recipe&& from);
+   template LANGULUS_EXPORT() void  Inner::RecipeBase::Destroy<Recipe>(this Recipe& self);
+   template LANGULUS_EXPORT() void  Inner::RecipeBase::Free<true, Recipe>(this Recipe& self);
+   template LANGULUS_EXPORT() void  Inner::RecipeBase::Free<false, Recipe>(this Recipe& self);
+   template LANGULUS_EXPORT() void  Inner::RecipeBase::Keep<Recipe>(this Recipe& self);
+   template LANGULUS_EXPORT() Recipe& Inner::RecipeBase::AssignAbsorb<Recipe, Recipe>(this Recipe& self, Recipe&& rhs);
+   template LANGULUS_EXPORT() bool  Inner::RecipeBase::IsMissingDeep<Recipe>(this Recipe const& self) noexcept;
 }
 
 namespace Langulus::Annies
