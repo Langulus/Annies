@@ -67,7 +67,7 @@ namespace Langulus::Annies
       /// emplaces all A in the container                                     
       template<Disambiguate A1, class...AN>
       constexpr TTable(A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0) {
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             if constexpr (CT::Table<A1>) {
                LglsAssumeUser(CT::NotTable<T>,
                   "Ambiguous use of construction "

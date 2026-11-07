@@ -98,7 +98,7 @@ namespace Langulus::Annies::Inner
       /// emplaces all A in the container                                     
       template<class A1, class...AN>
       constexpr Map(A1&& a1, AN&&...an) {
-         if constexpr (CT::Map<A1> and sizeof...(AN) == 0) {
+         if constexpr (CT::Map<A1> and sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             /*LglsAssumeUser((Same<Deint<A1>, Map>),
                "Ambiguous use of construction "
                "- you should use tag-dispatch with first argument either Absorb "

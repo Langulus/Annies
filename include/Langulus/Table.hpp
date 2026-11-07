@@ -87,7 +87,7 @@ namespace Langulus::Annies
       /// emplaces all A in the container                                     
       template<Disambiguate A1, class...AN>
       constexpr Table(A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0 and CT::Table<A1>) {
+         if constexpr (sizeof...(AN) == 0 and CT::Table<A1> and not CT::BoundedArray<A1>) {
             LglsAssumeUser(Same<Deint<A1>, Table>,
                "Ambiguous use of construction "
                "- you should use tag-dispatch with first argument either Absorb "

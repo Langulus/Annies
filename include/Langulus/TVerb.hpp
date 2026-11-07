@@ -73,7 +73,7 @@ namespace Langulus::Annies
       /// emplaces all A in place of verb's argument                          
       template<Disambiguate A1, class...AN>
       constexpr TVerb(A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0) {
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             if constexpr (CT::DeepDense<Deint<A1>> and not CT::Executable<Deint<A1>>) {
                /*LglsAssumeUser(CT::Executable<Deint<A1>>,
                   "Ambiguous use of construction "
@@ -107,7 +107,7 @@ namespace Langulus::Annies
       /// Construction that emplaces all arguments inside the verb's argument 
       template<class A1, class...AN>
       constexpr TVerb(Inner::Piecewise, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0)
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>)
             this->EmplaceConstruct(LglsFwd(a1));
          else {
             this->ConstructDefault();

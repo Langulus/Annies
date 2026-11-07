@@ -170,7 +170,7 @@ namespace Langulus::Annies
       /// emplaces all A in the container                                     
       template<Disambiguate A1, class...AN>
       constexpr Many(A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0) {
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             if constexpr (CT::DeepDense<Deint<A1>>) {
                LglsAssumeUser(Same<Deint<A1>, Many>,
                   "Ambiguous use of construction "
@@ -207,7 +207,7 @@ namespace Langulus::Annies
       /// Construction that emplaces all arguments inside                     
       template<class A1, class...AN>
       constexpr Many(Inner::Piecewise, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0)
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>)
             this->EmplaceConstruct(LglsFwd(a1));
          else {
             this->ConstructDefault();

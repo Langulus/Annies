@@ -200,7 +200,7 @@ namespace Langulus::Annies
          }
          else {
             // Only interface data, reference if able to and if desired 
-            if constexpr (::std::is_bounded_array_v<T>)
+            if constexpr (CT::BoundedArray<T>)
                this->SetHeapInner(static_cast<const void*>( data));
             else
                this->SetHeapInner(static_cast<const void*>(&data));
@@ -264,7 +264,7 @@ namespace Langulus::Annies
       template<CT::NoIntent T> requires CT::POD<::std::remove_all_extents_t<T>>
       static Bytes FromPOD(T&& data) noexcept {
          Bytes result;
-         if constexpr (::std::is_bounded_array_v<T>)
+         if constexpr (CT::BoundedArray<T>)
             result.SetHeapInner(static_cast<const void*>( data));
          else
             result.SetHeapInner(static_cast<const void*>(&data));

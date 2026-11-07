@@ -119,7 +119,7 @@ namespace Langulus::Annies
       constexpr Neat(A1&& a1, AN&&...an) {
          this->ConstructDefault();
 
-         if constexpr (sizeof...(AN) == 0) {
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             if constexpr (Same<Deint<A1>, Neat>) {
                this->GetTagsInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetTagsInner()));
                this->GetRecsInner().Absorb(NestIntentOf(a1, DeintCast(a1).GetRecsInner()));

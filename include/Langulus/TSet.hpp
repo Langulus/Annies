@@ -81,7 +81,7 @@ namespace Langulus::Annies
       /// emplaces all A in the container                                     
       template<class A1, class...AN>
       constexpr TSet(A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0) {
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             if constexpr (CT::Set<A1>) {
                LglsAssumeUser(CT::NotSet<T>,
                   "Ambiguous use of construction "

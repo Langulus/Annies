@@ -89,7 +89,7 @@ namespace Langulus::Annies
       /// emplaces all A in the container                                     
       template<class A1, class...AN>
       constexpr TMap(A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0 and CT::Map<A1>)
+         if constexpr (sizeof...(AN) == 0 and CT::Map<A1> and not CT::BoundedArray<A1>)
             this->Absorb(LglsFwd(a1));
          else {
             static_assert(CT::Pair<A1, AN...>, "Arguments must be pairs");
