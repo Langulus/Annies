@@ -156,6 +156,7 @@ namespace Langulus::Annies
    };
 }
 
+#if defined(LANGULUS_EXPORT_ALL) or defined(LANGULUS_EXPORT_ANNIES)
 namespace Langulus::Annies::Component
 {
    extern template void  Inner::TTagBase<void>::ConstructDefault<Tag>(this Tag&& self) noexcept;
@@ -167,6 +168,19 @@ namespace Langulus::Annies::Component
    extern template Tag&  Inner::TTagBase<void>::AssignAbsorb<Tag, Tag>(this Tag& self, Tag&& rhs);
    extern template bool  Inner::TTagBase<void>::IsMissingDeep<Tag>(this Tag const& self) noexcept;
 }
+#else
+namespace Langulus::Annies::Component
+{
+   template LANGULUS_IMPORT() void  Inner::TTagBase<void>::ConstructDefault<Tag>(this Tag&& self) noexcept;
+   template LANGULUS_IMPORT() void  Inner::TTagBase<void>::Absorb<Tag, Tag>(this Tag& self, Tag&& from);
+   template LANGULUS_IMPORT() void  Inner::TTagBase<void>::Destroy<Tag>(this Tag& self);
+   template LANGULUS_IMPORT() void  Inner::TTagBase<void>::Free<true, Tag>(this Tag& self);
+   template LANGULUS_IMPORT() void  Inner::TTagBase<void>::Free<false, Tag>(this Tag& self);
+   template LANGULUS_IMPORT() void  Inner::TTagBase<void>::Keep<Tag>(this Tag& self);
+   template LANGULUS_IMPORT() Tag&  Inner::TTagBase<void>::AssignAbsorb<Tag, Tag>(this Tag& self, Tag&& rhs);
+   template LANGULUS_IMPORT() bool  Inner::TTagBase<void>::IsMissingDeep<Tag>(this Tag const& self) noexcept;
+}
+#endif
 
 /// Define a tag                                                              
 ///   @param T the tag, as it appears in namespace Langulus::Tags             
