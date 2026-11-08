@@ -9,7 +9,6 @@
 #include "../Container.hpp"
 #include <Langulus/Assume.hpp>
 #include <Langulus/Allocator.hpp>
-//#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Allocatable.hpp>
 #include <Langulus/CT/Referenced.hpp>
 #include <Langulus/CT/Index.hpp>
@@ -50,15 +49,12 @@ namespace Langulus::Annies::Component
       using Id = Values<ID, SHARED...>;
 
       static constexpr unsigned OwnedDeep = STYLE;
-      //static constexpr bool ReferenceElements = REF_INDIVIDUAL;
       static constexpr bool Shared = sizeof...(SHARED) > 0;
       static constexpr int  ComponentPrecedence = 2000;
-      //template<Cid SID>
-      //static constexpr bool Relevant = Id::template Contains<SID>;
 
       /// MARK: Public                                                        
       /// Emergent deep ownership can't provide an array of entries           
-      template<Cid SID = ID> //requires Relevant<SID>
+      template<Cid SID = ID>
       constexpr auto GetEntries() const noexcept -> AllocationPtr const* {
          return nullptr;
       }
@@ -89,10 +85,12 @@ namespace Langulus::Annies::Component
       using Count = typename Deref<C>::CountType;
 
    #if LANGULUS_FEATURE(MANAGED_MEMORY)
-      /// Find _and populate_ an indirection entry                            
-      template<bool CUSTOM_POINTERS, CT::Container C>
+      /// Find _and populate_ an indirection entry.                           
+      /// Note: finding the entry behind a function pointer is causa perduta. 
+      template<bool CUSTOM_POINTERS, CT::Container C, CT::Sparse PTR>
+      requires (not ::std::is_function_v<Deptr<PTR>>)
       static void FindEntry(
-         AllocationPtr const* entries, CT::Sparse auto ptr,
+         AllocationPtr const* entries, PTR ptr,
          [[maybe_unused]] DMeta const& T = {},
          [[maybe_unused]] DMeta const& nextT = {}
       ) assumptious {
@@ -311,6 +309,7 @@ namespace Langulus::Annies::Component
             auto T = self.template GetType<SID>();
             LglsAssumeDev(T.IsSparse(),
                "Don't call KeepElementDeepCustomPointers if container isn't sparse");
+            //TODO type-erased is_function_v check
 
             void* src = self.template GetRawVoid<SID>();
             while (src and T.IsSparse()) {
@@ -341,6 +340,9 @@ namespace Langulus::Annies::Component
             using T = TypeOf<C, SID>;
             static_assert(CT::Sparse<T>,
                "Don't call KeepElementDeepCustomPointers if container isn't sparse");
+            static_assert(not ::std::is_function_v<Deptr<T>>,
+               "Don't call KeepElementDeepCustomPointers for function pointers"
+               " - finding their entry is causa perduta");
 
             auto& ptr = *self.template Get<void, SID>();
             ForEachIndirection(ptr, [&](auto& i) {
@@ -969,7 +971,7 @@ namespace Langulus::Annies::Component
       ///   @param intent entries will be copied/sought if handle/sparse,     
       ///      unless I is disowned                                           
       template<Cid SID = ID, CT::Container C, CT::Intent I>
-      requires(/*Relevant<SID> and*/ (CT::TypeErased<C> or CT::Sparse<TypeOf<C, SID>>))
+      requires(/*Relevant<SID> and*/ (CT::TypeErased<C> or (CT::Sparse<TypeOf<C, SID>> and not ::std::is_function_v<Deptr<TypeOf<C, SID>>>)))
       void EmplaceEntries(this C& self, I&& intent) {
          if constexpr (CT::TypeErased<C>) {
             // If container is type-erased, we need to make a runtime   

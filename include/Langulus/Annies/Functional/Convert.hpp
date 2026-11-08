@@ -98,6 +98,7 @@ namespace Langulus::Annies::Component
          if (FROM.IsSame(TO))
             return out.Concat(self);
          
+         //TODO type-erased pointer arithmetic based conversion
          // Search for a reflected conversion routine                
          LglsAssert((bool) TO, "Can't convert to unknown type");
          const auto converter = FROM.GetMorphism(TO);
@@ -127,28 +128,36 @@ namespace Langulus::Annies::Component
          // to generate a well inlined routine for conversion        
          using TO   = TypeOf<OUT>;
          using FROM = TypeOf<C>;
-         static_assert(CT::Convertible<FROM, TO> /*CT::Inner::FindMorphism<FROM, TO>() >= 0*/, "Not convertible");
 
-         if constexpr (Same<FROM, TO>)
-            return out.Concat(self);
+         if constexpr (CT::Sparse<TO> or CT::Sparse<FROM>) {
+            // Pointer arithmetic is about to happen                 
+            TODO();
+         }
          else {
-            // Types are statically convertible                      
-            out.AllocateMore(out.GetCount() + self.GetCount());
+            // Both types are dense, and we need a morphism          
+            static_assert(CT::Convertible<FROM, TO>, "Not convertible");
 
-            auto from = self.GetRaw();
-            const auto fromEnd = from + self.GetCount();
-            auto to = out.GetRaw() + out.GetCount();
-            try {
-               while (from != fromEnd) {
-                  new (to) TO {Langulus::Convert<TO>(*from)};
-                  ++to; ++from;
+            if constexpr (Same<FROM, TO>)
+               return out.Concat(self);
+            else {
+               // Types are statically convertible                   
+               out.AllocateMore(out.GetCount() + self.GetCount());
+
+               auto from = self.GetRaw();
+               const auto fromEnd = from + self.GetCount();
+               auto to = out.GetRaw() + out.GetCount();
+               try {
+                  while (from != fromEnd) {
+                     new (to) TO {Langulus::Convert<TO>(*from)};
+                     ++to; ++from;
+                  }
                }
-            }
-            catch (...) {
-               // Partial success                                    
-               auto n = from - self.GetRaw();
-               out.PartialSuccess(out.GetCount() + n);
-               throw;
+               catch (...) {
+                  // Partial success                                 
+                  auto n = from - self.GetRaw();
+                  out.PartialSuccess(out.GetCount() + n);
+                  throw;
+               }
             }
          }
       }

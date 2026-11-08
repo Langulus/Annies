@@ -1141,3 +1141,5 @@ namespace Langulus::Annies::Component
 #include <Langulus/Annies/Functional/Merge.hpp>
 #include <Langulus/Annies/Functional/Insert.hpp>
 #include <Langulus/Annies/Functional/Remove.hpp>
+#include <Langulus/Annies/Functional/Describe.hpp>
+#include <Langulus/Annies/Functional/Convert.hpp>

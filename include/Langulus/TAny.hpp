@@ -21,7 +21,7 @@ namespace Langulus::Annies::Inner
       Com::CountStatic<1u>,            // Statically sized to 1         
       Com::ReserveEmergent<>,          // Reserve derived from alloc    
       Com::OwnershipStack<>,           // Allocation is referenced      
-      EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
+      EnableComponentIf<CT::Sparse<T> and not ::std::is_function_v<Deptr<T>>, Com::OwnershipDeepHeap<>>,
       Com::HashEmergent<>,             // Hash is retrieved from item   
       Com::Deepening<Many>,            // Makes container deep          
       Com::Emplacement<>,              // Allows emplacement            

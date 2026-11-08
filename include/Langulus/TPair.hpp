@@ -67,8 +67,8 @@ namespace Langulus::Annies::Inner
       Com::CountStatic<1u>,               // Statically sized to 1      
       Com::ReserveStatic<1u>,             // Statically reserved to 1   
       Com::OwnershipStack<Com::StrongOwnership, 0, 1>,
-      Com::MultiownDeep<EnableComponentIf<CT::Sparse<K>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,
-                        EnableComponentIf<CT::Sparse<V>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 1>>>,
+      Com::MultiownDeep<EnableComponentIf<CT::Sparse<K> and not ::std::is_function_v<Deptr<K>>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 0>>,
+                        EnableComponentIf<CT::Sparse<V> and not ::std::is_function_v<Deptr<V>>, Com::OwnershipDeepHeap<Com::StrongOwnership, true, 1>>>,
       Com::HashEmergent<Hash, 0, 1>,      // Hash retrieved from items  
       Com::Deepening<Many>,               // Makes container deep       
       Com::Emplacement<0, 1>,             // Allows emplacement         

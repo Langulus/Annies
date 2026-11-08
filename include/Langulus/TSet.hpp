@@ -25,7 +25,7 @@ namespace Langulus::Annies::Inner
       Com::ReserveStack<>,             // Reserve kept as member        
       Com::IndexedHashHeap<>,          // Indexed by hash table         
       Com::OwnershipStack<>,           // Allocation is referenced      
-      EnableComponentIf<CT::Sparse<T>, Com::OwnershipDeepHeap<>>,
+      EnableComponentIf<CT::Sparse<T> and not ::std::is_function_v<Deptr<T>>, Com::OwnershipDeepHeap<>>,
       Com::HashHeap<>,                 // Hash can be cached            
       Com::Deepening<Many>,            // Makes container deep          
       Com::Merging<>,                  // Allows merging                

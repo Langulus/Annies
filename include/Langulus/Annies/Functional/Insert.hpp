@@ -99,7 +99,7 @@ namespace Langulus::Annies::Component
          // ConvertInsertInner uses ConcatAt, so any exceptions will 
          // be handled there                                         
          ThisCom::ConvertInsertInner(offset, LglsFwd(a1));
-         (ThisCom::ConvertInsertInner(offset, LglsFwd(an)), ...);
+        (ThisCom::ConvertInsertInner(offset, LglsFwd(an)), ...);
          return self.GetCountInner() - initial_count;
       }
       else {
@@ -108,7 +108,7 @@ namespace Langulus::Annies::Component
          bool deepened = false;
          size_t rhs_count = 0;
          ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
-         (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
+        (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          if (not rhs_count)
             return 0;
          
@@ -128,7 +128,7 @@ namespace Langulus::Annies::Component
             auto to = self.GetHandle();
             try {
                InsertInner(to, LglsFwd(a1));
-               (InsertInner(to, LglsFwd(an)), ...);
+              (InsertInner(to, LglsFwd(an)), ...);
             }
             catch (...) {
                // Account for throws inside constructors             
@@ -186,7 +186,7 @@ namespace Langulus::Annies::Component
             // Copy new elements in the gap                          
             try {
                InsertInner(dst, LglsFwd(a1));
-               (InsertInner(dst, LglsFwd(an)), ...);
+              (InsertInner(dst, LglsFwd(an)), ...);
             }
             catch (...) {
                // Account for throws inside constructors             
@@ -286,7 +286,7 @@ namespace Langulus::Annies::Component
          // ConvertInsertInner uses ConcatAt, so any exceptions will 
          // be handled there                                         
          ThisCom::ConvertInsertInner(offset, LglsFwd(a1));
-         (ThisCom::ConvertInsertInner(offset, LglsFwd(an)), ...);
+        (ThisCom::ConvertInsertInner(offset, LglsFwd(an)), ...);
          return offset - initial_count;
       }
       else {
@@ -297,7 +297,7 @@ namespace Langulus::Annies::Component
          bool deepened = false;
          size_t rhs_count = 0;
          ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
-         (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
+        (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          if (not rhs_count)
             return 0;
          
@@ -310,7 +310,7 @@ namespace Langulus::Annies::Component
          auto to = self.GetHandle() + lhs_count;
          try {
             InsertInner(to, LglsFwd(a1));
-            (InsertInner(to, LglsFwd(an)), ...);
+           (InsertInner(to, LglsFwd(an)), ...);
          }
          catch (...) {
             // Account for throws inside constructors                
@@ -582,8 +582,8 @@ namespace Langulus::Annies::Component
       // Empty containers can't change type. If one of the type      
       // changes raises a conflict, this function will throw.        
       size_t rhs_count = 0;
-         ThisCom::PrepareForAbsorption(LglsFwd(a1_intent), rhs_count);
-      (ThisCom::PrepareForAbsorption(LglsFwd(an_intent), rhs_count), ...);
+      ThisCom::PrepareForAbsorption(LglsFwd(a1_intent), rhs_count);
+     (ThisCom::PrepareForAbsorption(LglsFwd(an_intent), rhs_count), ...);
       if (not rhs_count)
          return 0;
       
@@ -596,7 +596,7 @@ namespace Langulus::Annies::Component
       auto to = self.GetHandle() + lhs_count;
       try {
          CopyContainer(LglsFwd(a1_intent), to);
-         (CopyContainer(LglsFwd(an_intent), to), ...);
+        (CopyContainer(LglsFwd(an_intent), to), ...);
       }
       catch (...) {
          // Account for throws inside constructors                   
@@ -892,7 +892,7 @@ namespace Langulus::Annies::Component
    /// 5. Containers of different or-ness are only compatible if one of    
    ///    the containers has count <= 1. That's the one case when or-ness  
    ///    does not matter at all.                                          
-   ///   @param other - the block to check                                 
+   ///   @param other the block to check                                   
    ///   @return true if state is compatible                               
    TEMPLATE
    constexpr bool LGLSCOM::CheckState(this auto const& self, CT::Container auto const& other) noexcept {
@@ -949,7 +949,7 @@ namespace Langulus::Annies::Component
    }
 
    /// Inner composition function                                          
-   ///   @tparam FORCE - insert even if types mismatch, by making this     
+   ///   @tparam FORCE insert even if types mismatch, by making this       
    ///      container deeper.                                              
    ///   @param stateCompliant whether states are compatible               
    ///   @param index the place to insert at                               

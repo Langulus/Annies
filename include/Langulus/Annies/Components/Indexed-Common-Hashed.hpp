@@ -735,13 +735,25 @@ namespace Langulus::Annies::Component
       ///   @return a reference to the value                                  
       template<CT::Multidimensional C, CT::NoIntent K> requires (not CT::TypeErased<C>)
       auto& operator[] (this C& self, K const& key) assumptious {
-         auto found = self.TableSearch(key);
-         if (found)
-            return *found.GetValHandle();
+         if constexpr (not Same<K, TypeOf<C>>) {
+            const auto key_converted = static_cast<TypeOf<C>>(key);
+            auto found = self.TableSearch(key_converted);
+            if (found)
+               return *found.GetValHandle();
 
-         // Add the key                                                 
-         found = self.Merge(key);
-         return *found.GetValHandle();
+            // Add the key                                              
+            found = self.Merge(key_converted);
+            return *found.GetValHandle();
+         }
+         else {
+            auto found = self.TableSearch(key);
+            if (found)
+               return *found.GetValHandle();
+
+            // Add the key                                              
+            found = self.Merge(key);
+            return *found.GetValHandle();
+         }
       }
    };
 
