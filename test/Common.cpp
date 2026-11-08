@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,7 +7,5 @@
 ///                                                                           
 #include <Langulus/MetaOf.hpp>
 #include "Common.hpp"
-
-LANGULUS_RTTI_BOUNDARY(RTTI::MainBoundary)
 
 TMany<Many> BANK {};

@@ -12,7 +12,6 @@
 #include "Recipe.hpp"
 #include "TTag.hpp"
 #include "Annies/Components/IndexedComposite.hpp"
-//#include <Langulus/IntentOf.hpp>
 
 
 namespace Langulus::Annies::Inner
@@ -182,40 +181,6 @@ namespace Langulus::Annies
          return *this;
       }
 
-      //using Com::Comparison<false, true, 0, 1, 2>::operator <=>;
-      //using Com::Comparison<false, true, 0, 1, 2>::operator ==;
-
-      /*Neat& operator = (Neat const&) = default;
-      Neat& operator = (Neat&&) noexcept = default;
-
-      /// Assign via intent                                                   
-      template<template<class> class I> requires CT::Intent<I<Neat>>
-      Neat& operator = (I<Neat>&& other) {
-         mTags         = I {other->mTags};
-         mRecipes      = I {other->mRecipes};
-         mAnythingElse = I {other->mAnythingElse};
-         mHash         = other->mHash;
-
-         if constexpr (I<Neat>::ResetsOnMove())
-            other->mHash = {};
-         return *this;
-      }
-
-      ///                                                                     
-      /// MARK:Comparison                                                     
-      /// Compare neat container                                              
-      ///   @param rhs the container to compare with                          
-      ///   @return true if descriptors match                                 
-      bool operator == (Neat const& rhs) const {
-         if (GetHash() != rhs.GetHash())
-            return false;
-
-         return mTags == rhs.mTags
-            and mRecipes == rhs.mRecipes
-            and mAnythingElse == rhs.mAnythingElse;
-      }*/
-
-   public:
       /// Clear the container without deallocating                            
       void Clear() {
          GetTagsInner().Clear();
@@ -229,22 +194,6 @@ namespace Langulus::Annies
          GetRecsInner().Reset();
          GetMessInner().Reset();
       }
-
-      ///                                                                     
-      /// MARK: Encapsulation                                                 
-      /// Get the hash of a neat container (and cache it)                     
-      ///   @attention missing scopes never participate in hashing/comparison 
-      ///   @return the hash                                                  
-      /*Hash GetHash() const {
-         if (mHash)
-            return mHash;
-
-         if (IsEmpty())
-            mHash = 1;
-         else
-            mHash = HashOf(mTags, mRecipes, mAnythingElse);//TODO we can just push/pop xor these, as order doesn't matter here
-         return mHash;
-      }*/
 
       /// Get list of tags corresponding to a statically specified tag        
       ///   @tparam T tag definition to search for                            
@@ -313,91 +262,8 @@ namespace Langulus::Annies
          return nullptr;
       }
 
-      /// Find data in recipe targets or tail, that casts to T                
-      ///   @tparam T type requirement                                        
-      ///   @return the first type that matches                               
-      /*template<CT::NotVoid T>
-      auto FindType() const -> DMeta {
-         return FindType(MetaDataOf<T>());
-      }
-
-      auto FindType(DMeta type) const -> DMeta {
-         DMeta primitive;
-         bool  ambiguous = false;
-         ForEachRecipe([&](Recipe const& c) noexcept {
-            if (not c.GetTarget().CastsTo(type))
-               return;
-
-            if (not primitive)
-               primitive = c.GetTarget();
-            else
-               ambiguous = true;
-         });
-         ForEachTail([&](Many const& c) noexcept {
-            if (not c.CastsTo(type))
-               return;
-
-            if (not primitive)
-               primitive = c.GetType();
-            else
-               ambiguous = true;
-         });
-
-         LglsAssumeDevWarn(not ambiguous,
-            "Multiple primitives defined in a single Neat on FindData - "
-            "all except the first `", primitive, "` will be ignored"
-         );
-         return primitive;
-      }*/
-
-      /// Set a default tag, if such wasn't already set                       
-      //TODO isn't this like simply merge?? also make merge test only by tag id when merging tags!
-      ///   @tparam T tag to set                                              
-      ///   @param value the value to assign to the tag                       
-      /*template<CT::DefineTag T>
-      void SetDefaultTag (CT::NotVoid auto&& data) {
-         auto found = GetTags<T>();
-         if (found and *found)
-            return;
-
-         AddTag(T {LglsFwd(data)});
-      }
-
-      /// Extract tags from the descriptor, write their values to outputs     
-      ///   @tparam T... tag(s) we're searching for                           
-      ///   @param values [out] where to save the value(s), if found          
-      ///   @return true if any output changed                                
-      template<CT::DefineTag...T>
-      bool ExtractTags(CT::NotVoid auto&...outputs) const {
-         return (ExtractTagInner<T>(outputs...) or ...);
-      }
-
-      auto ExtractData   (CT::NotVoid auto&) const -> size_t;
-      auto ExtractDataAs (CT::NotVoid auto&) const -> size_t;*/
-
-   protected:
-      /*template<CT::DefineTag>
-      bool ExtractTagInner(CT::NotVoid auto&...) const;
-      template<size_t...IDX>
-      bool ExtractTagInner(TagList const&, ExpandedSequence<IDX...>, CT::NotVoid auto&...) const;
-      template<size_t>
-      bool ExtractTagInnerInner(TagList const&, CT::NotVoid auto&) const;*/
-
-   public:
       ///                                                                     
-      ///   Iteration                                                         
-      /*size_t ForEach      (this auto&&, auto&&...);
-      size_t ForEachTag   (this auto&&, auto&&);
-      size_t ForEachDeep  (this auto&&, auto&&...);
-      size_t ForEachRecipe(this auto&&, auto&&);
-      size_t ForEachTail  (this auto&&, auto&&);
-
-   protected:
-      size_t ForEachInner (this auto&&, auto&&);*/
-
-   public:
-      ///                                                                     
-      ///   Insertion                                                         
+      /// MARK: Insertion                                                     
       auto Insert(auto&&, auto&&...) -> size_t;
 
       /// Merge another Neat into this one                                    
@@ -414,11 +280,6 @@ namespace Langulus::Annies
          GetRecsInner().MergeRange(rhs.GetRecsInner(), conflict_resolver);
          GetMessInner().MergeRange(rhs.GetMessInner(), conflict_resolver);
       }
-
-      //Neat& SetTag(CT::DefineTag auto&&, size_t = 0);
-
-      //Neat& operator <<  (auto&&);
-      //Neat& operator <<= (auto&&);
 
    protected:
       auto UnfoldInsert (auto&&) -> size_t;
@@ -545,6 +406,7 @@ namespace Langulus::Annies
       LglsComDeepening(friend);
       LglsComDescriptor(friend);
 
+      ///                                                                     
       /// MARK: ForEach                                                       
       template<class C, class F, CT::Handle H>
       LoopControl InvokeF(this C&& self, F&& f, H&& handle) noexcept_if(f) {

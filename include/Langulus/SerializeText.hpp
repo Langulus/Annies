@@ -350,7 +350,7 @@ namespace Langulus::CTTI
 }
 
 /// Map all arrays as convertible to text                                     
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Array, {
+/*LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Array, {
       if constexpr (CT::Character<Deext<T>>)
          return {from};
       else {
@@ -361,7 +361,7 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Array, {
       }
    },
    Annies::Text
-);
+);*/
 
 /// Converting to text relies on the serializer                               
 LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Tag, {
