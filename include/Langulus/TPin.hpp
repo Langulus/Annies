@@ -6,14 +6,16 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include "Annies/Container.hpp"
+#include "TOwn.hpp"
+#include "TRef.hpp"
+/*#include "Annies/Container.hpp"
 #include "Annies/Components/Typed-Static.hpp"
 #include "Annies/Components/Stack.hpp"
 #include "Annies/Components/Count-Static.hpp"
 #include "Annies/Components/Deepening.hpp"
 #include "Annies/Components/Emplacement.hpp"
 #include "Annies/Components/Assignment.hpp"
-#include "Annies/Components/Comparison.hpp"
+#include "Annies/Components/Comparison.hpp"*/
 #include "Annies/States/Pinned.hpp"
 #include <Langulus/CT/Pinnable.hpp>
 
@@ -21,6 +23,50 @@
 namespace Langulus::Annies::Inner
 {
    template<CT::NotVoid T>
+   using TPinBase = Tif<CT::Dense<T>, TOwn<T>, TRef<T>>;
+
+   /*//WORKAROUND
+   template<CT::NotVoid T> requires CT::NotReference<T>
+   using TOwnPinnedBase = Com::Container<
+      Com::State::Pinned<>,               // Added pin state            
+      Com::TypedStatic<DMeta, T>,         // Statically typed           
+      Com::Stack<T>,                      // Element on the stack       
+      Com::CountStatic<1u>,               // Statically sized           
+      Com::Deepening<Many>,               // Makes container deep       
+      Com::Emplacement<>,                 // Can be emplaced            
+      Com::Assignment<>,                  // Can be reassigned          
+      Com::Comparison<>                   // Can be compared            
+   >;
+
+   //WORKAROUND
+   template<class T> requires (not ::std::is_reference_v<T>)
+   using TRefPinnedBase = Com::Container<
+      Com::State::Pinned<>,               // Added pin state            
+      Com::TypedStatic<DMeta, T>,         // Statically typed           
+      Com::Stack<T>,
+      Com::CountStatic<1u>,               // Statically sized           
+      Com::ReserveEmergent<>,             // Reserve derived from alloc 
+      //Com::OwnershipStack<>,              // Allocation is referenced   
+      //Com::OwnershipDeepHeap<>,           // Individual references      //TODO what if we initialize heap using some arbitrary pointer and there is no entry data beside it?? OwnershipDeepStack instead? with a static array?
+      Com::OwnershipDeepEmergent<>,       // Individual references      //TODO temporary
+      Com::Deepening<Many>,               // Makes container deep       
+      Com::Emplacement<>,                 // Can be emplaced            
+      Com::Assignment<>,                  // Can be reassigned          
+      Com::Comparison<false, false>,      // Can be compared            
+      Com::Removal<>                      // Can be cleared/reset       
+   >;
+
+   //WORKAROUND
+   template<CT::NotVoid T>
+   using TPinBase = Tif<CT::Dense<T>, TOwnPinnedBase<T>, TRefPinnedBase<T>>;*/
+
+   /*template<CT::NotVoid T>
+   using TPinBase = Tif<CT::Dense<T>,
+      typename TOwnBase<T>::template Include<Com::State::Pinned<>>,
+      typename TRefBase<T>::template Include<Com::State::Pinned<>>
+   >;*///TODO this is excellent solution but adding states is currently ignored cuz Include doesn't discard the Com::StateStack<>
+
+   /*template<CT::NotVoid T>//TODO old thing - delete it eventually
    using TPinBase = Com::Container<
       Com::State::Pinned<>,               // Allows pinning             
       Com::TypedStatic<DMeta, T>,         // Statically typed           
@@ -30,7 +76,7 @@ namespace Langulus::Annies::Inner
       Com::Emplacement<>,                 // Can be emplaced            
       Com::Assignment<>,                  // Can be reassigned          
       Com::Comparison<>                   // Can be compared            
-   >;
+   >;*/
 }
 
 namespace Langulus::Annies
@@ -45,12 +91,39 @@ namespace Langulus::Annies
    template<CT::NotVoid T, class...TAGS>
    struct TPin : Inner::TPinBase<T> {
       using CTTI_ReflectAs = TPin;
-      using CTTI_POD       = Maybe<CT::POD<T>>;
+      using CTTI_POD       = Maybe<CT::POD<T> and CT::Dense<T>>;
       using CTTI_Tagged    = Types<TAGS...>;
       using CTTI_Pinnable  = Yup;
       using Base           = Inner::TPinBase<T>;
 
-      constexpr  TPin() noexcept {
+   private:
+      bool pinned = false;
+
+   public:
+      constexpr bool IsPinned() const noexcept { return pinned; }
+
+      TPin& Pin() noexcept {
+         pinned = true;
+         return *this;
+      }
+
+      TPin& Unpin() noexcept {
+         pinned = false;
+         return *this;
+      }
+
+      using Inner::TPinBase<T>::TPinBase;
+      using Inner::TPinBase<T>::operator ==;
+      using Inner::TPinBase<T>::operator <=>;
+
+      constexpr TPin& operator = (auto&& other) {
+         if (pinned)
+            return *this;
+         Inner::TPinBase<T>::operator = (LglsFwd(other));
+         return *this;
+      }
+
+      /*constexpr  TPin() noexcept {
          this->ConstructDefault();
       }
 
@@ -116,10 +189,10 @@ namespace Langulus::Annies
             return this->AssignAbsorb(LglsFwd(argument));
          }
          else return this->Assign(LglsFwd(argument));
-      }
+      }*/
 
       /// Three-way comparison                                                
-      constexpr auto operator <=> (const TPin& rhs) const noexcept {
+      /*constexpr auto operator <=> (const TPin& rhs) const noexcept {
          return Base::GetStackInner() <=> rhs.GetStackInner();
       }
 
@@ -158,6 +231,6 @@ namespace Langulus::Annies
       constexpr decltype(auto) New(auto&&...args)
       requires requires { Base::GetStackInner().New(LglsFwd(args)...); } {
          return Base::GetStackInner().New(LglsFwd(args)...);
-      }
+      }*/
    };
 }

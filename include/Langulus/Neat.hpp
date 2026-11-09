@@ -11,6 +11,7 @@
 #include "TMap.hpp"
 #include "Recipe.hpp"
 #include "TTag.hpp"
+#include "TTable.hpp"
 #include "Annies/Components/IndexedComposite.hpp"
 
 
@@ -195,6 +196,125 @@ namespace Langulus::Annies
          GetMessInner().Reset();
       }
 
+      /// If deep, counts number of categories. If not deep, returns the      
+      /// cumulative size of the category                                     
+      size_t GetCount() const noexcept {
+         size_t cat_count = GetCategoryCount();
+         if (cat_count != 1)
+            return cat_count;
+            
+         size_t cumulative_size = 0;
+         if (not GetTagsInner().IsEmpty()) {
+            for (auto& tag_list : InValuesOf(GetTagsInner()))
+               cumulative_size += tag_list.GetCount();
+            return cumulative_size;
+         }
+         
+         if (not GetRecsInner().IsEmpty()) {
+            for (auto& rec_list : InValuesOf(GetRecsInner()))
+               cumulative_size += rec_list.GetCount();
+            return cumulative_size;
+         }
+      
+         return GetMessInner().begin()->GetVal().GetCount();
+      }
+
+      /// How many buckets are populated?                                     
+      size_t GetCategoryCount() const noexcept {
+         size_t cross_category_size = 0;
+         if (not GetTagsInner().IsEmpty())
+            ++cross_category_size;
+         if (not GetRecsInner().IsEmpty())
+            ++cross_category_size;
+
+         cross_category_size += GetMessInner().GetCount();
+         return cross_category_size;
+      }
+
+      ///                                                                     
+      /// MARK: Capsulation                                                   
+      /// By default, a Neat is an AND container spread into buckets. It can  
+      /// be OR, if there's exactly one kind of bucket, and it is OR.         
+      bool IsOr() const noexcept {
+         if (GetCategoryCount() != 1)
+            return false;
+
+         if (not GetTagsInner().IsEmpty())
+            return GetTagsInner().begin()->GetVal().IsOr();
+         else if (not GetRecsInner().IsEmpty())
+            return GetRecsInner().begin()->GetVal().IsOr();
+         return GetMessInner().begin()->GetVal().IsOr();
+      }
+
+      /// By default, a Neat is flat if containing one type of elements,      
+      /// unless that one type is deep. If Neat contains different kinds of   
+      /// elements, then it can be considered deep.                           
+      bool IsDeep() const noexcept {
+         if (GetCategoryCount() == 1 and not GetMessInner().IsEmpty())
+            return GetMessInner().begin()->GetKey().IsDeep();
+         return true;
+      }
+
+      /// If Neat contains exactly one kind of data, you can test its type.   
+      /// If Neat contains more than one kind of data, it is only Many.       
+      template<class T>
+      bool Is() const noexcept {
+         if (GetCategoryCount() != 1)
+            return Akin<T, Many>;
+
+         const auto meta = MetaDataOf<T>();
+         if (not GetTagsInner().IsEmpty())
+            return MetaDataOf<Tag>().Is(meta);
+         if (not GetRecsInner().IsEmpty())
+            return MetaDataOf<Recipe>().Is(meta);
+            
+         return GetMessInner().begin()->GetKey().Is(meta);
+      }
+
+      template<class T>
+      bool IsSame() const noexcept {
+         if (GetCategoryCount() != 1)
+            return Same<T, Many>;
+
+         const auto meta = MetaDataOf<T>();
+         if (not GetTagsInner().IsEmpty())
+            return MetaDataOf<Tag>().IsSame(meta);
+         if (not GetRecsInner().IsEmpty())
+            return MetaDataOf<Recipe>().IsSame(meta);
+            
+         return GetMessInner().begin()->GetKey().IsSame(meta);
+      }
+
+      template<class T>
+      bool IsExact() const noexcept {
+         if (GetCategoryCount() != 1)
+            return Exact<T, Many>;
+
+         const auto meta = MetaDataOf<T>();
+         if (not GetTagsInner().IsEmpty())
+            return MetaDataOf<Tag>().IsExact(meta);
+         if (not GetRecsInner().IsEmpty())
+            return MetaDataOf<Recipe>().IsExact(meta);
+            
+         return GetMessInner().begin()->GetKey().IsExact(meta);
+      }
+
+      /// If Neat contains exactly one kind of data, you can test if castable 
+      /// to it. If Neat contains more than one kind of data, it is castable  
+      /// only to deep types.                                                 
+      template<class T>
+      bool CastsTo() const noexcept {
+         if (GetCategoryCount() != 1)
+            return CT::Deep<T>;
+
+         if (not GetTagsInner().IsEmpty())
+            return CT::Tag<T>;
+         if (not GetRecsInner().IsEmpty())
+            return CT::Recipe<T>;
+            
+         return GetMessInner().begin()->GetKey().CastsTo(MetaDataOf<T>());
+      }
+
       /// Get list of tags corresponding to a statically specified tag        
       ///   @tparam T tag definition to search for                            
       ///   @return the tag list, or nullptr if no such list exists           
@@ -224,7 +344,7 @@ namespace Langulus::Annies
 
       template<class C>
       auto GetTag(this C&& self, TMeta meta, size_t index = 0) -> LglsMutIf(C, Tag*) {
-         const auto found = self.mTags.Find(meta);
+         const auto found = self.GetTagsInner().Find(meta);
          if (found and found.GetValHandle()->GetCount() > index)
             return &((*found.GetValHandle())[index]);
          return nullptr;
@@ -240,7 +360,7 @@ namespace Langulus::Annies
 
       template<class C>
       auto GetData(this C&& self, DMeta d) -> LglsMutIf(C, Inner::MessyList*) {
-         auto found = self.mAnythingElse.Find(d ? d.GetOrigin() : d);
+         auto found = self.GetMessInner().Find(d ? d.GetOrigin() : d);
          if (found)
             return &*found.GetValHandle();
          return nullptr;

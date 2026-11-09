@@ -1190,7 +1190,7 @@ namespace Langulus::Annies::Component
       ///   @tparam SID can be used to access specific dimension. It is       
       ///      irrelevant if AS is a handle.                                  
       ///   @return the element, as a reference if possible                   
-      template<CT::NotVoid AS, Cid SID = 0, CT::Contiguous C>// requires Relevant<SID>
+      template<CT::NotVoid AS, Cid SID = 0, CT::Contiguous C>
       decltype(auto) As(this C&& self) {
          static_assert(not CT::Reference<AS>, "Strip references first");
 
@@ -1279,6 +1279,11 @@ namespace Langulus::Annies::Component
             }
             #endif
          }
+      }
+
+      template<CT::Void AS, Cid SID = 0, class C>
+      auto As(this C&& self) -> LglsMutIf(C, void*) {
+         return self.template GetRawVoid<SID>();
       }
 
       /// MARK: AssignAbsorb                                                  
