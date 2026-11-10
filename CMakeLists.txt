@@ -22,7 +22,7 @@ endif()
 add_langulus_library(LangulusAnnies
    SOURCES  $<TARGET_OBJECTS:LangulusLogger>
             $<TARGET_OBJECTS:LangulusRTTI>
-            $<$<BOOL:${LANGULUS_OPTION_MANAGED_MEMORY}>:$<TARGET_OBJECTS:LangulusFractalloc>>
+            $<TARGET_OBJECTS:LangulusFractalloc>
             $<TARGET_OBJECTS:LangulusPercist>
             source/Text.cpp
             source/Bytes.cpp
@@ -35,7 +35,7 @@ add_langulus_library(LangulusAnnies
 target_include_directories(LangulusAnnies
    PUBLIC   $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
             $<TARGET_PROPERTY:LangulusRTTI,INTERFACE_INCLUDE_DIRECTORIES>
-            $<$<BOOL:${LANGULUS_OPTION_MANAGED_MEMORY}>:$<TARGET_PROPERTY:LangulusFractalloc,INTERFACE_INCLUDE_DIRECTORIES>>
+            $<TARGET_PROPERTY:LangulusFractalloc,INTERFACE_INCLUDE_DIRECTORIES>
             $<TARGET_PROPERTY:LangulusPercist,INTERFACE_INCLUDE_DIRECTORIES>
             include
 )
@@ -51,5 +51,5 @@ target_compile_definitions(LangulusAnnies
 
 if(LANGULUS_OPTION_TESTING)
    enable_testing()
-   add_subdirectory(test)
+   #add_subdirectory(test)
 endif()

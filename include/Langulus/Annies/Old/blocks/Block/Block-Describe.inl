@@ -70,7 +70,7 @@ namespace Langulus::Annies
             //TODO can be optimized-out for POD
             value[progress] = data;
             ++progress;
-            return (progress >= CountOf<D>) ? Loop::Break : Loop::Continue;
+            return (progress >= ExtentOf<D>) ? Loop::Break : Loop::Continue;
          });
       }
       else {
@@ -94,7 +94,7 @@ namespace Langulus::Annies
 
       ForEachDeep([&](Many const& group) {
          if constexpr (CT::Vector<D> or CT::Array<D>) {
-            const auto toscan = ::std::min(CountOf<D> - progress, group.GetCount());
+            const auto toscan = ::std::min(ExtentOf<D> - progress, group.GetCount());
             for (size_t i = 0; i < toscan; ++i) {
                //TODO can be optimized-out for POD
                try {
@@ -104,7 +104,7 @@ namespace Langulus::Annies
                catch (...) {}
             }
 
-            return (progress >= CountOf<D>) ? Loop::Break : Loop::Continue;
+            return (progress >= ExtentOf<D>) ? Loop::Break : Loop::Continue;
          }
          else {
             try {

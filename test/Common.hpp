@@ -242,7 +242,7 @@ namespace Langulus::Flow
 }
 
 /// An empty trivial type                                                     
-class ImplicitlyConstructible {};
+class EmptyType {};
 
 /// A simple aggregate type                                                   
 struct AggregateType {
