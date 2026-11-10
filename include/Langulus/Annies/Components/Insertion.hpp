@@ -127,6 +127,32 @@ namespace Langulus::Annies::Component
       }*/
 
    public:
+      /// MARK: Resize                                                        
+      /// Reallocate and resize the container, either trimming excess elements
+      /// or filling new ones with default-constructed values.                
+      ///   @param desired_count number of elements to allocate and initialize
+      ///   @return a reference to this container                             
+      template<CT::IndexedLinearly C> requires (not CT::Multidimensional<C>)
+      C& Resize(this C& self, size_t desired_count);
+
+      template<CT::IndexedLinearly C, CT::NoIntent V> requires (not CT::Multidimensional<C>)
+      C& Resize(this C& self, size_t desired_count, V const&);
+
+      /// MARK: Fill                                                          
+      /// Fill all yet uninitialized elements with shallow copies of a given  
+      /// value.                                                              
+      ///   @param value value to shallow copy                                
+      ///   @return a reference to this container                             
+      template<CT::IndexedLinearly C, CT::NoIntent V> requires (not CT::Multidimensional<C>)
+      C& Fill(this C& self, V const& value);
+
+      /// MARK: FillDefault                                                   
+      /// Fill yet uninitialized elements with default constructed elements.  
+      /// Nullable elements will be batch-zeroed.                             
+      ///   @return a reference to this container                             
+      template<CT::IndexedLinearly C> requires (not CT::Multidimensional<C>)
+      C& FillDefault(this C& self);
+
       /// MARK: InsertAt                                                      
       /// Insert one or more elements at the specified position. Supports     
       /// intents and arrays.                                                 

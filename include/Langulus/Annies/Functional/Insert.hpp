@@ -70,6 +70,76 @@ namespace Langulus::Annies::Component
       }
    }
 
+   /// MARK: Resize                                                        
+   /// Reallocate and resize the container, either trimming excess elements
+   /// or filling new ones with default-constructed values.                
+   ///   @param desired_count number of elements to allocate and initialize
+   ///   @return a reference to this container                             
+   TEMPLATE template<CT::IndexedLinearly C> requires (not CT::Multidimensional<C>)
+   C& LGLSCOM::Resize(this C& self, size_t desired_count) {
+      self.Reserve(desired_count);
+      self.FillDefault();
+      return self;
+   }
+
+   /// MARK: Resize                                                        
+   /// Reallocate and resize the container, either trimming excess elements
+   /// or filling new ones with shallow copy-constructed values.           
+   ///   @param desired_count number of elements to allocate and initialize
+   ///   @param value the value to use for filling                         
+   ///   @return a reference to this container                             
+   TEMPLATE template<CT::IndexedLinearly C, CT::NoIntent V> requires (not CT::Multidimensional<C>)
+   C& LGLSCOM::Resize(this C& self, size_t desired_count, V const& value) {
+      self.Reserve(desired_count);
+      self.Fill(value);
+      return self;
+   }
+
+   /// MARK: Fill                                                          
+   /// Fill all yet uninitialized elements with shallow copies of a given  
+   /// value.                                                              
+   ///   @param value value to shallow copy                                
+   ///   @return a reference to this container                             
+   TEMPLATE template<CT::IndexedLinearly C, CT::NoIntent V> requires (not CT::Multidimensional<C>)
+   C& LGLSCOM::Fill(this C& self, V const& value) {
+      const size_t count = self.GetCount();
+      const size_t resrv = self.GetReserved();
+      if (count == resrv)
+         return self;
+
+      auto h = self.GetHandle() + count;
+      const auto end = h + (resrv - count);
+      while (h != end) {
+         h.EmplaceWithIntent(Refer(value));
+         ++h;
+      }
+
+      self.GetCountInner() = resrv;
+      return self;
+   }
+
+   /// MARK: FillDefault                                                   
+   /// Fill yet uninitialized elements with default constructed elements.  
+   /// Nullable elements will be batch-zeroed.                             
+   ///   @return a reference to this container                             
+   TEMPLATE template<CT::IndexedLinearly C> requires (not CT::Multidimensional<C>)
+   C& LGLSCOM::FillDefault(this C& self) {
+      const size_t count = self.GetCount();
+      const size_t resrv = self.GetReserved();
+      if (count == resrv)
+         return self;
+
+      auto h = self.GetHandle() + count;
+      const auto end = h + (resrv - count);
+      while (h != end) {
+         h.template EmplaceDefault<0, AllocationStrategy::DontAllocate>();
+         ++h;
+      }
+
+      self.GetCountInner() = resrv;
+      return self;
+   }
+
    /// MARK: InsertAt                                                      
    /// Insert one or more elements at the specified position. Supports     
    /// intents and arrays.                                                 

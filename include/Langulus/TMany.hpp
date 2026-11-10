@@ -105,7 +105,7 @@ namespace Langulus::Annies
       }
       
       /// Construction that absorbs the provided container                    
-      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
+      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())//TODO is this constrained required? we do this so we can reflect properly, right? the absorb constructor is not reflected
       constexpr TMany(Inner::Absorb, A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0)
             this->Absorb(LglsFwd(a1));

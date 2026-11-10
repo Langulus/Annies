@@ -62,7 +62,9 @@ namespace Langulus::Annies
    ///                                                                        
    ///   Normalized data container. Turns messy containers into neatly and    
    /// consistently ordered ones, that are very fast on compare, search,      
-   /// insert, or remove, albeit quite a bit larger.                          
+   /// insert, or remove, albeit quite a bit larger. It is designed to act    
+   /// exactly like Many on the outside, while being completely different on  
+   /// the inside.                                                            
    ///   Neats are extensively used as descriptors in factories, to check     
    /// whether an element with the same signature already exists.             
    ///   Elements that are marked missing are never considered part of the    
@@ -114,9 +116,11 @@ namespace Langulus::Annies
       }
 
       /// Construction that either absorbs the provided containers, or        
-      /// emplaces all A in the container                                     
+      /// emplaces all A in the container.                                    
+      ///   @attention converting to Neat is explicit because it involves a   
+      ///      lot of overhead                                                
       template<Disambiguate A1, class...AN>
-      constexpr Neat(A1&& a1, AN&&...an) {
+      explicit constexpr Neat(A1&& a1, AN&&...an) {
          this->ConstructDefault();
 
          if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
@@ -231,6 +235,16 @@ namespace Langulus::Annies
          return cross_category_size;
       }
 
+      /// Check if Neat is empty                                              
+      bool IsEmpty() const noexcept {
+         return GetCategoryCount() == 0;
+      }
+
+      /// Check if Neat is empty                                              
+      explicit operator bool() const noexcept {
+         return not IsEmpty();
+      }
+
       ///                                                                     
       /// MARK: Capsulation                                                   
       /// By default, a Neat is an AND container spread into buckets. It can  
@@ -313,6 +327,58 @@ namespace Langulus::Annies
             return CT::Recipe<T>;
             
          return GetMessInner().begin()->GetKey().CastsTo(MetaDataOf<T>());
+      }
+
+      bool CastsTo(DMeta meta) const noexcept {
+         if (GetCategoryCount() != 1)
+            return meta.CastsTo(MetaDataOf<Many>());
+
+         if (not GetTagsInner().IsEmpty())
+            return meta.CastsTo(MetaDataOf<Tag>());
+         if (not GetRecsInner().IsEmpty())
+            return meta.CastsTo(MetaDataOf<Recipe>());
+            
+         return GetMessInner().begin()->GetKey().CastsTo(meta);
+      }
+
+      /// Get pointer to the first element in the proper bucket.              
+      ///   @attention no type-safety                                         
+      ///   @attention assumes the bucket is valid and properly typed         
+      ///   @return pointer to the first element of the desired type          
+      template<class AS>
+      auto* Get(this auto&& self) {
+         LglsAssumeUser(not self.IsEmpty(), "Empty container on Neat::As");
+         LglsAssumeUser(self.GetCategoryCount() == 1, "Multiple categories on Neat::Get");
+
+         static_assert(not CT::Handle<AS>,    "AS can't be a handle");
+         static_assert(not CT::Reference<AS>, "Strip references first");
+         static_assert(not CT::Void<AS>,      "AS can't be coid");
+
+         if constexpr (CT::Tag<AS>)
+            return self.GetTagsInner().GetVal().template Get<AS>();
+         else if constexpr (CT::Recipe<AS>)
+            return self.GetRecsInner().GetVal().template Get<AS>();
+         else
+            return self.GetMessInner().Find(MetaDataOf<AS>()).GetVal()[0].template Get<AS>();
+      }
+
+      /// Get the first element of the proper bucket wrapped in a desired type
+      ///   @attention no type-safety                                         
+      ///   @attention assumes the container contains exactly one category    
+      ///   @return pointer to the first element of the desired type          
+      template<class AS>
+      decltype(auto) As(this auto&& self) {
+         LglsAssert(not self.IsEmpty(), "Empty container on Neat::As");
+         LglsAssert(self.GetCategoryCount() == 1, "Multiple categories on Neat::As");
+
+         if constexpr (CT::Tag<AS>)
+            return self.GetTagsInner().GetVal().template As<AS>();
+         else if constexpr (CT::Recipe<AS>)
+            return self.GetRecsInner().GetVal().template As<AS>();
+         else if constexpr (Same<AS, Many>)
+            return self.GetRecsInner().begin()->GetVal().template As<AS>();
+         else
+            return self.GetMessInner().Find(MetaDataOf<AS>()).GetVal()[0].template As<AS>();
       }
 
       /// Get list of tags corresponding to a statically specified tag        

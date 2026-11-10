@@ -130,8 +130,19 @@ namespace Langulus::Annies
       constexpr ~TPair() noexcept {
          this->Destroy();
       }
-      
-      constexpr TPair(CT::Pair auto&& p) {
+
+      template<CT::Pair P>
+      static consteval bool ConstructibleWith() {
+         if constexpr      (CT::Copied<P> and Same<K, TypeOf<P, 0>> and Same<V, TypeOf<P, 1>>)
+            return CT::ReferConstructible<K, V>;
+         else if constexpr (CT::Cloned<P> and Same<K, TypeOf<P, 0>> and Same<V, TypeOf<P, 1>>)
+            return CT::CloneConstructible<K, V>;
+         else
+            return true;
+      }
+
+      template<CT::Pair P>
+      constexpr TPair(P&& p) requires (ConstructibleWith<P>()) {
          this->Absorb(LglsFwd(p));
       }
       
@@ -166,7 +177,9 @@ namespace Langulus::Annies
       constexpr TPair(K_ALT&& a1, V_ALT&& a2)
       requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT> or CT::Handle<V_ALT>) {
          this->ResetState();
-         this->DeduceType(a1, a2);
+         //this->DeduceType(a1, a2);
+         Com::TypedStack<DMeta, K, true, 0>::DeduceType(a1);
+         Com::TypedStack<DMeta, V, true, 1>::DeduceType(a2);
          
          if constexpr (Inner::PairOnHeap<K, V>) {
             this->AllocateFresh(1);
@@ -181,11 +194,12 @@ namespace Langulus::Annies
 
       /// Construct on the heap (or from handles)                             
       ///   @attention default-initializes the value                          
-      template<Disambiguate K_ALT>
+      template<Disambiguate K_ALT> requires Same<Deint<K_ALT>, K>
       constexpr TPair(K_ALT&& a1) requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT>) {
          this->ResetState();
-         this->DeduceType(a1);
-         
+         //this->DeduceType(a1, V {});
+         Com::TypedStack<DMeta, K, true, 0>::DeduceType(a1);
+
          if constexpr (Inner::PairOnHeap<K, V>) {
             this->AllocateFresh(1);
             this->template EmplaceConstruct<0, Com::AllocationStrategy::DontAllocate>(FWDIntent(a1));
@@ -210,7 +224,9 @@ namespace Langulus::Annies
       constexpr TPair& operator = (TPair&& other) noexcept {
          return this->AssignAbsorb(Move(other));
       }
-      constexpr TPair& operator = (CT::Pair auto&& pair) {
+
+      template<CT::Pair P>
+      constexpr TPair& operator = (P&& pair) requires (ConstructibleWith<P>()) {
          return this->AssignAbsorb(LglsFwd(pair));
       }
 
@@ -233,6 +249,26 @@ namespace Langulus::Annies
 
       using Com::Comparison<false, true, 0, 1>::operator <=>;
       using Com::Comparison<false, true, 0, 1>::operator ==;
+
+      auto GetKey() const noexcept -> ConstAll<Deref<K>&> {
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> Deref<K>& requires CT::Dense<K> {
+         return *this->template GetRaw<0>();
+      }
+      auto GetKey()       noexcept -> Deref<K> requires CT::Sparse<K> {
+         return *this->template GetRaw<0>();
+      }
+
+      auto GetVal() const noexcept -> ConstAll<Deref<V>&> {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> Deref<V>& requires CT::Dense<V> {
+         return *this->template GetRaw<1>();
+      }
+      auto GetVal()       noexcept -> Deref<V> requires CT::Sparse<V> {
+         return *this->template GetRaw<1>();
+      }
 
       auto GetKeyHandle() const noexcept -> typename HandleType::KeyHandle {
          return {*this};

@@ -435,7 +435,7 @@ namespace Langulus::Annies::Component
          }
       }
       
-      if constexpr (CT::IndexedHashTable<C>) {
+      if constexpr (CT::IndexedTable<C>) {
          (void) cookie;
          return self.template TableSearch<SID>(item);
       }
@@ -480,7 +480,7 @@ namespace Langulus::Annies::Component
       auto first_rhs = item.GetHandle();
 
       DecideHandle<C> first_lhs;
-      if constexpr (CT::IndexedHashTable<C>) {
+      if constexpr (CT::IndexedTable<C>) {
          (void) cookie;
          first_lhs = self.template TableSearch<RELEVANT::First>(first_rhs);
       }

@@ -477,7 +477,7 @@ namespace Langulus::Annies::Component
 
             if constexpr (requires {
                self.template GetEntriesInner<SID>();
-                  rhs.template GetEntriesInner<SID>();
+                rhs.template GetEntriesInner<SID>();
             }) {
                // Both entry arrays are available, just swap them    
                auto lhs_entry = DecvqAllCast(self.template GetEntriesInner<SID>());
@@ -508,7 +508,13 @@ namespace Langulus::Annies::Component
             }
          }
          else {
-            if constexpr (requires { T {Abandon(lhs_item)}; }) {
+            if constexpr (CT::Aggregate<T>) {
+               // Aggregates don't play well with intents            
+               T tmp (::std::move(lhs_item));
+               new (&lhs_item) T (::std::move(rhs_item));
+               new (&rhs_item) T (::std::move(tmp));
+            }
+            else if constexpr (requires { T {Abandon(lhs_item)}; }) {
                // Abandon semantics are most optimal                 
                T tmp {Abandon(lhs_item)};
                new (&lhs_item) T {Abandon(rhs_item)};

@@ -79,7 +79,7 @@ namespace Langulus::Annies::Component
       ///      undefined behavior                                             
       template<Cid SID = Id::First, CT::Container C>// requires Relevant<SID>
       constexpr auto GetRaw(this C&& self) noexcept {
-         using Tcvq = LglsMutIf(C, StackRequest);
+         using Tcvq = LglsMutIf(C, TypeOf<C, SID>*);
          if constexpr (SID == Id::First)
             return static_cast<Tcvq>(ThisCom::GetHeapInner());
          else {
@@ -237,15 +237,15 @@ namespace Langulus::Annies::Component
          #endif
       }*/
 
-      template<CT::NotVoid AS>
+      /*template<CT::NotVoid AS = void>
       auto* GetKey(this auto&& self) requires Shared {
          return self.template Get<AS, 0>();
       }
 
-      template<CT::NotVoid AS>
+      template<CT::NotVoid AS = void>
       auto* GetVal(this auto&& self) requires Shared {
          return self.template Get<AS, 1>();
-      }
+      }*/
 
       /// Get first element as a handle, or any desired wrapping type.        
       /// Conversion or copying may occur depending on type.                  
@@ -424,6 +424,20 @@ namespace Langulus::Annies::Component
          else offset = ptr - memory_start;
 
          return self.GetHandle() + offset;
+      }
+
+      /// Check if a pointer is owned by this heap                            
+      ///   @attention if part of a non-linear container, this will return    
+      ///      true even for non-initialized elements!                        
+      template<CT::Container C>
+      bool Owns(this C const& self, CT::Sparse auto ptr) noexcept {
+         if (ptr < ThisCom::GetRaw())
+            return false;
+
+         if (ptr >= ThisCom::GetRawReserveEnd())
+            return false;
+
+         return true;
       }
 
    protected:

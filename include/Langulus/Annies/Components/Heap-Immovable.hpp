@@ -230,6 +230,7 @@ namespace Langulus::Annies::Component
          }
       }
 
+   public:
       /// Get a handle from a pointer to an element                           
       template<CT::Container C>
       auto GetHandleFromPointer(this C&& self, CT::Sparse auto ptr) -> DecideHandle<C> {
@@ -251,6 +252,21 @@ namespace Langulus::Annies::Component
          else offset = ptr - memory_start;
 
          return self.GetHandle() + offset;
+      }
+
+      /// Check if a pointer is owned by this heap                            
+      ///   @attention if part of a non-linear container, this will return    
+      ///      true even for non-initialized elements!                        
+      template<CT::Container C>
+      bool Owns(this C const& self, CT::Sparse auto ptr) noexcept {
+         if (ptr < ThisCom::GetRaw())
+            return false;
+
+         if (ptr >= ThisCom::GetRawReserveEnd())
+            return false;
+
+         //TODO ptr may be in one of the cascades, this is immovable heap after all
+         return true;
       }
    };
 
