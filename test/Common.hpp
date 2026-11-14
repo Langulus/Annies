@@ -417,7 +417,7 @@ namespace Verbs
 
 struct ImplicitlyReflectedData {
    using CTTI_POD = true;
-   using CTTI_Files = Yes<"ASE";
+   using CTTI_Files = Yes<"ase">;
 
    enum Named {One, Two, Three};
    LANGULUS_NAMED_VALUES(One, Two, Three);
@@ -559,19 +559,6 @@ struct Type {};
 struct TypeErasedContainer {
    using CTTI_Typed = void;
 };
-
-namespace N1 {
-   struct Type {};
-   struct Create {};
-}
-
-namespace N2 {
-   struct Type {};
-}
-
-namespace N3 {
-   struct type {};
-}
 
 enum class TypedEnum : int16_t {
    E1, E2, E3

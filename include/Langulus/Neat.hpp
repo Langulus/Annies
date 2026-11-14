@@ -512,15 +512,21 @@ namespace Langulus::Annies
             }
 
             auto found = this->GetTagsInner().Find(tag->GetTag());
-            if (found) {
-               found.GetVal().Insert(
-                  NestIntentOf(tag, tag->template ReinterpretAs<Tag>())
-               );
+
+            if constexpr (T::IsMoved()) {
+               decltype(auto) tag_erased = reinterpret_cast<Tag&&>(tag.what);
+               if (found)
+                  found.GetVal().Insert(NestIntentOf(tag, tag_erased));
+               else
+                  this->GetTagsInner().Merge(tag->GetTag(), NestIntentOf(tag, tag_erased));
             }
-            else this->GetTagsInner().Merge(
-               tag->GetTag(),
-               NestIntentOf(tag, tag->template ReinterpretAs<Tag>())
-            );
+            else {
+               decltype(auto) tag_erased = reinterpret_cast<Tag const&>(tag.what);
+               if (found)
+                  found.GetVal().Insert(NestIntentOf(tag, tag_erased));
+               else
+                  this->GetTagsInner().Merge(tag->GetTag(), NestIntentOf(tag, tag_erased));
+            }
          }
       }
 

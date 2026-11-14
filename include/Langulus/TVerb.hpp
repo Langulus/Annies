@@ -407,6 +407,20 @@ namespace Langulus::Annies
       /// Type-erasure operator to TVerb<void>                                
       operator Verb&       () noexcept { return reinterpret_cast<Verb      &>(*this); }
       operator Verb const& () noexcept { return reinterpret_cast<Verb const&>(*this); }
+
+      /// Execute a verb in the resulting output of this one                  
+      ///   @attention this verb will be executed if not executed yet         
+      ///   @param verb the verb to execute next, in the context of this      
+      ///      verb's output                                                  
+      ///   @return a reference to the new verb after execution               
+      template<CT::Executable NEXT>
+      auto Then(this auto&& self, NEXT& verb) -> NEXT& {
+         if (not self.IsDone())
+            LglsAssert(self.Run(), "Execution failed");
+
+         verb.In(self.mOutput).Run();
+         return verb;
+      }
    };
 }
 
