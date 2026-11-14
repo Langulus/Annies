@@ -255,7 +255,7 @@ namespace Langulus::Annies::Component
       ///   @return true if either contains state, or has stuff inserted      
       constexpr bool IsDefaultState(this auto const& self) noexcept { //TODO dimensions?
          if constexpr (HasStates)
-            return self.GetState() == GetDefaultState();
+            return self.GetStateInner() == GetDefaultState();
          else
             return true;
       }

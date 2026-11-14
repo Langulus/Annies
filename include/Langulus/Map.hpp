@@ -173,20 +173,20 @@ namespace Langulus::Annies::Inner
                using V = Decvq<Deref<TypeOf<P, 1>>>;
                LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
                LglsAssumeDev(this->template IsSame<V, 1>(), "Type mismatch");
-               return TPair<K, V> {Annies::Absorb, Copy {LglsFwd(initializer)}};
+               return TPair<K, V> {Langulus::Absorb, Copy {LglsFwd(initializer)}};
             }
             else {
                using K = Decvq<Deref<TypeOf<P, 0>>>;
                LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
                LglsAssumeDev(this->template IsTyped<1>(), "No default value type");
-               return Pair::From(*this, Annies::Piecewise,  LglsFwd(initializer));
+               return Pair::From(*this, Langulus::Piecewise,  LglsFwd(initializer));
             }
          }
          else {
             using K = Decvq<ShedDeref<P>>;
             LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
             LglsAssumeDev(this->template IsTyped<1>(), "No default value type");
-            return Pair::From(*this, Annies::Piecewise,  LglsFwd(initializer));
+            return Pair::From(*this, Langulus::Piecewise,  LglsFwd(initializer));
          }
       }
 

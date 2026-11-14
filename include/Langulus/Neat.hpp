@@ -568,10 +568,10 @@ namespace Langulus::Annies
 
             auto found = this->GetMessInner().Find(meta);
             if (found) {
-               found.GetVal().Insert(Many {Annies::Absorb, LglsFwd(data)});
+               found.GetVal().Insert(Many {Langulus::Absorb, LglsFwd(data)});
             }
             else this->GetMessInner().Merge(
-               meta, Many {Annies::Absorb, LglsFwd(data)}
+               meta, Many {Langulus::Absorb, LglsFwd(data)}
             );
          }
          else {

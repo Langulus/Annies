@@ -159,11 +159,11 @@ namespace Langulus::Annies::Inner
       constexpr auto CreateSwapper(A&& argument) assumptious {
          if constexpr (CT::Handle<A>) {
             LglsAssumeDev(this->template IsSame<TypeOf<A>>(), "Type mismatch");
-            return TAny {Annies::Absorb, Copy {LglsFwd(argument)}};
+            return TAny {Langulus::Absorb, Copy {LglsFwd(argument)}};
          }
          else {
             LglsAssumeDev(this->template IsSame<Deint<A>>(), "Type mismatch");
-            return TAny {Annies::Piecewise, LglsFwd(argument)};
+            return TAny {Langulus::Piecewise, LglsFwd(argument)};
          }
       }
    };

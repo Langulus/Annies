@@ -477,8 +477,9 @@ namespace Langulus::Annies
          return ToPartialOrdering(this->Compare(other));
       }
 
-      LANGULUS_API(ANNIES)
-      bool operator == (Text const& other) const noexcept;
+      constexpr bool operator == (Text const& other) const noexcept {
+         return this->CompareEqual(other);
+      }
 
       explicit operator ::std::string() const {
          return {this->GetRaw(), this->GetCount()};

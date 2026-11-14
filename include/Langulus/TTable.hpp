@@ -145,11 +145,11 @@ namespace Langulus::Annies
       constexpr auto CreateSwapper(A&& argument) assumptious {
          if constexpr (CT::Handle<A>) {
             static_assert(Same<T, TypeOf<A>>, "Type mismatch");
-            return TAny {Annies::Absorb, Copy {LglsFwd(argument)}};
+            return TAny {Langulus::Absorb, Copy {LglsFwd(argument)}};
          }
          else {
             static_assert(Same<T, Deint<A>>, "Type mismatch");
-            return TAny {Annies::Piecewise, LglsFwd(argument)};
+            return TAny {Langulus::Piecewise, LglsFwd(argument)};
          }
       }
       
@@ -166,6 +166,6 @@ namespace Langulus
 {
    template<CT::Map MAP> requires (not CT::TypeErased<MAP>)
    auto InValuesOf(MAP& some_map) {
-      return TTable<TypeOf<MAP, 1>> {Annies::Slice<1>, some_map};
+      return TTable<TypeOf<MAP, 1>> {Langulus::Slice<1>, some_map};
    }
 }

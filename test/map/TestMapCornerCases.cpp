@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -7,32 +7,34 @@
 ///                                                                           
 #include "TestMapCommon.hpp"
 
-struct VulkanLayer {};
-struct VulkanRenderer {};
-struct VulkanCamera {};
-struct Platform {};
-struct Vulkan {};
-struct Window {};
-struct VulkanLight {};
-struct Monitor {};
-struct VulkanRenderable {};
-struct Cursor {};
-
+namespace
+{
+   struct VulkanLayer {};
+   struct VulkanRenderer {};
+   struct VulkanCamera {};
+   struct Platform {};
+   struct Vulkan {};
+   struct Window {};
+   struct VulkanLight {};
+   struct Monitor {};
+   struct VulkanRenderable {};
+   struct Cursor {};
+}
 
 /// Testing some corner cases encountered during the use of the container     
 TEMPLATE_TEST_CASE("Map corner cases", "[map]",
-   (MapTest<OrderedMap, DMeta, Text>),
-   (MapTest<UnorderedMap, DMeta, Text>),
+   (MapTest<MapSorted,   DMeta, Text>),
+   (MapTest<MapUnsorted, DMeta, Text>),
    (MapTest<TMapUnsorted<DMeta, Text>, DMeta, Text>),
-   (MapTest<TMapSorted<DMeta, Text>, DMeta, Text>)
+   (MapTest<TMapSorted  <DMeta, Text>, DMeta, Text>)
 ) {
    using T = typename TestType::Container;
    using K = typename TestType::Key;
    using V = typename TestType::Value;
-   using Pair = TPair<K, V>;
+   using P = TPair<K, V>;
 
    GIVEN("Map instance initialized with 10 specific pairs for the corner case") {
-      const Pair pairs[10] = {
+      const P pairs[10] = {
          {MetaOf<VulkanLayer>(),       "VulkanLayer"},
          {MetaOf<VulkanRenderer>(),    "VulkanRenderer"},
          {MetaOf<VulkanCamera>(),      "VulkanCamera"},
@@ -49,12 +51,12 @@ TEMPLATE_TEST_CASE("Map corner cases", "[map]",
 
       WHEN("Removing around-the-end elements by value (corner case)") {
          size_t removed = 0;
-         removed += map.RemoveValue("VulkanRenderer");
-         removed += map.RemoveValue("VulkanCamera");
-         removed += map.RemoveValue("Vulkan");
-         removed += map.RemoveValue("VulkanRenderable");
-         removed += map.RemoveValue("VulkanLight");
-         removed += map.RemoveValue("VulkanLayer");
+         removed += map.RemoveVal("VulkanRenderer");
+         removed += map.RemoveVal("VulkanCamera");
+         removed += map.RemoveVal("Vulkan");
+         removed += map.RemoveVal("VulkanRenderable");
+         removed += map.RemoveVal("VulkanLight");
+         removed += map.RemoveVal("VulkanLayer");
 
          REQUIRE(removed == 6);
          REQUIRE(map.GetCount() == 4);

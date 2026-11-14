@@ -1,15 +1,18 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                           
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include <Langulus/Annies/Text.hpp>
-#include <Langulus/Annies/Path.hpp>
-#include <Langulus/Annies/TMap.hpp>
-#include <Langulus/Annies/TSet.hpp>
-#include <Langulus/Annies/Tag.hpp>
+#include <Langulus/Anyness/Text.hpp>
+#include <Langulus/Anyness/Path.hpp>
+#include <Langulus/Anyness/Map.hpp>
+#include <Langulus/Anyness/TMap.hpp>
+#include <Langulus/Anyness/Set.hpp>
+#include <Langulus/Anyness/TSet.hpp>
+#include <Langulus/Anyness/Tag.hpp>
+#include <Langulus/Anyness/TPair.hpp>
 #include "Common.hpp"
 
 
@@ -43,18 +46,16 @@ SCENARIO("Hashing different kinds of containers", "[hash]") {
 
 
 /// Cross-container consistency tests                                         
-TEMPLATE_TEST_CASE(
-   "Cross-container consistency tests for TMapSorted/TMapUnsorted/OrderedMap/UnorderedMap", "[map]",
-   (HashTest<Text, Tag*>),
-
-   (HashTest<Text, int>),
-   (HashTest<Text, Tag>),
-   (HashTest<Text, Tags::Count>),
-   (HashTest<Text, Many>),
-
-   (HashTest<Text, int*>),
-   (HashTest<Text, Tags::Count*>),
-   (HashTest<Text, Many*>)
+TEMPLATE_TEST_CASE("Cross-container consistency tests for TMapUnsorted/TMapSorted/MapUnsorted/MapSorted", "[map]"
+   , (HashTest<Text, int>)
+   , (HashTest<Text, Tag>)
+   , (HashTest<Text, Tags::Count>)
+   , (HashTest<Text, Many>)
+   
+   , (HashTest<Text, int*>)
+   , (HashTest<Text, Tag*>)
+   , (HashTest<Text, Tags::Count*>)
+   , (HashTest<Text, Many*>)
 ) {
    using K = typename TestType::Key;
    using V = typename TestType::Value;
@@ -62,21 +63,20 @@ TEMPLATE_TEST_CASE(
    Allocator::State memoryState;
 
    GIVEN("A single element initialized maps of all kinds") {
-      const auto pair = CreatePair<TPair<K, V>, K, V>(
-         "five hundred", 555);
+      const auto pair = CreatePair<TPair<K, V>, K, V>("five hundred", 555);
 
-      TMapUnsorted<K, V> uset1 {pair};
-      UnorderedMap uset2 {pair};
-      TMapSorted<K, V> oset1 {pair};
-      OrderedMap oset2 {pair};
+      TMapUnsorted<K, V> umap1 {pair};
+      TMapSorted<K, V>   omap1 {pair};
+      MapUnsorted        umap2 {pair};
+      MapSorted          omap2 {pair};
 
       WHEN("Their hashes are taken") {
          const auto elementHash = HashOf(pair);
 
-         const auto uhash1 = uset1.GetHash();
-         const auto uhash2 = uset2.GetHash();
-         const auto ohash1 = oset1.GetHash();
-         const auto ohash2 = oset2.GetHash();
+         const auto uhash1 = umap1.GetHash();
+         const auto uhash2 = umap2.GetHash();
+         const auto ohash1 = omap1.GetHash();
+         const auto ohash2 = omap2.GetHash();
 
          REQUIRE(uhash1 == uhash2);
          REQUIRE(ohash1 == ohash2);
@@ -98,10 +98,9 @@ TEMPLATE_TEST_CASE(
 }
 
 /// Cross-container consistency tests                                         
-TEMPLATE_TEST_CASE(
-   "Cross-container consistency tests for TOrderedSet/TUnorderedSet/OrderedSet/UnorderedSet", "[set]",
-   int,  Tag,  Tags::Count,  Many,
-   int*, Tag*, Tags::Count*, Many*
+TEMPLATE_TEST_CASE("Cross-container consistency tests for TSetUnsorted/TSetSorted/SetUnsorted/SetSorted", "[set]"
+   , int,  Tag,  Tags::Count,  Many
+   , int*, Tag*, Tags::Count*, Many*
 ) {
    Allocator::State memoryState;
 
@@ -109,10 +108,10 @@ TEMPLATE_TEST_CASE(
       const auto element = CreateElement<TestType>(555);
       const auto elementHash = HashOf(element);
 
-      TUnorderedSet<TestType> uset1 {element};
-      UnorderedSet uset2 {element};
-      TOrderedSet<TestType> oset1 {element};
-      OrderedSet oset2 {element};
+      TSetUnsorted<TestType> uset1 {element};
+      TSetSorted<TestType>   oset1 {element};
+      SetUnsorted            uset2 {element};
+      SetSorted              oset2 {element};
 
       WHEN("Their hashes are taken") {
          REQUIRE(uset1.template IsExact<TestType>());

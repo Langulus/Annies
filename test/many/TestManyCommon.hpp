@@ -1,321 +1,324 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-
-/// INTENTIONALLY NOT GUARDED                                                 
-/// Include this file once in each cpp file, after all other headers          
-#include <Langulus/Annies/Text.hpp>
-#include <Langulus/Annies/Tag.hpp>
-#include <Langulus/Annies/Many.hpp>
-#include "../Common.hpp"
+#pragma once
+#include "../any/TestAnyCommon.hpp"
+#include <Langulus/Many.hpp>
+#include <Langulus/TMany.hpp>
+#include <vector>
 
 
-template<class T, class E>
-decltype(auto) FromHelper() {
-   if constexpr (not CT::Typed<T>) {
-      if constexpr (CT::DefineTag<T>) {
-         if constexpr (CT::Tag<T>)
-            return T::template OfType<E>();
-         else
-            return T::template From<Tags::Count, E>();
-      }
-      else return T::template From<E>();
+#if LANGULUS(BENCHMARK)
+   /// Perform a persistent benchmark across build and verify performance     
+   #define BenchmarkMany(func, tolerance, my_init, my) { \
+      const auto token = ::std::string("Test/") + func + "(" + NameOf<E>() + ") |" + NameOf<T>() + "|"; \
+      volatile int i = 0; \
+      for (; i < BenchmarkWarmupCycles; i += 1) { \
+         my_init; \
+         my; \
+      } \
+      for (; i < BenchmarkWarmupCycles + BenchmarkMeasureCycles; i += 1) { \
+         my_init; \
+         { \
+            CTRACK_NAME_PERSIST(token.c_str()); \
+            my; \
+         } \
+      } \
+      auto results = ctrack::result_get_detail_table(); \
+      results.check_highscore(tolerance); \
    }
-   else return T {};
+
+   /// Perform two persistent benchmarks across builds - one for Any and      
+   /// one for std::any. Make sure they don't deviate a lot.                  
+   #define BenchmarkManyStd(func, tolerance_highscore, tolerance, my_init, my, theirs_init, theirs) { \
+      const auto token = ::std::string("Test/") + func + "(" + NameOf<E>() + ") |" + NameOf<T>() + "|"; \
+      volatile int i = 0; \
+      for (; i < BenchmarkWarmupCycles; i += 1) { \
+         my_init; \
+         my; \
+      } \
+      for (; i < BenchmarkWarmupCycles + BenchmarkMeasureCycles; i += 1) { \
+         my_init; \
+         { \
+            CTRACK_NAME_PERSIST(token.c_str()); \
+            my; \
+         } \
+      } \
+      i = 0; \
+      const auto token_std = ::std::string("Test/") + func + "(" + NameOf<E>() + ") |std::vector|"; \
+      for (; i < BenchmarkWarmupCycles; i += 1) { \
+         theirs_init; \
+         theirs; \
+      } \
+      for (; i < BenchmarkWarmupCycles + BenchmarkMeasureCycles; i += 1) { \
+         theirs_init; \
+         { \
+            CTRACK_NAME(token_std.c_str()); \
+            theirs; \
+         } \
+      } \
+      auto results = ctrack::result_get_detail_table(); \
+      results.check_highscore(tolerance_highscore); \
+      REQUIRE(results.check_same(token.c_str(), token_std.c_str(), tolerance)); \
+   }
+#else
+   #define BenchmarkMany(func, tolerance, my_init, my)
+   #define BenchmarkManyStd(func, tolerance_highscore, tolerance, my_init, my, theirs_init, theirs)
+#endif
+
+
+template<class E, CT::Container C> requires CT::NoIntent<C>
+void Many_Helper_TestType(const C& many) {
+   Any_Helper_TestType<E>(many);
 }
 
+template<class LHS, class RHS> requires (CT::Container<LHS, RHS> and CT::NoIntent<LHS, RHS>)
+void Many_Helper_TestSame(const LHS& lhs, const RHS& rhs, bool match_constness = true) {
+   Any_Helper_TestSame(lhs, rhs, match_constness);
+}
 
 ///                                                                           
-/// Possible states:                                                          
-///   - uninitialized                                                         
-///   - default                                                               
-template<class E>
-void Any_CheckState_Default(auto const&);
-///   - invariant                                                             
-template<class E>
-void Any_CheckState_Invariant(auto const&);
-///   - owned-full                                                            
-template<class E>
-void Any_CheckState_OwnedFull(auto const&);
-///   - owned-full-const                                                      
-template<class E>
-void Any_CheckState_OwnedFullConst(auto const&);
-///   - owned-empty                                                           
-template<class E>
-void Any_CheckState_OwnedEmpty(auto const&);
-///   - disowned-full                                                         
-template<class E>
-void Any_CheckState_DisownedFull(auto const&);
-///   - disowned-full-const                                                   
-template<class E>
-void Any_CheckState_DisownedFullConst(auto const&);
-///   - abandoned                                                             
-template<class E>
-void Any_CheckState_Abandoned(auto const&);
+/// Possible state test implementations                                       
+template<class E, CT::Container C> requires CT::NoIntent<C>
+void Many_CheckState_Default(const C& many, bool typed = false) {
+   Any_CheckState_Default<E>(many, typed);
 
-template<class E>
-void Any_Helper_TestType(auto const& any) {
-   REQUIRE      (any.IsTyped());
-   REQUIRE_FALSE(any.IsUntyped());
-   REQUIRE      (any.GetType() == MetaDataOf<E>());
-   REQUIRE      (any.GetType()->template IsSame<const E>());
-   REQUIRE      (any.GetType()->template IsExact<E>());
-   REQUIRE      (any.GetType()->template Is<E*>());
-   REQUIRE      (any.IsDense() == CT::Dense<E>);
-   REQUIRE      (any.IsSparse() == CT::Sparse<E>);
-   REQUIRE      (any.IsDeep() == CT::Deep<Decay<E>>);
+   if constexpr (requires { many.IsCompressed(); })
+      REQUIRE_FALSE(many.IsCompressed());
+   if constexpr (requires { many.IsEncrypted(); })
+      REQUIRE_FALSE(many.IsEncrypted());
+   if constexpr (requires { many.IsOr(); })
+      REQUIRE_FALSE(many.IsOr());
 }
 
-template<CT::BlockBased LHS, CT::BlockBased RHS>
-void Any_Helper_TestSame(LHS const& lhs, RHS const& rhs) {
-   REQUIRE(lhs.GetRaw() == rhs.GetRaw());
-   REQUIRE(lhs.IsExact(rhs.GetType()));
-   REQUIRE(lhs == rhs);
-   REQUIRE(lhs.IsDeep() == rhs.IsDeep());
-   REQUIRE(lhs.IsConstant() == rhs.IsConstant());
-   REQUIRE(lhs.GetUnconstrainedState() == rhs.GetUnconstrainedState());
+template<class E, CT::Container C> requires CT::NoIntent<C>
+void Many_CheckState_OwnedEmpty(const C& many) {
+   Any_CheckState_OwnedEmpty<E>(many);
 }
 
+template<class E, CT::Container C> requires CT::NoIntent<C>
+void Many_CheckState_OwnedFull(const C& many) {
+   Any_CheckState_OwnedFull<E>(many);
+}
 
-///                                                                           
-/// Possible actions for each state:                                          
-///   - uninitialized                                                         
-///      - constexpr-default-initialized                                      
-///      - runtime-default-initialized                                        
-///      - intent-initialized from container                                  
-///      - intent-initialized from single dense element                       
-///      - intent-initialized from multiple dense elements                    
-///      - intent-initialized from dense element bounded array                
+template<class E, CT::Container C> requires CT::NoIntent<C>
+void Many_CheckState_DisownedFull(const C& many) {
+   Any_CheckState_DisownedFull<E>(many);
+}
 
-template<class E>
-void Any_CheckState_Default(auto const& any) {
-   using T = Decay<decltype(any)>;
+template<class E, CT::Container C> requires CT::NoIntent<C>
+void Many_CheckState_Abandoned(const C& many) {
+   Any_CheckState_Abandoned<E>(many);
+}
 
-   if constexpr (CT::Typed<T>) {
-      static_assert(CT::Exact<TypeOf<T>, E>);
-      Any_Helper_TestType<E>(any);
-      REQUIRE      (any.GetState() == DataState::Typed);
+template<CT::Container T, CT::Intent I> requires CT::NoIntent<T>
+void Many_VerifyAccessorInterface(T const& many, I&&) {
+   using E = typename Decay<Deint<I>>::CTTI_Typed;
+
+   // The Get method always adds a pointer, because it interfaces the   
+   // heap directly                                                     
+   static_assert(requires {
+      {many.template GetAt<Decay<E>      >(0)} -> ::std::same_as<const Decay<E>*>;
+      {many.template GetAt<Decay<E> const>(0)} -> ::std::same_as<const Decay<E>*>;
+   });
+   static_assert(requires {
+      {many.template GetAt<E      >(0)} -> ::std::same_as<ConstAll<E> const*>;
+      {many.template GetAt<E const>(0)} -> ::std::same_as<ConstAll<E> const*>;
+   });
+
+   // AsAt dereferences that pointer, doing only pointer arithmetic     
+   /*if constexpr (CT::DeepDense<E> and (not Same<TypeOf<T>, E> or CT::TypeErased<T>)) {
+      static_assert(requires {
+         {many.template AsAt<E>(0)} -> ::std::same_as<Decay<E>>;
+      });
+   }
+   else {*/
+      using innerT = Tif<(CT::Sparse<E> and not CT::CustomPointer<E>), ConstAll<E>, ConstAll<E> const&>;
+      static_assert(requires {
+         {many.template AsAt<E>(0)} -> ::std::same_as<innerT>;
+      });
+   //}
+
+   if constexpr (CT::Dense<E> and CT::Typed<T>) {
+      // One additional indirection is always acceptable                
+      // A static container will static_assert if too many indirects    
+      static_assert(requires {
+         {many.template GetAt<Decay<E>      *>(0)} -> ::std::same_as<Decay<E> const*>;
+         {many.template GetAt<Decay<E> const*>(0)} -> ::std::same_as<Decay<E> const*>;
+      });
+      static_assert(requires {
+         {many.template AsAt<Decay<E>*>(0)} -> ::std::same_as<Decay<E> const*>;
+      });
+
+      /* shouldn't compile, too many indirections
+      static_assert(requires {
+         {many.template GetAt<Decay<E>      **>(0)} -> ::std::same_as<Decay<E> const* const*>;
+         {many.template GetAt<Decay<E> const**>(0)} -> ::std::same_as<Decay<E> const* const*>;
+      });
+      static_assert(requires {
+         {many.template AsAt<Decay<E>**>(0)} -> ::std::same_as<Decay<E> const* const* const&>;
+      });
+      */
+   }
+   else if constexpr (not CT::CustomPointer<E>) {                             //TODO access via custom pointers needs more rigorous testing
+      // One additional indirection is always acceptible                
+      // Type-erased containers will throw an exception at runtime, if  
+      // too many indirects were requested                              
+      static_assert(requires {
+         {many.template GetAt<Decay<E>      *>(0)} -> ::std::same_as<Decay<E> const* const*>;
+         {many.template GetAt<Decay<E> const*>(0)} -> ::std::same_as<Decay<E> const* const*>;
+      });
+      static_assert(requires {
+         {many.template AsAt<Decay<E>*>(0)} -> ::std::same_as<Decay<E> const*>;
+      });
+
+      if constexpr (IndirectsOf<E> >= 2 or CT::TypeErased<T>) {
+         static_assert(requires {
+            {many.template GetAt<Decay<E>      **>(0)} -> ::std::same_as<Decay<E> const* const* const*>;
+            {many.template GetAt<Decay<E> const**>(0)} -> ::std::same_as<Decay<E> const* const* const*>;
+         });
+
+         static_assert(requires {
+            {many.template AsAt<Decay<E>**>(0)} -> ::std::same_as<Decay<E> const* const*>;
+         });
+      }
+      else {
+         static_assert(requires {
+            {many.template GetAt<Decay<E>      **>(0)} -> ::std::same_as<Decay<E> const* const*>;
+            {many.template GetAt<Decay<E> const**>(0)} -> ::std::same_as<Decay<E> const* const*>;
+         });
+
+         static_assert(requires {
+            {many.template AsAt<Decay<E>**>(0)} -> ::std::same_as<Decay<E> const* const*>;
+         });
+      }
+   }
+}
+
+template<CT::Container T, CT::Intent I> requires CT::NoIntent<T>
+void Many_CheckState_ContainsOne(T const& many, I&& e_with_intent, int uses = 1) {
+   Any_CheckState_ContainsOne(many, LglsFwd(e_with_intent), uses);
+   Many_VerifyAccessorInterface(many, LglsFwd(e_with_intent));
+
+   auto& e = e_with_intent.what;
+   using E = typename Decay<Deint<I>>::CTTI_Typed;
+
+   if constexpr (CT::Cloned<I> and CT::Sparse<E>) {
+      //TODO test all kinds of ranged modifiers??
+      for (auto& it : many) {
+         if constexpr (CT::TypeErased<T>)
+            REQUIRE(not it.CompareOneEqual(*e));
+         else
+            REQUIRE(it != *e);
+      }
    }
    else {
-      REQUIRE_FALSE(any.IsTyped());
-      REQUIRE      (any.IsUntyped());
-      REQUIRE      (any.GetType() == nullptr);
-      REQUIRE      (any.IsDense());
-      REQUIRE_FALSE(any.IsSparse());
-      REQUIRE      (any.GetState() == DataState::Default);
-      REQUIRE_FALSE(any.IsDeep());
-   }
-
-   REQUIRE      (any.IsTypeConstrained() == CT::Typed<T>);
-   REQUIRE_FALSE(any.IsCompressed());
-   REQUIRE      (any.IsConstant() == CT::Constant<E>);
-   REQUIRE_FALSE(any.IsEncrypted());
-   REQUIRE_FALSE(any.IsMissing());
-   REQUIRE_FALSE(any.IsOr());
-   REQUIRE_FALSE(any.IsStatic());
-   REQUIRE_FALSE(any.IsValid());
-   REQUIRE      (any.IsInvalid());
-   REQUIRE_FALSE(any.IsAllocated());
-   REQUIRE_FALSE(any.GetAllocation());
-   REQUIRE      (any.IsNow());
-   REQUIRE_FALSE(any.IsFuture());
-   REQUIRE_FALSE(any.IsPast());
-   REQUIRE      (any.IsEmpty());
-   REQUIRE      (any.GetCount() == 0);
-   REQUIRE      (any.GetReserved() == 0);
-   REQUIRE      (any.GetUses() == 0);
-   REQUIRE      (any.GetRaw() == nullptr);
-   REQUIRE_FALSE(any);
-   REQUIRE      (not any);
-}
-
-template<class E>
-void Any_CheckState_OwnedEmpty(auto const& any) {
-   using T = Decay<decltype(any)>;
-
-   Any_Helper_TestType<E>(any);
-
-   REQUIRE      (any.IsTypeConstrained() == CT::Typed<T>);
-   REQUIRE_FALSE(any.IsCompressed());
-   REQUIRE      (any.IsConstant() == CT::Constant<E>);
-   REQUIRE_FALSE(any.IsEncrypted());
-   REQUIRE_FALSE(any.IsStatic());
-   REQUIRE_FALSE(any.IsValid());
-   REQUIRE      (any.IsInvalid());
-   REQUIRE      (any.IsAllocated());
-   REQUIRE      (any.GetAllocation());
-   REQUIRE      (any.IsEmpty());
-   REQUIRE      (any.GetCount() == 0);
-   REQUIRE      (any.GetReserved() > 0);
-   REQUIRE      (any.GetUses() == 1);
-   REQUIRE      (any.GetRaw());
-   REQUIRE_FALSE(any);
-   REQUIRE      (not any);
-}
-
-template<class E>
-void Any_CheckState_OwnedFull(auto const& any) {
-   using T = Decay<decltype(any)>;
-
-   Any_Helper_TestType<E>(any);
-
-   REQUIRE      (any.IsTypeConstrained() == CT::Typed<T>);
-   REQUIRE_FALSE(any.IsCompressed());
-   REQUIRE      (any.IsConstant() == CT::Constant<E>);
-   REQUIRE_FALSE(any.IsEncrypted());
-   REQUIRE      (any.IsValid());
-   REQUIRE_FALSE(any.IsInvalid());
-   REQUIRE_FALSE(any.IsStatic());
-   REQUIRE      (any.IsAllocated());
-   REQUIRE      (any.GetAllocation());
-   REQUIRE_FALSE(any.IsEmpty());
-   REQUIRE      (any.GetCount() > 0);
-   REQUIRE      (any.GetReserved() > 0);
-   REQUIRE      (any.GetUses() > 0);
-   REQUIRE      (any.GetRaw());
-   REQUIRE      (any);
-   REQUIRE_FALSE(not any);
-}
-
-template<class E>
-void Any_CheckState_DisownedFull(auto const& any) {
-   using T = Decay<decltype(any)>;
-
-   Any_Helper_TestType<E>(any);
-
-   REQUIRE      (any.IsTypeConstrained() == CT::Typed<T>);
-   REQUIRE_FALSE(any.IsCompressed());
-   REQUIRE      (any.IsConstant() == CT::Constant<E>);
-   REQUIRE_FALSE(any.IsEncrypted());
-   REQUIRE      (any.IsValid());
-   REQUIRE_FALSE(any.IsInvalid());
-   REQUIRE      (any.IsStatic());
-   REQUIRE      (any.IsAllocated());
-   REQUIRE_FALSE(any.GetAllocation());
-   REQUIRE_FALSE(any.IsEmpty());
-   REQUIRE      (any.GetCount() > 0);
-   REQUIRE      (any.GetReserved() > 0);
-   REQUIRE      (any.GetUses() == 0);
-   REQUIRE      (any.GetRaw());
-   REQUIRE      (any);
-   REQUIRE_FALSE(not any);
-}
-
-template<class E>
-void Any_CheckState_DisownedFullConst(auto const& any) {
-   using T = Decay<decltype(any)>;
-
-   Any_Helper_TestType<E>(any);
-
-   REQUIRE      (any.IsTypeConstrained() == CT::Typed<T>);
-   REQUIRE_FALSE(any.IsCompressed());
-   REQUIRE      (any.IsConstant());
-   REQUIRE_FALSE(any.IsEncrypted());
-   REQUIRE      (any.IsValid());
-   REQUIRE_FALSE(any.IsInvalid());
-   REQUIRE      (any.IsStatic());
-   REQUIRE      (any.IsAllocated());
-   REQUIRE_FALSE(any.GetAllocation());
-   REQUIRE_FALSE(any.IsEmpty());
-   REQUIRE      (any.GetCount() > 0);
-   REQUIRE      (any.GetReserved() > 0);
-   REQUIRE      (any.GetUses() == 0);
-   REQUIRE      (any.GetRaw());
-   REQUIRE      (any);
-   REQUIRE_FALSE(not any);
-}
-
-template<class E>
-void Any_CheckState_Abandoned(auto const& any) {
-   REQUIRE_FALSE(any.GetAllocation());
-}
-
-
-void Any_CheckState_ContainsOne(auto const& pack, auto const& e, Allocation* entry = nullptr) {
-   using T = Deref<decltype(pack)>;
-   using E = Deref<decltype(e)>;
-   (void) entry;
-
-   REQUIRE(pack.GetCount() == 1);
-   REQUIRE(pack.GetUses() == 1);
-   REQUIRE(pack.GetReserved() >= 1);
-
-   for (auto& it : pack)
-      REQUIRE(it == e);
-
-   if constexpr (CT::Sparse<E>) {
-      REQUIRE(&pack.template As<Deptr<E>>() ==  e);
-      REQUIRE( pack.template As<Deptr<E>>() == *e);
-      REQUIRE(*pack.template As<E>() == *e);
-      REQUIRE(*pack.template GetRaw<E>() == e);
-   }
-   else if constexpr (T::TypeErased or Same<TypeOf<T>, E>) {
-      REQUIRE(pack.template As<E>() == e);
-   }
-
-   IF_LANGULUS_MANAGED_MEMORY(REQUIRE(*pack.GetEntries() == entry));
-
-   if constexpr (T::TypeErased) {
-      REQUIRE_THROWS(pack.template As<float>() == 0.0f);
-      REQUIRE_THROWS(pack.template As<float*>() == nullptr);
-   }
-}
-
-void Any_CheckState_ContainsN(size_t n, auto const& pack, const CT::Sparse auto& e, Allocation* entry = nullptr) {
-   using T = Deref<decltype(pack)>;
-   using E = Deref<decltype(e)>;
-   (void)entry;
-
-   REQUIRE(pack.GetCount() == n);
-   REQUIRE(pack.GetUses() == 1);
-   REQUIRE(pack.GetReserved() >= n);
-
-   for (auto& it : pack)
-      REQUIRE(it == e);
-
-   for (size_t i = 0; i < n; ++i) {
-      REQUIRE(&pack.template As<Deptr<E>>(i) == e);
-      REQUIRE(pack.template As<Deptr<E>>(i) == *e);
-      REQUIRE(*pack.template As<E>(i) == *e);
-      REQUIRE(pack.template GetRaw<E>()[i] == e);
-      IF_LANGULUS_MANAGED_MEMORY(REQUIRE(pack.GetEntries()[i] == entry));
-
-      if constexpr (T::TypeErased) {
-         REQUIRE_THROWS(pack.template As<float>(i) == 0.0f);
-         REQUIRE_THROWS(pack.template As<float*>(i) == nullptr);
+      //TODO test all kinds of ranged modifiers??
+      for (auto& it : many) {
+         if constexpr (CT::TypeErased<T>)
+            REQUIRE(it.CompareOneEqual(*e));
+         else
+            REQUIRE(it == *e);
       }
    }
 }
 
-void Any_CheckState_ContainsArray(auto const& pack, const CT::Array auto& e, Allocation* entry = nullptr) {
-   using T = Deref<decltype(pack)>;
-   using E = Deext<decltype(e)>;
-   (void)entry;
-   constexpr int n = ExtentOf<decltype(e)>;
+template<CT::Container T, CT::Intent I> requires CT::NoIntent<T>
+void Many_CheckState_ContainsN(size_t n, const T& many, I&& e_scoped_with_intent, int uses = 1) {
+   auto& e = e_scoped_with_intent.what;
+   using E = typename Decay<Deint<I>>::CTTI_Typed;
 
-   REQUIRE(pack.GetCount() == n);
-   REQUIRE(pack.GetUses() == 1);
-   REQUIRE(pack.GetReserved() >= n);
+   REQUIRE(many.GetCount() == n);
+   REQUIRE(many.GetUses() == 1);
+   REQUIRE(many.GetReserved() >= n);
+
+   for (auto& it : many)
+      REQUIRE(it == e);
+
+   for (size_t i = 0; i < n; ++i) {
+      REQUIRE(&many.template As<Deptr<E>>(i) ==  e);
+      REQUIRE( many.template As<Deptr<E>>(i) == *e);
+      REQUIRE(*many.template As<E>(i) == *e);
+      REQUIRE( many.template GetRaw<E>()[i] == e);
+
+      if constexpr (CT::Dense<E>)
+         REQUIRE(many.GetEntries() == nullptr);
+      else if (uses) {
+         REQUIRE(many.GetEntries() != nullptr);
+
+         if constexpr (not CT::Disowned<I>) {
+            for (size_t indirection = 0; indirection < IndirectsOf<E>; ++indirection) {
+               size_t entry_idx = indirection + i * IndirectsOf<E>;
+               if constexpr (CT::Cloned<I>)
+                  REQUIRE(many.GetEntries()[entry_idx] != e.entries[indirection + 1]);
+               else
+                  REQUIRE(many.GetEntries()[entry_idx] == e.entries[indirection + 1]);
+            }
+         }
+         else {
+            for (size_t indirection = 0; indirection < IndirectsOf<E>; ++indirection) {
+               size_t entry_idx = indirection + i * IndirectsOf<E>;
+               REQUIRE(many.GetEntries()[entry_idx] == nullptr);
+            }
+         }
+      }
+
+      if constexpr (CT::TypeErased<T>) {
+         REQUIRE_THROWS(many.template As<float>(i) == 0.0f);
+         REQUIRE_THROWS(many.template As<float*>(i) == nullptr);
+      }
+   }
+}
+
+template<CT::Container T, CT::Intent I> requires (CT::NoIntent<T> and CT::Array<I>)
+void Many_CheckState_ContainsArray(const T& many, I&& e_scoped_array_with_intent) {
+   auto  e = e_scoped_array_with_intent.what;
+   using E = typename Decay<Deint<I>>::CTTI_Typed;
+   constexpr size_t n = ExtentOf<decltype(e_scoped_array_with_intent.what)>;
+
+   REQUIRE(many.GetCount() == n);
+   REQUIRE(many.GetUses() == 1);
+   REQUIRE(many.GetReserved() >= n);
 
    int index = 0;
-   for (auto& it : pack)
-      REQUIRE(it == e[index++]);
+   for (auto& it : many)
+      REQUIRE(it == *(e[index++]));
    REQUIRE(index == n);
 
-   for (size_t i = 0; i < n; ++i) {
-      REQUIRE(&pack.template As<Deptr<E>>(i) == e[i]);
-      REQUIRE(pack.template As<Deptr<E>>(i) == *e[i]);
-      REQUIRE(*pack.template As<E>(i) == *e[i]);
-      REQUIRE(pack.template GetRaw<E>()[i] == e[i]);
-      IF_LANGULUS_MANAGED_MEMORY(REQUIRE(pack.GetEntries()[i] == entry));
+   for (int i = 0; i < n; ++i) {
+      REQUIRE(&many.template As<Deptr<E>>(i) == e[i]);
+      REQUIRE( many.template As<Deptr<E>>(i) == *e[i]);
+      REQUIRE(*many.template As<E>(i) == *e[i]);
+      REQUIRE( many.template GetRaw<E>()[i] == e[i]);
+
+      if constexpr (not CT::Disowned<I>) {
+         for (size_t indirection = 0; indirection < IndirectsOf<E>; ++indirection) {
+            size_t entry_idx = indirection + i * IndirectsOf<E>;
+            if constexpr (CT::Cloned<I>)
+               REQUIRE(many.GetEntries()[entry_idx] != e[i].entries[indirection + 1]);
+            else
+               REQUIRE(many.GetEntries()[entry_idx] == e[i].entries[indirection + 1]);
+         }
+      }
+      else {
+         for (size_t indirection = 0; indirection < IndirectsOf<E>; ++indirection) {
+            size_t entry_idx = indirection + i * IndirectsOf<E>;
+            REQUIRE(many.GetEntries()[entry_idx] == nullptr);
+         }
+      }
 
       if constexpr (T::TypeErased) {
-         REQUIRE_THROWS(pack.template As<float>(i) == 0.0f);
-         REQUIRE_THROWS(pack.template As<float*>(i) == nullptr);
+         REQUIRE_THROWS(many.template As<float>(i) == 0.0f);
+         REQUIRE_THROWS(many.template As<float*>(i) == nullptr);
       }
    }
+}
+
+template<CT::Container T, class E> requires CT::NoIntent<T>
+void Many_Helper_CompareOne(const T& many, const E& e) {
+   Any_Helper_CompareOne(many, e);
 }

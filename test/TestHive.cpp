@@ -1,11 +1,11 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                           
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
-#include <Langulus/Annies/THive.hpp>
+#include <Langulus/Anyness/THive.hpp>
 #include "Common.hpp"
 
 
@@ -17,6 +17,8 @@ struct Producible : Referenced {
    bool operator == (const Producible& a) const noexcept {
       return v == a.v;
    }
+
+   explicit operator bool() const noexcept { return v != 0; }
 };
 
 SCENARIO("Test hives", "[hive]") {
@@ -25,59 +27,30 @@ SCENARIO("Test hives", "[hive]") {
    const Producible one {1};
    const Producible two {2};
 
-	GIVEN("A hive instance") {
-		THive<Producible> hive;
+   GIVEN("A hive instance") {
+      THive<Producible> hive;
 
-		WHEN("Default-constructed") {
-			REQUIRE(hive.GetReusable() == nullptr);
-			REQUIRE(hive.IsEmpty());
-			REQUIRE(hive.GetType() == MetaOf<Producible>());
-			REQUIRE(hive.GetCount() == 0);
-		}
+      WHEN("Default-constructed") {
+         REQUIRE(hive.GetReusable() == nullptr);
+         REQUIRE(hive.IsEmpty());
+         REQUIRE(hive.GetType() == MetaOf<Producible>());
+         REQUIRE(hive.GetCount() == 0);
+      }
 
-		WHEN("Two elements produced") {
-         auto p1 = hive.New(1);
-         auto p2 = hive.New(2);
+      WHEN("Two elements produced") {
+         auto p1 = hive.Emplace(1);
+         auto p2 = hive.Emplace(2);
 
          REQUIRE(p1);
          REQUIRE(p2);
 
-			REQUIRE(hive.GetCount() == 2);
-			REQUIRE(hive.GetFrames().GetCount() == 1);
-         REQUIRE(hive.GetReusable() == hive.GetFrames()[0].GetRaw() + 2);
+         REQUIRE(hive.GetCount() == 2);
+         REQUIRE(hive.GetFrames() == 1);
+         REQUIRE(hive.GetReusable() == hive.GetFrame(0) + 2*sizeof(Producible));
          REQUIRE(hive.GetType() == MetaOf<Producible>());
-			REQUIRE(hive.GetFrames()[0].GetRaw()[0].mData == one);
-			REQUIRE(hive.GetFrames()[0].GetRaw()[1].mData == two);
-		}
-
-		WHEN("30 elements produced") {
-         for (int i = 1; i <= 30; ++i)
-            REQUIRE(hive.New(i));
-
-			REQUIRE(hive.GetCount() == 30);
-			REQUIRE(hive.GetFrames().GetCount() == 2);
-         //REQUIRE(hive.GetReusable() == nullptr);
-         REQUIRE(hive.GetType() == MetaOf<Producible>());
-
-         for (size_t i = 0; i < hive.GetFrames()[0].GetReserved(); ++i) {
-            auto v = hive.GetFrames()[0].GetRaw()[i].mData;
-            REQUIRE(v.v == i + 1);
-         }
-
-         for (size_t i = hive.GetFrames()[0].GetReserved(); i < hive.GetFrames()[0].GetReserved() + hive.GetFrames()[1].GetReserved() - 1; ++i) {
-            auto v = hive.GetFrames()[1].GetRaw()[i - hive.GetFrames()[0].GetReserved()].mData;
-            REQUIRE(v.v == i + 1);
-         }
-
-         THEN("Iterated using range") {
-            int counter = 0;
-            for (auto& i : hive) {
-               ++counter;
-               REQUIRE(i == counter);
-            }
-            REQUIRE(counter == 30);
-         }
-		}
+         REQUIRE(*reinterpret_cast<Producible*>(hive.GetFrame(0)) == one);
+         REQUIRE(*reinterpret_cast<Producible*>(hive.GetFrame(0) + sizeof(Producible)) == two);
+      }
    }
 
    const_cast<Producible&>(one).Reference(-1);

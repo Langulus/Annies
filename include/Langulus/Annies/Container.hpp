@@ -226,11 +226,6 @@ namespace Langulus::Annies
       }
    }
 
-   constexpr Inner::Stackwise Stackwise {};
-   constexpr Inner::Piecewise Piecewise {};
-   constexpr Inner::Absorb    Absorb {};
-   template<Cid ID>
-   constexpr auto Slice = Inner::Slice<ID>{};
    
    template<CT::Container C>
    using DecideHandle = typename decltype(Inner::DecideHandleType<Deref<C>>())::First;
@@ -240,6 +235,15 @@ namespace Langulus::Annies
 
    template<class...T>
    concept Disambiguate = ((not requires { typename Decay<T>::CTTI_Disambiguator; }) and ...);
+}
+
+namespace Langulus
+{
+   constexpr Annies::Inner::Stackwise Stackwise {};
+   constexpr Annies::Inner::Piecewise Piecewise {};
+   constexpr Annies::Inner::Absorb    Absorb {};
+   template<Annies::Cid ID>
+   constexpr Annies::Inner::Slice<ID> Slice {};
 }
 
 namespace Langulus::Annies::Component
@@ -1268,13 +1272,13 @@ namespace Langulus::Annies::Component
                   if constexpr (CT::Pair<H> and not CT::Pair<AS>) {
                      //TODO magic numbers here, use H::PickDimension?
                      if constexpr (SID == 0)
-                        return Decvq<AS> {Annies::Absorb, self.template As<typename H::KeyHandle, 0>()};
+                        return Decvq<AS> {Langulus::Absorb, self.template As<typename H::KeyHandle, 0>()};
                      else if constexpr (SID == 1)
-                        return Decvq<AS> {Annies::Absorb, self.template As<typename H::ValHandle, 1>()};
+                        return Decvq<AS> {Langulus::Absorb, self.template As<typename H::ValHandle, 1>()};
                      else
                         static_assert(false, "Unsupported SID");
                   }
-                  else return Decvq<AS> {Annies::Absorb, self.template As<H, SID>()};
+                  else return Decvq<AS> {Langulus::Absorb, self.template As<H, SID>()};
                }
             }
             #endif
@@ -1414,7 +1418,7 @@ namespace Langulus::Annies::Component
          else {
             // Containers aren't binary compatible.                     
             // Do a disowned shallow copy to represent data.            
-            return Decay<AS> {Annies::Absorb, Disown(self)};
+            return Decay<AS> {Langulus::Absorb, Disown(self)};
          }
       }
    };

@@ -11,11 +11,7 @@ if (PROJECT_IS_TOP_LEVEL OR NOT LANGULUS)
    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
    include(LangulusUtilities.cmake)
-
-   fetch_langulus_module(RTTI GIT_TAG wip)
-   if(LANGULUS_OPTION_MANAGED_MEMORY)
-      fetch_langulus_module(Fractalloc GIT_TAG wip)
-   endif()
+   fetch_langulus_module(Fractalloc GIT_TAG wip)
 endif()
 
 # Build and install Annies library												
@@ -24,7 +20,6 @@ add_langulus_library(LangulusAnnies
             $<TARGET_OBJECTS:LangulusRTTI>
             $<TARGET_OBJECTS:LangulusFractalloc>
             $<TARGET_OBJECTS:LangulusPercist>
-            source/Text.cpp
             source/Bytes.cpp
             source/Many.cpp
             source/Tag.cpp
@@ -33,16 +28,11 @@ add_langulus_library(LangulusAnnies
 )
 
 target_include_directories(LangulusAnnies
-   PUBLIC   $<TARGET_PROPERTY:LangulusLogger,INTERFACE_INCLUDE_DIRECTORIES>
-            $<TARGET_PROPERTY:LangulusRTTI,INTERFACE_INCLUDE_DIRECTORIES>
-            $<TARGET_PROPERTY:LangulusFractalloc,INTERFACE_INCLUDE_DIRECTORIES>
-            $<TARGET_PROPERTY:LangulusPercist,INTERFACE_INCLUDE_DIRECTORIES>
-            include
+   PUBLIC   include
 )
 
 target_link_libraries(LangulusAnnies
-   PUBLIC   LangulusCore
-            $<TARGET_PROPERTY:LangulusLogger,INTERFACE_LINK_LIBRARIES>
+   PUBLIC   LangulusFractalloc
 )
 
 target_compile_definitions(LangulusAnnies
@@ -51,5 +41,5 @@ target_compile_definitions(LangulusAnnies
 
 if(LANGULUS_OPTION_TESTING)
    enable_testing()
-   #add_subdirectory(test)
+   add_subdirectory(test)
 endif()
