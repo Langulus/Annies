@@ -8,7 +8,6 @@
 #include "TestTextCommon.hpp"
 #include "../handle/TestHandleCommon.hpp"
 
-#include <Langulus/Annies/Functional/Compare.hpp>
 
 //TODO char* std::string_view std::string std::array<char> Literal
 

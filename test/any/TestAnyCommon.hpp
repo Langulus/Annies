@@ -18,6 +18,16 @@
 #include <ranges>
 #include <any>
 
+#include <Langulus/Annies/Functional/Describe.hpp>
+#include <Langulus/Annies/Functional/Compare.hpp>
+#include <Langulus/Annies/Functional/Assign.hpp>
+#include <Langulus/Annies/Functional/Insert.hpp>
+#include <Langulus/Annies/Functional/Convert.hpp>
+#include <Langulus/Annies/Functional/Deepen.hpp>
+#include <Langulus/Annies/Functional/ForEach.hpp>
+#include <Langulus/Annies/Functional/Merge.hpp>
+#include <Langulus/Annies/Functional/Remove.hpp>
+
 using namespace Langulus::Annies;
 
 #if LANGULUS(BENCHMARK)

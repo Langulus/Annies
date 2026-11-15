@@ -7,7 +7,6 @@
 ///                                                                           
 #pragma once
 #include "../Component.hpp"
-//#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Deep.hpp>
 #include <Langulus/CT/Executable.hpp>
 
@@ -321,7 +320,8 @@ namespace Langulus::Annies::Component
       constexpr void SetType() {
          static_assert(CT::NotSheddable<T>, "Strip all sheddables first");
          static_assert(CT::NotReference<T>, "Strip all references first");
-         static_assert(Exact<T, TYPE>, "Type mismatch");
+         static_assert(Same<T, TYPE>, "Type mismatch: " + CppNameOf<T>() + 
+                                       " isn't similar to " + CppNameOf<TYPE>());
       }
 
       /// This is still used if statically-typed - checks if types are        
@@ -330,7 +330,7 @@ namespace Langulus::Annies::Component
       ///   @param type the new type                                          
       template<Cid SID = ID>
       void SetType(META type) {
-         LglsAssert(GetType().IsExact(type), "Type mismatch");
+         LglsAssert(GetType().IsSame(type), "Type mismatch");
       }
       
       /// Set all contained data types by copying them from another container.
@@ -366,7 +366,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::Handle<A>)
             AbsorbType<0>(Copy(a));
          else
-            SetType<Decvq<::std::remove_all_extents_t<Deref<Deint<A>>>>>();
+            SetType<Decvq<CT::RemoveAllBoundedArrays<A>>>();
       }
    };
 }

@@ -57,13 +57,13 @@ namespace Langulus::Annies
       using Pick           = ConstAll<T>;
       using PickMut        = T;
       
-      #if not LANGULUS(FORCE_TYPE_ERASURE)
-         using HandleType    = THandle<ConstAll<T> const&>;
-         using HandleMutType = THandle<T&>;
-      #else
-         using HandleType    = Handle;
+      //#if not LANGULUS(FORCE_TYPE_ERASURE)
+         using HandleType    = THandleEmergent<ConstAll<T> const&>;
+         using HandleMutType = THandleEmergent<T&>;
+      /*#else
+         using HandleType    = HandleEmergent;
          using HandleMutType = HandleMut;
-      #endif
+      #endif*/
 
       constexpr TRef() noexcept {
          this->ConstructDefault();
@@ -87,7 +87,11 @@ namespace Langulus::Annies
          if constexpr (CT::ContainsOne<A>)
             this->Absorb(FWDIntent(pointer));
          else {
-            static_assert(CT::Sparse<A>, "A must be a pointer (intent is optional)");
+            static_assert(CT::Sparse<A>,
+               "A must be a pointer (intent is optional)");
+            static_assert(IndirectsOf<A> == IndirectsOf<T>,
+               "Number of indirections must match");
+
             auto* p = DeintCast(pointer);
             if (p) {
                this->EmplaceConstruct(LglsFwd(pointer));
@@ -112,9 +116,16 @@ namespace Langulus::Annies
       constexpr TRef& operator = (A&& pointer) noexcept {
          if constexpr (CT::ContainsOne<A>)
             return this->AssignAbsorb(LglsFwd(pointer));
+         else if constexpr (::std::is_null_pointer_v<Deint<A>>) {
+            this->Clear();
+            return *this;
+         }
          else {
             static_assert(CT::Sparse<A>,
                "A must be a pointer (intent is optional)");
+            static_assert(IndirectsOf<A> == IndirectsOf<T>,
+               "Number of indirections must match");
+               
             return this->Assign(LglsFwd(pointer));
          }
 
@@ -210,11 +221,11 @@ namespace Langulus::Annies
          return *Base::GetRaw() <=> *rhs.GetRaw();
       }
 
-      friend constexpr auto operator <=> (const TRef& lhs, const T* rhs) noexcept {
+      friend constexpr auto operator <=> (const TRef& lhs, const T rhs) noexcept {
          return *lhs.GetRaw() <=> rhs;
       }
 
-      friend constexpr auto operator <=> (const T* lhs, const TRef& rhs) noexcept {
+      friend constexpr auto operator <=> (const T lhs, const TRef& rhs) noexcept {
          return lhs <=> *rhs.GetRaw();
       }
 
@@ -231,11 +242,11 @@ namespace Langulus::Annies
          return *Base::GetRaw() == *rhs.GetRaw();
       }
 
-      friend constexpr bool operator == (const TRef& lhs, const T* rhs) noexcept {
+      friend constexpr bool operator == (const TRef& lhs, const T rhs) noexcept {
          return *lhs.GetRaw() == rhs;
       }
 
-      friend constexpr bool operator == (const T* lhs, const TRef& rhs) noexcept {
+      friend constexpr bool operator == (const T lhs, const TRef& rhs) noexcept {
          return lhs == *rhs.GetRaw();
       }
 
@@ -245,6 +256,14 @@ namespace Langulus::Annies
 
       friend constexpr bool operator == (nullptr_t, const TRef& rhs) noexcept {
          return *rhs.GetRaw() == nullptr;
+      }
+
+      explicit constexpr operator bool () const noexcept {
+         return *this->GetRaw() != nullptr;
+      }
+      
+      constexpr bool IsEmpty() const noexcept {
+         return *this->GetRaw() == nullptr;
       }
    };
 

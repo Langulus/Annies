@@ -167,7 +167,7 @@ void Set_CheckState_ContainsOne(T const& set, I&& e_with_intent, int uses = 1) {
 
    if constexpr (CT::Cloned<I> and CT::Sparse<E>) {
       //TODO test all kinds of ranged modifiers??
-      for (auto& it : set) {
+      for (auto it : set) {
          if constexpr (CT::TypeErased<T>)
             REQUIRE(not it.CompareOneEqual(*e));
          else
@@ -176,7 +176,7 @@ void Set_CheckState_ContainsOne(T const& set, I&& e_with_intent, int uses = 1) {
    }
    else {
       //TODO test all kinds of ranged modifiers??
-      for (auto& it : set) {
+      for (auto it : set) {
          if constexpr (CT::TypeErased<T>)
             REQUIRE(it.CompareOneEqual(*e));
          else
@@ -250,7 +250,7 @@ void Set_CheckState_ContainsArray(const T& set, A const&...array) {
 
    size_t iterated = 0;
    size_t found = 0;
-   for (auto& it : set) {
+   for (auto it : set) {
       found += (find(it, array) + ...);
       ++iterated;
    }

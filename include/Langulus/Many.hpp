@@ -243,15 +243,7 @@ namespace Langulus::Annies
       }
 
       using Com::Comparison<>::operator <=>;
-      //using Com::Comparison<>::operator ==;
-
-      LANGULUS_API(ANNIES)
-      bool operator == (Many const& other) const noexcept;
-
-      template<CT::Container C> requires (not Same<C, Many>)
-      constexpr bool operator == (C const& other) const noexcept {
-         return this->CompareEqual(other);
-      }
+      using Com::Comparison<>::operator ==;
    };
 }
 

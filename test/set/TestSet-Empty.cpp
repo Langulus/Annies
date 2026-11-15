@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "TestSetCommon.hpp"
+#include "../handle/TestHandleCommon.hpp"
 
 
 namespace Langulus::Annies  
@@ -728,17 +729,17 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
          //static_assert(CT::TypeErased<T>           or ::std::contiguous_iterator<IteratorConst>);
 
          size_t counter = 0;
-         for (auto& it : pack) {
+         for (auto it : pack) {
             (void) it;
             ++counter;
 
-            if constexpr (CT::TypeErased<T>/* or Sparse*/)
+            if constexpr (CT::TypeErased<T> or Sparse)
                static_assert(CT::Handle<decltype(it)>);
             else
                static_assert(Same<E, decltype(it)>);
          }
 
-         for (auto& it : ::std::as_const(pack)) {
+         for (auto it : ::std::as_const(pack)) {
             (void) it;
             ++counter;
 
@@ -748,17 +749,17 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
                static_assert(Same<E, decltype(it)>);
          }
 
-         for (auto& it : strategy) {
+         for (auto it : strategy) {
             (void) it;
             ++counter;
 
-            if constexpr (CT::TypeErased<T>/* or Sparse*/)
+            if constexpr (CT::TypeErased<T> or Sparse)
                static_assert(CT::Handle<decltype(it)>);
             else
                static_assert(Same<E, decltype(it)>);
          }
 
-         for (auto& it : strategyConst) {
+         for (auto it : strategyConst) {
             (void) it;
             ++counter;
 
@@ -789,17 +790,17 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
          //static_assert(CT::TypeErased<T>           or ::std::contiguous_iterator<IteratorConst>);
 
          size_t counter = 0;
-         for (auto& it : strategy) {
+         for (auto it : strategy) {
             (void) it;
             ++counter;
 
-            if constexpr (CT::TypeErased<T>/* or Sparse*/)
+            if constexpr (CT::TypeErased<T> or Sparse)
                static_assert(CT::Handle<decltype(it)>);
             else
                static_assert(Same<E, decltype(it)>);
          }
 
-         for (auto& it : strategyConst) {
+         for (auto it : strategyConst) {
             (void) it;
             ++counter;
 
@@ -873,7 +874,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
             (void) it;
             ++counter;
 
-            if constexpr (CT::TypeErased<T>/* or Sparse*/)
+            if constexpr (CT::TypeErased<T> or Sparse)
                static_assert(CT::Handle<decltype(it.one()), decltype(it.two())>);
             else
                static_assert(Same<E, decltype(it.one()), decltype(it.two())>);
@@ -935,7 +936,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
          Set_CheckState_ContainsArray(pack, immovable);
 
          if constexpr (Sparse and Reffed) {
-            for (uint i = 0; i < 5; ++i) {
+            for (unsigned i = 0; i < 5; ++i) {
                for (auto& arr : darray1) {
                   if (*pack.template GetAt<E>(i) == *arr) {
                      // Shallowly referenced in the set              
@@ -959,7 +960,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
          Set_CheckState_ContainsArray(pack, immovable, movable2);
 
          if constexpr (Sparse and Reffed) {
-            for (uint i = 0; i < 10; ++i) {
+            for (unsigned i = 0; i < 10; ++i) {
                for (auto& arr : darray1) {
                   if (*pack.template GetAt<E>(i) == *arr) {
                      // Shallowly referenced in the set              
@@ -990,7 +991,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
          Set_CheckState_OwnedFull<E>(pack);
 
          if constexpr (Sparse and Reffed) {
-            for (uint i = 0; i < 15; ++i) {
+            for (unsigned i = 0; i < 15; ++i) {
                for (auto& arr : darray1) {
                   if (*pack.template GetAt<E>(i) == *arr) {
                      // Shallowly referenced in the set              
@@ -1016,7 +1017,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
             /*int deep_matches1_total = 0;
             int deep_matches2_total = 0;*/
 
-            for (uint i = 0; i < 15; ++i) {
+            for (unsigned i = 0; i < 15; ++i) {
                int shallow_matches1 = 0;
                int shallow_matches2 = 0;
                int deep_matches1 = 0;
@@ -1076,7 +1077,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
                   return {2,1,5,3,6,4,9,8,7,10};
             }();
 
-            for (uint i = 0; i < 10; ++i) {
+            for (unsigned i = 0; i < 10; ++i) {
                if (hashed_order[i] <= 5) {
                   const int idx = hashed_order[i] - 1;
                   REQUIRE(*pack.template GetAt<E>(i) == *darray1[idx]);
@@ -1126,7 +1127,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
             /*int deep_matches1_total = 0;
             int deep_matches2_total = 0;*/
 
-            for (uint i = 0; i < 6; ++i) {
+            for (unsigned i = 0; i < 6; ++i) {
                int shallow_matches1 = 0;
                int shallow_matches2 = 0;
                int deep_matches1 = 0;
@@ -1217,7 +1218,7 @@ TEST_CASE_TEMPLATE("Test empty Set/TSet", TestType
             /*int deep_matches1_total = 0;
             int deep_matches2_total = 0;*/
 
-            for (uint i = 0; i < 6; ++i) {
+            for (unsigned i = 0; i < 6; ++i) {
                int shallow_matches1 = 0;
                int shallow_matches2 = 0;
                int deep_matches1 = 0;

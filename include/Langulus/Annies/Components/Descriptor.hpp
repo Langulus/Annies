@@ -9,7 +9,6 @@
 #include "../Container.hpp"
 #include <Langulus/CT/DefineTag.hpp>
 #include <Langulus/CT/Index.hpp>
-//#include <Langulus/MetaOf.hpp>
 #include <Langulus/Allocator.hpp>
 
 

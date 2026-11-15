@@ -367,10 +367,14 @@ void Map_CheckState_ContainsOne(T const& map, IK&& key_with_intent, IV&& val_wit
    //TODO test all kinds of ranged modifiers??
    for (auto& it : map) {
       if constexpr (CT::TypeErased<T>) {
-         REQUIRE(it.GetKey().CompareOneEqual(*e1) != (CT::Cloned<IK> and CT::Sparse<E1>));
-         REQUIRE(it.GetVal().CompareOneEqual(*e2) != (CT::Cloned<IV> and CT::Sparse<E2>));
+         static_assert(not requires { it.GetKey(); });
+         static_assert(not requires { it.GetVal(); });
+         REQUIRE(it.GetKeyHandle().CompareOneEqual(*e1) != (CT::Cloned<IK> and CT::Sparse<E1>));
+         REQUIRE(it.GetValHandle().CompareOneEqual(*e2) != (CT::Cloned<IV> and CT::Sparse<E2>));
       }
       else {
+         static_assert(requires { it.GetKeyHandle(); });
+         static_assert(requires { it.GetValHandle(); });
          REQUIRE((it.GetKey() != *e1) == (CT::Cloned<IK> and CT::Sparse<E1>));
          REQUIRE((it.GetVal() != *e2) == (CT::Cloned<IV> and CT::Sparse<E2>));
       }

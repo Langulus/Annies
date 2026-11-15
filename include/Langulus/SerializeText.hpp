@@ -349,8 +349,8 @@ namespace Langulus::CTTI
    }
 }
 
-/// Map all arrays as convertible to text                                     
-/*LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Array, {
+/// Map all bounded arrays as convertible to text                             
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::BoundedArray, {
       if constexpr (CT::Character<Deext<T>>)
          return {from};
       else {
@@ -361,7 +361,7 @@ namespace Langulus::CTTI
       }
    },
    Annies::Text
-);*/
+);
 
 /// Converting to text relies on the serializer                               
 LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Tag, {

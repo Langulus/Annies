@@ -54,7 +54,7 @@ namespace Langulus::Annies::Component
 
       /// MARK: Public                                                        
       /// Emergent deep ownership can't provide an array of entries           
-      template<Cid SID = ID>
+      /*template<Cid SID = ID>
       constexpr auto GetEntries() const noexcept -> AllocationPtr const* {
          return nullptr;
       }
@@ -71,7 +71,7 @@ namespace Langulus::Annies::Component
       }
       constexpr auto GetValEntriesAt(CT::Index auto&&) const noexcept requires Shared {
          return nullptr;
-      }
+      }*/
 
    protected:
       /// MARK: Protected                                                     
@@ -848,7 +848,7 @@ namespace Langulus::Annies::Component
             // Statically, custom pointers behave just like standard,   
             // so we can just reuse the static branches in the default  
             // routine.                                                 
-            self.DestroyElementDeepStandardPointers();
+            ThisCom::template DestroyElementDeepStandardPointers<SID>(); //TODO is ThisCom:: risky here?
          }
       }
 
@@ -936,7 +936,7 @@ namespace Langulus::Annies::Component
             // Statically, custom pointers behave just like standard,   
             // so we can just reuse the static branches in the default  
             // routine.                                                 
-            self.DestroyElementDeepStandardPointersEmergent();
+            ThisCom::template DestroyElementDeepStandardPointersEmergent<SID>();//TODO is ThisCom:: risky here?
          }
       }
    #endif
@@ -970,9 +970,10 @@ namespace Langulus::Annies::Component
       ///      when REF_INDIVIDUAL is enabled and items are CT::Referenced.   
       ///   @param intent entries will be copied/sought if handle/sparse,     
       ///      unless I is disowned                                           
+      ///   @attention this routine is made for non-emergent entries          
       template<Cid SID = ID, CT::Container C, CT::Intent I>
       requires(/*Relevant<SID> and*/ (CT::TypeErased<C> or (CT::Sparse<TypeOf<C, SID>> and not ::std::is_function_v<Deptr<TypeOf<C, SID>>>)))
-      void EmplaceEntries(this C& self, I&& intent) {
+      void EmplaceEntries(this C& self, I&& intent) requires requires { self.template GetEntries<SID>(); } {
          if constexpr (CT::TypeErased<C>) {
             // If container is type-erased, we need to make a runtime   
             // sparsity check for an early exit.                        
@@ -985,6 +986,7 @@ namespace Langulus::Annies::Component
          const auto entries_size = sizeof(AllocationPtr) * indirections;
          //const auto entries = self.template GetEntriesInner<SID>();
          const auto entries = self.template GetEntries<SID>();
+         LglsAssumeDev(entries, "Invalid entries");
          constexpr bool sought = not CT::Disowned<I>;
 
          if constexpr (CT::Handle<I>) {
@@ -1071,6 +1073,81 @@ namespace Langulus::Annies::Component
                   ThisCom::template KeepElementDeepStandardPointers<sought, SID>();
             #else
                ThisCom::template KeepElementDeepStandardPointers<sought, SID>();
+            #endif
+         }
+      }
+      
+      ///   @attention this routine is made for emergent entries              
+      template<Cid SID = ID, CT::Container C, CT::Intent I>
+      requires(/*Relevant<SID> and*/ (CT::TypeErased<C> or (CT::Sparse<TypeOf<C, SID>> and not ::std::is_function_v<Deptr<TypeOf<C, SID>>>)))
+      void EmplaceEntries(this C& self, I&& intent) requires (not requires { self.template GetEntries<SID>(); }) {
+         if constexpr (CT::TypeErased<C>) {
+            // If container is type-erased, we need to make a runtime   
+            // sparsity check for an early exit.                        
+            if (not self.template IsSparse<SID>())
+               return;
+         }
+
+         decltype(auto) rhs = LglsFwd(intent.what);
+         //const auto indirections = self.template GetIndirections<SID>();
+         //const auto entries_size = sizeof(AllocationPtr) * indirections;
+         constexpr bool sought = not CT::Disowned<I>;
+
+         if constexpr (CT::Handle<I>) {
+            // Copy all entries and reference them, unless we're moving 
+            // a handle                                                 
+            LglsAssumeDev(self.template IsSame<SID>(rhs.template GetType<SID>()),
+               "Type mismatch", ": ", self.template GetType<SID>(),
+               " is not same as ", rhs.template GetType<SID>()
+            );
+
+            if constexpr (not I::IsMoved() or not requires { rhs.template GetEntriesInner<SID>(); }) {
+               // We are not moving or rhs is emergent, so we have to   
+               // reference all elements.                               
+               ThisCom::template KeepElementDeep<sought, SID>();
+            }
+            else if constexpr (REF_INDIVIDUAL) {
+               // We are moving/abandoning, but since individual items  
+               // are referenced (even if they have no corresponding    
+               // entry), we need to zero the source pointers, so that  
+               // we avoid them getting dereferenced later.             
+               if (rhs.IsSparse()) {
+                  auto pointers_src = rhs.template GetRaw<SID>();
+                  if constexpr (requires { rhs.template GetUses<SID>(); }) {
+                     LglsAssumeDev(rhs.template GetUses<SID>() == 1,
+                        "Can't move out from used memory");
+                  }
+                  else {
+                     #if LANGULUS_FEATURE(MANAGED_MEMORY)
+                        LglsAssumeDev(Allocator::Find(pointers_src)->GetUses() == 1,
+                           "Can't move out from used memory");
+                     #endif
+                  }
+                  memset(DecvqAllCast(pointers_src), 0, rhs.template GetBytesize<SID>());
+               }
+            }
+         }
+         else if constexpr (CT::Sparse<Deint<I>>) {
+            // Reference each indirection of a raw pointer              
+            #if LANGULUS_FEATURE(MANAGED_MEMORY) or LANGULUS(SAFE) > 1
+            using T = Decvq<Deref<Deint<I>>>;
+            LglsAssumeDev((self.template IsSame<T, SID>()),
+               "Type mismatch", ": ", self.template GetType<SID>(),
+               " is not same as ", NameOf<T>()
+            );
+            #endif
+
+            // We're forced to reference even on abandon/move           
+            // because we can't abandon/move a raw pointer. Missing     
+            // entries will be sought and referenced as well, unless    
+            // inserted pointer is disowned.                            
+            #if LANGULUS_FEATURE(MANAGED_MEMORY)
+               if constexpr (CT::CustomPointer<T>)
+                  ThisCom::template KeepElementDeepCustomPointersEmergent<SID>();
+               else
+                  ThisCom::template KeepElementDeepStandardPointersEmergent<SID>();
+            #else
+               ThisCom::template KeepElementDeepStandardPointersEmergent<SID>();
             #endif
          }
       }
@@ -1222,12 +1299,12 @@ namespace Langulus::Annies::Component
       ///      with cached referencing in derived components.                 
       ///   @param intent The intent and container to transfer from.          
       ///   @important Notice that Copy and Clone intents are not handled     
-      ///      here. They're handled in heap components instead, in case      
+      ///      here. They're handled in heap/stack components instead, in case
       ///      something throws an exception while constructing.              
       template<class SELF, CT::Intent I>
       requires (CT::Container<I> and (STYLE & OnCreateAndDestroy) != 0
            and not CT::Copied<I> and not CT::Cloned<I> and not CT::Disowned<I>
-           and CT::HeapAllocated<I>
+           //and CT::HeapAllocated<I>
            and (CT::TypeErased<Deint<I>> or CT::Sparse<TypeOf<I, ID>>))
       void ConstructFrom(this SELF& self, I&& intent) {
          using IT = Decvq<Deref<Deint<I>>>;
@@ -1252,7 +1329,20 @@ namespace Langulus::Annies::Component
                      "Remote count should've been reset prior to this call");
                }
                else if_available(from.template SetEntriesInner<ID>(nullptr))
-               else ThisCom::Keep();
+               else {
+                  // Note: reaching this branch guarantees that source  
+                  // isn't emergently owned!                            
+                  if constexpr (CT::HeapAllocated<I>) {
+                     // Source is heap-allocated, but there's no way to 
+                     // transfer ownership. Just keep.                  
+                     ThisCom::Keep();
+                  }
+                  else {
+                     // Source is stack-allocated. We can transfer      
+                     // ownership by simply zeroing the source pointer. 
+                     from.GetStackInner() = nullptr;
+                  }
+               }
             }
          }
       }

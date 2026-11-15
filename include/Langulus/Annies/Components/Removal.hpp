@@ -337,7 +337,8 @@ namespace Langulus::Annies::Component
       /// have to.                                                            
       ///   @attention will never reset state except disownment               
       ///   @attention will never reset type                                  
-      void Clear(this auto& self); /*{
+      template<CT::HeapAllocated C>
+      void Clear(this C& self); /*{
          const auto al = self.GetAllocation();
          if (self.IsEmpty()) {
             // Container is already empty. Just make sure that we're    
@@ -384,6 +385,9 @@ namespace Langulus::Annies::Component
 
          if_available(self.DisableDisowned());
       }*/
+
+      template<CT::NotHeapAllocated C>
+      void Clear(this C& self);
 
       /// Destroy all elements, deallocate memory and reset state and type.   
       ///   @attention notice that heap pointer is not zeroed here, as it     

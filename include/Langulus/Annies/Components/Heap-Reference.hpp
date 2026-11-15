@@ -9,7 +9,6 @@
 #include "../Container.hpp"
 #include <Langulus/CT/Downcastable.hpp>
 #include <Langulus/CT/MinAlloc.hpp>
-//#include <Langulus/MetaOf.hpp>
 #include <Langulus/Utils/Pot.hpp>
 #include <Langulus/Utils/Align.hpp>
 #include <Langulus/Allocator.hpp>
@@ -407,22 +406,22 @@ namespace Langulus::Annies::Component
       /// Get a handle from a pointer to an element                           
       template<CT::Container C>
       auto GetHandleFromPointer(this C&& self, CT::Sparse auto ptr) -> DecideHandle<C> {
-         const auto memory_start = ThisCom::GetRaw();
-         if (ptr < memory_start)
+         void const* unpacked_ptr = static_cast<void const*>(ptr);
+         const auto memory_start = ThisCom::GetRawVoid();
+         if (unpacked_ptr < memory_start)
             return {};
 
          const auto memory_end = ThisCom::GetRawReserveEnd();
-         if (ptr >= memory_end)
+         if (unpacked_ptr >= memory_end)
             return {};
 
          size_t offset;
-         if constexpr (CT::TypeErased<C>) {
-            offset = reinterpret_cast<uint8_t const*>(ptr)
+         //if constexpr (CT::TypeErased<C>) {
+            offset = reinterpret_cast<uint8_t const*>(unpacked_ptr)
                    - static_cast<uint8_t const*>(memory_start);
             offset /= self.GetStride();
-         }
-         else offset = ptr - memory_start;
-
+         //}
+         //else offset = ptr - memory_start;
          return self.GetHandle() + offset;
       }
 

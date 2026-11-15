@@ -204,3 +204,16 @@ template<CT::Container T, class E> requires CT::NoIntent<T>
 void Text_Helper_CompareOne(const T& many, const E& e) {
    Many_Helper_CompareOne(many, e);
 }
+
+/// Map all pointers as convertible to text, so that we can serialize them    
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
+      if constexpr (CT::Complete<Deptr<T>>) {
+         if constexpr (CT::Character<Deptr<T>>)
+            return {from};
+         else
+            return NameOf<T>() + "(" + Annies::Text::Hex<true>(from) + ")";
+      }
+      else return NameOf<T>() + "(" + Annies::Text::Hex<true>(from) + ")";
+   },
+   Langulus::Annies::Text
+);

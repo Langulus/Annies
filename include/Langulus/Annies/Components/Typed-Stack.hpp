@@ -512,7 +512,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::Handle<A>)
             ThisCom::template AbsorbType<0>(Copy(a));
          else
-            ThisCom::template SetType<Decvq<::std::remove_all_extents_t<Deref<Deint<A>>>>>();
+            ThisCom::template SetType<Decvq<CT::RemoveAllBoundedArrays<A>>>();
       }
 
    protected:

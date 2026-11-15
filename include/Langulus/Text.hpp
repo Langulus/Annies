@@ -619,38 +619,9 @@ namespace Langulus::Annies
    }
 }
 
-/// MARK: CT                                                                  
-/*namespace Langulus::CT
-{
-   namespace Inner
-   {
-      /// Do types have an explicit/implicit cast operator to Text            
-      template<class...T>
-      concept StringifiableByOperator = (std::is_object_v<T> and ...)
-          and requires (T const&...a) {
-            ((a.operator ::Langulus::Annies::Text()), ...);
-          };
-
-      /// Does Text has an explicit/implicit constructor that accepts T       
-      template<class...T>
-      concept StringifiableByConstructor = requires (T const&...a) {
-         ((::Langulus::Annies::Text {a}), ...); };
-   }
-
-   /// A stringifiable type is one that has either an implicit or explicit    
-   /// cast operator to Text type, or can be used to explicitly initialize a  
-   /// Text container                                                         
-   template<class...T>
-   concept Stringifiable = ((Inner::StringifiableByOperator<T>
-                          or Inner::StringifiableByConstructor<T>) and ...);
-}*/
-
 /// MARK: Morphisms                                                           
 /// Convert std::string_view -> Text                                          
 LANGULUS_MORPHISM(std::string_view, Annies::Text);
-
-/// Convert Serial::Operator -> Text                                          
-//LANGULUS_MORPHISM(Langulus::Serial::Operator, Langulus::Annies::Text);
 
 /// Convert bool -> Text                                                      
 LANGULUS_MORPHISM_CUSTOM(bool, { return from ? "yes" : "no"; }, Annies::Text);

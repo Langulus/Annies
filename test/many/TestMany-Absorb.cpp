@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "TestManyCommon.hpp"
+#include "../handle/TestHandleCommon.hpp"
 
 
 namespace Langulus::Annies  
@@ -1124,9 +1125,9 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Many/TMany", TestType
          contains_full(pack_copied);
 
          if constexpr (Sparse) {
-            REQUIRE      (pack_cloned.GetDense().Contains(DenseCast(*originalElement)));
-            REQUIRE_FALSE(pack_cloned.Contains(*originalElement));
-            REQUIRE_FALSE(pack_cloned.Contains(*e1));
+            REQUIRE      (*pack_cloned.GetDense().template As<Decay<E>>() == DenseCast(*originalElement));
+            REQUIRE_FALSE(*pack_cloned.GetDense().template As<E>() == *originalElement);
+            REQUIRE_FALSE(*pack_cloned.GetDense().template As<E>() == *e1);
          }
          else contains_full(pack_cloned);
 

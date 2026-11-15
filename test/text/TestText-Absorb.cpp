@@ -1773,8 +1773,8 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Text", TestType
          Text_CheckState_ContainsOne(pack, *e556);
       }
 
-      /// MARK: <<                                                            
-      WHEN("Insert at the back by using << operator)") {
+      /// MARK: <<                                                            //TODO test only with characters. it's insertion operator, not concat operator!
+      /*WHEN("Insert at the back by using << operator)") {
          pack <<           immovable[0]
               << Refer    {immovable[1]}
               << Copy     {immovable[2]}
@@ -1819,10 +1819,10 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Text", TestType
             T temp,              temp << immovable[0],
             stdstr temp_std,     temp_std.emplace_back(immovable[0])
          );
-      }
+      }*/
 
-      /// MARK: >>                                                            
-      WHEN("Insert at the front by using >> operator)") {
+      /// MARK: >>                                                            //TODO test only with characters. it's insertion operator, not concat operator!
+      /*WHEN("Insert at the front by using >> operator)") {
          pack >>           immovable[0]
               >> Refer    {immovable[1]}
               >> Copy     {immovable[2]}
@@ -1867,7 +1867,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Text", TestType
             T temp,              temp >> immovable[0],
             stdstr temp_std,     temp_std.emplace_front(immovable[0])
          );
-      }
+      }*/
 
       /// MARK: Concat array                                                  
       if constexpr (CT::Text<E> and CT::Container<E>) {

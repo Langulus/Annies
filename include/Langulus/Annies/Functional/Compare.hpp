@@ -659,7 +659,7 @@ namespace Langulus::Annies::Component
 
    /// MARK: ==                                                            
    ///   @attention compares all shared dimensions at once                 
-   TEMPLATE template<CT::NotHandle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
+   /*TEMPLATE template<CT::NotHandle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>
    constexpr bool LGLSCOM::operator == (this LHS const& lhs, RHS const& rhs) assumptious {
       if constexpr (Same<LHS, RHS>)
          return lhs.CompareEqual(rhs);
@@ -674,7 +674,7 @@ namespace Langulus::Annies::Component
          return lhs.CompareEqual(rhs);
       }
       else return lhs.CompareOneEqual(rhs);
-   }
+   }*/
 
    /// Handles compare only their first pointers                           
    /*TEMPLATE template<CT::Handle LHS, CT::NoIntent RHS> requires CT::CompatibleDimensions<LHS, RHS>

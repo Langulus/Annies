@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "TestSetCommon.hpp"
+#include "../handle/TestHandleCommon.hpp"
 
 
 namespace Langulus::Annies  
@@ -1043,9 +1044,9 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Set/TSet", TestType
          contains_full(pack_copied);
 
          if constexpr (Sparse) {
-            REQUIRE      (pack_cloned.GetDenseAt(0).Contains(DenseCast(*originalElement)));
-            REQUIRE_FALSE(pack_cloned.Contains(*originalElement));
-            REQUIRE_FALSE(pack_cloned.Contains(*e1));
+            REQUIRE      (*pack_cloned.GetDenseAt(0).template As<Decay<E>>() == DenseCast(*originalElement));
+            REQUIRE_FALSE(*pack_cloned.GetDenseAt(0).template As<E>() == *originalElement);
+            REQUIRE_FALSE(*pack_cloned.GetDenseAt(0).template As<E>() == *e1);
          }
          else contains_full(pack_cloned);
 

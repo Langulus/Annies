@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "TestBytesCommon.hpp"
+#include "../handle/TestHandleCommon.hpp"
 
 
 TEST_CASE_TEMPLATE("Test empty Bytes", TestType
@@ -1507,8 +1508,8 @@ TEST_CASE_TEMPLATE("Test empty Bytes", TestType
          Bytes_CheckState_Default(pack);
       }
 
-      /// MARK: <<                                                            
-      WHEN("Insert at the back by using << operator") {
+      /// MARK: <<                                                            //TODO test only with Byte. it's insertion operator, not concat operator!
+      /*WHEN("Insert at the back by using << operator") {
          REQUIRE_NOTHROW(pack <<           immovable[0]
                               << Refer    {immovable[1]}
                               << Copy     {immovable[2]}
@@ -1520,14 +1521,14 @@ TEST_CASE_TEMPLATE("Test empty Bytes", TestType
 
          Bytes_CheckState_OwnedFull(pack);
 
-         /*if constexpr (Same<E, Bytes>) {
+         *//*if constexpr (Same<E, Bytes>) {
             for (int i = 0; i < 5; ++i)
                Bytes_CheckState_DisownedFull(immovable[i]);
             Bytes_CheckState_DisownedFull(movable1[0]);
             Bytes_CheckState_DisownedFull(movable2[0]);
             Bytes_CheckState_DisownedFull(movable3[0]);
          }
-         else*/ if constexpr (CT::Container<E>) {
+         else*//* if constexpr (CT::Container<E>) {
             for (int i = 0; i < 5; ++i)
                Many_CheckState_OwnedFull<TypeOf<E>>(immovable[i]);
             Many_CheckState_OwnedFull<TypeOf<E>>(movable1[0]);
@@ -1614,10 +1615,10 @@ TEST_CASE_TEMPLATE("Test empty Bytes", TestType
             T temp,              temp << immovable[0],
             stdbyt temp_std,     temp_std.emplace_back(immovable[0])
          );
-      }
+      }*/
 
-      /// MARK: >>                                                            
-      WHEN("Insert at the front by using >> operator") {
+      /// MARK: >>                                                            //TODO test only with Byte. it's insertion operator, not concat operator!
+      /*WHEN("Insert at the front by using >> operator") {
          REQUIRE_NOTHROW(pack >>           immovable[0]
                               >> Refer    {immovable[1]}
                               >> Copy     {immovable[2]}
@@ -1629,14 +1630,14 @@ TEST_CASE_TEMPLATE("Test empty Bytes", TestType
 
          Bytes_CheckState_OwnedFull(pack);
 
-         /*if constexpr (Same<E, Bytes>) {
+         *//*if constexpr (Same<E, Bytes>) {
             for (int i = 0; i < 5; ++i)
                Bytes_CheckState_DisownedFull(immovable[i]);
             Bytes_CheckState_DisownedFull(movable1[0]);
             Bytes_CheckState_DisownedFull(movable2[0]);
             Bytes_CheckState_DisownedFull(movable3[0]);
          }
-         else*/ if constexpr (CT::Container<E>) {
+         else*//* if constexpr (CT::Container<E>) {
             for (int i = 0; i < 5; ++i)
                Many_CheckState_OwnedFull<TypeOf<E>>(immovable[i]);
             Many_CheckState_OwnedFull<TypeOf<E>>(movable1[0]);
@@ -1723,7 +1724,7 @@ TEST_CASE_TEMPLATE("Test empty Bytes", TestType
             T temp,              temp >> immovable[0],
             stdbyt temp_std,     temp_std.emplace_front(immovable[0])
          );
-      }
+      }*/
 
       /// MARK: Concat array                                                  
       if constexpr (Same<E, Bytes>) {

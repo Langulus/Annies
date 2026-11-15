@@ -1,14 +1,12 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-//#include "../Container.hpp"
 #include "../Component.hpp"
-//#include <Langulus/MetaOf.hpp>
 #include <Langulus/CT/Deep.hpp>
 
 

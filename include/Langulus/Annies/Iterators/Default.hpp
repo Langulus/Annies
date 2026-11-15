@@ -40,15 +40,9 @@ namespace Langulus::Annies
 
    protected:
       using T = Tif<CT::Void<TypeOf<C>>, No, TypeOf<C>>;
-      using H = Tif<CT::TypeErased<C> or CT::Multidimensional<C> or CT::Neat<C>, DecideHandle<C>, LglsMutIf(C, T*)>;
-      using Exposed = Tif<CT::Handle<H>, 
-         DecideHandle<C> const&,
-         Tif<CT::Sparse<T>, LglsMutIf(C, T), LglsMutIf(C, T&)>
-      >;
-      using ExposedPtr = Tif<CT::Handle<H>, 
-         DecideHandle<C> const*,
-         Tif<CT::Sparse<T>, LglsMutIf(C, DeptrAll<T>*), LglsMutIf(C, T*)>
-      >;
+      using H = Tif<CT::TypeErased<C> or CT::Multidimensional<C> or CT::Neat<C> or (CT::Sparse<T> and CT::Mutable<C>), DecideHandle<C>, LglsMutIf(C, T*)>;
+      using Exposed    = Tif<CT::Handle<H>, DecideHandle<C> const&, LglsMutIf(C, T&)>;
+      using ExposedPtr = Tif<CT::Handle<H>, DecideHandle<C> const*, LglsMutIf(C, DeptrAll<T>*)>;
 
       static_assert(CT::NotReference<H>,
          "Iterator can't be a reference");
@@ -66,7 +60,7 @@ namespace Langulus::Annies
          using CTTI_ReflectAs    = void;
          using CTTI_Iterator     = Yup;
          using difference_type   = std::ptrdiff_t;
-         using iterator_category = typename C::IteratorCategory;
+         using iterator_category = typename Decay<C>::IteratorCategory;
          using value_type        = Deptr<H>;
          using reference         = Deptr<H>&;
 
@@ -171,8 +165,8 @@ namespace Langulus::Annies
          }
 
          auto operator * (this auto&& self) noexcept -> Exposed {
-            if constexpr (CT::Handle<H>) return (self.mIt);
-            else                         return *self.mIt;
+            if constexpr (CT::Handle<H>)        return (self.mIt);
+            else                                return *self.mIt;
          }
 
          auto operator -> (this auto&& self) noexcept -> ExposedPtr {

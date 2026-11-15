@@ -1067,7 +1067,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Any/TAny", TestType
          contains_full(pack_copied);
 
          if constexpr (CT::Sparse<E>) {
-            REQUIRE      (pack_cloned.GetDense().Contains(DenseCast(*originalElement)));
+            REQUIRE      (*pack_cloned.GetDense().template As<Decay<E>>() == DenseCast(*originalElement));
             REQUIRE_FALSE(pack_cloned.Contains(*originalElement));
             REQUIRE_FALSE(pack_cloned.Contains(*e1));
          }

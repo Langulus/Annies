@@ -6,6 +6,7 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #include "TestAnyCommon.hpp"
+#include "../handle/TestHandleCommon.hpp"
 #include <Langulus/Many.hpp>
 
 

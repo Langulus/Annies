@@ -168,7 +168,7 @@ namespace Langulus::Annies::Inner
       template<class P>
       constexpr auto CreateSwapper(P&& initializer) assumptious {
          if constexpr (CT::Handle<P>) {
-            if constexpr (Decvq<Deref<P>>::Dimensions::Count > 1) {
+            if constexpr (Com::Dimensions<P>::Count > 1) {
                using K = Decvq<Deref<TypeOf<P, 0>>>;
                using V = Decvq<Deref<TypeOf<P, 1>>>;
                LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");

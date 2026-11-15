@@ -261,7 +261,7 @@ namespace Langulus::Annies
       ///   @param data data to wrap, assumed valid, supports arrays          
       ///   @param count number of bytes inside 'data' to use                 
       ///   @return the raw bytes wrapped inside a Bytes container            
-      template<CT::NoIntent T> requires CT::POD<::std::remove_all_extents_t<T>>
+      template<CT::NoIntent T> requires CT::POD<CT::RemoveAllBoundedArrays<T>>
       static Bytes FromPOD(T&& data) noexcept {
          Bytes result;
          if constexpr (CT::BoundedArray<T>)
@@ -289,8 +289,8 @@ namespace Langulus::Annies
       template<Cid> void GetResolved()         = delete("Nothing to resolve");
       template<Cid> void GetDense(size_t = -1) = delete("Nothing to dereference");
 
-      LANGULUS_API(ANNIES)
-      bool operator == (Bytes const& other) const noexcept;
+      /*using Com::Comparison<true>::operator ==;
+      using Com::Comparison<true>::operator <=>;*/
 
       /// Allocate additional 'nbytes' and zero them                          
       void Null(size_t nbytes) {

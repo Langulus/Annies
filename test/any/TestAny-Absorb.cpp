@@ -7,6 +7,8 @@
 ///                                                                           
 #include "TestAnyCommon.hpp"
 #include <Langulus/Many.hpp>
+#include <Langulus/Assume.hpp>
+#include "../handle/TestHandleCommon.hpp"
 
 
 namespace Langulus::Annies  
@@ -39,6 +41,8 @@ namespace Langulus::Annies
 
 
 TEST_CASE_TEMPLATE("Test absorb-constructed Any/TAny", TestType
+   , Types<Any, ScopedElementPacked<pptr8>>
+
    // Elements are not allocated by the memory manager                  
    , Types<Any, ScopedElement<Text>>
    , Types<Any, ScopedElement<int>>
@@ -115,7 +119,6 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Any/TAny", TestType
    , Types<TAny<char**>, ScopedElement<char**, true>>
 
    // Packed pointers                                                   
-   , Types<Any, ScopedElementPacked<pptr8>>
    , Types<Any, ScopedElementPacked<pptr16>>
    , Types<Any, ScopedElementPacked<pptr32>>
 
@@ -140,7 +143,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Any/TAny", TestType
    auto testtype1 = MetaDataOf<E>();
    auto testtype2 = MetaDataOf<E const*>();
    auto testtype3 = MetaDataOf<Deptr<E> const*>();
-   LglsAssumeDev(testtype1.IsExact(testtype1.GetDecvq()), testtype1.GetName(), " != ", testtype1.GetDecvq().GetName());
+   LglsAssumeDev(testtype1.IsExact(testtype1.GetDecvq()));
    REQUIRE(testtype1.IsExact(testtype1.GetDecvq()));
    REQUIRE(testtype2.IsExact(testtype2.GetDecvq()));
    REQUIRE(testtype3.IsExact(testtype3.GetDecvq()));
@@ -1168,7 +1171,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Any/TAny", TestType
          contains_full(pack_copied);
 
          if constexpr (Sparse) {
-            REQUIRE      (pack_cloned.GetDense().Contains(DenseCast(*originalElement)));
+            REQUIRE      (*pack_cloned.GetDense().template As<Decay<E>>() == DenseCast(*originalElement));
             REQUIRE_FALSE(pack_cloned.Contains(*originalElement));
             REQUIRE_FALSE(pack_cloned.Contains(*e1));
          }

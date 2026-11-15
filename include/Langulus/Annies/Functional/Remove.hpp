@@ -308,11 +308,11 @@ namespace Langulus::Annies::Component
    }
 
    /// Destroy all elements but don't deallocate memory unless we really   
-   /// have to.                                                            
+   /// have to. Specialized for heap-based containers.                     
    ///   @attention will never reset state except disownment               
    ///   @attention will never reset type                                  
-   TEMPLATE
-   void LGLSCOM::Clear(this auto& self) {
+   TEMPLATE template<CT::HeapAllocated C>
+   void LGLSCOM::Clear(this C& self) {
       const auto al = self.GetAllocation();
       if (self.IsEmpty()) {
          // Container is already empty. Just make sure that we're    
@@ -358,6 +358,18 @@ namespace Langulus::Annies::Component
       }
 
       if_available(self.DisableDisowned());
+   }
+
+   /// Destroy all elements. Specialized for stack-based containers.       
+   TEMPLATE template<CT::NotHeapAllocated C>
+   void LGLSCOM::Clear(this C& self) {
+      if_available(self.Free());
+
+      // Make sure we zero any stack-based pointers                  
+      Id::ForEach([&self]<Cid D> {
+         if constexpr (CT::Sparse<TypeOf<C, D>>)
+            self.GetStackInner() = nullptr;
+      });
    }
 
    /// Destroy all elements, deallocate memory and reset state and type.   

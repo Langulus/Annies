@@ -1295,11 +1295,12 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Pair/TPair", TestType
          contains_full(pack_copied);
 
          if constexpr (CT::Sparse<E1, E2>) {
-            REQUIRE      (pack_cloned.GetDense().Contains(DenseCast(*originalElement1)));
-            REQUIRE_FALSE(pack_cloned.GetDense().Contains(DenseCast(*originalElement2)));
-            REQUIRE      (pack_cloned.GetDense().ContainsEx(TPair {DenseCast(*originalElement1), DenseCast(*originalElement2)}));
-            REQUIRE_FALSE(pack_cloned.ContainsEx(TPair {*originalElement1, *originalElement2}));
-            REQUIRE_FALSE(pack_cloned.ContainsEx(TPair {*e1, *e2}));
+            REQUIRE      (*pack_cloned.template GetDense<0>().template As<Decay<E1>>() == DenseCast(*originalElement1));
+            REQUIRE      (*pack_cloned.template GetDense<1>().template As<Decay<E2>>() == DenseCast(*originalElement2));
+            REQUIRE_FALSE(*pack_cloned.template GetDense<0>().template As<E1>() == *originalElement1);
+            REQUIRE_FALSE(*pack_cloned.template GetDense<1>().template As<E2>() == *originalElement2);
+            REQUIRE_FALSE(*pack_cloned.template GetDense<0>().template As<E1>() == *e1);
+            REQUIRE_FALSE(*pack_cloned.template GetDense<1>().template As<E2>() == *e2);
          }
          else contains_full(pack_cloned);
 

@@ -20,7 +20,6 @@ add_langulus_library(LangulusAnnies
             $<TARGET_OBJECTS:LangulusRTTI>
             $<TARGET_OBJECTS:LangulusFractalloc>
             $<TARGET_OBJECTS:LangulusPercist>
-            source/Bytes.cpp
             source/Many.cpp
             source/Tag.cpp
             source/Recipe.cpp

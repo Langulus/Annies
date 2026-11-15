@@ -15,41 +15,41 @@
 
 namespace Langulus::Annies::Component
 {
-   /// MARK: Assign                                                        
-   /// Assign a value to the first element, if that element is initialized.
-   /// If the element isn't initialized yet it will be constructed.        
-   ///   @param argument the argument to assign                            
-   ///   @return reference to self                                         
+   /// MARK: Assign                                                           
+   /// Assign a value to the first element, if that element is initialized.   
+   /// If the element isn't initialized yet it will be constructed.           
+   ///   @param argument the argument to assign                               
+   ///   @return reference to self                                            
    TEMPLATE template<CT::Container C, class A>
    C& LGLSCOM::Assign(this C& self, A&& argument) {//TODO pinnables
       if constexpr (not CT::Contiguous<C>) {
-         // Assignment for maps/sets falls back to merge             
+         // Assignment for maps/sets falls back to merge                
          self.Clear();
          self.Merge(LglsFwd(argument));
       }
       else if constexpr (CONVERT) {
-         // Rely on insertion to convert the argument                
+         // Always rely on insertion to convert the argument            
          static_assert(C::AttemptConvertOnInsert);
          self.Clear();
          self.Insert(LglsFwd(argument));
       }
-      else if constexpr (not CT::HeapAllocated<C>) {
+      /*else if constexpr (not CT::HeapAllocated<C>) {
          // This container is on the stack, and by extension         
          // statically-typed and always initialized                  
          auto& data = *self.template Get<void, ID>();
          data = LglsFwd(argument);
-      }
+      }*/
       else {
-         // This container is heap-allocated                         
+         // Standard routine                                            
          if constexpr (CT::Handle<A>)
             self.AbsorbType(Copy(argument));
          else
             self.DeduceType(LglsFwd(argument));
 
          if constexpr (not CT::Handle<C>) {
-            if (self.IsEmpty()) {
+            if (not CT::HeapAllocated<C> or self.IsEmpty()) {
                // Container is empty, we might have to fresh-allocate
-               ThisCom::PrepareForReconstruction();
+               if_available(ThisCom::PrepareForReconstruction());
 
                Id::ForEach([&]<Cid D>{
                   self.template EmplaceWithIntent<D>(FWDIntent(argument));
@@ -60,14 +60,23 @@ namespace Langulus::Annies::Component
                return self;
             }
          }
-         else LglsAssumeDev(not self.IsEmpty(),
-            "Can't assign to empty handle");
+         else if constexpr (CT::HeapAllocated<C>) {
+            LglsAssumeDev(not self.IsEmpty(),
+               "Can't assign to empty handle");
+         }
       
          // Container has at least one element, try to reuse it      
-         if (ThisCom::PrepareForReassignment()) {
-            Id::ForEach([&]<Cid D>{
-               ThisCom::template AssignWithIntent<D>(FWDIntent(argument));
-            });
+         if constexpr (CT::HeapAllocated<C>) {
+            if (ThisCom::PrepareForReassignment()) {
+               Id::ForEach([&]<Cid D>{
+                  ThisCom::template AssignWithIntent<D>(FWDIntent(argument));
+               });
+            }
+            else {
+               Id::ForEach([&]<Cid D>{
+                  self.template EmplaceWithIntent<D>(FWDIntent(argument));
+               });
+            }
          }
          else {
             Id::ForEach([&]<Cid D>{

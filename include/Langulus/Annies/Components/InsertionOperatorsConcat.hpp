@@ -10,6 +10,7 @@
 #include <Langulus/IntentOf.hpp>
 #include <Langulus/CT/Convertible.hpp>
 #include <Langulus/CT/Serializer.hpp>
+#include <Langulus/CT/ReflectAs.hpp>
 
 
 namespace Langulus::Annies::Component
@@ -33,7 +34,7 @@ namespace Langulus::Annies::Component
       /// Insert `rhs` at the back. Supports bounded arrays.                  
       template<CT::ContainsMany LHS, CT::NotContainer RHS>
       LHS& operator += (this LHS& lhs, RHS&& rhs) {
-         using ITEM = ::std::remove_all_extents_t<Deint<RHS>>;
+         using ITEM = CT::RemoveAllBoundedArrays<RHS>;
 
          if constexpr (CT::Array<RHS>) {
             if constexpr (requires { LHS {LglsFwd(rhs)}; }) {
@@ -90,7 +91,7 @@ namespace Langulus::Annies::Component
       /// Supports bounded arrays.                                            
       template<CT::ContainsMany LHS, CT::Container RHS>
       LHS& operator += (this LHS& lhs, RHS&& rhs) {
-         using ITEM = ::std::remove_all_extents_t<Deint<RHS>>;
+         using ITEM = CT::RemoveAllBoundedArrays<RHS>;
 
          if constexpr (CT::Array<RHS>) {
             using I = IntentOf(rhs);
@@ -119,7 +120,7 @@ namespace Langulus::Annies
    template<CT::NotContainer LHS, CT::Container RHS>
    requires (CT::NoIntent<LHS, RHS> and Com::HasInsertionOperatorsConcatEnabled<RHS>)
    RHS operator + (LHS const& lhs, RHS const& rhs) {
-      using ITEM = ::std::remove_all_extents_t<LHS>;
+      using ITEM = CT::RemoveAllBoundedArrays<LHS>;
       RHS temp;
 
       if constexpr (CT::Array<LHS>) {
@@ -172,7 +173,7 @@ namespace Langulus::Annies
    template<CT::Container LHS, CT::NotContainer RHS>
    requires (CT::NoIntent<LHS, RHS> and Com::HasInsertionOperatorsConcatEnabled<LHS>)
    LHS operator + (LHS const& lhs, RHS const& rhs) {
-      using ITEM = ::std::remove_all_extents_t<RHS>;
+      using ITEM = CT::RemoveAllBoundedArrays<RHS>;
       LHS temp;
 
       if constexpr (CT::Array<RHS>) {
@@ -222,17 +223,20 @@ namespace Langulus::Annies
    }
    
    /// MARK: Container + Container                                            
+   ///   @attention container marked as serializer always takes priority      
    ///   @attention when both sides are serializers, LHS takes priority       
    template<CT::Container LHS, CT::Container RHS>
    requires (Com::HasInsertionOperatorsConcatEnabled<LHS>
           or Com::HasInsertionOperatorsConcatEnabled<RHS>)
    auto operator + (LHS const& lhs, RHS const& rhs) {
-      if constexpr (Exact<LHS, RHS>) {
+      if constexpr (Exact<CT::ReflectedAs<LHS>, CT::ReflectedAs<RHS>>) {
+         // Similar containers get concatenated directly                
          LHS temp;
          temp.Concat(lhs, rhs);
          return temp;
       }
-      else if constexpr (CT::Serializer<LHS>) {
+      else if constexpr (CT::Serializer<LHS, RHS>) {
+         // If both sides are serializer, LHS takes precedence          
          LHS temp;
          static_assert(LHS::AttemptConvertOnInsert,
             "Can't be concatenated - incompatible arguments");
@@ -240,12 +244,28 @@ namespace Langulus::Annies
          Langulus::Serialize(rhs, temp);
          return temp;
       }
-      else {
+      else if constexpr (CT::Serializer<LHS>) {
+         // Serialize RHS and concatenate it right of LHS               
+         LHS temp;
+         temp.Concat(lhs);
+         Langulus::Serialize(rhs, temp);
+         return temp;
+      }
+      else if constexpr (CT::Serializer<RHS>) {
+         // Serialize LHS and concatenate it left of RHS                
          RHS temp;
-         static_assert(RHS::AttemptConvertOnInsert,
-            "Can't be concatenated - incompatible argument");
          Langulus::Serialize(lhs, temp);
          temp.Concat(rhs);
+         return temp;
+      }
+      else {
+         // No serializers are involved. Just convert RHS -> LHS if     
+         // possible.                                                   
+         LHS temp;
+         static_assert(LHS::AttemptConvertOnInsert,
+            "Can't be concatenated - incompatible arguments");
+         temp.Concat(lhs);
+         Langulus::Serialize(rhs, temp);
          return temp;
       }
    }

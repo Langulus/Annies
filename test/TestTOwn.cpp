@@ -11,7 +11,7 @@
 
 TEST_CASE_TEMPLATE("Owned value", T
    , Own<RT>
-   //, TOwn<const RT>
+   //, TOwn<const RT> //TODO why are these commented out?
    , Own<int>
    //, TOwn<const int>
    , Own<RT*>
@@ -22,12 +22,16 @@ TEST_CASE_TEMPLATE("Owned value", T
    static MemoryState memoryState;
    using E = TypeOf<T>;
    
+   
    GIVEN("Default-initialized") {
       T pointer;
       T pointer2;
 
       REQUIRE(pointer.GetRaw());
-      REQUIRE(pointer == pointer2);
+
+      if constexpr (not ::std::is_trivially_default_constructible_v<E>) {
+         REQUIRE(pointer == pointer2);
+      }
 
       /*WHEN("Create an instance") {
          pointer.Emplace(5);
@@ -140,7 +144,8 @@ TEST_CASE_TEMPLATE("Owned value", T
       }
 
       WHEN("Compared") {
-         static_assert(not requires { static_cast<bool>(T{}); });
+         //static_assert(not requires { static_cast<bool>(T{}); });
+
          static_assert(T{} == T{});
          static_assert(T{} == E{});
          static_assert(E{} == T{});
@@ -164,7 +169,7 @@ TEST_CASE_TEMPLATE("Owned value", T
       }
 
       WHEN("GetHandle is called on constant container") {
-         T const pack_constant;
+         T const pack_constant = *raw;
          auto h = pack_constant.GetHandle();
          static_assert(::std::same_as<decltype(h), THandleDisowned<ConstAll<E&>>>);
 

@@ -238,6 +238,34 @@ namespace Langulus::Annies::Component
       constexpr void ConstructDefault(this auto& self) noexcept requires CT::NotReference<T> {
          ThisCom::SetStackInner({});
       }
+
+      /// MARK: ConstructFrom                                                 
+      /// Transfer from any kind of container, respecting intents             
+      ///   @param intent the intent and container to transfer from.          
+      ///   @attention stack transfers only work if containers are binary     
+      ///      compatible                                                     
+      template<class C, CT::Intent I> requires Same<C, Deint<I>>
+      void ConstructFrom(this C& self, I&& intent, size_t = 0) {
+         auto src = intent->template GetRaw<ID>();
+         auto dst = ThisCom::GetRaw();
+         static_assert(Same<decltype(dst), decltype(src)>,
+            "Type mismatch: " + NameOf<decltype(dst)>() +
+            " is not compatible with " + NameOf<decltype(src)>()
+         );
+         IntentNew(dst, NestIntentOf(intent, *src));
+
+         if constexpr (CT::Copied<I> or CT::Cloned<I>) {
+            // This is needed because ownership components generally    
+            // skip ConstructFrom with these intents.                   
+            if_available(self.template EmplaceEntries<ID>(NestIntentOf(intent, *src)));
+         }
+                  
+         decltype(auto) from = LglsFwd(intent.what);
+         if constexpr (requires { from.template GetHashInner<ID>(); }) {
+                 if_available(self.template SetHashInner<ID>(from.template GetHashInner<ID>()))
+            else if_available(self.template ResetHash<ID>())
+         }
+      }
    };
 
    #undef ThisCom

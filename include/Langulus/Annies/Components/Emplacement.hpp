@@ -12,7 +12,6 @@
 #include <Langulus/CT/Index.hpp>
 #include <Langulus/CT/Akin.hpp>
 #include <Langulus/Allocator.hpp>
-//#include <Langulus/MetaOf.hpp>
 
 
 namespace Langulus::Annies
@@ -838,7 +837,7 @@ namespace Langulus::Annies::Component
                new (self.template GetRaw<SID>()) E {};
 
                if constexpr (CT::Sparse<E>)
-                  if_available(*self.template GetEntriesInner<SID>() = nullptr);
+                  if_available(*DecvqAllCast(self.template GetEntriesInner<SID>()) = nullptr); //TODO do we have guarantee that Uses() == 1?
             }
             else {
                // The type we're constructing isn't statically known    
@@ -861,7 +860,7 @@ namespace Langulus::Annies::Component
 
                if constexpr (requires { self.template GetEntriesInner<SID>(); }) {
                   if (T.IsSparse())
-                     *self.template GetEntriesInner<SID>() = nullptr;
+                     *DecvqAllCast(self.template GetEntriesInner<SID>()) = nullptr; //TODO do we have guarantee that Uses() == 1?
                }
             }
          }

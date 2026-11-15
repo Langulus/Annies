@@ -37,8 +37,4 @@ namespace Langulus::Annies
    template LANGULUS_EXPORT() void Component::Removal<0>::Trim<Many>(this Many&, size_t) noexcept;
    template LANGULUS_EXPORT() void Component::Removal<0>::Clear<Many>(this Many&);
    template LANGULUS_EXPORT() void Component::Removal<0>::Reset<Many>(this Many&);
-
-   bool Many::operator == (Many const& other) const noexcept {
-      return this->CompareEqual(other);
-   }
 }

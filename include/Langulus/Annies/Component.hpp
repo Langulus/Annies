@@ -171,6 +171,10 @@ namespace Langulus::CT
    template<class...T>
    concept HeapAllocated = Container<T...>
        and ((ShedDeref<T>::CountHeapProviders() > 0) and ...);
+
+   template<class...T>
+   concept NotHeapAllocated = Container<T...>
+       and ((ShedDeref<T>::CountHeapProviders() == 0) and ...);
    
    /// Check if listed types are containers with more than one heap provider, 
    /// such as maps.                                                          
