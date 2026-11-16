@@ -481,20 +481,24 @@ namespace Langulus::Annies::Component
       /// Set all contained data types by copying them from another container.
       /// This is still used if statically typed - checks if types are        
       /// compatible in constructors and assigners.                           
+      ///   @tparam SID the type provider _in I_ to use for setting ThisCom   
       ///   @attention intents like Clone and Copy will strip constness       
       ///   @param other the container to copy types from                     
       template<Cid SID = ID, CT::Container I, class SELF> requires CT::Intent<I>
       void AbsorbType(this SELF& self, I const& other) {
+         constexpr bool strip_constness
+            = CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>;
+
          if constexpr (TypeErased or CT::TypeErased<I>) {
             auto T = DeintCast(other).template GetType<SID>();
-            if constexpr (CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>)
+            if constexpr (strip_constness)
                ThisCom::SetType(T.GetDecvq());
             else
                ThisCom::SetType(T);
          }
          else {
             using T = Deref<TypeOf<I, SID>>;
-            if constexpr (CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>)
+            if constexpr (strip_constness)
                ThisCom::template SetType<Decvq<T>>();
             else
                ThisCom::template SetType<T>();

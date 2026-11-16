@@ -33,7 +33,7 @@ namespace Langulus::Annies::Component
          // ConvertMergeInner uses MergeRangeAt, so any exceptions   
          // will be handled there                                    
          ThisCom::ConvertMergeInner(offset, LglsFwd(a1));
-         (ThisCom::ConvertMergeInner(offset, LglsFwd(an)), ...);
+        (ThisCom::ConvertMergeInner(offset, LglsFwd(an)), ...);
          return self.GetCountInner() - initial_count;
       }
       else {
@@ -41,7 +41,7 @@ namespace Langulus::Annies::Component
          // Check all types, and gather the number of insertions.    
          ::std::vector<size_t> reduced;
          ThisCom::PrepareForMerging(FWDIntent(a1), reduced);
-         (ThisCom::PrepareForMerging(FWDIntent(an), reduced), ...);
+        (ThisCom::PrepareForMerging(FWDIntent(an), reduced), ...);
          if (reduced.empty())
             return 0;
          
@@ -97,7 +97,7 @@ namespace Langulus::Annies::Component
 
             try {
                MergeInnerLinear(to, it, counter, LglsFwd(a1));
-               (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
+              (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
             }
             catch (...) {
                // Account for throws inside constructors             
@@ -126,7 +126,7 @@ namespace Langulus::Annies::Component
             // Copy new elements in the gap                          
             try {
                MergeInnerLinear(dst, it, counter, LglsFwd(a1));
-               (MergeInnerLinear(dst, it, counter, LglsFwd(an)), ...);
+              (MergeInnerLinear(dst, it, counter, LglsFwd(an)), ...);
             }
             catch (...) {
                // Account for throws inside constructors             
@@ -172,7 +172,7 @@ namespace Langulus::Annies::Component
          // ConvertInsertInner uses ConcatAt, so any exceptions will 
          // be handled there                                         
          ThisCom::ConvertMergeInner(offset, LglsFwd(a1));
-         (ThisCom::ConvertMergeInner(offset, LglsFwd(an)), ...);
+        (ThisCom::ConvertMergeInner(offset, LglsFwd(an)), ...);
          return offset - initial_count;
       }
       else {
@@ -183,7 +183,7 @@ namespace Langulus::Annies::Component
          ::std::vector<size_t> reduced;
          size_t counter = 0;
          ThisCom::PrepareForMerging(FWDIntent(a1), counter, reduced);
-         (ThisCom::PrepareForMerging(FWDIntent(an), counter, reduced), ...);
+        (ThisCom::PrepareForMerging(FWDIntent(an), counter, reduced), ...);
          if (reduced.empty())
             return 0;
          
@@ -201,7 +201,7 @@ namespace Langulus::Annies::Component
             auto to = self.GetHandle().ForceMutable() + lhs_count;
             try {
                MergeInnerLinear(to, it, counter, LglsFwd(a1));
-               (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
+              (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
             }
             catch (...) {
                // Account for throws inside constructors             
@@ -220,7 +220,7 @@ namespace Langulus::Annies::Component
 
             try {
                ThisCom::MergeInnerTable1D(it, counter, LglsFwd(a1));
-               (ThisCom::MergeInnerTable1D(it, counter, LglsFwd(an)), ...);
+              (ThisCom::MergeInnerTable1D(it, counter, LglsFwd(an)), ...);
             }
             catch (...) {
                // Account for throws inside constructors             
@@ -252,19 +252,26 @@ namespace Langulus::Annies::Component
       static_assert(not CT::NullTerminated<C>,
          "Hash tables can't be null-terminated");
 
-      auto found = self.template TableSearch<ID>(DeintCast(a1));
-      if (found)
-         return found;
+      size_t const lhs_count = self.GetCount();
+      if (lhs_count != 0) {
+         auto found = self.template TableSearch<ID>(DeintCast(a1));
+         if (found)
+            return found;
+      }
+
+      // Check types (and set them if not typed yet)                 
+      self.DeduceType(LglsFwd(a1), LglsFwd(an)...);
+      /*self.AbsorbType(Copy(a1));
+     (self.AbsorbType(Copy(an)), ...);*/
       
       // Reallocate/branch out                                       
-      size_t const lhs_count = self.GetCount();
       size_t const all_count = lhs_count + 1;
       self.BranchOut(all_count);
       
       // Insert in a hash table                                      
-      found = ThisCom::MergeInnerTableMD(LglsFwd(a1), LglsFwd(an)...);
+      auto handle = ThisCom::MergeInnerTableMD(LglsFwd(a1), LglsFwd(an)...);
       self.SetCountInner(all_count);
-      return found;
+      return handle;
    }
 
    /// MARK: Merge every entry of one table into another                   
@@ -297,8 +304,10 @@ namespace Langulus::Annies::Component
          auto found = self.Find(*h.GetKeyHandle());
          if (found)
             conflict(*found.GetValHandle(), NestIntentOf(other, *h.GetValHandle()));
-         else
-            self.Merge(NestIntentOf(other, h));
+         else {
+            self.Merge(NestIntentOf(other, h.GetKeyHandle()),
+                       NestIntentOf(other, h.GetValHandle()));
+         }
       });
       return self.GetCount() - prev_size;
    }
@@ -512,12 +521,14 @@ namespace Langulus::Annies::Component
       }
    }
 
-   /// MARK: MergeInnerTableMD                                             
-   /// Inserts 'd1' into a hash map at the appropriate bucket. Emplaces    
-   /// all 'dn' under the same bucket, in each dimension. Dimensions with  
-   /// missing argument are default-initialized, or error out. Does not    
-   /// perform conversion.                                                 
-   ///   @attention operates on all dimensions at once                     
+   /// MARK: MergeInnerTableMD                                                
+   /// Inserts 'd1' into a hash map at the appropriate bucket. Emplaces       
+   /// all 'dn' under the same bucket, in each dimension. Dimensions with     
+   /// missing argument are default-initialized, or error out. Does not       
+   /// perform conversion.                                                    
+   ///   @attention operates on all dimensions at once                        
+   ///   @attention assumes the key doesn't exist in the map yet              
+   ///   @attention assumes there's at least one free slot in the map         
    TEMPLATE template<CT::Multidimensional C, class D1, class...DN>
    auto LGLSCOM::MergeInnerTableMD(this C& self, D1&& d1, DN&&...dn) -> DecideHandle<C> {
       static_assert(sizeof...(SHARED) >= sizeof...(DN), "Too many arguments");
@@ -531,23 +542,29 @@ namespace Langulus::Annies::Component
       else
          offset = self.TableEmplace(FWDIntent(d1));
 
-      auto h = self.GetHandle() + offset;
+      // At this point only the key is emplaced.                        
+      //TODO the value may or may not be default-initialized here. it depends
+      //TODO on whether it was lazily inserted (uninitialized) or force-inserted (defaulted)
+      //TODO if value type had some default-initalized heap, this would mean leak
+      auto h = self.GetHandle().ForceMutable() + offset;
       constexpr size_t overlapped_count
          = sizeof...(DN) < sizeof...(SHARED) ? sizeof...(DN)
                                              : sizeof...(SHARED);
 
-      // Emplace available                                           
+      // Emplace available, key not included                            
       LglsSequence(overlapped_count, {
          static_assert(not CONVERT
             or ((Same<TypeOf<C, Id::template At<I+1>>, CT::RemoveAllBoundedArrays<DN>>) and ...),
             "Use ConvertMergeInnerTableMD instead" //TODO function not implemented yet
          );
-         (h.template EmplaceWithIntent<Id::template At<I+1>>(FWDIntent(dn)), ...);
+         (h.template GetSlice<Id::template At<I+1>>()
+            .EmplaceWithIntent(FWDIntent(dn)), ...);
       });
 
-      // Default the rest                                            
+      // Default the rest                                               
       LglsSequence(sizeof...(SHARED) - overlapped_count, {
-         (h.template EmplaceDefault<Id::template At<I+1+overlapped_count>, AllocationStrategy::DontAllocate>(), ...);
+         (h.template GetSlice<Id::template At<I+1+overlapped_count>>()
+            .EmplaceDefault(), ...);
       });
       return h;
    }

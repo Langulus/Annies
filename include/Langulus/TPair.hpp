@@ -141,12 +141,12 @@ namespace Langulus::Annies
             return true;
       }
 
-      template<CT::Pair P>
+      template<CT::Pair P> requires Inner::PairOnHeap<K, V>
       constexpr TPair(P&& p) requires (ConstructibleWith<P>()) {
          this->Absorb(LglsFwd(p));
       }
       
-      constexpr TPair(Inner::Absorb, CT::Pair auto&& p) {
+      constexpr TPair(Inner::Absorb, CT::Pair auto&& p) requires Inner::PairOnHeap<K, V> {
          this->Absorb(LglsFwd(p));
       }
 
@@ -194,7 +194,7 @@ namespace Langulus::Annies
 
       /// Construct on the heap (or from handles)                             
       ///   @attention default-initializes the value                          
-      template<Disambiguate K_ALT> requires Same<Deint<K_ALT>, K>
+      template<Disambiguate K_ALT> /*requires Same<Deint<K_ALT>, K>*/
       constexpr TPair(K_ALT&& a1) requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT>) {
          this->ResetState();
          //this->DeduceType(a1, V {});
@@ -218,14 +218,14 @@ namespace Langulus::Annies
          : TPair {LglsFwd(a1)} {}
      
       /// Assignment                                                          
-      constexpr TPair& operator = (TPair const& other) {
+      constexpr TPair& operator = (TPair const& other) requires Inner::PairOnHeap<K, V> {
          return this->AssignAbsorb(Refer(other));
       }
-      constexpr TPair& operator = (TPair&& other) noexcept {
+      constexpr TPair& operator = (TPair&& other) noexcept requires Inner::PairOnHeap<K, V> {
          return this->AssignAbsorb(Move(other));
       }
 
-      template<CT::Pair P>
+      template<CT::Pair P> requires Inner::PairOnHeap<K, V> 
       constexpr TPair& operator = (P&& pair) requires (ConstructibleWith<P>()) {
          return this->AssignAbsorb(LglsFwd(pair));
       }

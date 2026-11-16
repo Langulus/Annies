@@ -464,40 +464,45 @@ namespace Langulus::Annies::Component
    requires (CT::ContainsOne<T> and (CT::Contiguous<C> or not REVERSE))
    auto LGLSCOM::FindEx(this C&& self, T const& item, size_t cookie) assumptious
    -> DecideHandle<C> {
-      using RELEVANT = typename Id::template Intersect<typename T::Dimensions>;
+      static_assert(CT::CompatibleDimensions<C, T>);
       if (self.IsEmpty())
          return {};
 
+      // Verify types are the same and are comparable                   
       if constexpr (CT::TypeErased<C>) {
-         if (not RELEVANT::ForEachAnd([&self,&item]<Cid D> {
+         if (not Id::ForEachAnd([&self,&item]<Cid D> {
             auto type = self.template GetType<D>();
             return type.IsSame(item.template GetType<D>())
                and type.GetComparerEqual();
          })) return {};
       }
 
-      // Find the first relevant dimension                           
-      auto first_rhs = item.GetHandle();
+      // Find the first relevant dimension                              
+      const auto key = item.GetKeyHandle();
 
-      DecideHandle<C> first_lhs;
+      DecideHandle<C> found;
       if constexpr (CT::IndexedTable<C>) {
+         // Hash table search                                           
          (void) cookie;
-         first_lhs = self.template TableSearch<RELEVANT::First>(first_rhs);
+         found = self.TableSearch(key);
       }
-      else first_lhs = self.template FindInner<REVERSE, RELEVANT::First>(first_rhs, cookie);
+      else {
+         // Linear search                                               
+         found = self.template FindInner<REVERSE>(key, cookie);
+      }
 
-      if constexpr (RELEVANT::Count == 1)
-         return first_lhs;
-      else if (first_lhs) {
-         // Compare the rest of the dimensions with the first handle 
-         if (RELEVANT::Expand([&first_lhs, &first_rhs]<Cid, Cid...DN> {
-            return (first_lhs.template CompareOneEqualInner<DN>(first_rhs) and ...);
-         }))
-            return first_lhs;
-         else
-            return {};
+      if constexpr (not CT::Multidimensional<C>)
+         return found;
+      else if (found) {
+         // Compare the rest of the dimensions                          
+         const auto item_handle = item.GetHandle();
+         if (Id::Expand([&found, &item_handle]<Cid, Cid...DN> {
+            return (found.template CompareOneEqualInner<DN>(item_handle) and ...);
+         })) return found;
       }
-      else return {};
+
+      // No match if reached                                            
+      return {};
    }
 
    /// MARK: FindExReverse                                                 

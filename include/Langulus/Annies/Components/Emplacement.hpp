@@ -795,7 +795,7 @@ namespace Langulus::Annies::Component
       ///      with multiple dimensions!                                      
       template<Cid SID = ID, AllocationStrategy STRAT = AllocationStrategy::FreshAllocate, class E = void, CT::Container C>
       requires Relevant<SID>
-      void EmplaceDefault(this C& self) {
+      void EmplaceDefault(this C&& self) {
          static_assert(CT::ContainsOne<C>,
             "Emplacing only first element in a container with many. "
             "GetHandle() first?"

@@ -599,9 +599,10 @@ namespace Langulus::Annies::Component
       ///   @param a The arguments - one for each dimension.                  
       constexpr void DeduceType(this auto& self, auto const&...a) {
          if constexpr (Subcomponents::Count == sizeof...(a)) {
-            Expand(Subcomponents{}, [&]<class...C> {
+            /*Expand(Subcomponents{}, [&]<class...C> {
                (self.C::DeduceType(a), ...);
-            });
+            });*/ //TODO not working correctly on clang?? :(
+            (self.TN::DeduceType(a), ...);
          }
          else {
             static_assert(sizeof...(a) == 1,

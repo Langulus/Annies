@@ -374,7 +374,7 @@ namespace Langulus::Annies
       /// MARK: begin()                                                       
       constexpr auto begin() noexcept -> Iterator {
          if (range.IsEmpty())
-            return {{}, &range};
+            return {};//{{}, &range};
 
          if constexpr (REVERSE)
             return {range.template AsAt<H>(Index::Last), &range};
@@ -385,7 +385,7 @@ namespace Langulus::Annies
       /// MARK: end()                                                         
       constexpr auto end() noexcept -> Iterator {
          if (range.IsEmpty())
-            return {{}, &range};
+            return {};//{{}, &range};
 
          if constexpr (REVERSE) {
             Iterator temp {range.template AsAt<H>(Index::First), &range};
@@ -402,7 +402,7 @@ namespace Langulus::Annies
       /// MARK: rbegin()                                                      
       constexpr auto rbegin() noexcept -> Iterator {
          if (range.IsEmpty())
-            return {{}, &range};
+            return {};//{{}, &range};
 
          if constexpr (REVERSE)
             return {range.template AsAt<H>(Index::First), &range};
@@ -413,7 +413,7 @@ namespace Langulus::Annies
       /// MARK: rend()                                                        
       constexpr auto rend() noexcept -> Iterator {
          if (range.IsEmpty())
-            return {{}, &range};
+            return {};//{{}, &range};
 
          if constexpr (not REVERSE) {
             Iterator temp {range.template AsAt<H>(Index::First), &range};

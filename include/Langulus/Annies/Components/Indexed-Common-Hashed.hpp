@@ -297,15 +297,12 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID, class C, CT::Intent H> requires Relevant<SID>
       size_t TableEmplace(this C& self, H&& item) {
          static_assert(not CT::Array<H>);
+         static_assert(CT::NotHandle<H> or not CT::Multidimensional<H>);
 
          // Get the item's hash.                                        
          // This hash will be truncated and used for bucketing in each  
          // cascading table.                                            
-         Hash hash;
-         if constexpr (not Shared or not CT::Handle<H>)
-            hash = HashOf(DeintCast(item));
-         else
-            hash = HashOf(DeintCast(item).GetKeyHandle()); //TODO this presumes the key dimension is the one the hash table is associated with
+         Hash hash = HashOf(DeintCast(item));
 
          // Pick insertion strategy                                     
          size_t occupied = self.GetCount();
@@ -407,9 +404,10 @@ namespace Langulus::Annies::Component
       /// Table insertion function for e specific cascade level.              
       /// Doesn't move anything around, as it only seeks an empty spot that   
       /// can be easily filled.                                               
-      ///   @attention works in the dimension intersection between C's Id and //TODO
-      ///      H's Id. Data will be allocated for all relevant dimensions,    
-      ///      but only the provided by H will be constructed!                
+      ///   @attention emplaces only SID of multidimensional handles!         
+               ///   @attention works in the dimension intersection between C's Id and //TODO
+               ///      H's Id. Data will be allocated for all relevant dimensions,    
+               ///      but only the provided by H will be constructed!                
       ///   @return the offset at which item was inserted, relative to the    
       ///      current tableBeg. Returns 'reserved' if unable to insert here  
       //TODO maybe also collect data about where would be best to do the TableEmplaceForce on the way
@@ -421,19 +419,21 @@ namespace Langulus::Annies::Component
          size_t const reserved,
          H&& item
       ) {
+         static_assert(CT::NotHandle<H> or not CT::Multidimensional<H>);
+
          // Get the starting index based on the key hash                
          auto table = tableBeg + start;
          if (not *table) {
             // Optimal path - the first bucket spot is already empty    
             auto absolute_idx = table - self.template GetHashTableInner<SID>();
             auto handle = self.GetHandle().ForceMutable() + absolute_idx;
-            if constexpr (not Shared or not CT::Handle<H>)
-               handle.template EmplaceWithIntent<SID>(LglsFwd(item));
-            else {
+            //if constexpr (not Shared or not CT::Handle<H>)
+               handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
+            /*else {
                Id::ForEach([&handle,&item]<Cid D>{
                   handle.template EmplaceWithIntent<D>(LglsFwd(item));
                });
-            }
+            }*/
             
             *table = 1;
             return start;
@@ -462,13 +462,13 @@ namespace Langulus::Annies::Component
          // If reached, then empty slot found, so put the value there   
          auto absolute_idx = table - self.template GetHashTableInner<SID>();
          auto handle = self.GetHandle().ForceMutable() + absolute_idx;
-         if constexpr (not Shared or not CT::Handle<H>)
-            handle.template EmplaceWithIntent<SID>(LglsFwd(item));
-         else {
+         //if constexpr (not Shared or not CT::Handle<H>)
+            handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
+         /*else {
             Id::ForEach([&handle,&item]<Cid D>{
                handle.template EmplaceWithIntent<D>(LglsFwd(item));
             });
-         }
+         }*/
          
          *table = attempts;
          return table - tableBeg;
@@ -491,19 +491,21 @@ namespace Langulus::Annies::Component
          size_t const reserved,
          H&& item
       ) {
+         static_assert(CT::NotHandle<H> or not CT::Multidimensional<H>);
+
          // Get the starting index based on the key hash                
          auto table = tableBeg + start;
          if (not *table) {
             // No swapping will happen                                  
             auto absolute_idx = table - self.template GetHashTableInner<SID>();
             auto handle = self.GetHandle().ForceMutable() + absolute_idx;
-            if constexpr (not Shared or not CT::Handle<H>)
-               handle.template EmplaceWithIntent<SID>(LglsFwd(item));
-            else {
+            //if constexpr (not Shared or not CT::Handle<H>)
+               handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
+            /*else {
                Id::ForEach([&handle,&item]<Cid D>{
                   handle.template EmplaceWithIntent<D>(LglsFwd(item));
                });
-            }
+            }*/
             
             *table = 1;
             return start;
@@ -596,6 +598,7 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID, class C, CT::NoIntent H> requires Relevant<SID>
       auto TableSearch(this C const& self, H const& item) assumptious -> DecideHandle<C> {
          static_assert(not CT::Array<H>);
+         static_assert(CT::NotHandle<H> or not CT::Multidimensional<H>);
 
          // Get the item's hash.                                        
          // This hash will be truncated and used for bucketing in each  
@@ -610,11 +613,8 @@ namespace Langulus::Annies::Component
          // Decide the comparison function for type-erased tables       
          RTTI::DefinitionData::FCompareEqual comparer = nullptr;
          if constexpr (CT::Handle<H>) {
-            if constexpr (H::Dimensions::Count == 1)
-               hash = HashOf(item);
-            else
-               hash = HashOf(item.GetKeyHandle()); //TODO this presumes the key dimension is the one the hash table is associated with
-
+            hash = HashOf(item);
+            
             if constexpr (CT::TypeErased<C> or CT::TypeErased<H>) {
                const auto type = self.template GetType<SID>();
                LglsAssumeDev(type.IsSame(item.template GetType<SID>()),

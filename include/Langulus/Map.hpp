@@ -111,8 +111,10 @@ namespace Langulus::Annies::Inner
          else {
             static_assert(CT::Pair<A1, AN...>, "Arguments must be pairs");
             this->ConstructDefault();
-            this->Merge(NestIntentOf(a1, DeintCast(a1).GetHandle()));
-           (this->Merge(NestIntentOf(an, DeintCast(an).GetHandle())), ...);
+            this->Merge(NestIntentOf(a1, DeintCast(a1).GetKeyHandle()),
+                        NestIntentOf(a1, DeintCast(a1).GetValHandle()));
+           (this->Merge(NestIntentOf(an, DeintCast(an).GetKeyHandle()),
+                        NestIntentOf(an, DeintCast(an).GetValHandle())), ...);
          }
       }
       
@@ -132,8 +134,10 @@ namespace Langulus::Annies::Inner
       template<CT::Pair A1, CT::Pair...AN>
       constexpr Map(Inner::Piecewise, A1&& a1, AN&&...an) {
          this->ConstructDefault();
-         this->Merge(NestIntentOf(a1, DeintCast(a1).GetHandle()));
-        (this->Merge(NestIntentOf(an, DeintCast(an).GetHandle())), ...);
+            this->Merge(NestIntentOf(a1, DeintCast(a1).GetKeyHandle()),
+                        NestIntentOf(a1, DeintCast(a1).GetValHandle()));
+           (this->Merge(NestIntentOf(an, DeintCast(an).GetKeyHandle()),
+                        NestIntentOf(an, DeintCast(an).GetValHandle())), ...);
       }
       
       /// Assignment                                                          
@@ -168,7 +172,7 @@ namespace Langulus::Annies::Inner
       template<class P>
       constexpr auto CreateSwapper(P&& initializer) assumptious {
          if constexpr (CT::Handle<P>) {
-            if constexpr (Com::Dimensions<P>::Count > 1) {
+            if constexpr (CT::Multidimensional<P>) {
                using K = Decvq<Deref<TypeOf<P, 0>>>;
                using V = Decvq<Deref<TypeOf<P, 1>>>;
                LglsAssumeDev(this->template IsSame<K, 0>(), "Type mismatch");
@@ -193,15 +197,17 @@ namespace Langulus::Annies::Inner
       /// Clear the map and assign a single pair                              
       auto Assign(CT::Pair auto&& pair) -> Map& {
          this->Reset();
-         this->Merge(NestIntentOf(pair, DeintCast(pair).GetHandle()));
+         this->Merge(NestIntentOf(pair, DeintCast(pair).GetKeyHandle()),
+                     NestIntentOf(pair, DeintCast(pair).GetValHandle()));
          return *this;
       }
 
       /// Clear the map and assign a key and a value                          
       auto Assign(auto&& key, auto&& val) -> Map& {
          this->Reset();
-         TPair temp {LglsFwd(key), LglsFwd(val)};
-         this->Merge(Abandon {temp.GetHandle()});
+         //TPair temp {LglsFwd(key), LglsFwd(val)};
+         //this->Merge(Abandon {temp.GetHandle()});
+         this->Merge(LglsFwd(key), LglsFwd(val));
          return *this;
       }
 

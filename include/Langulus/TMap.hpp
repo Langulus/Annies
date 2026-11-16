@@ -94,8 +94,10 @@ namespace Langulus::Annies
          else {
             static_assert(CT::Pair<A1, AN...>, "Arguments must be pairs");
             this->ConstructDefault();
-            this->Merge(NestIntentOf(a1, DeintCast(a1).GetHandle()));
-           (this->Merge(NestIntentOf(an, DeintCast(an).GetHandle())), ...);
+            this->Merge(NestIntentOf(a1, DeintCast(a1).GetKeyHandle()),
+                        NestIntentOf(a1, DeintCast(a1).GetValHandle()));
+           (this->Merge(NestIntentOf(an, DeintCast(an).GetKeyHandle()),
+                        NestIntentOf(an, DeintCast(an).GetValHandle())), ...);
          }
       }
       
@@ -115,8 +117,10 @@ namespace Langulus::Annies
       template<CT::Pair A1, CT::Pair...AN>
       constexpr TMap(Inner::Piecewise, A1&& a1, AN&&...an) {
          this->ConstructDefault();
-         this->Merge(NestIntentOf(a1, DeintCast(a1).GetHandle()));
-        (this->Merge(NestIntentOf(an, DeintCast(an).GetHandle())), ...);
+         this->Merge(NestIntentOf(a1, DeintCast(a1).GetKeyHandle()),
+                     NestIntentOf(a1, DeintCast(a1).GetValHandle()));
+        (this->Merge(NestIntentOf(an, DeintCast(an).GetKeyHandle()),
+                     NestIntentOf(an, DeintCast(an).GetValHandle())), ...);
       }
 
       /// Assignment                                                          
@@ -128,12 +132,13 @@ namespace Langulus::Annies
       }
 
       template<class A>
-      constexpr TMap& operator = (A&& argument) {
+      constexpr TMap& operator = (A&& a) {
          if constexpr (CT::Map<A>)
-            return this->AssignAbsorb(LglsFwd(argument));
+            return this->AssignAbsorb(LglsFwd(a));
          else {
             static_assert(CT::Pair<A>, "Argument must be pair or map");
-            return this->Assign(LglsFwd(argument));
+            return this->Assign(NestIntentOf(a, DeintCast(a).GetKeyHandle()),
+                                NestIntentOf(a, DeintCast(a).GetValHandle()));
          }
       }
       
@@ -144,7 +149,7 @@ namespace Langulus::Annies
       constexpr auto CreateSwapper(P&& initializer) assumptious {
          using DP = Decvq<ShedDeref<P>>;
          if constexpr (CT::Handle<P>) {
-            if constexpr (DP::Dimensions::Count > 1) {
+            if constexpr (CT::Multidimensional<DP>) {
                using PK = Decvq<Deref<TypeOf<DP, 0>>>;
                using PV = Decvq<Deref<TypeOf<DP, 1>>>;
                static_assert(Same<PK, K>, "Key type mismatch");
@@ -166,15 +171,17 @@ namespace Langulus::Annies
       /// Clear the map and assign a single pair                              
       auto Assign(CT::Pair auto&& pair) -> TMap& {
          this->Clear();
-         this->Merge(NestIntentOf(pair, DeintCast(pair).GetHandle()));
+         this->Merge(NestIntentOf(pair, DeintCast(pair).GetKeyHandle()),
+                     NestIntentOf(pair, DeintCast(pair).GetValHandle()));
          return *this;
       }
 
       /// Clear the map and assign a key and a value                          
       auto Assign(auto&& key, auto&& val) -> TMap& {
          this->Clear();
-         TPair temp {LglsFwd(key), LglsFwd(val)};
-         this->Merge(Abandon {temp.GetHandle()});
+         //TPair temp {LglsFwd(key), LglsFwd(val)};
+         //this->Merge(Abandon {temp.GetHandle()});
+         this->Merge(LglsFwd(key), LglsFwd(val));
          return *this;
       }
       
