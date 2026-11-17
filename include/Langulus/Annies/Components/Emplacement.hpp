@@ -788,10 +788,10 @@ namespace Langulus::Annies::Component
       }
       
       /// Emplace a new default-constructed item at the first position.       
-      ///   @attention This overwrites previous handle without dereferencing  
+      ///   @attention this overwrites previous handle without dereferencing  
       ///      it, and without destroying anything                            
-      ///   @attention Doesn't modify count                                   
-      ///   @attention Works in one dimension at a time! Beware when dealing  
+      ///   @attention doesn't modify count                                   
+      ///   @attention works in one dimension at a time! Beware when dealing  
       ///      with multiple dimensions!                                      
       template<Cid SID = ID, AllocationStrategy STRAT = AllocationStrategy::FreshAllocate, class E = void, CT::Container C>
       requires Relevant<SID>
@@ -828,10 +828,12 @@ namespace Langulus::Annies::Component
                LglsAssumeDev((self.template IsSame<E, SID>()), "Type mismatch");
 
                // Allocate if we have to                                
-               if constexpr (STRAT == AllocationStrategy::FreshAllocate)
-                  self.template AllocateFresh<SID>(1);
-               else if constexpr (STRAT == AllocationStrategy::Reallocate)
-                  self.template AllocateMore<SID>(1);
+               if constexpr (STRAT == AllocationStrategy::FreshAllocate) {
+                  if_available(self.template AllocateFresh<SID>(1));
+               }
+               else if constexpr (STRAT == AllocationStrategy::Reallocate) {
+                  if_available(self.template AllocateMore<SID>(1));
+               }
 
                // Construct the first element                           
                new (self.template GetRaw<SID>()) E {};
@@ -850,10 +852,12 @@ namespace Langulus::Annies::Component
 
                // Allocate if we have to. Do it only after we're sure   
                // that construction is possible                         
-               if constexpr (STRAT == AllocationStrategy::FreshAllocate)
-                  self.template AllocateFresh<SID>(1);
-               else if constexpr (STRAT == AllocationStrategy::Reallocate)
-                  self.template AllocateMore<SID>(1);
+               if constexpr (STRAT == AllocationStrategy::FreshAllocate) {
+                  if_available(self.template AllocateFresh<SID>(1));
+               }
+               else if constexpr (STRAT == AllocationStrategy::Reallocate) {
+                  if_available(self.template AllocateMore<SID>(1));
+               }
 
                // Construct the first element                           
                constructor(self.template GetRaw<SID>());
@@ -869,10 +873,10 @@ namespace Langulus::Annies::Component
             // This container is statically-typed. E is ignored.        
             // Allocate if we have to                                   
             if constexpr (STRAT == AllocationStrategy::FreshAllocate) {
-               self.template AllocateFresh<SID>(1);
+               if_available(self.template AllocateFresh<SID>(1));
             }
             else if constexpr (STRAT == AllocationStrategy::Reallocate) {
-               self.template AllocateMore<SID>(1);
+               if_available(self.template AllocateMore<SID>(1));
             }
 
             // Construct the first element                              

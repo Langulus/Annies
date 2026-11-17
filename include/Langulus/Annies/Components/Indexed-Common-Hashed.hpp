@@ -428,7 +428,11 @@ namespace Langulus::Annies::Component
             auto absolute_idx = table - self.template GetHashTableInner<SID>();
             auto handle = self.GetHandle().ForceMutable() + absolute_idx;
             //if constexpr (not Shared or not CT::Handle<H>)
+            if constexpr (CT::Multidimensional<H>)
                handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
+            else
+               handle.EmplaceWithIntent(LglsFwd(item));
+
             /*else {
                Id::ForEach([&handle,&item]<Cid D>{
                   handle.template EmplaceWithIntent<D>(LglsFwd(item));
@@ -463,7 +467,11 @@ namespace Langulus::Annies::Component
          auto absolute_idx = table - self.template GetHashTableInner<SID>();
          auto handle = self.GetHandle().ForceMutable() + absolute_idx;
          //if constexpr (not Shared or not CT::Handle<H>)
+         if constexpr (CT::Multidimensional<H>)
             handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
+         else
+            handle.EmplaceWithIntent(LglsFwd(item));
+
          /*else {
             Id::ForEach([&handle,&item]<Cid D>{
                handle.template EmplaceWithIntent<D>(LglsFwd(item));
@@ -500,7 +508,11 @@ namespace Langulus::Annies::Component
             auto absolute_idx = table - self.template GetHashTableInner<SID>();
             auto handle = self.GetHandle().ForceMutable() + absolute_idx;
             //if constexpr (not Shared or not CT::Handle<H>)
+            if constexpr (CT::Multidimensional<H>)
                handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
+            else
+               handle.EmplaceWithIntent(LglsFwd(item));
+
             /*else {
                Id::ForEach([&handle,&item]<Cid D>{
                   handle.template EmplaceWithIntent<D>(LglsFwd(item));

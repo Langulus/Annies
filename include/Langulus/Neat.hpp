@@ -511,21 +511,25 @@ namespace Langulus::Annies
                return;
             }
 
-            auto found = this->GetTagsInner().Find(tag->GetTag());
+            //auto found = this->GetTagsInner().Find(tag->GetTag());
 
             if constexpr (T::IsMoved()) {
                decltype(auto) tag_erased = reinterpret_cast<Tag&&>(tag.what);
-               if (found)
+               this->GetTagsInner()[tag->GetTag()] << NestIntentOf(tag, tag_erased);
+
+               /*if (found)
                   found.GetVal().Insert(NestIntentOf(tag, tag_erased));
                else
-                  this->GetTagsInner().Merge(tag->GetTag(), NestIntentOf(tag, tag_erased));
+                  this->GetTagsInner().Merge(tag->GetTag(), NestIntentOf(tag, tag_erased));*/
             }
             else {
                decltype(auto) tag_erased = reinterpret_cast<Tag const&>(tag.what);
-               if (found)
+               this->GetTagsInner()[tag->GetTag()] << NestIntentOf(tag, tag_erased);
+
+               /*if (found)
                   found.GetVal().Insert(NestIntentOf(tag, tag_erased));
                else
-                  this->GetTagsInner().Merge(tag->GetTag(), NestIntentOf(tag, tag_erased));
+                  this->GetTagsInner().Merge(tag->GetTag(), NestIntentOf(tag, tag_erased));*/
             }
          }
       }
@@ -543,11 +547,12 @@ namespace Langulus::Annies
                return;
             }
 
-            auto found = this->GetRecsInner().Find(meta);
+            this->GetRecsInner()[meta] << LglsFwd(recipe);
+            /*auto found = this->GetRecsInner().Find(meta);
             if (found)
                found.GetVal().Insert(LglsFwd(recipe));
             else
-               this->GetRecsInner().Merge(meta, LglsFwd(recipe));
+               this->GetRecsInner().Merge(meta, LglsFwd(recipe));*/
          }
       }
 
@@ -566,22 +571,25 @@ namespace Langulus::Annies
                return;
             }
 
-            auto found = this->GetMessInner().Find(meta);
+            this->GetMessInner()[meta] << Many {Langulus::Absorb, LglsFwd(data)};
+            /*auto found = this->GetMessInner().Find(meta);
             if (found) {
                found.GetVal().Insert(Many {Langulus::Absorb, LglsFwd(data)});
             }
             else this->GetMessInner().Merge(
                meta, Many {Langulus::Absorb, LglsFwd(data)}
-            );
+            );*/
          }
          else {
             // Push any other raw data/map                              
-            const auto meta = MetaDataOf<AS>();
+            this->GetMessInner()[MetaDataOf<AS>()] << Many {LglsFwd(data)};
+
+            /*const auto meta = MetaDataOf<AS>();
             auto found = this->GetMessInner().Find(meta);
             if (found) {
                found.GetVal().Insert(Many {LglsFwd(data)});
             }
-            else this->GetMessInner().Merge(meta, Many {LglsFwd(data)});
+            else this->GetMessInner().Merge(meta, Many {LglsFwd(data)});*/
          }
       }
 
