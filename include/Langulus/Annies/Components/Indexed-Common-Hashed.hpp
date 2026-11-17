@@ -749,6 +749,9 @@ namespace Langulus::Annies::Component
       auto& operator[] (this C& self, K const& key) assumptious {
          if constexpr (not Same<K, TypeOf<C>>) {
             const auto key_converted = static_cast<TypeOf<C>>(key);
+            if (self.IsEmpty())
+               return *self.Merge(key_converted).GetValHandle();
+
             auto found = self.TableSearch(key_converted);
             if (found)
                return *found.GetValHandle();
@@ -758,6 +761,9 @@ namespace Langulus::Annies::Component
             return *found.GetValHandle();
          }
          else {
+            if (self.IsEmpty())
+               return *self.Merge(key).GetValHandle();
+
             auto found = self.TableSearch(key);
             if (found)
                return *found.GetValHandle();

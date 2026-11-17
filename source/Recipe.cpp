@@ -23,7 +23,7 @@ namespace Langulus::Annies::Component
 
 namespace Langulus::Annies
 {
-   bool Recipe::operator == (Recipe const& other) const noexcept {
+   /*bool Recipe::operator == (Recipe const& other) const noexcept {
       return this->CompareEqual(other);
-   }
+   }*/
 }

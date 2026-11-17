@@ -87,23 +87,31 @@ namespace Langulus::Annies::Component
       }
       
       /// Get the mass component                                              
-      void SetMass(this auto& self, Real mass) noexcept {
+      template<class SELF>
+      auto SetMass(this SELF&& self, Real mass) noexcept -> SELF&& {
          ThisCom::GetChargeInner().mass = mass;
+         return LglsFwd(self);
       }
       
       /// Get the rate component                                              
-      void SetRate(this auto& self, Real rate) noexcept {
+      template<class SELF>
+      auto SetRate(this SELF&& self, Real rate) noexcept -> SELF&& {
          ThisCom::GetChargeInner().rate = rate;
+         return LglsFwd(self);
       }
       
       /// Get the time component                                              
-      void SetTime(this auto& self, Real time) noexcept {
+      template<class SELF>
+      auto SetTime(this SELF&& self, Real time) noexcept -> SELF&& {
          ThisCom::GetChargeInner().time = time;
+         return LglsFwd(self);
       }
       
       /// Get the precedence component                                        
-      void SetPrecedence(this auto& self, Real precedence) noexcept {
+      template<class SELF>
+      auto SetPrecedence(this SELF&& self, Real precedence) noexcept -> SELF&& {
          ThisCom::GetChargeInner().precedence = precedence;
+         return LglsFwd(self);
       }
       
    protected:

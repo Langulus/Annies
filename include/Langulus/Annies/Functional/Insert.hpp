@@ -489,7 +489,7 @@ namespace Langulus::Annies::Component
       using I = IntentOf(value);
       using T = Deint<I>;
       decltype(auto) other = DeintCast(value);
-      const bool stateCompliant = ThisCom::CheckState(other);
+      bool stateCompliant = true;
 
       if constexpr (CT::DeepDense<T>) {
          // We're inserting a deep item, so we can do various smart  
@@ -497,6 +497,7 @@ namespace Langulus::Annies::Component
          if (not other.IsValid())
             return 0;
 
+         stateCompliant = ThisCom::CheckState(other);
          if (stateCompliant) {
             if (self.IsEmpty()) {
                // We can directly absorb                             

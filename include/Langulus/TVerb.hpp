@@ -19,13 +19,54 @@
 
 namespace Langulus::Annies::Inner
 {
+   /// TVerbs is similar to the usual type-erased Many, which is used   
+   /// for the verb arguments (retrievable by GetRHS). Adds charge and  
+   /// verb ID components, Many mOutput and Many mContext as members.   
+   ///   @attention it is important to notice that insertion operators  
+   ///      like << and >>, and merge operators like <<= and >>=, act   
+   ///      on mOutput, instead of the verb argument. They also         
+   ///      implicitly mark the verb as satisfied.                      
+   template<class V>
+   using TVerbBase = Com::Container<
+      Com::State::Disowned<>,          // Allows disownment             
+      Com::State::Future<>,            // Toggle future linking         
+      Com::State::Past<>,              // Toggle past linking           
+      Com::State::Or<>,                // Toggle disjunction            
+      Com::State::Compressed<>,        // Toggle compression            
+      Com::State::Encrypted<>,         // Toggle encryption             
+      Com::TypedStack<DMeta>,          // Type-erased                   
+      Com::VerbedStack<VMeta, V>,      // Add verb, make executable     
+      Com::HeapMovable<>,              // Pointer to heap memory        
+      Com::CountStack<>,               // Dynamically sized             
+      Com::ReserveStack<>,             // Reserve kept as member        
+      Com::ChargedStack<>,             // Add charge                    
+      Com::IndexedLinear<>,            // Indexed directly              
+      Com::OwnershipStack<>,           // Allocation is referenced      
+      Com::OwnershipDeepHeap<>,        // Sparse elements are referenced
+      Com::HashStack<>,                // Hash can be cached            
+      Com::Deepening<Many>,            // Makes container deep          
+      Com::Insertion<>,                // Allows insertion              
+      //Com::InsertionOperators<>,       // << and >> insertion           
+      //Com::InsertionOperatorsConcat<>,
+      Com::Merging<>,                  // Allows merging                
+      //Com::MergingOperators<>,         // <<= and >>= merging           
+      Com::Emplacement<>,              // Allows emplacement            
+      Com::Assignment<>,               // Allows assignment             
+      Com::Removal<>,                  // Allows clear/reset            
+      Com::Conversion<>,               // Allows conversions            
+      Com::Comparison<>,               // Allows comparisons            
+      Com::IterationForEach<>,         // ForEach iteration             
+      Com::IterationRange<>,           // Ranged iteration              
+      Com::Descriptor<>                // Add descriptor interface      
+   >;
+
    /// TVerbs extend the usual type-erased Any, by adding charge and verb ID  
    /// as members.                                                            
-   template<class V>
+   /*template<class V>
    using TVerbBase = typename ManyBase::template Include<//TODO consider using Com::Composite with Many on the stack, so we can take easy reference of the argument!
       Com::VerbedStack<VMeta, V>,  // Add verb, make executable         
       Com::ChargedStack<>          // Add charge                        
-   >;
+   >;*/
 }
 
 namespace Langulus::Annies
@@ -189,10 +230,11 @@ namespace Langulus::Annies
          return *this;
       }
 
-      // Set output                                                           
-      auto SetOutput(auto&&...arguments) -> TVerb& {
-         mOutput = Many {LglsFwd(arguments)...};
-         return *this;
+      /// Set output                                                          
+      template<class SELF>
+      auto SetOutput(this SELF&& self, auto&&...arguments) -> SELF&& {
+         self.mOutput = Many {LglsFwd(arguments)...};
+         return LglsFwd(self);
       }
 
       /// Execute the verb in unary mode (ignores context).                   
@@ -405,8 +447,10 @@ namespace Langulus::Annies
       }
 
       /// Type-erasure operator to TVerb<void>                                
-      operator Verb&       () noexcept { return reinterpret_cast<Verb      &>(*this); }
-      operator Verb const& () noexcept { return reinterpret_cast<Verb const&>(*this); }
+      //operator Verb const&&() const noexcept { return reinterpret_cast<Verb     &&>(*this); }
+      //operator Verb&&      () noexcept { return reinterpret_cast<Verb     &&>(*this); }
+      operator Verb&       ()       noexcept { return reinterpret_cast<Verb      &>(*this); }
+      operator Verb const& () const noexcept { return reinterpret_cast<Verb const&>(*this); }
 
       /// Execute a verb in the resulting output of this one                  
       ///   @attention this verb will be executed if not executed yet         
@@ -421,6 +465,102 @@ namespace Langulus::Annies
          verb.In(self.mOutput).Run();
          return verb;
       }
+
+      /// Push anything to end of the outputs, satisfying the verb            
+      ///   @attention nullptrs are never pushed and don't satisfy verb       
+      ///   @param rhs the data and intent to push                            
+      ///   @return a reference to this verb for chaining                     
+      template<class SELF>
+      SELF& operator << (this SELF& self, auto&& rhs) {
+         using S = IntentOf(rhs);
+         using T = Deint<S>;
+
+         if constexpr (not CT::Null<T>) {
+            if constexpr (CT::Sparse<T>) {
+               // Push a pointer only if valid                          
+               if (not DeintCast(rhs))
+                  return self;
+            }
+
+            if (self.mOutput.Compose(LglsFwd(rhs)))
+               self.Done();
+         }
+
+         return self;
+      }
+
+      /// Push anything to the front of the outputs, satisfying the verb      
+      ///   @attention nullptrs are never pushed and don't satisfy verb       
+      ///   @param rhs the data and intent to push                            
+      ///   @return a reference to this verb for chaining                     
+      /*template<class SELF>
+      SELF& operator >> (this SELF& self, auto&& rhs) {
+         using S = IntentOf(rhs);
+         using T = Deint<S>;
+
+         if constexpr (not CT::Null<T>) {
+            if constexpr (CT::Sparse<T>) {
+               // Push a pointer only if valid                          
+               if (not DeintCast(rhs))
+                  return self;
+            }
+
+            if (self.mOutput.ComposeAt(Index::Front, LglsFwd(rhs)))
+               self.Done();
+         }
+
+         return self;
+      }*/
+
+      /// Merge anything to output's back, with or without an intent          
+      ///   @param rhs the data and intent to merge                           
+      ///   @return a reference to this verb for chaining                     
+      template<class SELF>
+      SELF& operator <<= (this SELF& self, auto&& rhs) {
+         using S = IntentOf(rhs);
+         using T = Deint<S>;
+
+         if constexpr (not CT::Null<T>) {
+            if constexpr (CT::Sparse<T>) {
+               // Push a pointer, but check if valid first              
+               if (not DeintCast(rhs))
+                  return self;
+            }
+
+            if (self.mOutput.Find(DeintCast(rhs)))
+               return self;
+
+            if (self.mOutput.Compose(LglsFwd(rhs)))
+               self.Done();
+         }
+
+         return self;
+      }
+
+      /// Merge anything to output's front, with or without an intent         
+      ///   @param rhs - the data and intent to merge                         
+      ///   @return a reference to this verb for chaining                     
+      /*template<class SELF>
+      SELF& operator >>= (this SELF& self, auto&& rhs) {
+         using S = IntentOf(rhs);
+         using T = Deint<S>;
+
+         if constexpr (not CT::Null<T>) {
+            if constexpr (CT::Sparse<T>) {
+               // Push a pointer, but check if valid first              
+               if (not DeintCast(rhs))
+                  return self;
+            }
+
+            if (self.mOutput.Find(DeintCast(rhs)))
+               return self;
+
+            if (self.mOutput.Compose(Index::Front, LglsFwd(rhs)))
+               self.Done();
+         }
+
+         return self;
+      }*/
    };
 }
 
@@ -432,7 +572,10 @@ namespace Langulus::Annies
 #define LANGULUS_DEFINE_VERB(P, N, PRECEDENCE, INFOSTRING) \
    namespace Langulus::Verbs { struct P; } \
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
-   namespace Langulus::Verbs { struct P : Annies::TVerb<P> { using CTTI_Info = Yes<INFOSTRING>; }; }
+   namespace Langulus::Verbs { struct P : Annies::TVerb<P> { \
+      using CTTI_Info = Yes<INFOSTRING>; \
+      using Annies::TVerb<P>::TVerb; \
+   };}
 
 /// Define a verb with operators                                              
 ///   @param P positive verb name, as it exists in namespace Langulus::Verbs  
@@ -446,4 +589,7 @@ namespace Langulus::Annies
    namespace Langulus::Verbs { struct P; } \
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
    namespace Langulus::CTTI  { template<> struct DefineVerbOp<::Langulus::Verbs::P> : NamedOperator<OP,ON> {}; } \
-   namespace Langulus::Verbs { struct P : Annies::TVerb<P> { using CTTI_Info = Yes<INFOSTRING>; }; }
+   namespace Langulus::Verbs { struct P : Annies::TVerb<P> { \
+      using CTTI_Info = Yes<INFOSTRING>; \
+      using Annies::TVerb<P>::TVerb; \
+   }; }

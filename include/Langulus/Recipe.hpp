@@ -15,9 +15,9 @@
 namespace Langulus::Annies::Inner
 {
    /// Recipe extends the usual type-erased Many, by adding charge and        
-   /// type as members.                                                       
+         /// type as members.                                                       
    using RecipeBase = typename ManyBase::template Include<
-      Com::Stack<DMeta, 1>,         // Add the constructed type         //TODO consider using Com::Composite with Many on the stack, so we can take easy reference of the descriptor!
+      //Com::Stack<DMeta, 1>,         // Add the constructed type         //TODO consider using Com::Composite with Many on the stack, so we can take easy reference of the descriptor!
       Com::ChargedStack<>           // Add charge                       
    >;
 }
@@ -39,6 +39,10 @@ namespace Langulus::Annies
    ///    6) create*2 Recipe(Thing, name("test"))                             
    ///    After execution all these are replaced by the two created Things    
    struct Recipe : Inner::RecipeBase {
+   private:
+      DMeta mTarget;
+
+   public:
       using CTTI_ReflectAs = Recipe;
       using CTTI_Recipe    = Yup;
       using CTTI_Deep      = No;
@@ -48,11 +52,14 @@ namespace Langulus::Annies
       constexpr Recipe() noexcept {
          this->ConstructDefault();
       }
-      constexpr Recipe(Recipe const& other) {
+      constexpr Recipe(Recipe const& other)
+         : mTarget {other.mTarget} {
          this->Absorb(Refer(other));
       }
-      constexpr Recipe(Recipe&& other) noexcept  {
+      constexpr Recipe(Recipe&& other) noexcept 
+         : mTarget {other.mTarget} {
          this->Absorb(Move(other));
+         other.mTarget = {};
       }
       constexpr ~Recipe() noexcept {
          this->Destroy();
@@ -107,22 +114,24 @@ namespace Langulus::Annies
       template<class T>
       void SetTarget() noexcept {
          //*Com::Stack<DMeta, 1>::Get() = MetaDataOf<T>();
-         *Get<DMeta, 1>() = MetaDataOf<T>();
+         //*Get<DMeta, 1>() = MetaDataOf<T>();
+         mTarget = MetaDataOf<T>();
       }
 
       /// Set what this recipe is for                                         
       void SetTarget(DMeta type) noexcept {
          //*Com::Stack<DMeta, 1>::Get() = type;
-         *Get<DMeta, 1>() = type;
+         //*Get<DMeta, 1>() = type;
+         mTarget = type;
       }
 
       /// What is this a recipe for?                                          
       DMeta GetTarget() const noexcept {
          //return *Com::Stack<DMeta, 1>::Get();
-         return *Get<DMeta, 1>();
+         return mTarget;//*Get<DMeta, 1>();
       }
    
-      /// Get the descriptor for the recipe                                   
+      /// Get a shallow copy of the recipe descriptor                         
       Many GetDescriptor() const noexcept {
          return Many {Langulus::Absorb, *this};
       }
@@ -141,6 +150,12 @@ namespace Langulus::Annies
                   "state your intent. Absorb will be used by default!"
                );
                this->Absorb(LglsFwd(a1));
+
+               if constexpr (CT::Recipe<A1>) {
+                  mTarget = DeintCast(a1).mTarget;
+                  if constexpr (CT::Moved<A1>)
+                     DeintCast(a1).mTarget = {};
+               }
             }
             else this->EmplaceConstruct(LglsFwd(a1));
          }
@@ -153,8 +168,15 @@ namespace Langulus::Annies
       /// Construction that absorbs the provided containers                   
       template<class A1, class...AN>
       constexpr Recipe(Inner::Absorb, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0)
+         if constexpr (sizeof...(AN) == 0) {
             this->Absorb(LglsFwd(a1));
+
+            if constexpr (CT::Recipe<A1>) {
+               mTarget = DeintCast(a1).mTarget;
+               if constexpr (CT::Moved<A1>)
+                  DeintCast(a1).mTarget = {};
+            }
+         }
          else {
             this->ConstructDefault();
             this->Concat(LglsFwd(a1), LglsFwd(an)...);
@@ -174,9 +196,12 @@ namespace Langulus::Annies
       
       /// Assignment                                                          
       constexpr Recipe& operator = (Recipe const& other) {
+         mTarget = other.mTarget;
          return this->AssignAbsorb(Refer(other));
       }
       constexpr Recipe& operator = (Recipe&& other) noexcept {
+         mTarget = other.mTarget;
+         other.mTarget = {};
          return this->AssignAbsorb(Move(other));
       }
       
@@ -190,20 +215,30 @@ namespace Langulus::Annies
                "first item) in order to clearly state your intent. "
                "AssignAbsorb will be used by default!"
             );
-            return this->AssignAbsorb(LglsFwd(argument));
+            this->AssignAbsorb(LglsFwd(argument));
+
+            if constexpr (CT::Recipe<A>) {
+               mTarget = DeintCast(argument).mTarget;
+               if constexpr (CT::Moved<A>)
+                  DeintCast(argument).mTarget = {};
+            }
+            return *this;
          }
          else return this->Assign(LglsFwd(argument));
       }
 
-      using Com::Comparison<>::operator <=>;
+      //using Com::Comparison<>::operator <=>;
       //using Com::Comparison<>::operator ==;
 
-      LANGULUS_API(ANNIES)
-      bool operator == (Recipe const& other) const noexcept;
+      //LANGULUS_API(ANNIES)
+      //bool operator == (Recipe const& other) const noexcept;
 
-      template<CT::Container C> requires (not Same<C, Recipe>)
+      template<CT::Container C>// requires (not Same<C, Recipe>)
       constexpr bool operator == (C const& other) const noexcept {
-         return this->CompareEqual(other);
+         if constexpr (CT::Recipe<C>)
+            return this->mTarget == other.mTarget and this->CompareEqual(other);
+         else
+            return this->CompareEqual(other);
       }
    };
 }
