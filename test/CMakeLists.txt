@@ -40,6 +40,17 @@ add_langulus_test(LangulusAnniesTest-Many
    LIBRARIES   LangulusAnnies
 )
 
+add_langulus_test(LangulusAnniesTest-Hive
+   SOURCES	   hive/TestHive-Empty.cpp
+          	   #hive/TestHive-EmptyPreallocated.cpp #needs work
+               hive/TestHive-Absorb.cpp
+               hive/TestHive-Piecewise.cpp
+               #hive/TestHive-Convert.cpp #needs work
+               #hive/TestHive-CornerCases.cpp #needs work
+
+   LIBRARIES   LangulusAnnies
+)
+
 add_langulus_test(LangulusAnniesTest-Set
    SOURCES	   set/TestSet-Empty.cpp
                set/TestSet-Absorb.cpp

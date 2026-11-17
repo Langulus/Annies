@@ -249,6 +249,39 @@ namespace Langulus::Annies::Component
             return ThisCom::BrowseTable(index);
          }
       }
+
+      /// MARK: TableEmplace                                                  
+      /// Table insertion function - picks a strategy of insertion and goes   
+      /// through all cascading tables until a free spot is found.            
+      ///   @param item item to insert                                        
+      ///   @attention assumes there's at least one free spot, in any one of  
+      ///      the cascades                                                   
+      ///   @attention works in the dimension intersection between C's Id and 
+      ///      H's Id. Data will be allocated for all relevant dimensions,    
+      ///      but only the provided by H will be constructed!                
+      ///   @attention assumes that reserved count is the same across all     
+      ///      relevant dimensions                                            
+      ///   @attention assumes that the same coverage table is used across all
+      ///      relevant dimensions                                            
+      ///   @return the absolute offset at which item was inserted            
+      template<Cid SID = ID, class C, CT::Intent H> requires Relevant<SID>
+      size_t TableEmplace(this C& self, H&& item) {
+         static_assert(not CT::Array<H>);
+         static_assert(CT::NotHandle<H> or not CT::Multidimensional<H>);
+
+         // Find a free spot                                            
+         TODO();
+         size_t slot = 0;
+
+         auto handle = self.GetHandle().ForceMutable() + slot;
+         if constexpr (CT::Multidimensional<H>)
+            handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
+         else
+            handle.EmplaceWithIntent(LglsFwd(item));
+            
+         self.EnableSlot(slot);
+         return slot;
+      }
    };
 
    #undef ThisCom

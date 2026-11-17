@@ -26,6 +26,10 @@ namespace Langulus::Annies::Inner
       EnableComponentIf<CT::Sparse<T> and not ::std::is_function_v<Deptr<T>>, Com::OwnershipDeepHeap<>>,
       Com::HashStack<>,                // Hash can be cached            
       Com::Deepening<Many>,            // Makes container deep          
+      Com::Insertion<>,                // Allows insertion              
+      Com::InsertionOperators<>,       // << and >> insertion           
+      Com::Merging<>,                  // Allows merging                
+      Com::MergingOperators<>,         // <<= and >>= merging           
       Com::Emplacement<>,              // Allows emplacement            
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
@@ -41,7 +45,8 @@ namespace Langulus::Annies
    /// MARK: TSlots                                                           
    ///                                                                        
    /// A statically-typed non-contiguous container of constant size, capable  
-   /// of reusing empty cells.                                                
+   /// of reusing empty cells. Guarantees that elements _never_ move from     
+   /// the memory location they were initially constructed in.                
    template<CT::NotVoid T> 
    struct THive : Inner::THiveBase<T> {
       using CTTI_ReflectAs = THive;
@@ -142,10 +147,10 @@ namespace Langulus::Annies
       
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
-      using Com::IterationRange<>::begin;
+      /*using Com::IterationRange<>::begin;
       using Com::IterationRange<>::end;
       using Com::IterationRange<>::rbegin;
-      using Com::IterationRange<>::rend;
+      using Com::IterationRange<>::rend;*/
 
       
       /// Emplaces an element of T at a free spot in the hive.                

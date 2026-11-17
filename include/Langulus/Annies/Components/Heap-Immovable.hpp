@@ -37,6 +37,15 @@ namespace Langulus::Annies::Component
       using Id           = typename Base::Id;
       using HeapProvider = typename Base::HeapProvider;
 
+      /// We have two pointers in the heap, that point to the previous        
+      /// and next container of type SELF, for chaining multiple immovable    
+      /// memory pages.                                                       
+      struct Page {
+         void* prev;
+         void* next;
+      };
+      using HeapRequest  = Page;
+
       static constexpr unsigned InitialSize   = INITIAL_SIZE;
       static constexpr unsigned GrowthFactor  = GROWTH_FACTOR;
       static constexpr bool     Reallocatable = true;
@@ -51,6 +60,11 @@ namespace Langulus::Annies::Component
       LglsComConversion(friend);
       LglsComOwnershipEmergent(friend);
 
+      /// Get the page pointers                                               
+      template<Cid SID = Id::First, class SELF>
+      constexpr auto* GetPages(this SELF&& self) noexcept {
+         return self.template AccessHeap<HeapImmovable, SID>();
+      }
 
       /// MARK: AllocateMore                                                  
       /// Allocate a number of elements, relying on the type of the container 
@@ -96,7 +110,7 @@ namespace Langulus::Annies::Component
             C previous {Abandon {self}};
             if_available(self.DisableDisowned());
 
-            TODO(); //TODO now allowed to reallocate, instead allocate a new block and attach it to an imaginary data[mReserved] element
+            TODO(); //TODO now allowed to reallocate, instead allocate a new page and attach it to the chain
             #if LANGULUS_FEATURE(MANAGED_MEMORY)
                auto reallocated = Allocator::Reallocate(self.template GetType<SID>(), request.mTotalBytes, al);
             #else
