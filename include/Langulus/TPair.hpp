@@ -194,8 +194,27 @@ namespace Langulus::Annies
 
       /// Construct on the heap (or from handles)                             
       ///   @attention default-initializes the value                          
-      template<Disambiguate K_ALT> /*requires Same<Deint<K_ALT>, K>*/
-      constexpr TPair(K_ALT&& a1) requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT>) {
+      /*template<Disambiguate K_ALT> *//*requires Same<Deint<K_ALT>, K>*//*
+      explicit constexpr TPair(K_ALT&& a1) requires (Inner::PairOnHeap<K, V> or CT::Handle<K_ALT>) {
+         this->ResetState();
+         //this->DeduceType(a1, V {});
+         Com::TypedStack<DMeta, K, true, 0>::DeduceType(a1);
+
+         if constexpr (Inner::PairOnHeap<K, V>) {
+            this->AllocateFresh(1);
+            this->template EmplaceConstruct<0, Com::AllocationStrategy::DontAllocate>(FWDIntent(a1));
+            this->template EmplaceDefault  <1, Com::AllocationStrategy::DontAllocate>();
+         }
+         else {
+            this->template EmplaceWithIntent<0>(FWDIntent(a1));
+            this->template EmplaceDefault   <1>();
+         }
+      }*/
+
+      constexpr TPair(Inner::Piecewise, auto&& a1, auto&& a2) requires Inner::PairOnHeap<K, V>
+         : TPair {LglsFwd(a1), LglsFwd(a2)} {}
+     
+      constexpr TPair(Inner::Piecewise, auto&& a1) requires Inner::PairOnHeap<K, V> {
          this->ResetState();
          //this->DeduceType(a1, V {});
          Com::TypedStack<DMeta, K, true, 0>::DeduceType(a1);
@@ -210,12 +229,6 @@ namespace Langulus::Annies
             this->template EmplaceDefault   <1>();
          }
       }
-
-      constexpr TPair(Inner::Piecewise, auto&& a1, auto&& a2) requires Inner::PairOnHeap<K, V>
-         : TPair {LglsFwd(a1), LglsFwd(a2)} {}
-     
-      constexpr TPair(Inner::Piecewise, auto&& a1) requires Inner::PairOnHeap<K, V>
-         : TPair {LglsFwd(a1)} {}
      
       /// Assignment                                                          
       constexpr TPair& operator = (TPair const& other) requires Inner::PairOnHeap<K, V> {
