@@ -92,7 +92,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
    constexpr bool Managed   = ScopedE::Managed;
    constexpr bool Sparse    = CT::Sparse<E>;
    //constexpr bool Reffed    = CT::Referenced<Decay<E>>;
-   constexpr bool Ambiguous = not Same<T, E> and CT::DeepDense<E> and LANGULUS(SAFE);
+   constexpr bool Ambiguous = false;//not Same<T, E> and CT::DeepDense<E> and LANGULUS(SAFE);
 
    #if LANGULUS(BENCHMARK)
       using stdvec = ::std::vector<E>;

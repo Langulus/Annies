@@ -177,10 +177,37 @@ namespace Langulus::Annies::Component
          // Check all types, and gather the number of insertions.    
          bool deepened = false;
          size_t rhs_count = 0;
-         ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
-        (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
-         if (not rhs_count)
-            return 0;
+
+         if constexpr (sizeof...(an) == 0) {
+            // Insertions have a common type                         
+            if constexpr (CT::Handle<A1>)
+               self.AbsorbType(Copy(a1));
+            else
+               self.DeduceType(LglsFwd(a1));
+
+            ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
+         }
+         else if constexpr (requires { typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type; }) {
+            // Insertions have a common type                         
+            self.template SetType<typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type>();
+            ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
+           (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
+         }
+         else if constexpr (requires { typename C::DeepType; }) {
+            // Arguments of different types require deepening        
+            using DT = typename C::DeepType;
+            C deepened;
+            deepened.Insert(DT {Langulus::Absorb, Abandon {self}});
+            deepened.Insert(DT {Langulus::Piecewise, LglsFwd(a1)});
+           (deepened.Insert(DT {Langulus::Piecewise, LglsFwd(an)}), ...);
+            /*C deepened {Langulus::Piecewise, DT {Langulus::Absorb, Abandon {self}},
+                                             DT {Langulus::Piecewise, LglsFwd(a1)},
+                                             DT {Langulus::Piecewise, LglsFwd(an)}...};*///TODO actually insert at the desired place
+                                             
+            new (&self) C {Langulus::Absorb, Abandon{deepened}};
+            return 2 + sizeof...(an);
+         }
+         else LglsError("Can't deepen to incorporate differently typed arguments");
          
          size_t const lhs_count = self.GetCount();
          if (lhs_count == 0) {
@@ -366,11 +393,38 @@ namespace Langulus::Annies::Component
          // changes raises a conflict, this function will throw.     
          bool deepened = false;
          size_t rhs_count = 0;
-         ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
-        (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
-         if (not rhs_count)
-            return 0;
-         
+
+         if constexpr (sizeof...(an) == 0) {
+            // Insertions have a common type                         
+            if constexpr (CT::Handle<A1>)
+               self.AbsorbType(Copy(a1));
+            else
+               self.DeduceType(LglsFwd(a1));
+               
+            ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
+         }
+         else if constexpr (requires { typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type; }) {
+            // Insertions have a common type                         
+            self.template SetType<typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type>();
+            ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
+           (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
+         }
+         else if constexpr (requires { typename C::DeepType; }) {
+            // Arguments of different types require deepening        
+            using DT = typename C::DeepType;
+            C deepened;
+            deepened.Insert(DT {Langulus::Absorb, Abandon {self}});
+            deepened.Insert(DT {Langulus::Piecewise, LglsFwd(a1)});
+           (deepened.Insert(DT {Langulus::Piecewise, LglsFwd(an)}), ...);
+
+            /*C deepened {Langulus::Piecewise, DT {Langulus::Absorb, Abandon {self}},
+                                             DT {Langulus::Piecewise, LglsFwd(a1)},
+                                             DT {Langulus::Piecewise, LglsFwd(an)}...};*/
+            new (&self) C {Langulus::Absorb, Abandon{deepened}};
+            return 2 + sizeof...(an);
+         }
+         else LglsError("Can't deepen to incorporate differently typed arguments");
+
          // Reallocate/branch out                                    
          size_t const lhs_count = self.GetCount();
          size_t const all_count = lhs_count + rhs_count;
@@ -830,10 +884,10 @@ namespace Langulus::Annies::Component
    /// containers.                                                         
    ///   @attention operates in all relevant dimensions simultaneously     
    TEMPLATE template<class C, class A>
-   void LGLSCOM::PrepareForInsertion(this C& self, A&& a, size_t& out_count, bool& deepened) {
+   void LGLSCOM::PrepareForInsertion(this C& /*self*/, A&& a, size_t& out_count, bool& /*deepened*/) {
       if constexpr (CT::Handle<A>) {
          // Inserting handles                                        
-         if (not deepened) {
+         /*if (not deepened) {
             try {
                self.AbsorbType(Copy(a));
             } catch(...) {
@@ -843,21 +897,21 @@ namespace Langulus::Annies::Component
             }
             ++out_count;
          }
-         else ++out_count;
+         else*/ ++out_count;
       }
       else {
          // Inserting element or an array                            
-         if (not deepened) {
+         /*if (not deepened) {
             try {
                self.DeduceType(LglsFwd(a));
             } catch(...) {
                deepened = true;
                out_count = 2;
                return;
-            }
+            }*/
             out_count += GetAllExtentsOf(a);
-         }
-         else ++out_count;
+         /*}
+         else ++out_count;*/
       }
    }
 

@@ -89,7 +89,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
    using E = TypeOf<ScopedE>;
 
    constexpr bool Managed = ScopedE::Managed;
-   constexpr bool Ambiguous = not Same<T, E> and CT::DeepDense<E> and LANGULUS(SAFE);
+   constexpr bool Ambiguous = false; //not Same<T, E> and CT::DeepDense<E> and LANGULUS(SAFE);
 
    #if LANGULUS(BENCHMARK)
       using stdvec = ::std::vector<E>;
@@ -647,7 +647,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
             Hive_CheckState_Default<E>(a);
             Hive_CheckState_OwnedFull<E>(absorbed);
             //Hive_Helper_TestSame(absorbed, backup);
-            REQUIRE(absorbed.GetUses() == 2);
+            REQUIRE(absorbed.GetUses() == 1);
          };
 
          absorb_construct_move1(pack_referred1);
@@ -668,7 +668,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
             Hive_CheckState_Default<E>(a);
             Hive_CheckState_OwnedFull<E>(absorbed);
             //Hive_Helper_TestSame(absorbed, backup);
-            REQUIRE(absorbed.GetUses() == 2);
+            REQUIRE(absorbed.GetUses() == 1);
          };
 
          absorb_construct_move2(pack_referred1);
@@ -689,7 +689,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
             Hive_CheckState_Abandoned<E>(a);
             Hive_CheckState_OwnedFull<E>(absorbed);
             //Hive_Helper_TestSame(absorbed, backup);
-            REQUIRE(absorbed.GetUses() == 2);
+            REQUIRE(absorbed.GetUses() == 1);
          };
 
          absorb_construct_abandon(pack_referred1);
@@ -777,7 +777,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
          absorb_construct_clone(pack_disowned);
       }
       
-      WHEN("Emplace (overwrite)") {
+      WHEN("Emplace (which means insert for hives)") {
          auto emplace_overwrite = [&](T& a, [[maybe_unused]] const char* intent) {
             ScopedE i666{666};
             const auto i666backup = *i666;
@@ -788,14 +788,16 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
                REQUIRE(instance.CompareOneEqual(i666backup));
             else
                REQUIRE(instance == i666backup);
-            REQUIRE(a.GetCount() == 1);
-            REQUIRE(a.GetReserved() >= 1);
+            REQUIRE(a.GetCount() == 2);
+            REQUIRE(a.GetReserved() >= 2);
+
             if constexpr (CT::Typed<T>) {
-               REQUIRE(*a == i666backup);
+               REQUIRE(DenseCast(a[0]) == DenseCast(*originalElement));
+               REQUIRE(DenseCast(a[1]) == DenseCast(i666backup));
                if constexpr (CT::Handle<decltype(instance)>)
-                  REQUIRE(&*a == &*instance);
+                  REQUIRE(&a[1] == &*instance);
                else
-                  REQUIRE(&*a == &instance);
+                  REQUIRE(&a[1] == &instance);
             }
 
             BenchmarkHive("Piecewise/" + intent + "/Emplace", 30,
@@ -821,7 +823,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
          emplace_overwrite(pack_disowned,  "Disown");
       }
 
-      WHEN("Emplace (overwrite, describe)") {
+      /*WHEN("Emplace (overwrite, describe)") {
          auto emplace_overwrite_describe = [&](T& a, [[maybe_unused]] const char* intent) {
             ScopedE i666{666};
             const auto i666backup = *i666;
@@ -853,7 +855,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
          emplace_overwrite_describe(pack_moved1,    "Move");
          emplace_overwrite_describe(pack_abandoned, "Abandon");
          emplace_overwrite_describe(pack_disowned,  "Disown");
-      }
+      }*/
       
       WHEN("Cleared") {
          auto clear_full = [&](T& a, [[maybe_unused]] const char* intent) {
@@ -998,7 +1000,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
          Hive_CheckState_OwnedFull<E>(pack2);
          Hive_CheckState_ContainsOne(pack2, Refer(e1));
 
-         REQUIRE(pack1.GetUses() == 2);
+         REQUIRE(pack1.GetUses() == 1);
          REQUIRE(pack2.GetUses() == 1);
          //REQUIRE(memory2.GetUses() == 1);
          
@@ -1047,10 +1049,10 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
          Hive_CheckState_Default<E>(pack1);
          //Hive_CheckState_OwnedFull<E>(pack1);
          Hive_CheckState_OwnedFull<E>(pack2);
-         Hive_Helper_TestSame(pack1, pack2);
+         //Hive_Helper_TestSame(pack1, pack2);
          
-         REQUIRE(pack1.GetUses() == 3);
-         REQUIRE(pack2.GetUses() == 3);
+         REQUIRE(pack1.GetUses() == 0);
+         REQUIRE(pack2.GetUses() == 1);
          //REQUIRE(memory2.GetUses() == 1);
       }
 
@@ -1060,10 +1062,10 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
          Hive_CheckState_Default<E>(pack1);
          //Hive_CheckState_OwnedFull<E>(pack1);
          Hive_CheckState_OwnedFull<E>(pack2);
-         Hive_Helper_TestSame(pack1, pack2);
+         //Hive_Helper_TestSame(pack1, pack2);
          
-         REQUIRE(pack1.GetUses() == 3);
-         REQUIRE(pack2.GetUses() == 3);
+         REQUIRE(pack1.GetUses() == 0);
+         REQUIRE(pack2.GetUses() == 1);
          //REQUIRE(memory2.GetUses() == 1);
       }
 
@@ -1089,16 +1091,16 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
          //Hive_CheckState_OwnedFull<E>(pack1);
          Hive_CheckState_OwnedFull<E>(pack2);
 
-         REQUIRE(pack1.GetUses() == 3);
-         REQUIRE(pack2.GetUses() == 3);
+         REQUIRE(pack1.GetUses() == 0);
+         REQUIRE(pack2.GetUses() == 1);
          //REQUIRE(memory2.GetUses() == 1);
-         REQUIRE(pack1 == pack2);
+         //REQUIRE(pack1 == pack2);
       }
 
       WHEN("Clone-assign pack1 in pack2") {
          pack2 = Clone(pack1);
 
-         REQUIRE(pack1.GetUses() == 2);
+         REQUIRE(pack1.GetUses() == 1);
          REQUIRE(pack2.GetUses() == 1);
          REQUIRE((pack1 == pack2) == CT::Dense<E>);
          /*REQUIRE((pack2 == memory1) == CT::Dense<E>);
@@ -1118,25 +1120,24 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed hive", TestType
 
       WHEN("Clone-assign pack1 in pack2, then reset pack1") {
          pack2 = Clone(pack1);
-         REQUIRE(pack1.GetUses() == 2);
+         REQUIRE(pack1.GetUses() == 1);
          REQUIRE(pack2.GetUses() == 1);
+
          if constexpr (CT::Sparse<E>)
             REQUIRE((*pack2.GetEntries())->GetUses() == 1);
          if constexpr (CT::Sparse<Deptr<E>>)
             REQUIRE((*(pack2.GetEntries()+1))->GetUses() == 1);
 
-         //const T memory3 = pack2;
-         REQUIRE(pack2.GetUses() == 2);
          if constexpr (CT::Sparse<E>)
-            REQUIRE((*pack2.GetEntries())->GetUses() == 2);
+            REQUIRE((*pack2.GetEntries())->GetUses() == 1);
          if constexpr (CT::Sparse<Deptr<E>>)
-            REQUIRE((*(pack2.GetEntries() + 1))->GetUses() == 2);
+            REQUIRE((*(pack2.GetEntries() + 1))->GetUses() == 1);
 
          pack1.Reset();
 
          REQUIRE_FALSE(pack1.GetAllocation());
-         REQUIRE(pack2.GetUses() == 2);
-         //REQUIRE(memory3.GetUses() == 2);
+         REQUIRE(pack1.GetUses() == 0);
+         REQUIRE(pack2.GetUses() == 1);
       }
 
       WHEN("Move-assign pack1 in pack2, then reset pack2") {

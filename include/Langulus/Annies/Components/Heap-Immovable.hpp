@@ -82,53 +82,34 @@ namespace Langulus::Annies::Component
 
          if (not al) {
             //                                                          
-            // Allocate a fresh set of elements                         
+            // Allocate a fresh set of elements locally                 
             ThisCom::AllocateFresh(elements);
             return;
          }
 
-         /*LglsAssumeDev(al->GetUses() == 1,
-            "Can't reuse memory of a heap used from multiple places. "
-            "Container should've branched-out prior to AllocateMore. "
-         );*/
-
-         const auto request = ThisCom::RequestHeap(elements + size_t(CT::NullTerminated<C>));
-         if constexpr (CT::ContainsMany<C>) {
-            if (self.GetReserved() >= request.mReserved)
-               return;
-
-            if (request.mTotalBytes <= al->GetSize()) {
-               // In some cases, no reallocation happens, but reserved  
-               // count may still change, due to the allocation being   
-               // rounded to the closest power-of-two. Move heap footers
-               // accordingly in such cases.                            
-               self.RemapAllHeapRequests(request.mReserved);
-               return;
-            }
-
-            //                                                          
-            // Reallocate                                               
-            C previous {Abandon {self}};
-            if_available(self.DisableDisowned());
-
-            TODO(); //TODO now allowed to reallocate, instead allocate a new page and attach it to the chain
-            #if LANGULUS_FEATURE(MANAGED_MEMORY)
-               auto reallocated = Allocator::Reallocate(self.template GetType<SID>(), request.mTotalBytes, al);
-            #else
-               auto reallocated = Allocator::Reallocate(request.mTotalBytes, al);
-            #endif
-            LglsAssert(reallocated, "Out of memory");
-
-            self.template SetAllocationInner<SID>(reallocated);
-
-            // Memory never moves, make sure we don't free anything     
-            LglsAssumeDev(self.template GetAllocationInner<SID>() == reallocated,
-               "Allocation pointer should still be the same");
-
-            if_available(previous.EnableDisowned())
-            else previous.SetCountInner(0);
-            self.RemapAllHeapRequests(request.mReserved);
+         // If reached, then we need a new page. We're not allowed to   
+         // reallocate in place, because heap is not allowed to move.   
+         static_assert(C::InitialSize and C::GrowthFactor);
+         size_t total = C::InitialSize;
+         size_t growth = C::InitialSize;
+         Page* last_page = self.GetPages();
+         while (last_page->next and elements > total) {
+            last_page = static_cast<C*>(last_page->next)->GetPages();
+            growth *= C::GrowthFactor;
+            total += growth;
          }
+         elements = total;
+         
+         if (last_page->next) {
+            // The desired amount is already allocated                  
+            return;
+         }
+
+         // Time to allocate a new page                                 
+         auto new_allocation = Allocator::Allocate(MetaDataOf<C>(), pot_t(Roof2(sizeof(C))));
+         last_page->next = new_allocation->GetBlockStart();
+         new (last_page->next) C {};
+         static_cast<C*>(last_page->next)->AllocateFresh(elements);
       }
 
       /// MARK: AllocateLess                                                  

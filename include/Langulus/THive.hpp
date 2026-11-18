@@ -42,11 +42,13 @@ namespace Langulus::Annies::Inner
 
 namespace Langulus::Annies
 {
-   /// MARK: TSlots                                                           
+   /// MARK: THive                                                            
    ///                                                                        
-   /// A statically-typed non-contiguous container of constant size, capable  
+   ///   A statically-typed non-contiguous container of constant size, capable
    /// of reusing empty cells. Guarantees that elements _never_ move from     
    /// the memory location they were initially constructed in.                
+   ///   @attention a hive can't be refer-constructed - only moved, copied or 
+   ///      cloned.                                                           
    template<CT::NotVoid T> 
    struct THive : Inner::THiveBase<T> {
       using CTTI_ReflectAs = THive;
@@ -74,7 +76,7 @@ namespace Langulus::Annies
             return CT::ReferConstructible<T>;
          else if constexpr (sizeof...(AN) == 0 and CT::Cloned<A1> and Same<THive, Deint<A1>>)
             return CT::CloneConstructible<T>;
-         else if constexpr (sizeof...(AN) == 0 and (CT::Moved<IntentOfT<A1>> or CT::Abandoned<A1>) and Same<THive, Deint<A1>>)
+         else if constexpr (sizeof...(AN) == 0 and (CT::Moved<IntentOfT<A1>> or CT::Abandoned<Deref<A1>>) and Same<THive, Deint<A1>>)
             return CT::AbandonConstructible<T>;
          else
             return not Same<THive, Deint<A1>>;

@@ -464,11 +464,12 @@ namespace Langulus::Annies::Component
             else {*/
                // Type is not compatible, but container is not typed, so
                // if it has no constructed elements we can still mutate 
-               LglsAssert(self.IsEmpty(), "Can't mutate ", t,
-                  " to incompatible type ", type);
+               //LglsAssert(self.IsEmpty(), "Can't mutate ", t,
+               //   " to incompatible type ", type);
             /*}*/
             
-            t = type;
+            //t = type;
+            LglsError("Can't mutate from ", t, " to ", type);
          }
          else {
             // This container is statically typed                       

@@ -12,7 +12,6 @@
 namespace Langulus::Annies  
 {
    // Reuses definitions from TestMany-Empty.cpp. Reduces compile time.  
-   extern template struct THive<Text*>;
 
    extern template struct THive<Text>;
    extern template struct THive<int>;
@@ -20,6 +19,7 @@ namespace Langulus::Annies
    extern template struct THive<RT>;
    extern template struct THive<char>;
 
+   extern template struct THive<Text*>;
    extern template struct THive<int*>;
    extern template struct THive<Any*>;
    extern template struct THive<RT*>;
@@ -40,6 +40,7 @@ namespace Langulus::Annies
 
 
 TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
+   , Types<THive<Text*>,  ScopedElement<Text*>>
    // Elements are not allocated by the memory manager                  
    , Types<THive<Text>,   ScopedElement<Text>>
    , Types<THive<int>,    ScopedElement<int>>
@@ -47,7 +48,6 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
    , Types<THive<RT>,     ScopedElement<RT>>
    , Types<THive<char>,   ScopedElement<char>>
 
-   , Types<THive<Text*>,  ScopedElement<Text*>>
    , Types<THive<int*>,   ScopedElement<int*>>
    , Types<THive<Many*>,  ScopedElement<Many*>>
    , Types<THive<RT*>,    ScopedElement<RT*>>
@@ -192,7 +192,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
          else Hive_CheckState_ContainsOne(pack_disowned,  Disown(originalElement), 0);*/
 
          if constexpr (Reffed) {
-            REQUIRE(DenseCast(*originalElement).GetReferences() == (CT::Sparse<E> ? 8 : 1));
+            REQUIRE(DenseCast(*originalElement).GetReferences() == (CT::Sparse<E> ? 6 : 1));
          }
 
          /*BenchmarkManyStd("Empty/AbsorbConstructor", 30, 100,
@@ -840,19 +840,19 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
          absorb_construct_copy(pack_referred2, 3, managed_sparse ? 9 : 3, 9);
          Hive_CheckState_OwnedFull<E>(pack_referred2);*/
 
-         absorb_construct_copy(pack_copied,    1, managed_sparse ? 9 : 3, 9);
+         absorb_construct_copy(pack_copied,    1, managed_sparse ? 7 : 3, 7);
          Hive_CheckState_OwnedFull<E>(pack_copied);
 
          absorb_construct_copy(pack_cloned,    1, 2, 2);
          Hive_CheckState_OwnedFull<E>(pack_cloned);
 
-         absorb_construct_copy(pack_moved1,    1, managed_sparse ? 9 : 1, 9);
+         absorb_construct_copy(pack_moved1,    1, managed_sparse ? 7 : 1, 7);
          Hive_CheckState_OwnedFull<E>(pack_moved1);
 
-         absorb_construct_copy(pack_moved2,    1, managed_sparse ? 9 : 1, 9);
+         absorb_construct_copy(pack_moved2,    1, managed_sparse ? 7 : 1, 7);
          Hive_CheckState_OwnedFull<E>(pack_moved2);
 
-         absorb_construct_copy(pack_abandoned, 1, managed_sparse ? 9 : 1, 9);
+         absorb_construct_copy(pack_abandoned, 1, managed_sparse ? 7 : 1, 7);
          Hive_CheckState_OwnedFull<E>(pack_abandoned);
 
          /*absorb_construct_copy(pack_disowned,  0, managed_sparse ? 9 : 0, 9);
@@ -900,8 +900,8 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             REQUIRE(a.GetReserved() >= 2);
 
             if constexpr (CT::Typed<T>) {
-               REQUIRE(a[0] == *originalElement);
-               REQUIRE(a[1] == i666backup);
+               REQUIRE(DenseCast(a[0]) == DenseCast(*originalElement));
+               REQUIRE(DenseCast(a[1]) == DenseCast(i666backup));
                if constexpr (CT::Handle<decltype(instance)>)
                   REQUIRE(&a[1] == &*instance);
                else

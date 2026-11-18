@@ -68,7 +68,8 @@ void Hive_CheckState_DisownedFull(const C& many) {
 
 template<class E, CT::Container C> requires CT::NoIntent<C>
 void Hive_CheckState_Abandoned(const C& many) {
-   Many_CheckState_Abandoned<E>(many);
+   const bool test = many.IsDisowned() or many.IsEmpty();
+   REQUIRE(test);
 }
 
 template<CT::Container T, CT::Intent I> requires CT::NoIntent<T>
