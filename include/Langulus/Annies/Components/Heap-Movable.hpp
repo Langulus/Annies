@@ -813,7 +813,7 @@ namespace Langulus::Annies::Component
             self.SetCountInner(n);
             self.template ResetHash<SID>();
 
-            if constexpr (not CT::Contiguous<C>) {
+            if constexpr (CT::IndexedHashTable<C>) {
                // Partial success involving maps/sets might result in   
                // gaps in the hash table that need to be accounted for. 
                self.template ShiftEntries<SID>();
@@ -884,18 +884,23 @@ namespace Langulus::Annies::Component
                         dst.template EmplaceWithIntent<D>(Refer(src));
                   });
 
-                  if constexpr (not CT::Contiguous<C>) {
+                  if constexpr (CT::IndexedHashTable<C>) {
                      // Copy hash table entry as well                   
                      const auto idx = dst - self.GetHandle();
                      self.template GetHashTableInner<Id::First>()[idx]
                         = from.template GetHashTableInner<Id::First>()[idx];
+                  }
+                  else if constexpr (CT::IndexedCoverage<C>) {
+                     // Copy coverage table entry as well               
+                     const auto idx = dst - self.GetHandle();
+                     self.template EnableSlot<Id::First>(idx);
                   }
                }
                ++dst;
             });
 
             if constexpr (CT::NullTerminated<C>) {
-               // Make sure last byte is zero                              
+               // Make sure last byte is zero                           
                static_assert(CT::Contiguous<C>,
                   "Only contiguous containers can be null-terminated");
                Id::ForEach([&dst]<Cid D>{
