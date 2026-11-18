@@ -6,10 +6,10 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
+#include "Langulus/Logger.hpp"
 #include <Langulus/Testing/CommonTypes.hpp>
 #include <Langulus/Testing/ScopedElement.hpp>
 #include <Langulus/Testing/PackedPointers.hpp>
-#include "Langulus/Logger.hpp"
 #include <Langulus/Handle.hpp>
 #include <Langulus/Any.hpp>
 #include <Langulus/TAny.hpp>

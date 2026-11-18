@@ -91,7 +91,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
 
    constexpr bool Managed   = ScopedE::Managed;
    constexpr bool Sparse    = CT::Sparse<E>;
-   constexpr bool Reffed    = CT::Referenced<Decay<E>>;
+   //constexpr bool Reffed    = CT::Referenced<Decay<E>>;
    constexpr bool Ambiguous = not Same<T, E> and CT::DeepDense<E> and LANGULUS(SAFE);
 
    #if LANGULUS(BENCHMARK)
@@ -104,19 +104,19 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
    static_assert(not CT::TypeErased<T>);
    static_assert(    CT::Comparable<TypeOf<T>, E>);
 
-   static_assert(CT::CopyConstructible<T>    == CT::CopyConstructible<E>);
-   static_assert(CT::ReferConstructible<T>   == CT::ReferConstructible<E>);
-   static_assert(CT::AbandonConstructible<T> == CT::AbandonConstructible<E>);
-   static_assert(CT::MoveConstructible<T>    == CT::MoveConstructible<E>);
-   static_assert(CT::CloneConstructible<T>   == CT::CloneConstructible<E>);
-   static_assert(CT::DisownConstructible<T>  == CT::DisownConstructible<E>);
+   static_assert(    CT::CopyConstructible<T>    == CT::CopyConstructible<E>);
+   static_assert(not CT::ReferConstructible<T>   /*== CT::ReferConstructible<E>*/);
+   static_assert(    CT::AbandonConstructible<T> == CT::AbandonConstructible<E>);
+   static_assert(    CT::MoveConstructible<T>    == CT::MoveConstructible<E>);
+   static_assert(    CT::CloneConstructible<T>   == CT::CloneConstructible<E>);
+   static_assert(not CT::DisownConstructible<T>  /*== CT::DisownConstructible<E>*/);
 
-   static_assert(CT::CopyAssignable<T>       == CT::CopyAssignable<E>);
-   static_assert(CT::ReferAssignable<T>      == CT::ReferAssignable<E>);
-   static_assert(CT::AbandonAssignable<T>    == CT::AbandonAssignable<E>);
-   static_assert(CT::MoveAssignable<T>       == CT::MoveAssignable<E>);
-   static_assert(CT::CloneAssignable<T>      == CT::CloneAssignable<E>);
-   static_assert(CT::DisownAssignable<T>     == CT::DisownAssignable<E>); 
+   static_assert(    CT::CopyAssignable<T>       == CT::CopyAssignable<E>);
+   static_assert(not CT::ReferAssignable<T>      /*== CT::ReferAssignable<E>*/);
+   static_assert(    CT::AbandonAssignable<T>    == CT::AbandonAssignable<E>);
+   static_assert(    CT::MoveAssignable<T>       == CT::MoveAssignable<E>);
+   static_assert(    CT::CloneAssignable<T>      == CT::CloneAssignable<E>);
+   static_assert(not CT::DisownAssignable<T>     /*== CT::DisownAssignable<E>*/); 
    
    {
       static_assert(    CT::Deep<T>);
@@ -156,21 +156,23 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
       static_assert(not requires (T pack)         { pack.GetDense(); });
       static_assert(not requires (T pack)         { pack + pack; });
       static_assert(    CT::TextRange<E> or not requires (T pack, E item){  pack + item; });
+      static_assert(    CT::TextRange<E> or not requires (T pack, E item){  item + pack; });
       static_assert(not CT::TextRange<E> or     requires (T pack, E item){ {pack + item} -> CT::Text; });
+      static_assert(not CT::TextRange<E> or     requires (T pack, E item){ {item + pack} -> CT::Text; });
       static_assert(not requires (T pack)         { pack +=  pack; });
       static_assert(not requires (T pack, E item) { pack +=  item; });
-      static_assert(    requires (T pack, E item) { pack <<  item; });
-      static_assert(    requires (T pack, E item) { pack >>  item; });
-      static_assert(    requires (T pack, E item) { pack <<= item; });
-      static_assert(    requires (T pack, E item) { pack >>= item; });
+      static_assert(not requires (T pack, E item) { pack <<  item; });
+      static_assert(not requires (T pack, E item) { pack >>  item; });
+      static_assert(not requires (T pack, E item) { pack <<= item; });
+      static_assert(not requires (T pack, E item) { pack >>= item; });
       static_assert(not requires (T pack, E item) { pack.InsertAt(Index::Back, item); });
       static_assert(not requires (T pack, E item) { pack.EmplaceAt(Index::Back, item); });
       static_assert(not requires (T pack)         { pack.ConcatAt(Index::Back, pack); });
       static_assert(not requires (T pack)         { pack.Concat(pack); });
       static_assert(not requires (T pack, E item) { pack.MergeAt(Index::Back, item); });
       static_assert(not requires (T pack)         { pack.MergeRangeAt(Index::Back, pack); });
-      static_assert(    requires (T pack, E item) { pack.Merge(item); });
-      static_assert(    requires (T pack)         { pack.MergeRange(pack); });
+      static_assert(not requires (T pack, E item) { pack.Merge(item); });
+      static_assert(not requires (T pack)         { pack.MergeRange(pack); });
       static_assert(    requires (T pack, E item) { pack.Erase(item); });
       static_assert(not requires (T pack)         { pack.EraseAt(Index::Front); });
       static_assert(    requires (T pack)         { pack.Reserve(20); });
@@ -223,7 +225,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          );*/
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed by referral") {
             if (CT::Typed<T> and not pack.IsSame(element->GetType())) {
                const auto element_backup = *element;
@@ -240,13 +242,13 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
             REQUIRE(pack.GetUses() == 2);
             REQUIRE(pack.GetAllocation() == element->GetAllocation());
 
-            /*BenchmarkManyStd("Empty/AssignAbsorb/Refer", 30, 100,
+            *//*BenchmarkManyStd("Empty/AssignAbsorb/Refer", 30, 100,
                T temp,                         temp.AssignAbsorb(*element),
                stdvec src_std (1, *element);
                stdvec temp_std,                temp_std = src_std;
-            );*/
+            );*//*
          }
-      }
+      }*/
 
       /// MARK: Assign/Move                                                   
       if constexpr (Ambiguous) {
@@ -275,7 +277,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          );*/
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed by move") {
             auto movable = *element;
 
@@ -294,14 +296,14 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
             REQUIRE(pack.GetUses() == 2);
             REQUIRE(pack.GetAllocation() == element->GetAllocation());
 
-            /*BenchmarkManyStd("Empty/AssignAbsorb/Move", 30, 100,
+            *//*BenchmarkManyStd("Empty/AssignAbsorb/Move", 30, 100,
                auto movable = *element;
                T temp,                       temp.AssignAbsorb(::std::move(movable)),
                stdvec movable (1, 555);
                stdvec temp_std,              temp_std.emplace_back(::std::move(movable))
-            );*/
+            );*//*
          }
-      }
+      }*/
 
       /// MARK: Assign/Copy                                                   
       if constexpr (Ambiguous) {
@@ -322,7 +324,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          );*/
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed copied value") {
             if (CT::Typed<T> and not pack.IsSame(element->GetType())) {
                const auto element_backup = *element;
@@ -344,13 +346,13 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
             REQUIRE(pack.GetUses() == 1);
             REQUIRE(pack.GetAllocation());
 
-            /*BenchmarkManyStd("Empty/AssignAbsorb/Copy", 30, 100,
+            *//*BenchmarkManyStd("Empty/AssignAbsorb/Copy", 30, 100,
                T temp,                          temp.AssignAbsorb(Copy(*element)),
                stdvec src_std (1, *element);
                stdvec temp_std,                 temp_std = src_std
-            );*/
+            );*//*
          }
-      }
+      }*/
 
       /// MARK: Assign/Clone                                                  
       if constexpr (Ambiguous) {
@@ -371,7 +373,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          );*/
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed cloned value") {
             if (CT::Typed<T> and not pack.IsSame(element->GetType())) {
                const auto element_backup = *element;
@@ -394,13 +396,13 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
             REQUIRE(pack.GetUses() == 1);
             REQUIRE(pack.GetAllocation());
 
-            /*BenchmarkManyStd("Empty/AssignAbsorb/Clone", 30, 100,
+            *//*BenchmarkManyStd("Empty/AssignAbsorb/Clone", 30, 100,
                T temp,                          temp.AssignAbsorb(Clone(*element)),
                stdvec src_std (1, *element);
                stdvec temp_std,                 temp_std = src_std
-            );*/
+            );*//*
          }
-      }
+      }*/
 
       /// MARK: Assign/Disown                                                 
       if constexpr (Ambiguous) {
@@ -421,7 +423,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          );*/
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed disowned value") {
             if (CT::Typed<T> and not pack.IsSame(element->GetType())) {
                const auto element_backup = *element;
@@ -438,13 +440,13 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
             Hive_Helper_TestSame(pack, *element, false);
             REQUIRE(pack.IsConstant());
 
-            /*BenchmarkManyStd("Empty/AssignAbsorb/Disown", 30, 100,
+            *//*BenchmarkManyStd("Empty/AssignAbsorb/Disown", 30, 100,
                T temp,                       temp.AssignAbsorb(Disown(*element)),
                stdvec src_std (1, *element);
                stdvec temp_std,              temp_std = src_std
-            );*/
+            );*//*
          }
-      }
+      }*/
 
       /// MARK: Assign/Abandon                                                
       if constexpr (Ambiguous) {
@@ -471,7 +473,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          );*/
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed abandoned value") {
             auto movable = *element;
 
@@ -489,22 +491,22 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
             REQUIRE(pack.GetUses() == 2);
             REQUIRE(pack.GetAllocation() == element->GetAllocation());
 
-            /*BenchmarkManyStd("Empty/AssignAbsorb/Abandon", 30, 100,
+            *//*BenchmarkManyStd("Empty/AssignAbsorb/Abandon", 30, 100,
                auto movable = *element;
                T temp,                       temp.AssignAbsorb(Abandon(movable)),
                stdvec movable (1, 555);
                stdvec temp_std,              temp_std = ::std::move(movable)
-            );*/
+            );*//*
          }
-      }
+      }*/
 
       /// MARK: Assign empty                                                  
-      WHEN("Ambigous assigned empty self") {
+      /*WHEN("Ambigous assigned empty self") {
          LglsDisableWarningPush
          LglsDisableWarning_SelfAssign
          REQUIRE_NOTHROW(pack = pack);
          LglsDisableWarningPop
-      }
+      }*/
       
       WHEN("Assigned empty self") {
          REQUIRE_NOTHROW(pack.AssignAbsorb(pack));
@@ -612,7 +614,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          );*/
       }
 
-      WHEN("Referred empty") {
+      /*WHEN("Referred empty") {
          T refer1 = pack;
 
          Hive_Helper_TestSame(refer1, pack);
@@ -624,7 +626,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          Hive_Helper_TestSame(refer2, pack);
          Hive_CheckState_Default<E>(refer2);
          Hive_CheckState_Default<E>(pack);
-      }
+      }*/
 
       WHEN("Cloned empty") {
          T clone = Clone(pack);
@@ -634,13 +636,13 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          Hive_CheckState_Default<E>(pack);
       }
 
-      WHEN("Disowned empty") {
+      /*WHEN("Disowned empty") {
          T disowned = Disown(pack);
 
          Hive_Helper_TestSame(disowned, pack);
          Hive_CheckState_Default<E>(disowned);
          Hive_CheckState_Default<E>(pack);
-      }
+      }*/
 
       WHEN("Copied empty") {
          T copy = Copy(pack);
@@ -651,28 +653,24 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
       }
 
       WHEN("Moved empty") {
-         T movable1 = pack;
-         const T moved1 = ::std::move(movable1);
+         const T moved1 = ::std::move(pack);
 
-         Hive_CheckState_Default<E>(movable1);
          Hive_Helper_TestSame(moved1, pack);
          Hive_CheckState_Default<E>(moved1);
          Hive_CheckState_Default<E>(pack);
+      }
 
-         T movable2 = pack;
-         const T moved2 = Move(movable2);
+      WHEN("Moved empty (intent)") {
+         const T moved2 = Move(pack);
 
-         Hive_CheckState_Default<E>(movable2);
          Hive_Helper_TestSame(moved2, pack);
          Hive_CheckState_Default<E>(moved2);
          Hive_CheckState_Default<E>(pack);
       }
 
       WHEN("Abandoned empty") {
-         T movable = pack;
-         const T moved = Abandon(movable);
+         const T moved = Abandon(pack);
 
-         Hive_CheckState_Default<E>(movable);
          Hive_Helper_TestSame(moved, pack);
          Hive_CheckState_Default<E>(moved);
          Hive_CheckState_Default<E>(pack);
@@ -903,10 +901,10 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
    }
 
    GIVEN("Default-constructed container and a couple of arrays") {
-      const ScopedE darray1[5] {1, 2, 3, 4,  5};
-      const ScopedE darray2[5] {6, 7, 8, 9, 10};
+      /*const ScopedE darray1[5] {1, 2, 3, 4,  5};
+      const ScopedE darray2[5] {6, 7, 8, 9, 10};*/
 
-      const E immovable[5] {
+      /*const E immovable[5] {
          *darray1[0], *darray1[1], *darray1[2], *darray1[3], *darray1[4]
       };
       E movable1[5] {
@@ -919,10 +917,10 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          *darray2[0], *darray2[1], *darray2[2], *darray2[3], *darray2[4]
       };
 
-      T pack;
+      T pack;*/
 
       /// MARK: <<                                                            
-      WHEN("Insert at the back by using << operator)") {
+      /*WHEN("Insert at the back by using << operator)") {
          REQUIRE_NOTHROW(pack <<           immovable[0]
                               << Refer    {immovable[1]}
                               << Copy     {immovable[2]}
@@ -962,14 +960,14 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
             REQUIRE(DenseCast(pack.template GetAt<E>(7)).GetReferences() == 1);
          }
 
-         /*BenchmarkManyStd("Empty/Insert/Element/Back", 30, 100,
+         *//*BenchmarkManyStd("Empty/Insert/Element/Back", 30, 100,
             T temp,              temp << immovable[0],
             stdvec temp_std,     temp_std.emplace_back(immovable[0])
-         );*/
-      }
+         );*//*
+      }*/
 
       /// MARK: >>                                                            
-      WHEN("Insert at the front by using >> operator)") {
+      /*WHEN("Insert at the front by using >> operator)") {
          REQUIRE_NOTHROW(pack >>           immovable[0]
                               >> Refer    {immovable[1]}
                               >> Copy     {immovable[2]}
@@ -1008,11 +1006,11 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          for (int i = 4; i < 8; ++i)
             REQUIRE(*pack.template GetAt<E>(i) == *darray1[4 - (i - 3)%5]);
 
-         /*BenchmarkManyStd("Empty/Insert/Element/Front", 30, 100,
+         *//*BenchmarkManyStd("Empty/Insert/Element/Front", 30, 100,
             T temp,              temp >> immovable[0],
             stdvec temp_std,     temp_std.emplace_front(immovable[0])
-         );*/
-      }
+         );*//*
+      }*/
    }
 
    REQUIRE(memoryState.Assert());

@@ -344,7 +344,7 @@ namespace Langulus::Annies::Component
    ///      incompatible type is encountered.                              
    ///   @param a1, an elements (and their intents) to insert              
    ///   @return the number of inserted elements (after any conversions)   
-   TEMPLATE template<bool FORCE, class A1, class...AN, CT::IndexedLinearly C>
+   TEMPLATE template<bool FORCE, class A1, class...AN, class C>
    auto LGLSCOM::Insert(this C& self, A1&& a1, AN&&...an) -> size_t {
       static_assert(CT::ContainsMany<C>,
          "Container should support multiple elements");
@@ -403,7 +403,7 @@ namespace Langulus::Annies::Component
    /// This usually means at the back of a contiguous container. The       
    /// inserted elements will be default-constructed.                      
    ///   @param count the number of elements to insert                     
-   TEMPLATE template<CT::IndexedLinearly C>
+   TEMPLATE template<class C>
    auto LGLSCOM::InsertDefault(this C& self, size_t count) -> size_t {
       const auto previousCount = self.GetCount();
       self.AllocateMore(previousCount + count);
@@ -829,7 +829,7 @@ namespace Langulus::Annies::Component
    /// 'out_count' being rewritten to reflect the number of required sub-  
    /// containers.                                                         
    ///   @attention operates in all relevant dimensions simultaneously     
-   TEMPLATE template<CT::IndexedLinearly C, class A>
+   TEMPLATE template<class C, class A>
    void LGLSCOM::PrepareForInsertion(this C& self, A&& a, size_t& out_count, bool& deepened) {
       if constexpr (CT::Handle<A>) {
          // Inserting handles                                        

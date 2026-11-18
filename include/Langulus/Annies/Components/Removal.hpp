@@ -359,7 +359,7 @@ namespace Langulus::Annies::Component
             // Allocations are already nonexistent, so no need to reset.
             self.Free();
             if_available(self.SetReservedInner(0));
-            if_available(self.SetHashTableInner(nullptr));
+            if_available(self.SetCoverageTableInner(nullptr));
             self.ResetCount();
             if_available(self.DisableDisowned());
             return;
@@ -370,7 +370,7 @@ namespace Langulus::Annies::Component
             // destroy all elements. We will reuse the memory and type  
             // only if the container keeps track of the count separately
             self.template Free<false>();
-            if_available(self.ResetHashTable());
+            if_available(self.ResetTable());
             self.ResetCount();
          }
          else {

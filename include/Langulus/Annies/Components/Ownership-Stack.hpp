@@ -122,6 +122,7 @@ namespace Langulus::Annies::Component
          ThisCom::SetAllocationInner(nullptr);
          if_available(self.SetReservedInner(0));
          if_available(self.template SetHashTableInner<SID>(nullptr));
+         if_available(self.template SetCoverageTableInner<SID>(nullptr));
          self.ResetCount();
       }
 

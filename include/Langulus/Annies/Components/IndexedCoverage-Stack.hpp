@@ -81,12 +81,23 @@ namespace Langulus::Annies::Component
       }
 
       /// This method is called to erase the coverage table                   
-      template<Cid SID = ID> requires Relevant<SID>
-      constexpr void ResetCoverageTable(this auto& self) noexcept {
+      template<Cid SID = ID, class C> requires Relevant<SID>
+      constexpr void ResetTable(this C& self) noexcept {
          memset(
             ThisCom::GetCoverageTableInner(), 0,
-            self.GetReserved() * sizeof(TableType)
+            self.GetReservedInner() * sizeof(TableType)
          );
+
+         if constexpr (CT::HasImmovableHeap<C>) {
+            // We have to reset the coverage table for all pages of an  
+            // immovable heap.                                          
+            auto* pages = self.GetPages();
+            while (pages->next) {
+               auto typed_next = static_cast<C*>(pages->next);
+               typed_next->ResetTable();
+               pages = typed_next->GetPages();
+            }
+         }
       }
 
       /// Occupy a coverage table slot                                        
@@ -115,7 +126,7 @@ namespace Langulus::Annies::Component
       /// This method is called upon allocation to nullify table              
       constexpr void ConstructHeapRequestGlobal(this auto& self) noexcept {
          ThisCom::SetCoverageTableInner(self.template AccessHeap<IndexedCoverageStack, ID>());
-         ThisCom::ResetCoverageTable();
+         ThisCom::ResetTable();
       }
 
       /// Transfer from any kind of container, respecting intents             
@@ -162,11 +173,10 @@ namespace Langulus::Annies::Component
                   TableType temp = *table;
                   size_t offset = ::std::countr_zero(temp);
                   while (index > 0) {
-                     temp &= ~::std::bit_floor(temp);
+                     temp   = temp & (temp - 1); //~::std::bit_floor(temp);
                      offset = ::std::countr_zero(temp);
                      --index;
                   }
-                  LglsAssumeDev(::std::has_single_bit(temp));
                   return (table - tableBeg) * BitsPerCell + offset;
                }
 
@@ -250,6 +260,121 @@ namespace Langulus::Annies::Component
          }
       }
 
+      /// MARK: TableSearch                                                   
+      /// Locate element handle inside the coverage pages                     
+      ///   @attention assumes container is not empty                         
+      ///   @attention assumes that container is of the same comparable type  
+      ///   @attention operates only in the first dimension!                  
+      ///   @param item the item to search for                                
+      ///   @return handle of the found item                                  
+      template<Cid SID = ID, class C, CT::NoIntent H> requires Relevant<SID>
+      auto TableSearch(this C const& self, H const& item) assumptious -> DecideHandle<C> {
+         static_assert(not CT::Array<H>);
+         static_assert(CT::NotHandle<H> or not CT::Multidimensional<H>);
+
+         // Decide the comparison function for type-erased tables       
+         RTTI::DefinitionData::FCompareEqual comparer = nullptr;
+         if constexpr (CT::Handle<H>) {
+            if constexpr (CT::TypeErased<C> or CT::TypeErased<H>) {
+               const auto type = self.template GetType<SID>();
+               LglsAssumeDev(type.IsSame(item.template GetType<SID>()),
+                  "Type mismatch");
+               comparer = type.GetComparerEqual();
+               LglsAssumeDev(comparer, "Type-erased data not comparable");
+            }
+            else {
+               static_assert(CT::ComparableEqual<TypeOf<C, SID>, TypeOf<H, SID>>,
+                  NameOf<TypeOf<C, SID>>() + " not comparable to " + NameOf<TypeOf<H, SID>>()
+               );
+            }
+         }
+         else {
+            if constexpr (CT::TypeErased<C>) {
+               const auto type = self.template GetType<SID>();
+               LglsAssumeDev(type.IsSame(MetaDataOf<H>()),
+                  "Type mismatch");
+               comparer = type.GetComparerEqual();
+               LglsAssumeDev(comparer, "Type-erased data not comparable");
+            }
+            else {
+               static_assert(CT::ComparableEqual<TypeOf<C, SID>, H>,
+                  NameOf<TypeOf<C, SID>>() + " not comparable to " + NameOf<H>()
+               );
+            }
+         }
+
+         // First attempt                                               
+         auto found = ThisCom::TableSearchInner(item, comparer);
+         if (found)
+            return found;
+      
+         // First attempt failed, try other tables                      
+         auto* pages = self.GetPages();
+         while (pages->next) {
+            auto typed_next = static_cast<C const*>(pages->next);
+            found = typed_next->TableSearchInner(item, comparer);
+            if (found)
+               return found;
+            pages = typed_next->GetPages();
+         }
+
+         // Nothing found if reached                                    
+         return {};
+      }
+      
+      /// MARK: TableSearchInner                                              
+      /// Table search function for a specific page.                          
+      ///   @attention works for single dimension SID                         
+      ///   @return the handle at the match, empty handle if no match         
+      template<Cid SID = ID, class C, CT::NoIntent H> requires Relevant<SID>
+      auto TableSearchInner(
+         this C const& self,
+         H const& item,
+         [[maybe_unused]] RTTI::DefinitionData::FCompareEqual comparer
+      ) -> DecideHandle<C> {
+         if (self.GetCountInner() == 0)
+            return {};
+
+         auto h = self.GetHandle();
+         auto const beg = h;
+         auto const end = h + self.GetReservedInner();
+         
+         while (h != end) {
+            // Skip empty slots                                         
+            if (not self.IsSlotOccupied(h - beg)) {
+               ++h;
+               continue;
+            }
+
+            // Test value                                               
+            if constexpr (CT::Handle<H>) {
+               if constexpr (CT::TypeErased<C> or CT::TypeErased<H>) {
+                  if (comparer(h.template GetRaw<SID>(), item.template GetRaw<SID>()))
+                     return h;
+               }
+               else {
+                  if (*h.template GetRaw<SID>() == *item.template GetRaw<SID>())
+                     return h;
+               }
+            }
+            else {
+               if constexpr (CT::TypeErased<C>) {
+                  if (comparer(h.template GetRaw<SID>(), &item))
+                     return h;
+               }
+               else {
+                  if (*h.template GetRaw<SID>() == item)
+                     return h;
+               }
+            }
+            
+            ++h;
+         }
+
+         // If reached, then item wasn't found                          
+         return {};
+      }
+
       /// MARK: TableEmplace                                                  
       /// Table insertion function - picks a strategy of insertion and goes   
       /// through all cascading tables until a free spot is found.            
@@ -264,25 +389,55 @@ namespace Langulus::Annies::Component
       ///   @attention assumes that the same coverage table is used across all
       ///      relevant dimensions                                            
       ///   @return the absolute offset at which item was inserted            
-      template<Cid SID = ID, class C, CT::Intent H> requires Relevant<SID>
-      size_t TableEmplace(this C& self, H&& item) {
-         static_assert(not CT::Array<H>);
-         static_assert(CT::NotHandle<H> or not CT::Multidimensional<H>);
+      template<Cid SID = ID, class C> requires Relevant<SID>
+      auto TableEmplace(this C& self, auto&&...arguments) -> DecideHandle<C> {
+         // Try locally first                                           
+         auto found = ThisCom::TableEmplaceInner(LglsFwd(arguments)...);
+         if (found)
+            return found;
+      
+         // First attempt failed, try other pages                       
+         auto* pages = self.GetPages();
+         while (pages->next) {
+            auto typed_next = static_cast<C*>(pages->next);
+            found = typed_next->TableEmplaceInner(LglsFwd(arguments)...);
+            if (found)
+               return found;
+            pages = typed_next->GetPages();
+         }
 
-         // Find a free spot                                            
-         TODO();
-         size_t slot = 0;
+         return {};
+      }
 
-         auto handle = self.GetHandle().ForceMutable() + slot;
-         if constexpr (CT::Multidimensional<H>)
-            handle.GetKeyHandle().EmplaceWithIntent(LglsFwd(item));
-         else
-            handle.EmplaceWithIntent(LglsFwd(item));
-            
-         self.EnableSlot(slot);
-         return slot;
+      template<Cid SID = ID, class C> requires Relevant<SID>
+      auto TableEmplaceInner(this C& self, auto&&...arguments) -> DecideHandle<C> {
+         const size_t reserved_local = self.GetReservedInner();
+         if (self.GetCountInner() == reserved_local)
+            return {};
+
+         auto h = self.GetHandle();
+         auto const beg = h;
+         auto const end = h + reserved_local;
+         
+         while (h != end) {
+            // Skip empty slots                                         
+            const size_t slot = h - beg;
+            if (self.IsSlotOccupied(slot)) {
+               ++h;
+               continue;
+            }
+
+            // Implant value                                            
+            h.EmplaceConstruct(LglsFwd(arguments)...);
+            self.GetCountInner() += 1;
+            self.EnableSlot(slot);
+            return h;
+         }
+
+         LglsError("Shouldn't be reached, ever");
+         return {};
       }
    };
-
-   #undef ThisCom
 }
+
+#undef ThisCom

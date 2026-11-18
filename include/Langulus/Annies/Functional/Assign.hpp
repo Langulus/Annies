@@ -22,10 +22,15 @@ namespace Langulus::Annies::Component
    ///   @return reference to self                                            
    TEMPLATE template<CT::Container C, class A>
    C& LGLSCOM::Assign(this C& self, A&& argument) {//TODO pinnables
-      if constexpr (not CT::Contiguous<C>) {
+      if constexpr (CT::IndexedHashTable<C>) {
          // Assignment for maps/sets falls back to merge                
          self.Clear();
          self.Merge(LglsFwd(argument));
+      }
+      else if constexpr (CT::IndexedCoverage<C>) {
+         // Assignment for hives/slots defaults to emplace              
+         self.Clear();
+         self.Emplace(LglsFwd(argument));
       }
       else if constexpr (CONVERT) {
          // Always rely on insertion to convert the argument            

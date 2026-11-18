@@ -30,6 +30,8 @@ namespace Langulus::CTTI
    template<class T> struct Tag;
    template<class T> struct Pair;
    template<class T> struct Neat;
+   template<class T> struct Hive;
+   template<class T> struct Slots;
    template<class T> struct Recipe;
    template<class T> struct Iterator;
 }
@@ -43,6 +45,8 @@ LANGULUS_CTTI_CONCEPT_DECVQ(Set);
 LANGULUS_CTTI_CONCEPT_DECVQ(Tag);
 LANGULUS_CTTI_CONCEPT_DECVQ(Pair);
 LANGULUS_CTTI_CONCEPT_DECVQ(Neat);
+LANGULUS_CTTI_CONCEPT_DECVQ(Hive);
+LANGULUS_CTTI_CONCEPT_DECVQ(Slots);
 LANGULUS_CTTI_CONCEPT_DECVQ(Recipe);
 LANGULUS_CTTI_CONCEPT_DECVQ(Iterator);
 
@@ -172,6 +176,7 @@ namespace Langulus::CT
    concept HeapAllocated = Container<T...>
        and ((ShedDeref<T>::CountHeapProviders() > 0) and ...);
 
+   /// Check if listed types are containers with no heap memory whatsoever    
    template<class...T>
    concept NotHeapAllocated = Container<T...>
        and ((ShedDeref<T>::CountHeapProviders() == 0) and ...);
@@ -188,6 +193,16 @@ namespace Langulus::CT
    template<class...T>
    concept HasVariableCount = HeapAllocated<T...>
        and (ShedDeref<T>::HeapCanBeNull and ...);
+   
+   /// Checks if a container with heap never moves its memory.                
+   /// Note: disables BranchOut routines. Provided by Com::HeapImmovable      
+   template<class...T>
+   concept HasImmovableHeap = HeapAllocated<T...>
+       and (ShedDeref<T>::ImmovableHeap and ...);
+   
+   /// Checks if a container with heap memory is allowed to move its memory   
+   template<class...T>
+   concept HasMovableHeap = ((not HasImmovableHeap<T>) and ...);
    
    /// Check if listed types are containers that can have multiple elements   
    template<class...T>

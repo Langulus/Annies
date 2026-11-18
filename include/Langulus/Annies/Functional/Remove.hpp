@@ -149,7 +149,7 @@ namespace Langulus::Annies::Component
       if (not found)
          return 0;
 
-      ThisCom::EraseFromTable(found.ForceMutable());
+      ThisCom::EraseFromTable(found);
       return 1;
    }
 
@@ -167,9 +167,8 @@ namespace Langulus::Annies::Component
                   and key.GetRawEnd() <= self.GetRawEnd(),
          "Handle doesn't belong to this container");
 
-      auto h = key.ForceMutable();
-      ThisCom::EraseFromTable(h);
-      return h - 1;
+      ThisCom::EraseFromTable(key);
+      return key - 1;
    }
 
    /// If key is mutable and can be reassigned, we can notify on discard   
@@ -334,6 +333,7 @@ namespace Langulus::Annies::Component
          self.Free();
          if_available(self.SetReservedInner(0));
          if_available(self.SetHashTableInner(nullptr));
+         if_available(self.SetCoverageTableInner(nullptr));
          self.ResetCount();
          if_available(self.DisableDisowned());
          return;
@@ -344,7 +344,7 @@ namespace Langulus::Annies::Component
          // destroy all elements. We will reuse the memory and type  
          // only if the container keeps track of the count separately
          self.template Free<false>();
-         if_available(self.ResetHashTable());
+         if_available(self.ResetTable());
          self.ResetCount();
       }
       else {

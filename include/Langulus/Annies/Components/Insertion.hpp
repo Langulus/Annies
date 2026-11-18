@@ -367,7 +367,7 @@ namespace Langulus::Annies::Component
       ///      incompatible type is encountered.                              
       ///   @param a1, an elements (and their intents) to insert              
       ///   @return the number of inserted elements (after any conversions)   
-      template<bool FORCE = true, class A1, class...AN, CT::IndexedLinearly C>
+      template<bool FORCE = true, class A1, class...AN, class C>
       auto Insert(this C& self, A1&& a1, AN&&...an) -> size_t; /*{
          static_assert(CT::ContainsMany<C>,
             "Container should support multiple elements");
@@ -425,7 +425,7 @@ namespace Langulus::Annies::Component
       /// This usually means at the back of a contiguous container. The       
       /// inserted elements will be nullified.                                
       ///   @param count the number of elements to insert                     
-      template<CT::IndexedLinearly C>
+      template<class C>
       auto InsertNulled(this C&, size_t count = 1) -> size_t;
 
       /// MARK: InsertDefault                                                 
@@ -433,7 +433,7 @@ namespace Langulus::Annies::Component
       /// This usually means at the back of a contiguous container. The       
       /// inserted elements will be default-constructed.                      
       ///   @param count the number of elements to insert                     
-      template<CT::IndexedLinearly C>
+      template<class C>
       auto InsertDefault(this C& self, size_t count = 1) -> size_t; /*{
          const auto previousCount = self.GetCount();
          self.AllocateMore(previousCount + count);
@@ -888,7 +888,7 @@ namespace Langulus::Annies::Component
       /// 'out_count' being rewritten to reflect the number of required sub-  
       /// containers.                                                         
       ///   @attention operates in all relevant dimensions simultaneously     
-      template<CT::IndexedLinearly C, class A>
+      template<class C, class A>
       void PrepareForInsertion(this C& self, A&& a, size_t& out_count, bool& deepened); /*{
          if constexpr (CT::Handle<A>) {
             // Inserting handles                                        

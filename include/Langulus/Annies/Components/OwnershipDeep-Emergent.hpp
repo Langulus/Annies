@@ -561,7 +561,7 @@ namespace Langulus::Annies::Component
                if constexpr (CT::Sparse<DT>) {
                   // Pointer to pointer.                                
                   // Destroy all nested indirection layers.             
-                  typename H::Denser temp {Stackwise, ptr, entries + 1};
+                  typename H::Denser temp {Stackwise, DecvqAllCast(ptr), entries + 1}; //TODO why is DecvqAllCast required here? smells of lack of const-correctness somewhere up the line
                   temp.DestroyElementDeepStandardPointers();
                }
                else if constexpr (CT::Destroyable<DT>) {
@@ -578,7 +578,7 @@ namespace Langulus::Annies::Component
                if constexpr (CT::Sparse<DT>) {
                   // Pointer to pointer.                                
                   // Destroy all nested indirection layers.             
-                  typename H::Denser temp {Stackwise, ptr, entries + 1};
+                  typename H::Denser temp {Stackwise, DecvqAllCast(ptr), entries + 1}; //TODO why is DecvqAllCast required here? smells of lack of const-correctness somewhere up the line
                   temp.DestroyElementDeepStandardPointers();
                }
                else if constexpr (REF_INDIVIDUAL and CT::Referenced<DT>) {

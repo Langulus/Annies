@@ -49,6 +49,7 @@ namespace Langulus::Annies::Component
       static constexpr unsigned InitialSize   = INITIAL_SIZE;
       static constexpr unsigned GrowthFactor  = GROWTH_FACTOR;
       static constexpr bool     Reallocatable = true;
+      static constexpr bool     ImmovableHeap = true;
 
    protected:
       LglsComIterationOperators(friend);
@@ -214,34 +215,28 @@ namespace Langulus::Annies::Component
       }
 
       /// MARK: BranchOut                                                     
-      /// Branch out the current container by doing a shallow copy.           
-      /// Happens when you try to modify a container with strong ownership    
-      /// from somewhere else (when GetUses() > 1), or when container is      
-      /// disowned. Allocates a fresh allocation in the case we haven't       
-      /// allocated anything yet.                                             
-      ///   @param newReserve usually branching is accompanied by a resize,   
-      ///      so specify it here                                             
+      ///   Immovable heaps _never_ branch-out! They are the only ones capable
+      /// of being modified from multiple places at once.                     
+      ///   All this does is fresh allocation if heap hasn't been allocated   
+      /// yet, or reallocate using new pages, if more space is required.      
       template<Cid SID = Id::First, CT::Container C>
       void BranchOut(this C& self, size_t newReserve) {
-         TODO(); //TODO hives shouldn't branch out, right? that's their whole point.
-         if (not self.IsDisowned() and self.template GetUses<SID>() == 1) {
-            // No need to branch out - reuse the current allocation     
-            // unless container was disowned                            
-            ThisCom::AllocateMore(newReserve);
-            return;
-         }
-
          if (self.IsEmpty()) {
             // Empty - do a fresh allocation                            
             ThisCom::AllocateFresh(newReserve);
             return;
          }
-         else {
-            // Branch out by performing a shallow clone                 
-            const C backup {Abandon{self}};
-            if_available(self.DisableDisowned()); //TODO redundant?
-            ThisCom::ConstructFrom(Copy(backup), newReserve);
-         }
+
+         // No need to branch out - reuse the current allocation        
+         // unless container was disowned                               
+         ThisCom::AllocateMore(newReserve);
+      }
+
+      /// This method is called upon allocation to nullify pages              
+      constexpr void ConstructHeapRequestGlobal(this auto& self) noexcept {
+         auto pages = ThisCom::GetPages();
+         pages->next = nullptr;
+         pages->prev = nullptr;
       }
 
    public:
@@ -279,7 +274,7 @@ namespace Langulus::Annies::Component
          if (ptr >= ThisCom::GetRawReserveEnd())
             return false;
 
-         //TODO ptr may be in one of the cascades, this is immovable heap after all
+         //TODO ptr may be in one of the pages, this is immovable heap after all
          return true;
       }
    };

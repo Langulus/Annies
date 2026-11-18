@@ -20,6 +20,11 @@ namespace Langulus::Annies::Component
    ///   @attention this relies on Com::Insertion being present               
    template<Cid ID, Cid...SHARED>
    struct InsertionOperators {
+      /// Refers back to this particular component instance through the       
+      /// deduced 'this'. Just for convenience. It is #undef-ed at the end of 
+      /// this file.                                                          
+      #define ThisCom self.InsertionOperators<ID, SHARED...>
+
       using CTTI_Component = Yup;
       using CTTI_ReflectAs = void;
       using Id             = Values<ID, SHARED...>;
@@ -28,24 +33,33 @@ namespace Langulus::Annies::Component
 
       /// Push back                                                           
       template<CT::ContainsMany C, class A>
-      C& operator << (this C& lhs, A&& rhs) {
+      C& operator << (this C& self, A&& rhs) {
          if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
          and           not Same<Deint<A>, TypeOf<C>>)
-            lhs.Insert(static_cast<TypeOf<C>>(LglsFwd(rhs)));
+            self.Insert(static_cast<TypeOf<C>>(LglsFwd(rhs)));
          else
-            lhs.Insert(LglsFwd(rhs));
-         return lhs;
+            self.Insert(LglsFwd(rhs));
+         return self;
       }
 
       /// Push front                                                          
       template<CT::ContainsMany C, class A>
-      C& operator >> (this C& lhs, A&& rhs) {
-         if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
-         and           not Same<Deint<A>, TypeOf<C>>)
-            lhs.InsertAt(Index::Front, static_cast<TypeOf<C>>(LglsFwd(rhs)));
-         else
-            lhs.InsertAt(Index::Front, LglsFwd(rhs));
-         return lhs;
+      C& operator >> (this C& self, A&& rhs) {
+         if constexpr (CT::IndexedLinearly<C>) {
+            // InsertAt is available only for linearly indexed packs    
+            if constexpr (not CT::TypeErased<C> and not CT::Handle<A>
+            and           not Same<Deint<A>, TypeOf<C>>)
+               self.InsertAt(Index::Front, static_cast<TypeOf<C>>(LglsFwd(rhs)));
+            else
+               self.InsertAt(Index::Front, LglsFwd(rhs));
+         }
+         else {
+            // ...otherwise it defauls to Insert                        
+            return ThisCom::operator << (LglsFwd(rhs));
+         }
+         return self;
       }
    };
 }
+
+#undef ThisCom

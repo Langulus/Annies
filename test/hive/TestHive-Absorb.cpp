@@ -12,13 +12,14 @@
 namespace Langulus::Annies  
 {
    // Reuses definitions from TestMany-Empty.cpp. Reduces compile time.  
+   extern template struct THive<Text*>;
+
    extern template struct THive<Text>;
    extern template struct THive<int>;
    extern template struct THive<Any>;
    extern template struct THive<RT>;
    extern template struct THive<char>;
 
-   extern template struct THive<Text*>;
    extern template struct THive<int*>;
    extern template struct THive<Any*>;
    extern template struct THive<RT*>;
@@ -158,37 +159,37 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
       T piecewise3{Piecewise, *originalElement};
       T piecewise4{Piecewise, *originalElement};
 
-      T pack_referred1{Absorb,             piecewise1};
-      T pack_referred2{Absorb,       Refer(piecewise1)};
+      //T pack_referred1{Absorb,             piecewise1};
+      //T pack_referred2{Absorb,       Refer(piecewise1)};
       T pack_copied   {Absorb,        Copy(piecewise1)};
       T pack_cloned   {Absorb,       Clone(piecewise1)};
       T pack_moved1   {Absorb, ::std::move(piecewise2)};
       T pack_moved2   {Absorb,        Move(piecewise3)};
       T pack_abandoned{Absorb,     Abandon(piecewise4)};
-      T pack_disowned {Absorb,      Disown(piecewise1)};
+      //T pack_disowned {Absorb,      Disown(piecewise1)};
 
       WHEN("Absorb-constructed") {
-         Hive_CheckState_OwnedFull<E>(pack_referred1);
-         Hive_CheckState_OwnedFull<E>(pack_referred2);
+         //Hive_CheckState_OwnedFull<E>(pack_referred1);
+         //Hive_CheckState_OwnedFull<E>(pack_referred2);
          Hive_CheckState_OwnedFull<E>(pack_copied);
          Hive_CheckState_OwnedFull<E>(pack_cloned);
          Hive_CheckState_OwnedFull<E>(pack_moved1);
          Hive_CheckState_OwnedFull<E>(pack_moved2);
          Hive_CheckState_OwnedFull<E>(pack_abandoned);
-         Hive_CheckState_DisownedFull<E>(pack_disowned);
+         //Hive_CheckState_DisownedFull<E>(pack_disowned);
 
-         Hive_CheckState_ContainsOne(pack_referred1,  Refer(originalElement), 3);
-         Hive_CheckState_ContainsOne(pack_referred2,  Refer(originalElement), 3);
+         //Hive_CheckState_ContainsOne(pack_referred1,  Refer(originalElement), 3);
+         //Hive_CheckState_ContainsOne(pack_referred2,  Refer(originalElement), 3);
          Hive_CheckState_ContainsOne(pack_copied,     Refer(originalElement), 1);
          Hive_CheckState_ContainsOne(pack_cloned,     Clone(originalElement), 1);
          Hive_CheckState_ContainsOne(pack_moved1,     Refer(originalElement), 1);
          Hive_CheckState_ContainsOne(pack_abandoned,  Refer(originalElement), 1);
 
-         if constexpr (Managed) {
+         /*if constexpr (Managed) {
             // Entries are still propagated when absorbed               
             Hive_CheckState_ContainsOne(pack_disowned,  Refer(originalElement), 3);
          }
-         else Hive_CheckState_ContainsOne(pack_disowned,  Disown(originalElement), 3);
+         else Hive_CheckState_ContainsOne(pack_disowned,  Disown(originalElement), 0);*/
 
          if constexpr (Reffed) {
             REQUIRE(DenseCast(*originalElement).GetReferences() == (CT::Sparse<E> ? 8 : 1));
@@ -221,15 +222,15 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             );*/
          };
 
-         assign_refer(pack_referred1, "Refer");
+         //assign_refer(pack_referred1, "Refer");
          assign_refer(pack_copied,    "Copy");
          assign_refer(pack_cloned,    "Clone");
          assign_refer(pack_moved1,    "Move");
          assign_refer(pack_abandoned, "Abandon");
-         assign_refer(pack_disowned,  "Disown");
+         //assign_refer(pack_disowned,  "Disown");
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::Hive<E>) {
          WHEN("Assigned and absorbed referred container") {
             if (not pack_referred1.IsSame(element->GetType())) {
                auto misabsorb_refer = [&](auto& a, int uses) {
@@ -272,11 +273,11 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
                REQUIRE(a.GetUses() == 2);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
-               /*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Refer", 30, 100,
+               *//*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Refer", 30, 100,
                   a.AssignAbsorb(*element),                 a.AssignAbsorb(*originalElement),
                   stdvec temp_std1 (1, *element);
                   stdvec temp_std2 (1, *originalElement),   temp_std1 = temp_std2
-               );*/
+               );*//*
             };
 
             absorb_refer(pack_referred1, "Refer");
@@ -286,7 +287,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             absorb_refer(pack_abandoned, "Abandon");
             absorb_refer(pack_disowned,  "Disown");
          }
-      }
+      }*/
       
       WHEN("Assigned compatible cloned value") {
          auto assign_clone = [&](T& a, [[maybe_unused]] const char* intent) {
@@ -303,15 +304,15 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             );*/
          };
 
-         assign_clone(pack_referred1, "Refer");
+         //assign_clone(pack_referred1, "Refer");
          assign_clone(pack_copied,    "Copy");
          assign_clone(pack_cloned,    "Clone");
          assign_clone(pack_moved1,    "Move");
          assign_clone(pack_abandoned, "Abandon");
-         assign_clone(pack_disowned,  "Disown");
+         //assign_clone(pack_disowned,  "Disown");
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed cloned container") {
             if (not pack_referred1.IsSame(element->GetType())) {
                auto misabsorb_clone = [&](T& a) {
@@ -339,11 +340,11 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
                REQUIRE(a.GetUses() == 2);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
-               /*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Clone", 30, 100,
+               *//*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Clone", 30, 100,
                   a.AssignAbsorb(Clone(*element)),          a.AssignAbsorb(Clone(*originalElement)),
                   stdvec temp_std1 (1, *element);
                   stdvec temp_std2 (1, *originalElement),   temp_std1 = temp_std2
-               );*/
+               );*//*
             };
 
             absorb_clone(pack_referred1, "Refer");
@@ -353,7 +354,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             absorb_clone(pack_abandoned, "Abandon");
             absorb_clone(pack_disowned,  "Disown");
          }
-      }
+      }*/
 
       WHEN("Assigned compatible copied value") {
          auto assign_copy = [&](T& a, [[maybe_unused]] const char* intent) {
@@ -370,15 +371,15 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             );*/
          };
 
-         assign_copy(pack_referred1, "Refer");
+         //assign_copy(pack_referred1, "Refer");
          assign_copy(pack_copied,    "Copy");
          assign_copy(pack_cloned,    "Clone");
          assign_copy(pack_moved1,    "Move");
          assign_copy(pack_abandoned, "Abandon");
-         assign_copy(pack_disowned,  "Disown");
+         //assign_copy(pack_disowned,  "Disown");
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed copied container") {
             if (not pack_referred1.IsSame(element->GetType())) {
                auto misabsorb_copy = [&](T& a) {
@@ -406,11 +407,11 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
                REQUIRE(a.GetUses() == 2);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
-               /*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Copy", 30, 100,
+               *//*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Copy", 30, 100,
                   a.AssignAbsorb(Copy(*element)),           a.AssignAbsorb(Copy(*originalElement)),
                   stdvec temp_std1 (1, *element);
                   stdvec temp_std2 (1, *originalElement),   temp_std1 = temp_std2
-               );*/
+               );*//*
             };
 
             absorb_copy(pack_referred1, "Refer");
@@ -420,7 +421,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             absorb_copy(pack_abandoned, "Abandon");
             absorb_copy(pack_disowned,  "Disown");
          }
-      }
+      }*/
 
       WHEN("Assigned compatible moved value") {
          auto assign_move = [&](T& a, [[maybe_unused]] const char* intent) {
@@ -442,15 +443,15 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             );*/
          };
 
-         assign_move(pack_referred1, "Refer");
+         //assign_move(pack_referred1, "Refer");
          assign_move(pack_copied,    "Copy");
          assign_move(pack_cloned,    "Clone");
          assign_move(pack_moved1,    "Move");
          assign_move(pack_abandoned, "Abandon");
-         assign_move(pack_disowned,  "Disown");
+         //assign_move(pack_disowned,  "Disown");
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed moved container") {
             if (not pack_referred1.IsSame(element->GetType())) {
                auto misabsorb_move = [&](T& a) {
@@ -484,13 +485,13 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
                REQUIRE(a.GetUses() == 2);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
-               /*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Move", 30, 100,
+               *//*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Move", 30, 100,
                   T movable1 = *element;
                   T movable2 = *originalElement;
                   a.AssignAbsorb(Move(movable1)),          a.AssignAbsorb(Move(movable2)),
                   stdvec movable1 (1, *element);
                   stdvec movable2 (1, *originalElement),   movable1 = ::std::move(movable2)
-               );*/
+               );*//*
             };
 
             absorb_move(pack_referred1, "Refer");
@@ -500,7 +501,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             absorb_move(pack_abandoned, "Abandon");
             absorb_move(pack_disowned,  "Disown");
          }
-      }
+      }*/
 
       WHEN("Assigned compatible disowned value") {
          auto assign_disown = [&](T& a, [[maybe_unused]] const char* intent) {
@@ -515,15 +516,15 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             );*/
          };
 
-         assign_disown(pack_referred1, "Refer");
+         //assign_disown(pack_referred1, "Refer");
          assign_disown(pack_copied,    "Copy");
          assign_disown(pack_cloned,    "Clone");
          assign_disown(pack_moved1,    "Move");
          assign_disown(pack_abandoned, "Abandon");
-         assign_disown(pack_disowned,  "Disown");
+         //assign_disown(pack_disowned,  "Disown");
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed disowned container") {
             if (not pack_referred1.IsSame(element->GetType())) {
                auto misabsorb_disown = [&](T& a) {
@@ -555,11 +556,11 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
                REQUIRE(a.GetUses() == 0);
                REQUIRE_FALSE(a.GetAllocation());
 
-               /*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Disown", 30, 100,
+               *//*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Disown", 30, 100,
                   a.AssignAbsorb(Disown(*element)),         a.AssignAbsorb(Disown(*originalElement)),
                   stdvec temp_std1 (1, *element);
                   stdvec temp_std2 (1, *originalElement),   temp_std1 = temp_std2
-               );*/
+               );*//*
             };
 
             absorb_disown(pack_referred1, "Refer");
@@ -569,7 +570,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             absorb_disown(pack_abandoned, "Abandon");
             absorb_disown(pack_disowned,  "Disown");
          }
-      }
+      }*/
       
       WHEN("Assigned compatible abandoned value") {
          auto assign_abandon = [&](T& a, [[maybe_unused]] const char* intent) {
@@ -591,15 +592,15 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             );*/
          };
 
-         assign_abandon(pack_referred1, "Refer");
+         //assign_abandon(pack_referred1, "Refer");
          assign_abandon(pack_copied,    "Copy");
          assign_abandon(pack_cloned,    "Clone");
          assign_abandon(pack_moved1,    "Move");
          assign_abandon(pack_abandoned, "Abandon");
-         assign_abandon(pack_disowned,  "Disown");
+         //assign_abandon(pack_disowned,  "Disown");
       }
 
-      if constexpr (CT::DeepDense<E>) {
+      /*if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed abandoned container") {
             if (not pack_referred1.IsSame(element->GetType())) {
                auto misabsorb_abandon = [&](T& a) {
@@ -632,14 +633,14 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
                REQUIRE(a.GetUses() == 2);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
-               /*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Abandon", 30, 100,
+               *//*BenchmarkManyStd("Absorb/" + intent + "/AssignAbsorb/Abandon", 30, 100,
                   T movable1 = *element;
                   T movable2 = *originalElement;
                   a.AssignAbsorb(Abandon(movable1)),          a.AssignAbsorb(Abandon(movable2)),
                   stdvec movable1 (1, *element);
                   stdvec movable2 (1, *originalElement);
                   stdvec temp_std = ::std::move(movable1),    temp_std = ::std::move(movable2)
-               );*/
+               );*//*
             };
 
             absorb_abandon(pack_referred1, "Refer");
@@ -649,7 +650,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             absorb_abandon(pack_abandoned, "Abandon");
             absorb_abandon(pack_disowned,  "Disown");
          }
-      }
+      }*/
 
       WHEN("Assigned compatible empty self") {
          auto assign_empty_self = [&](T& a) {
@@ -657,39 +658,39 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             Hive_CheckState_Default<E>(a);
          };
 
-         assign_empty_self(pack_referred1);
-         assign_empty_self(pack_referred2);
+         /*assign_empty_self(pack_referred1);
+         assign_empty_self(pack_referred2);*/
          assign_empty_self(pack_copied);
          assign_empty_self(pack_cloned);
          assign_empty_self(pack_moved1);
          assign_empty_self(pack_moved2);
          assign_empty_self(pack_abandoned);
-         assign_empty_self(pack_disowned);
+         //assign_empty_self(pack_disowned);
       }
 
-      WHEN("Assigned compatible full self") {
-         auto assign_full_self = [&](T& a, bool allow_change_in_constness = false) {
-            auto backup = a;
+      /*WHEN("Assigned compatible full self") {
+         auto assign_full_self = [&](T& a) {
+            //auto backup = a;
             const auto uses_before = a.GetUses();
             LglsDisableWarningPush
             LglsDisableWarning_SelfAssign
                REQUIRE_NOTHROW(a = a);
             LglsDisableWarningPop
-            Hive_Helper_TestSame(a, backup, not allow_change_in_constness);
+            //Hive_Helper_TestSame(a, backup, not allow_change_in_constness);
             REQUIRE(a.GetUses() == uses_before);
-         };
+         };*/
 
-         assign_full_self(pack_referred1);
-         assign_full_self(pack_referred2);
-         assign_full_self(pack_copied);
+         /*assign_full_self(pack_referred1);
+         assign_full_self(pack_referred2);*/
+         /*assign_full_self(pack_copied);
          assign_full_self(pack_cloned);
          assign_full_self(pack_moved1);
          assign_full_self(pack_moved2);
-         assign_full_self(pack_abandoned);
-         assign_full_self(pack_disowned, true);
-      }
+         assign_full_self(pack_abandoned);*/
+         //assign_full_self(pack_disowned, true);
+      //}
 
-      WHEN("Absorbed by referral") {
+      /*WHEN("Absorbed by referral") {
          auto absorb_construct_refer = [&](T& a, T& compare_against, int uses) {
             T absorbed1 {a};
             T absorbed2 {Refer {a}};
@@ -698,82 +699,82 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             Hive_Helper_TestSame(absorbed2, compare_against);
             REQUIRE(absorbed1.GetUses() == uses);
             REQUIRE(absorbed2.GetUses() == uses);
-         };
+         };*/
 
-         absorb_construct_refer(pack_referred1, pack_referred1, 5);
-         absorb_construct_refer(pack_referred2, pack_referred1, 5);
-         absorb_construct_refer(pack_copied,    pack_copied,    3);
+         /*absorb_construct_refer(pack_referred1, pack_referred1, 5);
+         absorb_construct_refer(pack_referred2, pack_referred1, 5);*/
+         /*absorb_construct_refer(pack_copied,    pack_copied,    3);
          absorb_construct_refer(pack_cloned,    pack_cloned,    3);
          absorb_construct_refer(pack_moved1,    pack_moved1,    3);
          absorb_construct_refer(pack_moved2,    pack_moved2,    3);
-         absorb_construct_refer(pack_abandoned, pack_abandoned, 3);
-         absorb_construct_refer(pack_disowned,  pack_referred1, 5);
-      }
+         absorb_construct_refer(pack_abandoned, pack_abandoned, 3);*/
+         //absorb_construct_refer(pack_disowned,  pack_referred1, 5);
+      //}
       
       WHEN("Absorbed by move") {
          auto absorb_construct_move = [&](T& a, int uses) {
-            T backup = a;
+            //T backup = a;
             T absorbed {::std::move(a)};
 
             Hive_CheckState_Default<E>(a);
             Hive_CheckState_OwnedFull<E>(absorbed);
-            Hive_Helper_TestSame(absorbed, backup);
+            //Hive_Helper_TestSame(absorbed, backup);
             REQUIRE(absorbed.GetUses() == uses);
          };
 
-         absorb_construct_move(pack_referred1, 4);
-         absorb_construct_move(pack_referred2, 3); // piecewise1 has been dereferenced twice in the prior call, because pack_referred1 was moved away
-         absorb_construct_move(pack_copied,    2);
-         absorb_construct_move(pack_cloned,    2);
-         absorb_construct_move(pack_moved1,    2);
-         absorb_construct_move(pack_moved2,    2);
-         absorb_construct_move(pack_abandoned, 2);
-         absorb_construct_move(pack_disowned,  3); // moving from a disowned container acts as referencing - nothing was owned prior
+         /*absorb_construct_move(pack_referred1, 4);
+         absorb_construct_move(pack_referred2, 3);*/ // piecewise1 has been dereferenced twice in the prior call, because pack_referred1 was moved away
+         absorb_construct_move(pack_copied,    1);
+         absorb_construct_move(pack_cloned,    1);
+         absorb_construct_move(pack_moved1,    1);
+         absorb_construct_move(pack_moved2,    1);
+         absorb_construct_move(pack_abandoned, 1);
+         //absorb_construct_move(pack_disowned,  3); // moving from a disowned container acts as referencing - nothing was owned prior
       }
       
       WHEN("Absorbed by move (alt)") {
          auto absorb_construct_move = [&](T& a, int uses) {
-            T backup = a;
+            //T backup = a;
             T absorbed {Move(a)};
 
             Hive_CheckState_Default<E>(a);
             Hive_CheckState_OwnedFull<E>(absorbed);
-            Hive_Helper_TestSame(absorbed, backup);
+            //Hive_Helper_TestSame(absorbed, backup);
             REQUIRE(absorbed.GetUses() == uses);
          };
 
-         absorb_construct_move(pack_referred1, 4);
-         absorb_construct_move(pack_referred2, 3);
-         absorb_construct_move(pack_copied,    2);
-         absorb_construct_move(pack_cloned,    2);
-         absorb_construct_move(pack_moved1,    2);
-         absorb_construct_move(pack_moved2,    2);
-         absorb_construct_move(pack_abandoned, 2);
-         absorb_construct_move(pack_disowned,  3);
+         /*absorb_construct_move(pack_referred1, 4);
+         absorb_construct_move(pack_referred2, 3);*/
+         absorb_construct_move(pack_copied,    1);
+         absorb_construct_move(pack_cloned,    1);
+         absorb_construct_move(pack_moved1,    1);
+         absorb_construct_move(pack_moved2,    1);
+         absorb_construct_move(pack_abandoned, 1);
+         //absorb_construct_move(pack_disowned,  3);
       }
       
       WHEN("Absorbed by abandon") {
          auto absorb_construct_abandon = [&](T& a, int uses) {
-            T backup = a;
+            //T backup = a;
             T absorbed {Abandon {a}};
 
             Hive_CheckState_Abandoned<E>(a);
             Hive_CheckState_OwnedFull<E>(absorbed);
-            Hive_Helper_TestSame(absorbed, backup);
+            //Hive_Helper_TestSame(absorbed, backup);
             REQUIRE(absorbed.GetUses() == uses);
          };
 
-         absorb_construct_abandon(pack_referred1, 4);
-         absorb_construct_abandon(pack_referred2, 3);
-         absorb_construct_abandon(pack_copied,    2);
-         absorb_construct_abandon(pack_cloned,    2);
-         absorb_construct_abandon(pack_moved1,    2);
-         absorb_construct_abandon(pack_moved2,    2);
-         absorb_construct_abandon(pack_abandoned, 2);
-         absorb_construct_abandon(pack_disowned,  3); // abandoning from a disowned container acts as referencing - nothing was owned prior
+         /*absorb_construct_abandon(pack_referred1, 4);
+         absorb_construct_abandon(pack_referred2, 3);*/
+         absorb_construct_abandon(pack_copied,    1);
+         absorb_construct_abandon(pack_cloned,    1);
+         absorb_construct_abandon(pack_moved1,    1);
+         absorb_construct_abandon(pack_moved2,    1);
+         absorb_construct_abandon(pack_abandoned, 1);
+         //absorb_construct_abandon(pack_disowned,  3); // abandoning from a disowned container acts as referencing - nothing was owned prior
       }
       
-      WHEN("Absorbed by disown") {
+      /*WHEN("Absorbed by disown") {
          auto absorb_construct_disown = [&](T& a, int uses) {
             T absorbed {Disown {a}};
 
@@ -788,15 +789,15 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             REQUIRE(absorbed.GetUses() == uses);
          };
 
-         absorb_construct_disown(pack_referred1, 3);
-         absorb_construct_disown(pack_referred2, 3);
-         absorb_construct_disown(pack_copied,    1);
-         absorb_construct_disown(pack_cloned,    1);
-         absorb_construct_disown(pack_moved1,    1);
-         absorb_construct_disown(pack_moved2,    1);
-         absorb_construct_disown(pack_abandoned, 1);
+         *//*absorb_construct_disown(pack_referred1, 0);
+         absorb_construct_disown(pack_referred2, 0);*/
+         /*absorb_construct_disown(pack_copied,    0);
+         absorb_construct_disown(pack_cloned,    0);
+         absorb_construct_disown(pack_moved1,    0);
+         absorb_construct_disown(pack_moved2,    0);
+         absorb_construct_disown(pack_abandoned, 0);*/
 
-         T absorbed{Disown {pack_disowned}};
+         /*T absorbed{Disown {pack_disowned}};
          Hive_CheckState_DisownedFull<E>(pack_disowned);
          Hive_CheckState_DisownedFull<E>(absorbed);
          REQUIRE(absorbed.GetRaw() == pack_disowned.GetRaw());
@@ -805,8 +806,8 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
          REQUIRE(absorbed.IsDeep() == pack_disowned.IsDeep());
          REQUIRE(absorbed.IsConstant() == pack_disowned.IsConstant());
          REQUIRE(absorbed.GetUnconstrainedState() == pack_disowned.GetUnconstrainedState());
-         REQUIRE(absorbed.GetUses() == 3);
-      }
+         REQUIRE(absorbed.GetUses() == 0);*/
+      //}
       
       WHEN("Absorbed by copy") {
          const bool managed_sparse = Sparse and Managed;
@@ -833,11 +834,11 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             }
          };
 
-         absorb_construct_copy(pack_referred1, 3, managed_sparse ? 9 : 3, 9);
+         /*absorb_construct_copy(pack_referred1, 3, managed_sparse ? 9 : 3, 9);
          Hive_CheckState_OwnedFull<E>(pack_referred1);
 
          absorb_construct_copy(pack_referred2, 3, managed_sparse ? 9 : 3, 9);
-         Hive_CheckState_OwnedFull<E>(pack_referred2);
+         Hive_CheckState_OwnedFull<E>(pack_referred2);*/
 
          absorb_construct_copy(pack_copied,    1, managed_sparse ? 9 : 3, 9);
          Hive_CheckState_OwnedFull<E>(pack_copied);
@@ -854,8 +855,8 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
          absorb_construct_copy(pack_abandoned, 1, managed_sparse ? 9 : 1, 9);
          Hive_CheckState_OwnedFull<E>(pack_abandoned);
 
-         absorb_construct_copy(pack_disowned,  3, managed_sparse ? 9 : 0, 9);
-         Hive_CheckState_DisownedFull<E>(pack_disowned);
+         /*absorb_construct_copy(pack_disowned,  0, managed_sparse ? 9 : 0, 9);
+         Hive_CheckState_DisownedFull<E>(pack_disowned);*/
       }
       
       WHEN("Absorbed by clone") {
@@ -872,18 +873,18 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             REQUIRE(absorbed.GetUses() == 1);
          };
 
-         absorb_construct_clone(pack_referred1, 1);
-         absorb_construct_clone(pack_referred2, 1);
+         /*absorb_construct_clone(pack_referred1, 1);
+         absorb_construct_clone(pack_referred2, 1);*/
          absorb_construct_clone(pack_copied,    1);
          absorb_construct_clone(pack_cloned,    1);
          absorb_construct_clone(pack_moved1,    1);
          absorb_construct_clone(pack_moved2,    1);
          absorb_construct_clone(pack_abandoned, 1);
-         absorb_construct_clone(pack_disowned,  0);
+         //absorb_construct_clone(pack_disowned,  0);
       }
       
       /// MARK: Emplace                                                       
-      WHEN("Emplace (overwrite)") {
+      WHEN("Emplace (which means insert for hives)") {
          auto emplace_overwrite = [&](T& a, [[maybe_unused]] const char* intent) {
             ScopedE i666{666};
             const auto i666backup = *i666;
@@ -895,15 +896,16 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             else
                REQUIRE(instance == i666backup);
 
-            REQUIRE(a.GetCount() == 1);
-            REQUIRE(a.GetReserved() >= 1);
+            REQUIRE(a.GetCount() == 2);
+            REQUIRE(a.GetReserved() >= 2);
 
             if constexpr (CT::Typed<T>) {
-               REQUIRE(*a == i666backup);
+               REQUIRE(a[0] == *originalElement);
+               REQUIRE(a[1] == i666backup);
                if constexpr (CT::Handle<decltype(instance)>)
-                  REQUIRE(&*a == &*instance);
+                  REQUIRE(&a[1] == &*instance);
                else
-                  REQUIRE(&*a == &instance);
+                  REQUIRE(&a[1] == &instance);
             }
 
             BenchmarkHive("Absorb/" + intent + "/Emplace", 30,
@@ -921,16 +923,16 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             }
          };
 
-         emplace_overwrite(pack_referred1, "Refer");
+         //emplace_overwrite(pack_referred1, "Refer");
          emplace_overwrite(pack_copied,    "Copy");
          emplace_overwrite(pack_cloned,    "Clone");
          emplace_overwrite(pack_moved1,    "Move");
          emplace_overwrite(pack_abandoned, "Abandon");
-         emplace_overwrite(pack_disowned,  "Disown");
+         //emplace_overwrite(pack_disowned,  "Disown"); //TODO can't insert into disowned hive?
       }
 
       /// MARK: Describe                                                      
-      WHEN("Emplace (overwrite, describe)") {
+      /*WHEN("Emplace (overwrite, describe)") {
          auto emplace_overwrite_describe = [&](T& a, [[maybe_unused]] const char* intent) {
             ScopedE i666{666};
             const auto i666backup = *i666;
@@ -962,7 +964,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
          emplace_overwrite_describe(pack_moved1,    "Move");
          emplace_overwrite_describe(pack_abandoned, "Abandon");
          emplace_overwrite_describe(pack_disowned,  "Disown");
-      }
+      }*/
       
       /// MARK: Clear                                                         
       WHEN("Cleared") {
@@ -980,12 +982,12 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
                Hive_CheckState_OwnedEmpty<E>(a);
          };
 
-         clear_full(pack_referred1, "Refer", 3);
+         //clear_full(pack_referred1, "Refer", 3);
          clear_full(pack_copied,    "Copy");
          clear_full(pack_cloned,    "Clone");
          clear_full(pack_moved1,    "Move");
          clear_full(pack_abandoned, "Abandon");
-         clear_full(pack_disowned,  "Disown", 0);
+         //clear_full(pack_disowned,  "Disown", 0);
       }
 
       /// MARK: Reset                                                         
@@ -1001,12 +1003,12 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             Hive_CheckState_Default<E>(a);
          };
 
-         reset_full(pack_referred1, "Refer");
+         //reset_full(pack_referred1, "Refer");
          reset_full(pack_copied,    "Copy");
          reset_full(pack_cloned,    "Clone");
          reset_full(pack_moved1,    "Move");
          reset_full(pack_abandoned, "Abandon");
-         reset_full(pack_disowned,  "Disown");
+         //reset_full(pack_disowned,  "Disown");
       }
 
       if constexpr (LANGULUS_FEATURE(MANAGED_MEMORY) and not CT::Container<E>) {
@@ -1037,7 +1039,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
          T defaulted_pack;
 
          auto compared_full = [&](T& a, [[maybe_unused]] const char* intent) {
-            T same_pack {a};
+            T same_pack {Copy {a}};
 
             REQUIRE      (a != another_pack1);
             REQUIRE_FALSE(a == another_pack1);
@@ -1059,12 +1061,12 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             );*/
          };
 
-         compared_full(pack_referred1, "Refer");
+         //compared_full(pack_referred1, "Refer");
          compared_full(pack_copied,    "Copy");
          compared_full(pack_cloned,    "Clone");
          compared_full(pack_moved1,    "Move");
          compared_full(pack_abandoned, "Abandon");
-         compared_full(pack_disowned,  "Disown");
+         //compared_full(pack_disowned,  "Disown");
       }
 
       /// MARK: Contains                                                      
@@ -1076,21 +1078,21 @@ TEST_CASE_TEMPLATE("Test absorb-constructed hive", TestType
             REQUIRE_FALSE(a.Contains(*e1));
          };
 
-         contains_full(pack_referred1);
-         contains_full(pack_referred2);
+         /*contains_full(pack_referred1);
+         contains_full(pack_referred2);*/
          contains_full(pack_copied);
 
          if constexpr (Sparse) {
-            REQUIRE      (*pack_cloned.GetDense().template As<Decay<E>>() == DenseCast(*originalElement));
-            REQUIRE_FALSE(*pack_cloned.GetDense().template As<E>() == *originalElement);
-            REQUIRE_FALSE(*pack_cloned.GetDense().template As<E>() == *e1);
+            REQUIRE      (*pack_cloned.GetDenseAt(0).template As<Decay<E>>() == DenseCast(*originalElement));
+            REQUIRE_FALSE(*pack_cloned.GetDenseAt(0).template As<E>() == *originalElement);
+            REQUIRE_FALSE(*pack_cloned.GetDenseAt(0).template As<E>() == *e1);
          }
          else contains_full(pack_cloned);
 
          contains_full(pack_moved1);
          contains_full(pack_moved2);
          contains_full(pack_abandoned);
-         contains_full(pack_disowned);
+         //contains_full(pack_disowned);
 
          [[maybe_unused]] volatile bool dont_optimize = false;
          BenchmarkHive("Absorb/Contains", 30,

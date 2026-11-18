@@ -77,7 +77,7 @@ namespace Langulus::Annies::Component
 
       /// This method is called to erase the hash table                       
       template<Cid SID = ID> requires Relevant<SID>
-      constexpr void ResetHashTable(this auto& self) noexcept {
+      constexpr void ResetTable(this auto& self) noexcept {
          memset(
             ThisCom::GetHashTableInner(), 0,
             self.GetReserved() * sizeof(TableType)
@@ -92,7 +92,7 @@ namespace Langulus::Annies::Component
       /// This method is called upon allocation to nullify table              
       constexpr void ConstructHeapRequestGlobal(this auto& self) noexcept {
          ThisCom::SetHashTableInner(self.template AccessHeap<IndexedHashStack, ID>());
-         ThisCom::ResetHashTable();
+         ThisCom::ResetTable();
       }
 
       /// Transfer from any kind of container, respecting intents             

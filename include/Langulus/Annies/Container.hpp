@@ -309,6 +309,7 @@ namespace Langulus::Annies::Component
       LglsComStack(friend);
       LglsComHeapReference(friend);
       LglsComHeapMovable(friend);
+      LglsComHeapImmovable(friend);
       LglsComOwnershipEmergent(friend);
       LglsComOwnershipStack(friend);
       LglsComCountHeap(friend);
@@ -351,9 +352,8 @@ namespace Langulus::Annies::Component
 
       /// A tag-dispatch constructor that forwards arguments to mStack.       
       /// Used in some niche container cases, like TOwn.                      
-      /*explicit*/ constexpr Container(Inner::Stackwise, auto&&...arguments)
+      constexpr Container(Inner::Stackwise, auto&&...arguments)
          : mStack {LglsFwd(arguments)...} {}
-      //   : mStack({LglsFwd(arguments)}...) {}
 
       /// Default destructor does nothing. Each container has to implement    
       /// it, most likely by calling this->Destroy(). This is needed, because 

@@ -103,10 +103,10 @@ namespace Langulus::Annies::Component
             auto t2 = rhs.GetHandle();
             lhs.template Apply<false>([&](auto&& t1) -> bool {
                if constexpr (LglsSupported(t1)) {
-                  if constexpr (not CT::Contiguous<RHS>) {
+                  if constexpr (CT::IndexedTable<RHS>) {
                      // Make sure hash table spot is valid           
                      const auto idx = t1 - lhs.GetHandle();
-                     if (not rhs.GetHashTable()[idx]) {
+                     if (not rhs.IsSlotOccupied(idx)) {
                         LglsVerbose(Info, Logger::Red,
                            "Element #", idx, " has no hash table equivalent (typed)");
                         return (result = false);
@@ -120,10 +120,10 @@ namespace Langulus::Annies::Component
                      return (result = false);
                   }
                }
-               else if constexpr (not CT::Contiguous<RHS>) {
+               else if constexpr (CT::IndexedTable<RHS>) {
                   // Spots on tables must both match                 
                   const auto idx = t2 - rhs.GetHandle();
-                  if (rhs.GetHashTable()[idx]) {
+                  if (rhs.IsSlotOccupied(idx)) {
                      LglsVerbose(Info, Logger::Red,
                         "Element #", idx, " has no hash table equivalent (typed)");
                      return (result = false);
@@ -197,7 +197,7 @@ namespace Langulus::Annies::Component
                   auto t2 = rhs.GetHandle();
                   lhs.template Apply<false>([&](auto&& t1) -> bool {
                      if constexpr (LglsSupported(t1)) {
-                        if constexpr (not CT::Contiguous<RHS>) {
+                        if constexpr (CT::IndexedTable<RHS>) {
                            // Make sure hash table spot is valid     
                            const auto idx = t1 - lhs.GetHandle();
                            if (not rhs.IsSlotOccupied(idx)) {
@@ -214,7 +214,7 @@ namespace Langulus::Annies::Component
                            return (result = false);
                         }
                      }
-                     else if constexpr (not CT::Contiguous<RHS>) {
+                     else if constexpr (CT::IndexedTable<RHS>) {
                         // Spots on tables must both match           
                         const auto idx = t2 - rhs.GetHandle();
                         if (rhs.IsSlotOccupied(idx)) {

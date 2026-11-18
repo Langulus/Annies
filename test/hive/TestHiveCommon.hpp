@@ -106,36 +106,36 @@ void Hive_CheckState_ContainsOne(T const& many, I&& e_with_intent, int uses = 1)
 
    if constexpr (CT::OwnedDeep<T>) {
       if constexpr (CT::Dense<E1>)
-         REQUIRE(many.GetKeyEntries() == nullptr);
+         REQUIRE(many.GetEntries() == nullptr);
       else if (uses) {
-         REQUIRE(many.GetKeyEntries() != nullptr);
+         REQUIRE(many.GetEntries() != nullptr);
 
          if constexpr (not CT::Disowned<I>) {
             for (size_t i = 0; i < IndirectsOf<E1>; ++i) {
                if constexpr (CT::Cloned<I>) {
-                  REQUIRE(many.GetKeyEntriesAt(0)[i] != nullptr);
-                  REQUIRE(many.GetKeyEntriesAt(0)[i] != e1.entries[i + 1]);
+                  REQUIRE(many.GetEntriesAt(0)[i] != nullptr);
+                  REQUIRE(many.GetEntriesAt(0)[i] != e1.entries[i + 1]);
                }
                else {
                   #if LANGULUS_FEATURE(MANAGED_MEMORY)
-                     REQUIRE(many.GetKeyEntriesAt(0)[i] == e1.entries[i + 1]);
+                     REQUIRE(many.GetEntriesAt(0)[i] == e1.entries[i + 1]);
                   #else
-                     REQUIRE(many.GetKeyEntriesAt(0)[i] == nullptr);
+                     REQUIRE(many.GetEntriesAt(0)[i] == nullptr);
                   #endif
                }
             }
          }
          else {
             for (size_t i = 0; i < IndirectsOf<E1>; ++i)
-               REQUIRE(many.GetKeyEntriesAt(0)[i] == nullptr);
+               REQUIRE(many.GetEntriesAt(0)[i] == nullptr);
          }
       }
    }
 
    //TODO test all kinds of ranged modifiers??
    for (auto& it : many) {
-      static_assert(requires { it.GetHandle(); });
-      REQUIRE((it.Get() != *e1) == (CT::Cloned<I> and CT::Sparse<E1>));
+      static_assert(Exact<ConstAll<TypeOf<T>&>, decltype(it)>);
+      REQUIRE((it != *e1) == (CT::Cloned<I> and CT::Sparse<E1>));
    }
 }
 

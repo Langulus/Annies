@@ -1,5 +1,5 @@
 ///                                                                           
-/// Langulus::Annies                                                         
+/// Langulus::Annies                                                          
 /// Copyright (c) 2012 Dimo Markov <team@langulus.com>                        
 /// Part of the Langulus framework, see https://langulus.com                  
 ///                                                                           
@@ -228,7 +228,12 @@ namespace Langulus::Annies
    template<CT::Container LHS, CT::Container RHS>
    requires (Com::HasInsertionOperatorsConcatEnabled<LHS>
           or Com::HasInsertionOperatorsConcatEnabled<RHS>)
-   auto operator + (LHS const& lhs, RHS const& rhs) {
+   auto operator + (LHS const& lhs, RHS const& rhs) 
+   requires (Exact<CT::ReflectedAs<LHS>, CT::ReflectedAs<RHS>>
+         or CT::Serializer<LHS>
+         or CT::Serializer<RHS>
+         or LHS::AttemptConvertOnInsert
+   ) {
       if constexpr (Exact<CT::ReflectedAs<LHS>, CT::ReflectedAs<RHS>>) {
          // Similar containers get concatenated directly                
          LHS temp;

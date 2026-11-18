@@ -18,7 +18,7 @@ namespace Langulus::Annies::Inner
       Com::State::Compressed<>,        // Toggle compression            
       Com::State::Encrypted<>,         // Toggle encrypted              
       Com::TypedStack<DMeta, T>,       // Type-constrained              
-      Com::HeapImmovable<8, 2, HeapEntry<0, T*>>,
+      Com::HeapImmovable<32, 2, HeapEntry<0, T*>>,
       Com::CountStack<>,               // Dynamically sized             
       Com::ReserveStack<>,             // Reserve kept as member        
       Com::IndexedCoverageStack<>,     // Indexed by coverage mask      
@@ -26,11 +26,11 @@ namespace Langulus::Annies::Inner
       EnableComponentIf<CT::Sparse<T> and not ::std::is_function_v<Deptr<T>>, Com::OwnershipDeepHeap<>>,
       Com::HashStack<>,                // Hash can be cached            
       Com::Deepening<Many>,            // Makes container deep          
-      Com::Insertion<>,                // Allows insertion              
+      /*Com::Insertion<>,                // Allows insertion              
       Com::InsertionOperators<>,       // << and >> insertion           
       Com::Merging<>,                  // Allows merging                
       Com::MergingOperators<>,         // <<= and >>= merging           
-      Com::Emplacement<>,              // Allows emplacement            
+      Com::Emplacement<>,*/              // Allows emplacement            
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
       Com::Conversion<>,               // Allows conversions            
@@ -57,9 +57,9 @@ namespace Langulus::Annies
       constexpr THive() noexcept {
          this->ConstructDefault();
       }
-      constexpr THive(THive const& other) {
+      constexpr THive(THive const& other) = delete; /*{ //Hives can't be referenced, only moved/copied/cloned
          this->Absorb(Refer(other));
-      }
+      }*/
       constexpr THive(THive&& other) noexcept {
          this->Absorb(Move(other));
       }
@@ -67,43 +67,36 @@ namespace Langulus::Annies
          this->Destroy();
       }
 
+      /// @attention sensitive to whether you forward && due to IntentOfT     
       template<class A1, class...AN>
       static consteval bool ConstructibleWith() {
          if constexpr      (sizeof...(AN) == 0 and CT::Copied<A1> and Same<THive, Deint<A1>>)
             return CT::ReferConstructible<T>;
          else if constexpr (sizeof...(AN) == 0 and CT::Cloned<A1> and Same<THive, Deint<A1>>)
             return CT::CloneConstructible<T>;
+         else if constexpr (sizeof...(AN) == 0 and (CT::Moved<IntentOfT<A1>> or CT::Abandoned<A1>) and Same<THive, Deint<A1>>)
+            return CT::AbandonConstructible<T>;
          else
-            return true;
+            return not Same<THive, Deint<A1>>;
       }
       
       /// Construction that either absorbs the provided containers, or        
       /// emplaces all A in the container                                     
-      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
+      template<Disambiguate A1, class...AN> requires (ConstructibleWith<A1&&, AN&&...>())
       constexpr THive(A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
-            if constexpr (Same<Deint<A1>, THive>) {
-               /*LglsAssumeUser(not SameAsOneOf<T, TMany, Many>,
-                  "Ambiguous use of construction "
-                  "- you should use tag-dispatch with first argument either Absorb "
-                  "(if you want to overwrite the container itself) or Piecewise "
-                  "(if you want to overwrite the first item) in order to clearly "
-                  "state your intent. Absorb will be used by default!"
-               );*/
-               this->Absorb(LglsFwd(a1));
-            }
-            else this->EmplaceConstruct(LglsFwd(a1));
-         }
+         if constexpr (sizeof...(AN) == 0 and Same<Deint<A1>, THive> and not CT::BoundedArray<A1>)
+            this->Absorb(LglsFwd(a1));
          else {
             this->ConstructDefault();
-            this->Insert(LglsFwd(a1), LglsFwd(an)...);
+            this->Emplace(LglsFwd(a1));
+           (this->Emplace(LglsFwd(an)), ...);
          }
       }
       
       /// Construction that absorbs the provided container                    
-      template<class A1, class...AN> requires (ConstructibleWith<A1, AN...>())
+      template<class A1, class...AN> requires (ConstructibleWith<A1&&, AN&&...>())
       constexpr THive(Inner::Absorb, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0)
+         if constexpr (sizeof...(AN) == 0 and Same<Deint<A1>, THive> and not CT::BoundedArray<A1>)
             this->Absorb(LglsFwd(a1));
          else {
             this->ConstructDefault();
@@ -114,44 +107,29 @@ namespace Langulus::Annies
       /// Construction that emplaces all arguments inside                     
       template<class A1, class...AN>
       constexpr THive(Inner::Piecewise, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>)
-            this->EmplaceConstruct(LglsFwd(a1));
-         else {
-            this->ConstructDefault();
-            this->Insert(LglsFwd(a1), LglsFwd(an)...);
-         }
+         this->ConstructDefault();
+         this->Emplace(LglsFwd(a1));
+        (this->Emplace(LglsFwd(an)), ...);
       }
 
       /// Assignment                                                          
-      constexpr THive& operator = (THive const& other) {
+      constexpr THive& operator = (THive const& other) = delete; /*{
          return this->AssignAbsorb(Refer(other));
-      }
+      }*/
       constexpr THive& operator = (THive&& other) noexcept {
          return this->AssignAbsorb(Move(other));
       }
 
-      template<class A> requires (ConstructibleWith<A>())
+      template<class A> requires (ConstructibleWith<A&&>())
       constexpr THive& operator = (A&& argument) {
-         if constexpr (Same<Deint<A>, THive>) {
-            /*LglsAssumeUser(not SameAsOneOf<T, TMany, Many>,
-               "Ambiguous use of assignment "
-               "- you should use either AssignAbsorb (if you want to overwrite "
-               "the container itself) or Assign (if you want to overwrite the "
-               "first item) in order to clearly state your intent. "
-               "AssignAbsorb will be used by default!"
-            );*/
+         if constexpr (Same<Deint<A>, THive> and not CT::BoundedArray<A>)
             return this->AssignAbsorb(LglsFwd(argument));
-         }
-         else return this->Assign(LglsFwd(argument));
+         else
+            return this->Assign(LglsFwd(argument));
       }
       
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
-      /*using Com::IterationRange<>::begin;
-      using Com::IterationRange<>::end;
-      using Com::IterationRange<>::rbegin;
-      using Com::IterationRange<>::rend;*/
-
       
       /// Emplaces an element of T at a free spot in the hive.                
       /// There's a strong guarantee that no elements will move.              
@@ -161,21 +139,7 @@ namespace Langulus::Annies
          if (this->GetCount() == this->GetReserved())
             this->AllocateMore(this->GetReserved() + 1);
 
-         // Free slot available                                         
-         size_t it = 0;
-         size_t const end = this->GetReserved();
-         while(it != end) {
-            if (not this->IsSlotOccupied(it))//TODO checks bit by bit, but we can batch it and make it super fast
-               break;
-            ++it;
-         }
-
-         // Emplace                                                     
-         THandle<T&> result = this->GetHandle() + it;
-         result.EmplaceConstruct(LglsFwd(arguments)...);
-         this->GetCountInner() += 1;
-         this->EnableSlot(it);
-         return result;
+         return this->TableEmplace(LglsFwd(arguments)...);
       }
    };
 
