@@ -10,7 +10,7 @@
 #include <ranges>
 
 
-namespace Langulus::Annies
+namespace Langulus
 {
 
    ///                                                                        

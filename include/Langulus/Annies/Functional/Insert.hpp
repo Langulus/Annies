@@ -187,6 +187,12 @@ namespace Langulus::Annies::Component
 
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
          }
+         else if constexpr (Same<Deint<A1>, Deint<AN>...>) {
+            // Insertions have a common type                         
+            self.template SetType<Decvq<Deref<Deint<A1>>>>();
+            ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
+           (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
+         }
          else if constexpr (requires { typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type; }) {
             // Insertions have a common type                         
             self.template SetType<typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type>();
@@ -402,6 +408,12 @@ namespace Langulus::Annies::Component
                self.DeduceType(LglsFwd(a1));
                
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
+         }
+         else if constexpr (Same<Deint<A1>, Deint<AN>...>) {
+            // Insertions have a common type                         
+            self.template SetType<Decvq<Deref<Deint<A1>>>>();
+            ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
+           (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
          else if constexpr (requires { typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type; }) {
             // Insertions have a common type                         

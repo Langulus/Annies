@@ -11,7 +11,7 @@
 #include <ranges>
 
 
-namespace Langulus::Annies
+namespace Langulus
 {
    ///                                                                        
    ///   Keep iterator when using ranged-for                                  

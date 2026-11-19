@@ -149,7 +149,7 @@ namespace Langulus::Annies::Component
       if (not found)
          return 0;
 
-      ThisCom::EraseFromTable(found);
+      ThisCom::EraseFromTable(found.ForceMutable());
       return 1;
    }
 
@@ -167,7 +167,7 @@ namespace Langulus::Annies::Component
                   and key.GetRawEnd() <= self.GetRawEnd(),
          "Handle doesn't belong to this container");
 
-      ThisCom::EraseFromTable(key);
+      ThisCom::EraseFromTable(key.ForceMutable());
       return key - 1;
    }
 

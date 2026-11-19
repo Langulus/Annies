@@ -14,7 +14,7 @@
 #include <ranges>
 
 
-namespace Langulus::Annies
+namespace Langulus
 {
    ///                                                                        
    ///   Default iteration                                                    
@@ -40,9 +40,9 @@ namespace Langulus::Annies
 
    protected:
       using T = Tif<CT::Void<TypeOf<C>>, No, TypeOf<C>>;
-      using H = Tif<CT::TypeErased<C> or CT::Multidimensional<C> or CT::Neat<C> or (CT::Sparse<T> and CT::Mutable<C>), DecideHandle<C>, LglsMutIf(C, T*)>;
-      using Exposed    = Tif<CT::Handle<H>, DecideHandle<C> const&, LglsMutIf(C, T&)>;
-      using ExposedPtr = Tif<CT::Handle<H>, DecideHandle<C> const*, LglsMutIf(C, DeptrAll<T>*)>;
+      using H = Tif<CT::TypeErased<C> or CT::Multidimensional<C> or CT::Neat<C> or (CT::Sparse<T> and CT::Mutable<C>), Annies::DecideHandle<C>, LglsMutIf(C, T*)>;
+      using Exposed    = Tif<CT::Handle<H>, Annies::DecideHandle<C> const&, LglsMutIf(C, T&)>;
+      using ExposedPtr = Tif<CT::Handle<H>, Annies::DecideHandle<C> const*, LglsMutIf(C, DeptrAll<T>*)>;
 
       static_assert(CT::NotReference<H>,
          "Iterator can't be a reference");

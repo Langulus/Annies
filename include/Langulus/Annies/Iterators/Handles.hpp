@@ -9,7 +9,7 @@
 #include "Default.hpp"
 
 
-namespace Langulus::Annies
+namespace Langulus
 {
    ///                                                                        
    ///   Handle iteration                                                     
@@ -30,7 +30,7 @@ namespace Langulus::Annies
          "C is not indexed");
 
    protected:
-      using H          = DecideHandle<C>;
+      using H          = Annies::DecideHandle<C>;
       using Exposed    = H const&;
       using ExposedPtr = H const*;
 

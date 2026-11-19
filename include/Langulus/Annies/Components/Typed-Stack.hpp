@@ -469,7 +469,12 @@ namespace Langulus::Annies::Component
             /*}*/
             
             //t = type;
-            LglsError("Can't mutate from ", t, " to ", type);
+            if (not type) {
+               LglsAssert(self.IsEmpty(), "Can't erase type ", t,
+                  " while container is not empty");
+               t = type;
+            }
+            else LglsError("Can't mutate from ", t, " to ", type);
          }
          else {
             // This container is statically typed                       
