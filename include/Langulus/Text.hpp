@@ -397,7 +397,7 @@ namespace Langulus::Annies
       ///   @return text containing the generated name                        
       template<class T>
       static Text Mention(Token const& token, T const& instance) {
-         Text result = token;
+         Text result;
          result += token;
          result += '(';
          //TODO pack the pointer before hexing it - it will result in much more compact and 
@@ -415,7 +415,7 @@ namespace Langulus::Annies
       }
 
       /// Generates token from named constant                                 
-      template<CT::HasNamedValues T>
+      template<CT::HasNamedValues T> requires CT::NoIntent<T>
       static Text Named(T const& constant) {
          constexpr auto named_values = CT::Inner::GetNamedValueList<T>();
          Text result;
@@ -426,6 +426,22 @@ namespace Langulus::Annies
             }
             else return false;
          });
+
+         if constexpr (requires { constant.TypedCast(); }) {
+            if (not result) {
+               // No named value found, fallback                           
+               result += MetaOf<T>().GetShortestUnambiguousToken();
+               result += '(';
+               result += constant.TypedCast();
+               result += ')';
+            }
+         }
+         else if (not result) {
+            result += "/*unnamed instance of ";
+            result += MetaOf<T>().GetShortestUnambiguousToken();
+            result += "*/";
+         }
+
          return result;
       }
 
@@ -551,6 +567,8 @@ namespace Langulus::Annies
             );
             result.GetCountInner() += copy;
          }
+
+         *(result.GetRaw() + result.GetCount()) = '\0';
          return result;
       }
 
@@ -613,13 +631,23 @@ namespace Langulus::Annies
    };
    
    static_assert(CT::NotVoid<CT::ReflectedAs<Text>>);
+}
 
-   inline Text operator ""_text(const char* token, size_t size) noexcept {
-      return Text::FromText(token, size);
+namespace Langulus
+{
+   inline Annies::Text operator ""_txt(const char* token, size_t size) noexcept {
+      return Annies::Text::FromText(token, size);
    }
 }
 
 /// MARK: Morphisms                                                           
+/// Same-type conversions are always suppressed, but serializations are not.  
+/// This particular morphism adds quotes around the text.                     
+LANGULUS_MORPHISM(Annies::Text, Annies::Text); //TODO and should also escape any quotes already in it
+
+/// Convert std::string -> Text                                               
+LANGULUS_MORPHISM(std::string, Annies::Text);
+
 /// Convert std::string_view -> Text                                          
 LANGULUS_MORPHISM(std::string_view, Annies::Text);
 
@@ -631,6 +659,11 @@ LANGULUS_MORPHISM_CUSTOM(Byte, { return Annies::Text::Hex(from); }, Annies::Text
 
 /// Convert Hash -> Text                                                      
 LANGULUS_MORPHISM_CUSTOM(Hash, { return Annies::Text::Hex(from.value); }, Annies::Text);
+
+/// Convert Index -> Text                                                     
+LANGULUS_MORPHISM_CUSTOM(Langulus::Index::At, {
+   return Annies::Text::Named(from);
+}, Annies::Text);
 
 /// Convert Number -> Text                                                    
 LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::BuiltinNumberUnambiguously, {
@@ -671,3 +704,7 @@ LANGULUS_MORPHISM_CONCEPT(CT::Character, Annies::Text);
 );*/ //TODO nah, this is too aggressive - some types ignore sparness, while others don't
      //TODO also, shouldn't be that needed when we have the sparse fmt adapter now
      
+/// @attention can't avoid it, unfortunately. If we happen to reflect Text    
+///   before this is included, there will be missing converters. Play it safe.
+//TODO maybe if we start merging reflections from multiple places? i bet's it's gonna be REALLY slow
+#include "SerializeText.hpp"

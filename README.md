@@ -95,9 +95,9 @@ Index in various ways, each with advantages and disadvantages:
 ```c++
 TMany<int> integers {1, 2, 3};
 if (integers[0u] == 1) { /*unsigned index is fastest, but most unsafe*/ }
-if (integers[-1] == 3) { /*signed indices allow for counting backwards*/ }
-if (integers[IndexMiddle] == 2) { /*special indices are most safe and convenient, but slowest*/ }
-if (integers[IndexMax] == 3) { /*some of them are context-dependent, IndexMax returns the biggest value*/ }
+if (integers[Index::Last] == 3) { /*signed indices allow for counting backwards*/ }
+if (integers[Index::Middle] == 2) { /*special indices are most safe and convenient, but slowest*/ }
+if (integers[Index::Biggest] == 3) { /*some of them are context-dependent, returns the biggest value*/ }
 ```
 
 ## Mission statement

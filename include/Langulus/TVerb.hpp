@@ -116,14 +116,14 @@ namespace Langulus::Annies
       template<Disambiguate A1, class...AN>
       constexpr TVerb(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
-            if constexpr (CT::DeepDense<Deint<A1>> and not CT::Executable<Deint<A1>>) {
-               /*LglsAssumeUser(CT::Executable<Deint<A1>>,
+            if constexpr ((CT::DeepDense<A1> and not CT::Handle<A1>) or SameAsOneOf<Deint<A1>, TVerb, Verb>) {
+               LglsAssumeUserAndBreak(Same<Deint<A1>, TVerb>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
-                  "(if you want to overwrite the container itself) or Piecewise "
-                  "(if you want to overwrite the first item) in order to clearly "
+                  "(if you want to overwrite the verb itself) or Piecewise "
+                  "(if you want to insert the verb as argument) in order to clearly "
                   "state your intent. Absorb will be used by default!"
-               );*/
+               );
                this->Absorb(LglsFwd(a1));
             }
             else this->EmplaceConstruct(LglsFwd(a1));
@@ -196,12 +196,12 @@ namespace Langulus::Annies
       
       template<class A>
       constexpr TVerb& operator = (A&& argument) {
-         if constexpr (CT::DeepDense<Deint<A>> or CT::Executable<Deint<A>>) {
-            LglsAssumeUser(not CT::Executable<Deint<A>>,
+         if constexpr ((CT::DeepDense<A> and not CT::Handle<A>) or SameAsOneOf<Deint<A>, TVerb, Verb>) {
+            LglsAssumeUserAndBreak(Same<Deint<A>, TVerb>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
-               "the container itself) or Assign (if you want to overwrite the "
-               "first item) in order to clearly state your intent. "
+               "the verb itself) or Assign (if you want to insert the verb as argument) "
+               "in order to clearly state your intent. "
                "AssignAbsorb will be used by default!"
             );
             return this->AssignAbsorb(LglsFwd(argument));

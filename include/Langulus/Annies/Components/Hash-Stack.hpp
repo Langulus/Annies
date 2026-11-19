@@ -85,9 +85,6 @@ namespace Langulus::Annies::Component
             // recomputed on demand on comparison either way.           
             if_available(ThisCom::SetHashInner(from.template GetHashInner<ID>()))
             else ThisCom::SetHashInner(0);
-
-            if constexpr (I::ResetsOnMove())
-               if_available(from.template SetHashInner<ID>(1));
          }
       }
    };

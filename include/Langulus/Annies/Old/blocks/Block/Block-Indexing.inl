@@ -655,7 +655,7 @@ namespace Langulus::Annies
    ///   @param count - [out] count the number of repeats for the mode        
    ///   @return the index of the first found mode                            
    template<class TYPE>
-   Index Block<TYPE>::GetIndexMode(size_t& count) const IF_UNSAFE(noexcept) {
+   Index Block<TYPE>::GetIndexModal(size_t& count) const IF_UNSAFE(noexcept) {
       if constexpr (not TypeErased and CT::Comparable<TYPE, TYPE>) {
          if (IsEmpty()) {
             count = 0;
@@ -764,7 +764,7 @@ namespace Langulus::Annies
          return GetIndex<IndexSmallest>();
       else if (result == IndexMode) {
          [[maybe_unused]] size_t unused;
-         return GetIndexMode(unused);
+         return GetIndexModal(unused);
       }
 
       return result;

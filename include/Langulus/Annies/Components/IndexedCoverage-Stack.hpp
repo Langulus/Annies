@@ -140,9 +140,6 @@ namespace Langulus::Annies::Component
             decltype(auto) from = LglsFwd(intent.what);
          
             ThisCom::SetCoverageTableInner(from.template GetCoverageTable<ID>());
-            
-            if constexpr (I::ResetsOnMove())
-               if_available(from.template SetCoverageTableInner<ID>(nullptr));
          }
       }
       
@@ -207,7 +204,7 @@ namespace Langulus::Annies::Component
             static_assert(false, "Index::Single can't be used here");
          else if constexpr (::std::same_as<INDEX, Index::Inner::None>)
             static_assert(false, "Index::None can't be used here");
-         else if constexpr (::std::same_as<INDEX, Index::Inner::Mode>)
+         else if constexpr (::std::same_as<INDEX, Index::Inner::Modal>)
             static_assert(false, "Index::Mode can't be used here");
          else if constexpr (::std::same_as<INDEX, Index::Inner::Front>)
             return ThisCom::BrowseTable(0);

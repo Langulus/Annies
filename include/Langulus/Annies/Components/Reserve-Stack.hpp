@@ -115,9 +115,6 @@ namespace Langulus::Annies::Component
                   ThisCom::SetReservedInner(1);
                }
             }
-
-            if constexpr (I::ResetsOnMove())
-               if_available(from.SetReservedInner(0));
          }
       }
    };

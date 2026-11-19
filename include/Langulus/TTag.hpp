@@ -49,7 +49,7 @@ namespace Langulus::Annies
       template<Disambiguate A1, class...AN>
       constexpr TTag(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
-            if constexpr (CT::DeepDense<Deint<A1>> or CT::Tag<A1>) {
+            if constexpr ((CT::DeepDense<A1> and not CT::Handle<A1>) or CT::Tag<A1>) {
                LglsAssumeUser(SameAsOneOf<Deint<A1>, TTag, Tag>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
@@ -133,7 +133,7 @@ namespace Langulus::Annies
       
       template<class A>
       constexpr TTag& operator = (A&& argument) {
-         if constexpr (CT::DeepDense<Deint<A>> or CT::Tag<A>) {
+         if constexpr ((CT::DeepDense<A> and not CT::Handle<A>) or CT::Tag<A>) {
             LglsAssumeUser(SameAsOneOf<Deint<A>, TTag, Tag>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "

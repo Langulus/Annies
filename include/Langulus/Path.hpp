@@ -54,14 +54,14 @@ namespace Langulus::Annies
          if (IsEmpty())
             return rhs;
 
-         if ((*this)[-1] == Separator) {
-            if (rhs[-1] == Separator)
+         if ((*this)[Index::Last] == Separator) {
+            if (rhs[Index::Last] == Separator)
                return *this + rhs.Select(1);
             else
                return *this + rhs;
          }
          else {
-            if (rhs[-1] == Separator)
+            if (rhs[Index::Last] == Separator)
                return *this + rhs;
             else {
                Path temp = *this;
@@ -79,14 +79,14 @@ namespace Langulus::Annies
          if (IsEmpty())
             return (*this = rhs);
 
-         if ((*this)[-1] == Separator) {
-            if (rhs[-1] == Separator)
+         if ((*this)[Index::Last] == Separator) {
+            if (rhs[Index::Last] == Separator)
                *this += rhs.Select(1);
             else
                *this += rhs;
          }
          else {
-            if (rhs[-1] == Separator)
+            if (rhs[Index::Last] == Separator)
                *this += rhs;
             else {
                *this += Separator;

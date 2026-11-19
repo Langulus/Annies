@@ -59,8 +59,8 @@ namespace Langulus::Annies::Component
             return self.GetCount() / 2;
          else if constexpr (::std::same_as<INDEX, Index::Inner::Back>)
             return self.GetCount();
-         else if constexpr (::std::same_as<INDEX, Index::Inner::Mode>)
-            return self.GetIndexMode();
+         else if constexpr (::std::same_as<INDEX, Index::Inner::Modal>)
+            return self.GetIndexModal();
          else if constexpr (::std::same_as<INDEX, Index::Inner::Biggest>)
             return self.GetIndexLargest();
          else if constexpr (::std::same_as<INDEX, Index::Inner::Smallest>)
@@ -147,8 +147,11 @@ namespace Langulus::Annies::Component
       ///   @return the selected disowned contiguous range                    
       template<CT::Container C>
       auto Select(this C&& self, CT::Index auto&& start, CT::Index auto&& count) assumptious -> Decay<C> {
-         size_t const begin = ThisCom::SimplifyIndex(LglsFwd(start));
          size_t const size  = ThisCom::SimplifyIndex(LglsFwd(count));
+         if (not size)
+            return {};
+            
+         size_t const begin = ThisCom::SimplifyIndex(LglsFwd(start));
          return ThisCom::SelectInner(begin, size);
       }
 
@@ -159,6 +162,8 @@ namespace Langulus::Annies::Component
       auto Select(this C&& self, CT::Index auto&& start) assumptious -> Decay<C> {
          size_t const begin = ThisCom::SimplifyIndex(LglsFwd(start));
          size_t const size  = self.GetCount() - begin;
+         if (not size)
+            return {};
          return ThisCom::SelectInner(begin, size);
       }
 

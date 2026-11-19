@@ -216,7 +216,7 @@ namespace Langulus::Annies
       // closer to it. Moving is costly, unless you use pointers        
       try_again:
       while (*psl > 1) {
-         psl[-1] = (*psl) - 1;
+         psl[Index::Last] = (*psl) - 1;
 
          (key--).CreateWithIntent(Abandon(key));
          key.FreeInner();

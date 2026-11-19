@@ -184,12 +184,9 @@ namespace Langulus::Annies::Component
                // Transfer ownership if we can, otherwise refer         
                // Deep ownership can be reset in two ways: either reset 
                // the entries pointer, or reset the count.              
-               if constexpr (CT::HasVariableCount<I>) {
-                  LglsAssumeDev(from.IsEmpty(),
-                     "Remote count should've been reset prior to this call");
-               }
-               else if_available(from.template SetEntriesInner<ID>(nullptr))
-               else ThisCom::Keep();
+               if constexpr (not CT::HasVariableCount<I>
+               and not requires { from.template SetEntriesInner<ID>(nullptr); })
+                  ThisCom::Keep();
             }
          }
       }

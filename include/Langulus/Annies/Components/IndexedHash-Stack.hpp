@@ -106,9 +106,6 @@ namespace Langulus::Annies::Component
             decltype(auto) from = LglsFwd(intent.what);
          
             ThisCom::SetHashTableInner(from.template GetHashTable<ID>());
-            
-            if constexpr (I::ResetsOnMove())
-               if_available(from.template SetHashTableInner<ID>(nullptr));
          }
       }
    };

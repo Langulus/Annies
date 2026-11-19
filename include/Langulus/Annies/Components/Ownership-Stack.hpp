@@ -154,7 +154,7 @@ namespace Langulus::Annies::Component
       template<class SELF, CT::Intent I> requires CT::Container<I>
       void ConstructFrom(this SELF& self, I&& intent) {
          if constexpr (not CT::Copied<I> and not CT::Cloned<I> and CT::HeapAllocated<I>) {
-            using IT = Decvq<Deref<Deint<I>>>;
+            //using IT = Decvq<Deref<Deint<I>>>;
             decltype(auto) from = LglsFwd(intent.what);
 
             if constexpr (CT::Disowned<I>) {
@@ -203,10 +203,10 @@ namespace Langulus::Annies::Component
                         ThisCom::Keep();
                      }
 
-                     if constexpr (CT::Moved<I> or not IT::CanBeDisowned) {
+                     /*if constexpr (CT::Moved<I> or not IT::CanBeDisowned) {
                         // Transfer ownership in order to disown        
                         from.template SetAllocationInner<ID>(nullptr);
-                     }
+                     }*/
                   }
                   else ThisCom::FindAllocationInner();
                }

@@ -253,9 +253,6 @@ namespace Langulus::Annies::Component
                   ThisCom::EnableVerbConstrained();
             }
          }
-
-         if constexpr (CT::Moved<I> and CT::VerbErased<I>)
-            intent->template SetVerbInner<ID>(META{});
       }
    };
 

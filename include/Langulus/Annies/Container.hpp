@@ -302,6 +302,9 @@ namespace Langulus::Annies::Component
       }
       
    protected:
+      template<CT::Component...C> requires ValidComponentOrder<C...>
+      friend struct Container;
+
       LglsComStateStack(friend);
       LglsComTypedStack(friend);
       LglsComVerbedStack(friend);
@@ -854,21 +857,22 @@ namespace Langulus::Annies::Component
       /// Call ConstructFrom in all components that implement it.             
       /// Fallback to ConstructDefault otherwise.                             
       template<CT::Container SELF, CT::Container FROM>
-      constexpr void Absorb(this SELF& self, FROM&& from) {
+      constexpr void Absorb(this SELF& self, FROM&& intent) {
          /*static_assert(CT::Handle<SELF> or CT::Contiguous<SELF> == CT::Contiguous<FROM>,
             "You can't absorb from containers with different contiguousness");*/ //TODO causes circular dependency due to ::std::contiguous_range and IterateRange
 
-         decltype(auto) source = DeintCast(from);
-         using I = IntentOf(from);
+         decltype(auto) from = DeintCast(intent);
+         using I = IntentOf(intent);
+         using IT = Decvq<Deref<Deint<I>>>;
 
          if constexpr (not CT::Handle<SELF>) {
-            if (source.IsEmpty()) {
+            if (from.IsEmpty()) {
                // If source is empty, we copy only the type and the     
                // unconstrained state. Everything else is defaulted.    
-               ForEach(ComponentList{}, [&self,&from]<class C>{
+               ForEach(ComponentList{}, [&self,&intent]<class C>{
                   if constexpr (requires { &C::template GetState<SELF>; }
                             or  requires { &C::template GetType<0, SELF>; }) {
-                     if_available_gcc(C::template ConstructFrom<SELF, I>)(FWDIntent(from));
+                     if_available_gcc(C::template ConstructFrom<SELF, I>)(FWDIntent(intent));
                   }
                   else if_available_gcc(C::template ConstructDefault<SELF>)();
                });
@@ -876,21 +880,113 @@ namespace Langulus::Annies::Component
             }
          }
 
-         ForEach(ComponentList{}, [&self,&from]<class C>{
-                 if_available_gcc(C::template ConstructFrom<SELF, I>)(FWDIntent(from));
+         ForEach(ComponentList{}, [&self,&intent]<class C>{
+                 if_available_gcc(C::template ConstructFrom<SELF, I>)(FWDIntent(intent));
             else if_available_gcc(C::template ConstructDefault<SELF>)();
          });
 
+         // Count is responsible for deep ownership, it has to       
+         // be reset on move to disable destruction in 'from'.       //TODO combine branches
+         if constexpr (CT::Moved<I>) {
+            // Moving                                                
+            if_available(from.SetCountInner(0));
+         }
+         else if constexpr (CT::Abandoned<I> and CT::OwnedDeepStrong<I>) {
+            // Abandoning                                            
+            if constexpr (not IT::CanBeDisowned) {
+               // In case source is not disownable, this component   
+               // must make sure to reset relevant properties.       
+               if_available(from.SetCountInner(0));
+            }
+         }
+
          if constexpr (CT::Abandoned<I>) {
-            // Make sure we disown an abandoned container at the end    
+            // Make sure we disown an abandoned container at the end    //TODO combine branches
             // If container is not disownable, it is every component's  
             // responsibility to remain in a disowned state.            
-            if_available(source.EnableDisowned());
+            if_available(from.EnableDisowned());
          }
          else if constexpr (CT::Moved<I>) {
-            // Make sure we reset state after all movement concludes    
-            if_available(source.ResetState());
+            // Make sure we reset everything after movement concludes   
+            if_available(from.ResetState());
          }
+
+      
+         if constexpr (I::ResetsOnMove())//TODO combine branches
+            if_available(from.SetHashInner(1)); //TODO for all dimensions?
+
+         if constexpr (CT::Moved<I> and CT::OwnedStrong<I>) {//TODO combine branches
+            // We are moving 'from'. If it is owned on destruction,  
+            // it needs to be fully reset.                           
+            if_available(from.SetHeapInner(nullptr));//TODO for all dimensions?
+         }
+         else if constexpr (CT::Abandoned<I> and CT::OwnedStrong<I>) {
+            // We are abandoning 'from'.                             
+            // First and foremost, if 'from' supports State::Disowned
+            // we do just that in the last ownership component.      
+            // If disownment is not supported, we need to reset all  
+            // properties responsible for dereferencing and          
+            // destruction. This will be done in their respective    
+            // components, if possible:                              
+            //    1. Allocation responsible for shallow ownership    
+            //    2. Count responsible for deep ownership            
+            if constexpr (not IT::CanBeDisowned
+            and (not requires { from.SetCountInner(0); }
+                  or IT::CountHeapRequests())
+            ) {
+               // Some monocontainers have no variable count, and in 
+               // some cases the heap pointer is used to specify the 
+               // count of 1. In these cases, this component is      
+               // responsible to reset the pointer. Same applies in  
+               // the cases where vital properties are positioned on 
+               // the heap (CountHeap/HashHeap/OwnershipDeepHeap)    
+               from.SetHeapInner(nullptr);
+            }
+         }
+                  
+         if constexpr (I::ResetsOnMove()) {
+            if_available(from.SetCoverageTableInner(nullptr));//TODO for all dimensions?
+            if_available(from.SetHashTableInner(nullptr));//TODO for all dimensions?
+         }
+
+         if constexpr (CT::Moved<I> or (CT::Abandoned<I> and not IT::CanBeDisowned)) {
+            // Transfer ownership if we can, otherwise refer         
+            if_available(from.SetAllocationInner(nullptr))//TODO for all dimensions?
+
+               // Transfer ownership if we can, otherwise refer         
+               // Deep ownership can be reset in two ways: either reset 
+               // the entries pointer, or reset the count.              
+               if constexpr (CT::HasVariableCount<I>) {
+                  LglsAssumeDev(from.IsEmpty(),
+                     "Remote count should've been reset prior to this call");
+               }
+               else if_available(from.SetEntriesInner(nullptr))//TODO for all dimensions?
+               else {
+                  // Note: reaching this branch guarantees that source  
+                  // isn't emergently owned!                            
+                  if constexpr (not CT::HeapAllocated<I>) {
+                     // Source is stack-allocated. We can transfer      
+                     // ownership by simply zeroing the source pointer. 
+                     from.GetStackInner() = nullptr;
+                  }
+               }
+
+         }
+
+         if constexpr (I::ResetsOnMove())
+            if_available(from.SetReservedInner(0));
+      
+         if constexpr (CT::Moved<I> and CT::TagErased<I>)
+            from.SetTagInner({}); //TODO for all dimensions?
+
+         if constexpr (CT::Moved<I> and CT::TypeErased<I>) {
+            GetDimensions().ForEach([&from]<Cid ID> {
+               from.template SetTypeInner<ID>(DMeta{});
+            });
+         }
+
+         if constexpr (CT::Moved<I> and CT::VerbErased<I>)
+            from.SetVerbInner({}); //TODO for all dimensions?
       }
 
       /// MARK: SliceFrom                                                     
@@ -1029,7 +1125,7 @@ namespace Langulus::Annies::Component
       ///      for better overall performance.                                
       template<bool SKIP_EMPTY = true, CT::Container C>//TODO reverse?
       void Apply(this C& self, auto&& lambda, [[maybe_unused]] size_t cookie = 0) {
-         LglsAssumeDev(not self.IsEmpty(), "Make sure container isn't empty");
+         LglsAssumeDevAndBreak(not self.IsEmpty(), "Make sure container isn't empty");
 
          if constexpr (CT::Handle<C>)
             lambda(self);

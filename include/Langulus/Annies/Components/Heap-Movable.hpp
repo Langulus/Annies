@@ -176,35 +176,6 @@ namespace Langulus::Annies::Component
             /// @attention this should never be reached if I is stack   
             ///    allocated                                            
             ThisCom::SetHeapInner(from.template GetRaw<Id::First>());
-
-            if constexpr (CT::Moved<I> and CT::OwnedStrong<I>) {
-               // We are moving 'from'. If it is owned on destruction,  
-               // it needs to be fully reset.                           
-               from.template SetHeapInner<Id::First>(nullptr);
-            }
-            else if constexpr (CT::Abandoned<I> and CT::OwnedStrong<I>) {
-               // We are abandoning 'from'.                             
-               // First and foremost, if 'from' supports State::Disowned
-               // we do just that in the last ownership component.      
-               // If disownment is not supported, we need to reset all  
-               // properties responsible for dereferencing and          
-               // destruction. This will be done in their respective    
-               // components, if possible:                              
-               //    1. Allocation responsible for shallow ownership    
-               //    2. Count responsible for deep ownership            
-               if constexpr (not IT::CanBeDisowned
-               and (not requires { from.SetCountInner(0); }
-                    or IT::CountHeapRequests())
-               ) {
-                  // Some monocontainers have no variable count, and in 
-                  // some cases the heap pointer is used to specify the 
-                  // count of 1. In these cases, this component is      
-                  // responsible to reset the pointer. Same applies in  
-                  // the cases where vital properties are positioned on 
-                  // the heap (CountHeap/HashHeap/OwnershipDeepHeap)    
-                  from.template SetHeapInner<Id::First>(nullptr);
-               }
-            }
          }
       }
       

@@ -101,7 +101,7 @@ namespace Langulus::Annies::Component
          // We can find the allocation behind the pointer but in order  
          // to save it, we must make sure that entry array resides in   
          // non-shared memory (when OwnershipDeepHeap is used)          
-         auto entry_allocation = Allocator::Find(entries);
+         [[maybe_unused]] auto entry_allocation = Allocator::Find(entries);
          LglsAssumeDev(entry_allocation and entry_allocation->GetUses() == 1);
       #endif
 
@@ -1324,23 +1324,14 @@ namespace Langulus::Annies::Component
                // Transfer ownership if we can, otherwise refer         
                // Deep ownership can be reset in two ways: either reset 
                // the entries pointer, or reset the count.              
-               if constexpr (CT::HasVariableCount<I>) {
-                  LglsAssumeDev(from.IsEmpty(),
-                     "Remote count should've been reset prior to this call");
-               }
-               else if_available(from.template SetEntriesInner<ID>(nullptr))
-               else {
+               if constexpr (not CT::HasVariableCount<I>
+               and not requires { from.template SetEntriesInner<ID>(nullptr); }) {
                   // Note: reaching this branch guarantees that source  
                   // isn't emergently owned!                            
                   if constexpr (CT::HeapAllocated<I>) {
                      // Source is heap-allocated, but there's no way to 
                      // transfer ownership. Just keep.                  
                      ThisCom::Keep();
-                  }
-                  else {
-                     // Source is stack-allocated. We can transfer      
-                     // ownership by simply zeroing the source pointer. 
-                     from.GetStackInner() = nullptr;
                   }
                }
             }

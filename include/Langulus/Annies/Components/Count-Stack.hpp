@@ -93,24 +93,8 @@ namespace Langulus::Annies::Component
       template<class SELF, CT::Intent I> requires CT::Container<I>
       void ConstructFrom(this SELF& self, I&& intent) {
          if constexpr (not CT::Copied<I> and not CT::Cloned<I> and CT::HeapAllocated<I>) {
-            using IT = Decvq<Deref<Deint<I>>>;
             decltype(auto) from = LglsFwd(intent.what);
             ThisCom::SetCountInner(from.GetCount());
-
-            // Count is responsible for deep ownership, it has to       
-            // be reset on move to disable destruction in 'from'.       
-            if constexpr (CT::Moved<I>) {
-               // Moving                                                
-               if_available(from.SetCountInner(0));
-            }
-            else if constexpr (CT::Abandoned<I> and CT::OwnedDeepStrong<I>) {
-               // Abandoning                                            
-               if constexpr (not IT::CanBeDisowned) {
-                  // In case source is not disownable, this component   
-                  // must make sure to reset relevant properties.       
-                  if_available(from.SetCountInner(0));
-               }
-            }
          }
       }
 

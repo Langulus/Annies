@@ -425,7 +425,7 @@ namespace Langulus::Annies::Component
          // That way we move every entry that is far from its bucket    
          // closer to it.                                               
          while (*psl > 1) {
-            psl[-1] = (*psl) - 1;
+            psl[Index::Last] = (*psl) - 1;
 
             auto prev_h = h - 1;
             Id::ForEach([&prev_h, &h]<Cid D> {

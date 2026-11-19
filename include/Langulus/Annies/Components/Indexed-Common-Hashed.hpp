@@ -107,7 +107,7 @@ namespace Langulus::Annies::Component
             static_assert(false, "Index::Single can't be used here");
          else if constexpr (::std::same_as<INDEX, Index::Inner::None>)
             static_assert(false, "Index::None can't be used here");
-         else if constexpr (::std::same_as<INDEX, Index::Inner::Mode>)
+         else if constexpr (::std::same_as<INDEX, Index::Inner::Modal>)
             static_assert(false, "Index::Mode can't be used here");
          else if constexpr (::std::same_as<INDEX, Index::Inner::Front>)
             return ThisCom::BrowseTable(0);

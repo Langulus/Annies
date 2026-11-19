@@ -253,9 +253,6 @@ namespace Langulus::Annies::Component
                   ThisCom::EnableTagConstrained();
             }
          }
-
-         if constexpr (CT::Moved<I> and CT::TagErased<I>)
-            intent->template SetTagInner<ID>(META{});
       }
    };
 

@@ -110,8 +110,8 @@ namespace Langulus::Annies::Component
             }
             else if constexpr (CT::Moved<I> or not IT::CanBeDisowned) {
                // Transfer ownership if we can, otherwise refer         
-               if_available(from.template SetAllocationInner<ID>(nullptr))
-               else ThisCom::Keep();
+               if constexpr (not requires { from.template SetAllocationInner<ID>(nullptr); })
+                  ThisCom::Keep();
             }
          }
       }

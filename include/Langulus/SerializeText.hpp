@@ -12,6 +12,7 @@
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/Derived.hpp>
 #include <Langulus/CT/Charged.hpp>
+#include <Langulus/CT/Derived.hpp>
 
 
 namespace Langulus::Flow
@@ -426,14 +427,18 @@ namespace fmt
 
       template<class CONTEXT>
       auto format(T const& e, CONTEXT& ctx) const {
-         try {
-            ::Langulus::Annies::Text result;
-            ::Langulus::Serialize(e, result);
-            return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(result));
-         }
-         catch(...) {
-            // Don't allow any exceptions to leak out of here           
-            return format_to(ctx.out(), "<error while serializing to text>");
+         if constexpr (::Langulus::CT::DerivedFrom<T, ::Langulus::Annies::Text>)
+            return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(e));
+         else {
+            try {
+               ::Langulus::Annies::Text result;
+               ::Langulus::Serialize(e, result);
+               return format_to(ctx.out(), "{}", static_cast<::Langulus::Token>(result));
+            }
+            catch(...) {
+               // Don't allow any exceptions to leak out of here           
+               return format_to(ctx.out(), "<error while serializing to text>");
+            }
          }
       }
    };

@@ -617,9 +617,6 @@ namespace Langulus::Annies::Component
                ThisCom::EnableTypeConstrained();
          }
          //}
-
-         if constexpr (CT::Moved<I> and CT::TypeErased<I>)
-            intent->template SetTypeInner<ID>(META{});
       }
    };
 
