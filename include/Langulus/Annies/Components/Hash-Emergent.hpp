@@ -48,7 +48,7 @@ namespace Langulus::Annies::Component
             const auto T = self.template GetType<SID>();
             LglsAssumeDev(T, "Can't hash untyped container");
             const auto hasher = T.GetHasher();
-            LglsAssumeDev(hasher, "Not hashable");
+            LglsAssumeDev(hasher, "Type not hashable: ", T);
             void* const data = const_cast<void*>(
                static_cast<void const*>(self.template GetRaw<SID>())
             );

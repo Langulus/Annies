@@ -782,7 +782,7 @@ namespace Langulus::Annies::Component
          if constexpr (requires { self.SetCountInner(1); }) {
             // Partial success is supported                             
             self.SetCountInner(n);
-            self.template ResetHash<SID>();
+            if_available(self.template ResetHash<SID>());
 
             if constexpr (CT::IndexedHashTable<C>) {
                // Partial success involving maps/sets might result in   

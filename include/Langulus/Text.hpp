@@ -643,7 +643,8 @@ namespace Langulus
 /// MARK: Morphisms                                                           
 /// Same-type conversions are always suppressed, but serializations are not.  
 /// This particular morphism adds quotes around the text.                     
-LANGULUS_MORPHISM(Annies::Text, Annies::Text); //TODO and should also escape any quotes already in it
+//LANGULUS_MORPHISM(Annies::Text, Annies::Text); //TODO and should also escape any quotes already in it
+LANGULUS_MORPHISM_CONCEPT(CT::Container, Annies::Text);
 
 /// Convert std::string -> Text                                               
 LANGULUS_MORPHISM(std::string, Annies::Text);

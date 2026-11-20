@@ -138,23 +138,28 @@ namespace Langulus::Annies::Component
          return GetType().IsSame(type);
       }
 
-      /// Check if unqualified type is the same as another container's type.  
-      /// This can potentially happen at compile-time.                        
+      /// Check if unqualified type is the same as another container's type   
       ///   @attention ignores only cv-qualifiers                             
+      ///   @attention if one of the types is missing always returns true     
       ///   @param other the container to check for                           
+      ///   @return true if all types (for all dimensions) are compatible     
       template<Cid SID = ID, CT::Container C>
-      constexpr void AssertTypesAreSame(C const& other) const {
+      constexpr bool CheckIfTypesAreCompatible(C const& other) const noexcept {
          if constexpr (CT::TypeErased<C>) {
             auto t1 = GetType();
             auto t2 = other.template GetType<SID>();
             if (t1 and t2) {
-               LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
-                  t1, " is not similar to ", t2, " (dimension #", SID, ")");
+               return t1.IsSame(t2);
+               /*LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
+                  t1, " is not similar to ", t2, " (dimension #", SID, ")");*/
             }
+            else return true;
          }
          else {
             (void) other;
-            static_assert(Same<TYPE, TypeOf<C, SID>>, "Type mismatch");
+            static_assert(Same<TYPE, TypeOf<C, SID>>,
+               "Compile-time type mismatch");
+            return false;
          }
       }
 

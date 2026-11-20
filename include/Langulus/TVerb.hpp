@@ -43,7 +43,7 @@ namespace Langulus::Annies::Inner
       Com::IndexedLinear<>,            // Indexed directly              
       Com::OwnershipStack<>,           // Allocation is referenced      
       Com::OwnershipDeepHeap<>,        // Sparse elements are referenced
-      Com::HashStack<>,                // Hash can be cached            
+      /*Com::HashStack<>,*/                // Hash can be cached            
       Com::Deepening<Many>,            // Makes container deep          
       Com::Insertion<>,                // Allows insertion              
       //Com::InsertionOperators<>,       // << and >> insertion           
@@ -54,7 +54,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
       Com::Conversion<>,               // Allows conversions            
-      Com::Comparison<>,               // Allows comparisons            
+      Com::Comparison<false ,false>,               // Allows comparisons            
       Com::IterationForEach<>,         // ForEach iteration             
       Com::IterationRange<>,           // Ranged iteration              
       Com::Descriptor<>                // Add descriptor interface      
@@ -77,8 +77,8 @@ namespace Langulus::Annies
    /// function calls. Can be verb-constrained: the verb it contains could    
    /// be known at compile-time.                                              
    ///   This template is used as base for all verb definitions, so that you  
-   /// can directly use specific verbs as containers, like so:                
-   /// Verbs::Write{Verbs::Catenate{1,2,3}}.In(file).AndThen(Verbs::Halt{});  
+   /// can directly use specific verbs as argument containers, like so:       
+   /// Verbs::Write{Verbs::Catenate{1,2,3}}.In(file).Then(Verbs::Halt{});     
    ///   Cool, huh?                                                           
    template<class V>
    struct TVerb : Inner::TVerbBase<V> {
@@ -86,6 +86,7 @@ namespace Langulus::Annies
       using CTTI_Executable = Yup;
       using CTTI_Deep       = No;
       using DeepType        = Many;
+      using ArgumentType    = Inner::TVerbBase<V>;
       
    private:
       // The number of successful executions                            
@@ -101,12 +102,22 @@ namespace Langulus::Annies
       constexpr TVerb() noexcept {
          this->ConstructDefault();
       }
-      constexpr TVerb(TVerb const& other) {
+
+      constexpr TVerb(TVerb const& other)
+         : mSuccesses {other.mSuccesses}
+         , mOutput    {other.mOutput}
+         , mContext   {other.mContext} {
          this->Absorb(Refer(other));
       }
-      constexpr TVerb(TVerb&& other) noexcept  {
+
+      constexpr TVerb(TVerb&& other) noexcept
+         : mSuccesses {other.mSuccesses}
+         , mOutput    {Move {other.mOutput}}
+         , mContext   {Move {other.mContext}} {
          this->Absorb(Move(other));
+         other.mSuccesses = 0;
       }
+
       constexpr ~TVerb() noexcept {
          this->Destroy();
       }
@@ -125,6 +136,16 @@ namespace Langulus::Annies
                   "state your intent. Absorb will be used by default!"
                );
                this->Absorb(LglsFwd(a1));
+
+               if constexpr (CT::Executable<A1>) {
+                  decltype(auto) other = DeintCast(a1);
+                  mSuccesses = other.mSuccesses;
+                  mOutput = NestIntentOf(a1, other.mOutput);
+                  mContext = NestIntentOf(a1, other.mContext);
+
+                  if constexpr (IntentOf(a1)::ResetsOnMove())
+                     other.mSuccesses = 0;
+               }
             }
             else this->EmplaceConstruct(LglsFwd(a1));
          }
@@ -136,30 +157,45 @@ namespace Langulus::Annies
       
       /// Construction that absorbs the provided containers into the verb's   
       /// argument.                                                           
-      template<class A1, class...AN>
-      constexpr TVerb(Inner::Absorb, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0)
-            this->Absorb(LglsFwd(a1));
+      template<class...A>
+      constexpr TVerb(Inner::Absorb, A&&...args) {
+         if constexpr (sizeof...(A) == 0)
+            this->ConstructDefault();
+         else if constexpr (sizeof...(A) == 1) {
+            this->Absorb(LglsFwd(args)...);
+
+            if constexpr (CT::Executable<A...>) {
+               decltype(auto) other = DeintCast(args...[0]);
+               mSuccesses = other.mSuccesses;
+               mOutput = NestIntentOf(args...[0], other.mOutput);
+               mContext = NestIntentOf(args...[0], other.mContext);
+
+               if constexpr (IntentOf(args...[0])::ResetsOnMove())
+                  other.mSuccesses = 0;
+            }
+         }
          else {
             this->ConstructDefault();
-            this->Concat(LglsFwd(a1), LglsFwd(an)...);
+            this->Concat(LglsFwd(args)...);
          }
       }
       
       /// Construction that emplaces all arguments inside the verb's argument 
-      template<class A1, class...AN>
-      constexpr TVerb(Inner::Piecewise, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>)
-            this->EmplaceConstruct(LglsFwd(a1));
+      template<class...A>
+      constexpr TVerb(Inner::Piecewise, A&&...args) {
+         if constexpr (sizeof...(A) == 0)
+            this->ConstructDefault();
+         else if constexpr (sizeof...(A) == 1 and not CT::BoundedArray<A...>)
+            this->EmplaceConstruct(LglsFwd(args)...);
          else {
             this->ConstructDefault();
-            this->Insert(LglsFwd(a1), LglsFwd(an)...);
+            this->Insert(LglsFwd(args)...);
          }
       }
       
       /// Create a verb by manually specifying the verb ID and arguments      
       static TVerb From(VMeta verb, auto&&...arguments) {
-         TVerb result {LglsFwd(arguments)...};
+         TVerb result {Piecewise, LglsFwd(arguments)...};
          result.SetVerb(verb);
          return result;
       }
@@ -188,10 +224,20 @@ namespace Langulus::Annies
 
       /// Assignment                                                          
       constexpr TVerb& operator = (TVerb const& other) {
-         return this->AssignAbsorb(Refer(other));
+         this->AssignAbsorb(Refer(other));
+         mSuccesses = other.mSuccesses;
+         mOutput = other.mOutput;
+         mContext = other.mContext;
+         return *this;
       }
+
       constexpr TVerb& operator = (TVerb&& other) noexcept {
-         return this->AssignAbsorb(Move(other));
+         this->AssignAbsorb(Move(other));
+         mSuccesses = other.mSuccesses;
+         mOutput = Move(other.mOutput);
+         mContext = Move(other.mContext);
+         other.mSuccesses = 0;
+         return *this;
       }
       
       template<class A>
@@ -204,30 +250,37 @@ namespace Langulus::Annies
                "in order to clearly state your intent. "
                "AssignAbsorb will be used by default!"
             );
-            return this->AssignAbsorb(LglsFwd(argument));
+
+            this->AssignAbsorb(LglsFwd(argument));
+
+            if constexpr (CT::Executable<A>) {
+               decltype(auto) other = DeintCast(argument);
+               mSuccesses = other.mSuccesses;
+               mOutput = NestIntentOf(argument, other.mOutput);
+               mContext = NestIntentOf(argument, other.mContext);
+
+               if constexpr (IntentOf(argument)::ResetsOnMove())
+                  other.mSuccesses = 0;
+            }
+            return *this;
          }
          else return this->Assign(LglsFwd(argument));
       }
 
       /// Set source                                                          
-      ///   @attention setting source resets verb completion                  
-      auto In(auto&&...arguments) -> TVerb& {
-         mContext = Many {LglsFwd(arguments)...};
-         Clear();
-         return *this;
+      ///   @attention setting source resets output and satisfaction          
+      template<class SELF>
+      auto In(this SELF&& self, auto&&...arguments) -> SELF&& {
+         self.mContext = Many {LglsFwd(arguments)...};
+         self.Clear();
+         return LglsFwd(self);
       }
       
       /// Set arguments                                                       
-      template<class...A>
-      auto SetArgument(A&&...arguments) -> TVerb& {
-         if constexpr (sizeof...(A) == 1) {
-            if constexpr (((CT::DeepDense<Deint<A>> and not CT::Executable<Deint<A>>) and ...))
-               this->Absorb(LglsFwd(arguments)...);
-            else
-               this->EmplaceConstruct(LglsFwd(arguments)...);
-         }
-         else this->Insert(LglsFwd(arguments)...);
-         return *this;
+      template<class SELF>
+      auto SetArgument(this SELF&& self, auto&&...arguments) -> SELF&& {
+         self.AssignAbsorb(Many {LglsFwd(arguments)...});
+         return LglsFwd(self);
       }
 
       /// Set output                                                          
@@ -252,16 +305,19 @@ namespace Langulus::Annies
       /// MARK: Access                                                        
       /// Hash the verb (emergent). Each sub container should cache their own,
       /// to make things relatively fast.                                     
-      auto GetHash() const -> Hash {
+      /*auto GetHash() const -> Hash {
          return HashOf(//TODO should charge be ignored?
-            this->GetVerb(),//TODO can't we xor these, so that if one changes we just do xor push/pop?
+            this->GetVerb(),
             mContext, 
-            Inner::TVerbBase<V>::GetHash(),
+            ArgumentType::GetHash(),
             mOutput
          );
-      }
+      }*/
 
-      /// Get the verb token or operator depending on context and energy      
+      /// Get the verb token/operator and charge, depending on energy         
+      ///   @param tokenized [in/out] informs the outside world that a token  
+      ///      instead of an operator was chosen for representing verb.       
+      ///   @return the token/operator, and charge appended to it, if relevant
       auto GetOperatorToken(bool& tokenized) const -> Text {
          const auto v = this->GetVerb();
          const auto c = this->GetCharge();
@@ -272,6 +328,8 @@ namespace Langulus::Annies
             tokenized = true;
             return out.Lowercase();
          }
+
+         LglsAssumeDev(not v.GetPositiveName().empty(), "Invalid verb token");
 
          // A valid verb is written either as token, or as operator     
          if (c.mass < 0) {
@@ -294,18 +352,24 @@ namespace Langulus::Annies
          }
          else {
             if (not c.IsCharged()) {
-               // Write as operator                                     
-               out += v.GetPositiveOperator();
+               if (not v.GetPositiveOperator().empty()) {
+                  // Write as operator                                  
+                  out += v.GetPositiveOperator();
+               }
+               else {
+                  out += v.GetPositiveName();
+                  tokenized = true;
+               }
             }
             else {
-               // Write as token                                        
+               // Write as token & charge                               
                out += v.GetPositiveName();
                out += c;
                tokenized = true;
             }
          }
 
-         return out.Lowercase();
+         return out;//.Lowercase(); //TODO guarantee it is lowercased at compile-time
       }
 
       /// Get verb left operand, a.k.a. the context                           
@@ -348,7 +412,7 @@ namespace Langulus::Annies
       ///   @return true if anything is missing                               
       bool IsMissing() const noexcept {
          return mContext.IsMissing()
-             or Inner::TVerbBase<V>::IsMissing()
+             or ArgumentType::IsMissing()
              or mOutput.IsMissing();
       }
 
@@ -356,7 +420,7 @@ namespace Langulus::Annies
       ///   @return true if anything is missing                               
       bool IsMissingDeep() const noexcept {
          return mContext.IsMissingDeep()
-             or Inner::TVerbBase<V>::IsMissingDeep()
+             or ArgumentType::IsMissingDeep()
              or mOutput.IsMissingDeep();
       }
 
@@ -378,10 +442,11 @@ namespace Langulus::Annies
       ///   @return true if verbs match                                       
       ///   @attention charges are ignored                                    
       constexpr bool operator == (const TVerb& rhs) const {
-         return this->GetVerb() == rhs.GetVerb()
-            and mContext == rhs.mContext
-            and Inner::TVerbBase<V>::operator == (rhs.GetRHS())
-            and mOutput == rhs.mOutput;
+         bool same_verb = this->GetVerb() == rhs.GetVerb();
+         bool same_context = mContext == rhs.mContext;
+         bool same_argument = ArgumentType::operator == (rhs.GetRHS());
+         bool same_output = mOutput == rhs.mOutput;
+         return same_verb and same_context and same_argument and same_output;
       }
 
       /// Three-way comparison by precedence only                             
@@ -434,7 +499,7 @@ namespace Langulus::Annies
          this->ResetVerb();
          this->ResetCharge();
          mContext.Reset();
-         Inner::TVerbBase<V>::Reset();
+         ArgumentType::Reset();
          mOutput.Reset();
          mSuccesses = 0;
       };

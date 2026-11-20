@@ -1401,12 +1401,18 @@ namespace Langulus::Annies::Component
          if (static_cast<const void*>(&self) == static_cast<const void*>(&from))
             return self;
 
-         // Never modify containers if type-incompatible                
-         if_available(self.AssertTypesAreSame(from));
-
-         // Free old data and absorb the new container                  
+         // Free old data                                               
          self.Free();
-         if_available(self.ResetCount()); //TODO not redundant! but why? shouldn't Absorb set it either way?
+
+         if (not self.CheckIfTypesAreCompatible(from)) {
+            // We have to reset memory and type                         
+            if_available(self.ResetAllAllocations());
+            if_available(self.ResetAllTypes());
+         }
+         else {
+            if_available(self.ResetCount()); //TODO not redundant! but why? shouldn't Free set it either way?
+         }
+
          self.Absorb(LglsFwd(rhs));
          return self;
       }

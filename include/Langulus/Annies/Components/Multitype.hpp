@@ -286,24 +286,30 @@ namespace Langulus::Annies::Component
          return &DenseCast(self.template GetRaw<Id::Second>());
       }
 
-      /// Assert if any of the types aren't Same                              
-      ///   @attention ignores cv-qualifiers only                             
-      ///   @param other the container to compare with                        
+      /// Check if unqualified type is the same as another container's type   
+      ///   @attention ignores only cv-qualifiers                             
+      ///   @attention if one of the types is missing always returns true     
+      ///   @param other the container to check for                           
+      ///   @return true if all types (for all dimensions) are compatible     
       template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
-      void AssertTypesAreSame(this LHS const& self, RHS const& other) {
-         Id::ForEach([&]<Cid D> {
+      bool CheckIfTypesAreCompatible(this LHS const& self, RHS const& other) noexcept {
+         return Id::ForEachAnd([&self,&other]<Cid D> noexcept {
             if constexpr (CT::TypeErased<RHS> or CT::TypeErased<LHS>) {
                auto t1 = self.template GetType<D>();
                auto t2 = other.template GetType<D>();
                if (t1 and t2) {
-                  LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
-                     t1, " is not similar to ", t2, " (dimension #", D, ")");
+                  return t1.IsSame(t2);
+                  /*LglsAssert(t1.IsSame(t2), "Runtime type mismatch", ": ",
+                     t1, " is not similar to ", t2, " (dimension #", D, ")");*/
                }
+               else return true;
             }
             else {
                (void) self;
                (void) other;
-               static_assert(Same<TypeOf<LHS, D>, TypeOf<RHS, D>>, "Type mismatch");
+               static_assert(Same<TypeOf<LHS, D>, TypeOf<RHS, D>>,
+                  "Compile-time type mismatch");
+               return false;
             }
          });
       }

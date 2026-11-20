@@ -8,7 +8,7 @@
 #pragma once
 #include <Langulus/Annies/Components/Comparison.hpp>
 
-#define LglsVerboseEnabled 0 or LANGULUS_META_VERBOSITY_MASTER_SWITCH()
+#define LglsVerboseEnabled 1
 #include <Langulus/Logger/ToggleVerbose.hpp>
 
 #define TEMPLATE template<bool CONVERT, bool HASH, Cid ID, Cid...SHARED>
@@ -74,7 +74,7 @@ namespace Langulus::Annies::Component
             if (raw1 == raw2)
                return true;   // Both point to same memory           
 
-            if constexpr (requires { lhs.CompareHashes(rhs); }) {
+            if constexpr (HASH and requires { lhs.CompareHashes(rhs); }) {
                if (LT.GetHasher() and not lhs.CompareHashes(rhs)) {
                   // Early failure if valid hashes differ - no point 
                   // in comparing anything at all                    

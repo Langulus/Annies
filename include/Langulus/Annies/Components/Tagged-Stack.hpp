@@ -172,7 +172,7 @@ namespace Langulus::Annies::Component
       /// Reset the tag of the container, unless it's tag-constrained.        
       /// If this container isn't tag-erased, this call is a no-op.           
       template<Cid SID = ID>
-      constexpr void ResetType(this auto& self) noexcept {
+      constexpr void ResetTag(this auto& self) noexcept {
          if constexpr (TagErased) {
             if constexpr (requires { self.template IsTagConstrained<SID>(); }) {
                if (not self.template IsTagConstrained<SID>())

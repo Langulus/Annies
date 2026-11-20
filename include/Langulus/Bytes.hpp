@@ -272,19 +272,8 @@ namespace Langulus::Annies
          return result;
       }
 
-      /// Conversion to standard string as a sequence of hex bytes            
-      explicit operator ::std::string() const {
-         if (this->IsEmpty())
-            return {};
-
-         ::std::string result;
-         result.resize(this->GetCount() * 2);
-         auto from_bytes = this->template GetRawAs<uint8_t>();
-         auto to_bytes = result.data();
-         for (size_t i = 0; i < result.size(); ++i)
-            ::fmt::format_to(to_bytes + i * 2, ::fmt::runtime("{:02X}"), from_bytes[i]);
-         return result;
-      }
+      /// Conversion to Text as a sequence of hex bytes                       
+      //explicit operator Text() const ;
 
       template<Cid> void GetResolved()         = delete("Nothing to resolve");
       template<Cid> void GetDense(size_t = -1) = delete("Nothing to dereference");
