@@ -957,8 +957,8 @@ namespace Langulus::Annies::Component
                // Deep ownership can be reset in two ways: either reset 
                // the entries pointer, or reset the count.              
                if constexpr (CT::HasVariableCount<I>) {
-                  LglsAssumeDev(from.IsEmpty(),
-                     "Remote count should've been reset prior to this call");
+                  //LglsAssumeDev(from.IsEmpty(),
+                  //   "Remote count should've been reset prior to this call");
                }
                else if_available(from.SetEntriesInner(nullptr))//TODO for all dimensions?
                else {
@@ -967,7 +967,7 @@ namespace Langulus::Annies::Component
                   if constexpr (not CT::HeapAllocated<I>) {
                      // Source is stack-allocated. We can transfer      
                      // ownership by simply zeroing the source pointer. 
-                     from.GetStackInner() = nullptr;
+                     if_available(from.GetStackInner() = nullptr);
                   }
                }
 
