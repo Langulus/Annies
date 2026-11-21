@@ -119,6 +119,7 @@ namespace Langulus::Annies::Component
                      Move{argument.GetHandle()}
                   );
                });
+               if_available(self.SetHashInner(0));
                return self;
             }
          }
@@ -127,6 +128,7 @@ namespace Langulus::Annies::Component
       Id::ForEach([&]<Cid D>{
          ThisCom::template SwapInner<D>(argument);
       });
+      if_available(self.SetHashInner(0));
       return self;
    }
 

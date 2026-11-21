@@ -50,8 +50,13 @@ namespace Langulus::Annies::Component
          (void) index;
          LglsAssumeDev(self.IsEmpty(),
             "Call this only when 'self' is empty inside *At method");
-         if constexpr (requires { index.index; })
-            LglsAssert(index.index == 0, "Explicit Index::At for empty container");
+
+         if constexpr (requires { index.index; }) {
+            LglsAssert(index.index == 0
+            or index == Index::Back  or index == Index::Front
+            or index == Index::First or index == Index::Last,
+            "Explicit Index::At for empty container");
+         }
          else if constexpr (CT::Integer<INDEX>)
             LglsAssert(index == 0, "Explicit index for empty container");
       }

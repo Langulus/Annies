@@ -43,7 +43,7 @@ namespace Langulus::Annies::Inner
       Com::IndexedLinear<>,            // Indexed directly              
       Com::OwnershipStack<>,           // Allocation is referenced      
       Com::OwnershipDeepHeap<>,        // Sparse elements are referenced
-      /*Com::HashStack<>,*/                // Hash can be cached            
+      Com::HashStack<>,                // Hash can be cached            
       Com::Deepening<Many>,            // Makes container deep          
       Com::Insertion<>,                // Allows insertion              
       //Com::InsertionOperators<>,       // << and >> insertion           
@@ -54,7 +54,7 @@ namespace Langulus::Annies::Inner
       Com::Assignment<>,               // Allows assignment             
       Com::Removal<>,                  // Allows clear/reset            
       Com::Conversion<>,               // Allows conversions            
-      Com::Comparison<false ,false>,               // Allows comparisons            
+      Com::Comparison<>,               // Allows comparisons            
       Com::IterationForEach<>,         // ForEach iteration             
       Com::IterationRange<>,           // Ranged iteration              
       Com::Descriptor<>                // Add descriptor interface      
@@ -127,8 +127,8 @@ namespace Langulus::Annies
       template<Disambiguate A1, class...AN>
       constexpr TVerb(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
-            if constexpr ((CT::DeepDense<A1> and not CT::Handle<A1>) or SameAsOneOf<Deint<A1>, TVerb, Verb>) {
-               LglsAssumeUserAndBreak(Same<Deint<A1>, TVerb>,
+            if constexpr ((CT::DeepDense<A1> and not CT::Handle<A1>) or SameAsOneOf<Deint<A1>, TVerb, Verb, V>) {
+               LglsAssumeUserAndBreak(SameAsOneOf<Deint<A1>, TVerb, V>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the verb itself) or Piecewise "
@@ -147,7 +147,10 @@ namespace Langulus::Annies
                      other.mSuccesses = 0;
                }
             }
-            else this->EmplaceConstruct(LglsFwd(a1));
+            else {
+               this->ConstructDefault();
+               this->Insert(LglsFwd(a1));
+            }
          }
          else {
             this->ConstructDefault();
@@ -242,8 +245,8 @@ namespace Langulus::Annies
       
       template<class A>
       constexpr TVerb& operator = (A&& argument) {
-         if constexpr ((CT::DeepDense<A> and not CT::Handle<A>) or SameAsOneOf<Deint<A>, TVerb, Verb>) {
-            LglsAssumeUserAndBreak(Same<Deint<A>, TVerb>,
+         if constexpr ((CT::DeepDense<A> and not CT::Handle<A>) or SameAsOneOf<Deint<A>, TVerb, Verb, V>) {
+            LglsAssumeUserAndBreak(SameAsOneOf<Deint<A>, TVerb, V>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the verb itself) or Assign (if you want to insert the verb as argument) "
@@ -305,14 +308,14 @@ namespace Langulus::Annies
       /// MARK: Access                                                        
       /// Hash the verb (emergent). Each sub container should cache their own,
       /// to make things relatively fast.                                     
-      /*auto GetHash() const -> Hash {
+      auto GetHash() const -> Hash {
          return HashOf(//TODO should charge be ignored?
-            this->GetVerb(),
+            this->GetVerb()/*,
             mContext, 
             ArgumentType::GetHash(),
-            mOutput
+            mOutput*/
          );
-      }*/
+      }
 
       /// Get the verb token/operator and charge, depending on energy         
       ///   @param tokenized [in/out] informs the outside world that a token  
@@ -442,11 +445,15 @@ namespace Langulus::Annies
       ///   @return true if verbs match                                       
       ///   @attention charges are ignored                                    
       constexpr bool operator == (const TVerb& rhs) const {
-         bool same_verb = this->GetVerb() == rhs.GetVerb();
+         /*bool same_verb = this->GetVerb() == rhs.GetVerb();
          bool same_context = mContext == rhs.mContext;
-         bool same_argument = ArgumentType::operator == (rhs.GetRHS());
+         bool same_argument = ArgumentType::CompareEqual(rhs.GetRHS());
          bool same_output = mOutput == rhs.mOutput;
-         return same_verb and same_context and same_argument and same_output;
+         return same_verb and same_context and same_argument and same_output;*/
+         return this->GetVerb() == rhs.GetVerb()
+            and mContext == rhs.mContext
+            and GetRHS().CompareEqual(rhs.GetRHS()) //TODO slow
+            and mOutput == rhs.mOutput;
       }
 
       /// Three-way comparison by precedence only                             

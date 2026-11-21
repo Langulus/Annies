@@ -34,6 +34,7 @@ namespace Langulus::Annies::Component
          // will be handled there                                    
          ThisCom::ConvertMergeInner(offset, LglsFwd(a1));
         (ThisCom::ConvertMergeInner(offset, LglsFwd(an)), ...);
+         if_available(self.SetHashInner(0));
          return self.GetCountInner() - initial_count;
       }
       else {
@@ -64,7 +65,7 @@ namespace Langulus::Annies::Component
 
             try {
                MergeInnerLinear(to, it, counter, LglsFwd(a1));
-               (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
+              (MergeInnerLinear(to, it, counter, LglsFwd(an)), ...);
             }
             catch (...) {
                // Account for throws inside constructors          
@@ -80,6 +81,7 @@ namespace Langulus::Annies::Component
             self.SetCountInner(reduced.size());
             if constexpr (CT::NullTerminated<C>)
                memset(to.GetRaw(), 0, 1);
+            if_available(self.SetHashInner(0));
             return reduced.size();  
          }
 
@@ -149,6 +151,7 @@ namespace Langulus::Annies::Component
          self.SetCountInner(all_count);
          if constexpr (CT::NullTerminated<C>)
             memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
+         if_available(self.SetHashInner(0));
          return reduced.size();
       }
    }
@@ -173,6 +176,7 @@ namespace Langulus::Annies::Component
          // be handled there                                         
          ThisCom::ConvertMergeInner(offset, LglsFwd(a1));
         (ThisCom::ConvertMergeInner(offset, LglsFwd(an)), ...);
+         if_available(self.SetHashInner(0));
          return offset - initial_count;
       }
       else {
@@ -233,6 +237,7 @@ namespace Langulus::Annies::Component
          self.SetCountInner(all_count);
          if constexpr (CT::NullTerminated<C>)
             memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
+         if_available(self.SetHashInner(0));
          return reduced.size();
       }
    }
@@ -271,6 +276,7 @@ namespace Langulus::Annies::Component
       // Insert in a hash table                                      
       auto handle = ThisCom::MergeInnerTableMD(LglsFwd(a1), LglsFwd(an)...);
       self.SetCountInner(all_count);
+      if_available(self.SetHashInner(0));
       return handle;
    }
 
@@ -309,6 +315,7 @@ namespace Langulus::Annies::Component
                        NestIntentOf(other, h.GetValHandle()));
          }
       });
+      if_available(self.SetHashInner(0));
       return self.GetCount() - prev_size;
    }
    

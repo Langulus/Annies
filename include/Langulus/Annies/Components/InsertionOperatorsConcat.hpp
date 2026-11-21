@@ -108,6 +108,14 @@ namespace Langulus::Annies::Component
             lhs.Insert(LglsFwd(rhs));
          return lhs;
       }
+
+      /// MARK: -= self                                                       
+      /// Trims the amount of items on the back                               
+      template<CT::ContainsMany LHS>
+      LHS& operator -= (this LHS& lhs, size_t count) {
+         lhs.Trim(count);
+         return lhs;
+      }
    };
 
    template<class T>

@@ -1401,15 +1401,20 @@ namespace Langulus::Annies::Component
          if (static_cast<const void*>(&self) == static_cast<const void*>(&from))
             return self;
 
-         // Free old data                                               
-         self.Free();
-
          if (not self.CheckIfTypesAreCompatible(from)) {
+            // Free old data after the check, cuz it might throw, and   
+            // we don't want to modify container if it does.            
+            self.Free();
+
             // We have to reset memory and type                         
             if_available(self.ResetAllAllocations());
             if_available(self.ResetAllTypes());
          }
          else {
+            // Free old data after the check, cuz it might throw, and   
+            // we don't want to modify container if it does.            
+            self.Free();
+
             if_available(self.ResetCount()); //TODO not redundant! but why? shouldn't Free set it either way?
          }
 

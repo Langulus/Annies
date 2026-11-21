@@ -192,12 +192,12 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID>
       constexpr auto& GetTagInner(this auto&& self) noexcept {
          auto& member = self.template AccessStack<TaggedStack>();
-         if constexpr (not TagErased) {
+         //if constexpr (not TagErased) {
             // Statically tagged containers generally don't use the     
             // stack member - it's there only for binary compatiblity.  
-            // Set the member only if really, REALLY need by reference. 
-            DecvqAllCast(member) = MetaTagOf<TYPE>();
-         }
+            // Set the member only if really, REALLY need by reference. //TODO WRONG - all tags get reflected as TagErased tag when contained!
+            //DecvqAllCast(member) = MetaTagOf<TYPE>();
+         //}
          return (member);
       }
 
@@ -233,12 +233,20 @@ namespace Langulus::Annies::Component
          }
       }
 
+      /// Default-initialize tag, if known at compile-time                    
+      constexpr void ConstructDefault(this auto& self) noexcept requires (not TagErased) {
+         if not consteval {
+            ThisCom::GetTagInner() = MetaTagOf<TYPE>();
+         }
+      }
+
       /// Transfer from any kind of container, respecting intents             
       ///   @param intent the intent and container to transfer from           
       template<class SELF, CT::Intent I>
       void ConstructFrom(this SELF& self, I&& intent)
       requires (CT::Container<I> and requires { intent->GetTag(); }) {
-         ThisCom::AbsorbTag(DeintCast(intent));
+         //ThisCom::AbsorbTag(DeintCast(intent));
+         ThisCom::GetTagInner() = intent->GetTag();
 
          if constexpr (TagErased) { //TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated. so what about tag constraints?
             // While we are interfacing external memory, we have to     

@@ -192,12 +192,12 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID>
       constexpr auto& GetVerbInner(this auto&& self) noexcept {
          auto& member = self.template AccessStack<VerbedStack>();
-         if constexpr (not VerbErased) {
+         //if constexpr (not VerbErased) {
             // Statically verbed containers generally don't use the     
             // stack member - it's there only for binary compatiblity.  
-            // Set the member only if really, REALLY need by reference. 
-            DecvqAllCast(member) = MetaVerbOf<VERB>();
-         }
+            // Set the member only if really, REALLY need by reference. //TODO WRONG - all verbs get reflected as VerbErased verb when contained!
+            //DecvqAllCast(member) = MetaVerbOf<VERB>();
+         //}
          return (member);
       }
 
@@ -233,12 +233,20 @@ namespace Langulus::Annies::Component
          }
       }
 
+      /// Default-initialize verb, if known at compile-time                   
+      constexpr void ConstructDefault(this auto& self) noexcept requires (not VerbErased) {
+         if not consteval {
+            ThisCom::GetVerbInner() = MetaVerbOf<VERB>();
+         }
+      }
+
       /// Transfer from any kind of container, respecting intents             
       ///   @param intent the intent and container to transfer from           
       template<class SELF, CT::Intent I>
       void ConstructFrom(this SELF& self, I&& intent)
       requires (CT::Container<I> and requires { intent->GetVerb(); }) {
-         ThisCom::AbsorbVerb(DeintCast(intent));
+         //ThisCom::AbsorbVerb(DeintCast(intent));
+         ThisCom::GetVerbInner() = intent->GetVerb();
 
          if constexpr (VerbErased) { //TODO type constraints are either pointless, or should happen only if source is !Copied and !Cloned and !HeapAllocated. so what about verb constraints?
             // While we are interfacing external memory, we have to     

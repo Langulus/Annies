@@ -144,14 +144,16 @@ namespace Langulus::Annies::Component
       ///   @param other the container to check for                           
       ///   @return true if all types (for all dimensions) are compatible     
       template<Cid SID = ID, CT::Container C>
-      constexpr bool CheckIfTypesAreCompatible(C const& other) const noexcept {
+      constexpr bool CheckIfTypesAreCompatible(C const& other) const {
          if constexpr (CT::TypeErased<C>) {
             auto t1 = GetType();
-            auto t2 = other.template GetType<SID>();
-            if (t1 and t2) {
-               return t1.IsSame(t2);
-               /*LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
-                  t1, " is not similar to ", t2, " (dimension #", SID, ")");*/
+            if (t1 /*and t2*/) {
+               auto t2 = other.template GetType<SID>();
+
+               // Throw because LHS type can never change               
+               LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
+               t1, " is not similar to ", t2, " (dimension #", SID, ")");
+               return true;
             }
             else return true;
          }

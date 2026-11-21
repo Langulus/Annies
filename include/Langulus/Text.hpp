@@ -11,6 +11,7 @@
 #include <Langulus/CT/Convertible.hpp>
 #include <Langulus/CT/Serializer.hpp>
 #include <Langulus/CT/DefineConst.hpp>
+#include <Langulus/CT/Time.hpp>
 #include <Langulus/RTTI/MetaConst.hpp>
 #include <Langulus/RTTI/MetaVerb.hpp>
 #include <Langulus/Utils/Byte.hpp>
@@ -690,6 +691,8 @@ LANGULUS_MORPHISM_CONCEPT(CT::Literal, Annies::Text);
 
 /// Convert Character -> Text                                                 
 LANGULUS_MORPHISM_CONCEPT(CT::Character, Annies::Text);
+
+LANGULUS_MORPHISM_CONCEPT_CUSTOM(CT::Time, { return Annies::Text::Format({}, from); }, Annies::Text);
 
 /// Map all pointers as convertible to text                                   
 /*LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {

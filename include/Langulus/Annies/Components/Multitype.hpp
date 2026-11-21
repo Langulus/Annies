@@ -292,15 +292,19 @@ namespace Langulus::Annies::Component
       ///   @param other the container to check for                           
       ///   @return true if all types (for all dimensions) are compatible     
       template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
-      bool CheckIfTypesAreCompatible(this LHS const& self, RHS const& other) noexcept {
+      bool CheckIfTypesAreCompatible(this LHS const& self, RHS const& other) {
          return Id::ForEachAnd([&self,&other]<Cid D> noexcept {
             if constexpr (CT::TypeErased<RHS> or CT::TypeErased<LHS>) {
                auto t1 = self.template GetType<D>();
                auto t2 = other.template GetType<D>();
-               if (t1 and t2) {
-                  return t1.IsSame(t2);
-                  /*LglsAssert(t1.IsSame(t2), "Runtime type mismatch", ": ",
-                     t1, " is not similar to ", t2, " (dimension #", D, ")");*/
+               if (t1 /*and t2*/) {
+                  if (not TypeErased or self.IsTypeConstrained()) {
+                     // Throw because LHS type can never change         
+                     LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
+                     t1, " is not similar to ", t2, " (dimension #", D, ")");
+                     return true;
+                  }
+                  else return t1.IsSame(t2);
                }
                else return true;
             }

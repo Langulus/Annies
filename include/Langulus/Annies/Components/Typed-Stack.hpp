@@ -189,12 +189,18 @@ namespace Langulus::Annies::Component
       ///   @param other the container to check for                           
       ///   @return true if all types (for all dimensions) are compatible     
       template<Cid SID = ID, CT::Container C>
-      constexpr bool CheckIfTypesAreCompatible(this auto const& self, C const& other) noexcept {
+      constexpr bool CheckIfTypesAreCompatible(this auto const& self, C const& other) {
          if constexpr (TypeErased or CT::TypeErased<C>) {
             auto t1 = ThisCom::GetTypeInner();
-            auto t2 = other.template GetType<SID>();
-            if (t1 and t2) {
-               return t1.IsSame(t2);
+            if (t1 /*and t2*/) {
+               auto t2 = other.template GetType<SID>();
+               if (not TypeErased or self.IsTypeConstrained()) {
+                  // Throw because LHS type can never change            
+                  LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
+                  t1, " is not similar to ", t2, " (dimension #", SID, ")");
+                  return true;
+               }
+               else return t1.IsSame(t2);
                /*LglsAssert(t1.IsSame(t2), "Type mismatch", ": ",
                   t1, " is not similar to ", t2, " (dimension #", SID, ")");*/
             }
@@ -564,12 +570,12 @@ namespace Langulus::Annies::Component
       template<Cid SID = ID>
       constexpr auto& GetTypeInner(this auto&& self) noexcept {
          auto& member = self.template AccessStack<TypedStack>();
-         if constexpr (not TypeErased) {
+         //if constexpr (not TypeErased) {
             // Statically typed containers generally don't use the      
             // stack member - it's there only for binary compatiblity.  
-            // Set the member only if really, REALLY need by reference. 
-            DecvqAllCast(member) = MetaDataOf<TYPE>();
-         }
+            // Set the member only if really, REALLY need by reference. //TODO WRONG - all TMany get reflected as TypeErased Many when contained!
+            //DecvqAllCast(member) = MetaDataOf<TYPE>();
+         //}
          return (member);
       }
 
@@ -605,11 +611,20 @@ namespace Langulus::Annies::Component
          //}
       }
 
+      /// Default-initialize type, if known at compile-time                   
+      constexpr void ConstructDefault(this auto& self) noexcept requires (not TypeErased) {
+         if not consteval {
+            ThisCom::GetTypeInner() = MetaDataOf<TYPE>();
+         }
+      }
+
       /// Transfer from any kind of container, respecting intents             
       ///   @param intent the intent and container to transfer from           
-      template<class SELF, CT::Intent I> requires CT::Container<I>
-      void ConstructFrom(this SELF& self, I&& intent) {
-         ThisCom::AbsorbType(LglsFwd(intent));
+      template<class SELF, CT::Intent I>
+      void ConstructFrom(this SELF& self, I&& intent)
+      requires (CT::Container<I> and requires { intent->GetType(); }) {
+         //ThisCom::AbsorbType(LglsFwd(intent));
+         ThisCom::GetTypeInner() = intent->GetType();
 
          //if constexpr (TypeErased) { 
          // While we are interfacing external memory, we have to     

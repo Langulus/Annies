@@ -38,11 +38,12 @@ namespace Langulus::Annies
 
 
 TEST_CASE_TEMPLATE("Test absorb-constructed Pair/TPair", TestType
+   , Types<Pair, ScopedElement<RT>,      ScopedElement<RT>>
+
    // Elements are not allocated by the memory manager                  
    , Types<Pair, ScopedElement<Text>,    ScopedElement<Text>>
    , Types<Pair, ScopedElement<int>,     ScopedElement<int>>
    , Types<Pair, ScopedElement<Any>,     ScopedElement<Any>>
-   , Types<Pair, ScopedElement<RT>,      ScopedElement<RT>>
    , Types<Pair, ScopedElement<char>,    ScopedElement<char>>
 
    , Types<Pair, ScopedElement<Text*>,   ScopedElement<Text*>>

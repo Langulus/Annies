@@ -8,7 +8,7 @@
 #pragma once
 #include <Langulus/Annies/Components/Comparison.hpp>
 
-#define LglsVerboseEnabled 1
+#define LglsVerboseEnabled 0
 #include <Langulus/Logger/ToggleVerbose.hpp>
 
 #define TEMPLATE template<bool CONVERT, bool HASH, Cid ID, Cid...SHARED>
@@ -34,7 +34,7 @@ namespace Langulus::Annies::Component
          return true;
       }
       else {
-         LglsVerboseScoped(Info, "Comparing ",
+         LglsVerboseSection(Verbose, "Comparing ",
             Logger::White, lhs.GetCount(), "x of ", lhs.GetName(),
             Logger::Reset, " with ",
             Logger::White, rhs.GetCount(), "x of ", rhs.GetName()
@@ -58,14 +58,14 @@ namespace Langulus::Annies::Component
             const RTTI::DMeta LT = lhs.template GetType<SID>();
             const RTTI::DMeta RT = rhs.template GetType<SID>();
             if (not LT.IsSame(RT)) { //TODO but what if differently typed pointers to the same virtual objects?
-               LglsVerbose(Info, Logger::Red, "Types differ (type-erased): ",
+               LglsVerbose(Verbose, Logger::Red, "Types differ (type-erased): ",
                   LT, " != ", RT);
                return false;
             }
 
             const auto comparer = LT.GetComparerEqual();
             if (not comparer) {
-               LglsVerbose(Info, Logger::Red, "Type not comparable (type-erased): ", LT);
+               LglsVerbose(Verbose, Logger::Red, "Type not comparable (type-erased): ", LT);
                return false;
             }
             
@@ -75,10 +75,10 @@ namespace Langulus::Annies::Component
                return true;   // Both point to same memory           
 
             if constexpr (HASH and requires { lhs.CompareHashes(rhs); }) {
-               if (LT.GetHasher() and not lhs.CompareHashes(rhs)) {
+               if (LT.GetHasher() and not lhs.CompareHashes(rhs)) {//TODO use hashes only if containers are too big?
                   // Early failure if valid hashes differ - no point 
                   // in comparing anything at all                    
-                  LglsVerbose(Info, Logger::Red, "Different hashes (type-erased): ",
+                  LglsVerbose(Verbose, Logger::Red, "Different hashes (type-erased): ",
                      Logger::Hex(lhs.GetHash()), " != ", Logger::Hex(rhs.GetHash()));
                   return false;
                }
@@ -89,9 +89,9 @@ namespace Langulus::Annies::Component
                   // Batch-compare memory if POD or sparse           
                   const bool same = (0 == ::std::memcmp(raw1, raw2, lhs.GetBytesize()));
                   if (not same) {
-                     LglsVerbose(Info, Logger::Red,
+                     LglsVerbose(Verbose, Logger::Red,
                         "Different POD memory after memcmp (type-erased)");
-                     LglsVerbose(Info, Logger::Red,
+                     LglsVerbose(Verbose, Logger::Red,
                         "Most likely padding bytes filled with junk - pack your struct: ", LT);
                   }
                   return same;
@@ -107,16 +107,16 @@ namespace Langulus::Annies::Component
                      // Make sure hash table spot is valid           
                      const auto idx = t1 - lhs.GetHandle();
                      if (not rhs.IsSlotOccupied(idx)) {
-                        LglsVerbose(Info, Logger::Red,
-                           "Element #", idx, " has no hash table equivalent (typed)");
+                        LglsVerbose(Verbose, Logger::Red,
+                           "Element #", idx, " has no hash table equivalent (type-erased)");
                         return (result = false);
                      }
                   }
 
                   if (not comparer (t1.GetRaw(), t2.GetRaw())) {
                      // Make sure all elements match                 
-                     LglsVerbose(Info, Logger::Red,
-                        "Element #", t1 - lhs.GetHandle(), " differs (typed)");
+                     LglsVerbose(Verbose, Logger::Red,
+                        "Element #", t1 - lhs.GetHandle(), " differs (type-erased)");
                      return (result = false);
                   }
                }
@@ -124,8 +124,8 @@ namespace Langulus::Annies::Component
                   // Spots on tables must both match                 
                   const auto idx = t2 - rhs.GetHandle();
                   if (rhs.IsSlotOccupied(idx)) {
-                     LglsVerbose(Info, Logger::Red,
-                        "Element #", idx, " has no hash table equivalent (typed)");
+                     LglsVerbose(Verbose, Logger::Red,
+                        "Element #", idx, " has no hash table equivalent (type-erased)");
                      return (result = false);
                   }
                }
@@ -149,7 +149,7 @@ namespace Langulus::Annies::Component
             if (lhs_count != rhs_count) {
                // Early failure if count differs, no point in        
                // comparing anything at all                          
-               LglsVerbose(Info, Logger::Red, "Different count (typed): ",
+               LglsVerbose(Verbose, Logger::Red, "Different count (typed): ",
                   lhs.GetCount(), " != ", rhs.GetCount());
                return false;
             }
@@ -159,7 +159,7 @@ namespace Langulus::Annies::Component
 
             if constexpr (not Same<LT, RT>) { //TODO but what if differently typed pointers to the same virtual objects?
                // Types are different                                
-               LglsVerbose(Info, Logger::Red, "Types differ (typed): ",
+               LglsVerbose(Verbose, Logger::Red, "Types differ (typed): ",
                   NameOf<LT>(), " != ", NameOf<RT>());
                return false;
             }
@@ -174,7 +174,7 @@ namespace Langulus::Annies::Component
                      if (not lhs.CompareHashes(rhs)) {
                         // Early failure if valid hashes differ - no 
                         // point in comparing anything at all        
-                        LglsVerbose(Info, Logger::Red, "Different hashes (typed): ",
+                        LglsVerbose(Verbose, Logger::Red, "Different hashes (typed): ",
                            Logger::Hex(lhs.GetHash()), " != ", Logger::Hex(rhs.GetHash()));
                         return false;
                      }
@@ -184,9 +184,9 @@ namespace Langulus::Annies::Component
                      // Batch compare POD data, including pointers   
                      const bool same = (0 == ::std::memcmp(raw1, raw2, lhs.GetBytesize()));
                      if (not same) {
-                        LglsVerbose(Info, Logger::Red,
+                        LglsVerbose(Verbose, Logger::Red,
                            "Different POD memory after memcmp (typed)");
-                        LglsVerbose(Info, Logger::Red,
+                        LglsVerbose(Verbose, Logger::Red,
                            "Most likely padding bytes filled with junk - pack your struct: ", NameOf<LT>());
                      }
                      return same;
@@ -201,7 +201,7 @@ namespace Langulus::Annies::Component
                            // Make sure hash table spot is valid     
                            const auto idx = t1 - lhs.GetHandle();
                            if (not rhs.IsSlotOccupied(idx)) {
-                              LglsVerbose(Info, Logger::Red,
+                              LglsVerbose(Verbose, Logger::Red,
                                  "Element #", idx, " has no hash table equivalent (typed)");
                               return (result = false);
                            }
@@ -209,7 +209,7 @@ namespace Langulus::Annies::Component
 
                         if (*t1.GetRaw() != *t2.GetRaw()) {
                            // Make sure all elements match           
-                           LglsVerbose(Info, Logger::Red,
+                           LglsVerbose(Verbose, Logger::Red,
                               "Element #", t1 - lhs.GetHandle(), " differs (typed)");
                            return (result = false);
                         }
@@ -218,7 +218,7 @@ namespace Langulus::Annies::Component
                         // Spots on tables must both match           
                         const auto idx = t2 - rhs.GetHandle();
                         if (rhs.IsSlotOccupied(idx)) {
-                           LglsVerbose(Info, Logger::Red,
+                           LglsVerbose(Verbose, Logger::Red,
                               "Element #", idx, " has no hash table equivalent (typed)");
                            return (result = false);
                         }
@@ -231,13 +231,151 @@ namespace Langulus::Annies::Component
                   return result;
                }
                else {
-                  LglsVerbose(Info, Logger::Red, "Type not comparable (typed): ", NameOf<LT>());
+                  LglsVerbose(Verbose, Logger::Red, "Type not comparable (typed): ", NameOf<LT>());
                   return false;
                }
             }
          }
          #endif
       }
+   }
+
+   /// MARK: Compare                                                          
+   /// Three-way compare two containers                                       
+   ///   @attention compares all shared dimensions at once                    
+   ///   @attention this doesn't benefit from hashing and will three-way      
+   ///      compare all elements until short-circuited                        
+   ///   @return the ordering result                                          
+   TEMPLATE template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
+   constexpr auto LGLSCOM::Compare(this LHS const& lhs, RHS const& rhs) -> Compared {
+      LglsVerboseScoped(Info, "Comparing ",
+         Logger::White, lhs.GetCount(), "x of ", lhs.GetName(),
+         Logger::Reset, " with ",
+         Logger::White, rhs.GetCount(), "x of ", rhs.GetName()
+      );
+
+      IF_NOT_LANGULUS_FORCE_TYPE_ERASURE(if constexpr (CT::TypeErased<LHS> or CT::TypeErased<RHS>)) {
+         //                                                          
+         // Both container are type-erased - all we can do is call   
+         // the reflected comparison functions                       
+         const auto lhs_count = lhs.GetCount();
+         const auto rhs_count = rhs.GetCount();
+         if (lhs_count != rhs_count) {
+            LglsVerbose(Info, Logger::Red, "Different count (type-erased): ",
+               lhs_count, " != ", rhs_count);
+            return Compared::Unordered;
+         }
+
+         if (not lhs_count)
+            return Compared::Equal;    // Both empty                 
+
+         const RTTI::DMeta LT = lhs.GetType();
+         const RTTI::DMeta RT = rhs.GetType();
+         if (not LT.IsSame(RT)) { //TODO but what if differently typed pointers to the same virtual objects?
+            LglsVerbose(Info, Logger::Red, "Types differ (type-erased): ",
+               LT, " != ", RT);
+            return Compared::Unordered;
+         }
+         
+         const auto comparer = LT.GetComparer();
+         if (comparer) {
+            auto t1 = lhs.template GetRawAs<uint8_t>();
+            auto t2 = rhs.template GetRawAs<uint8_t>();
+            if (t1 == t2) {
+               // Both point to the same memory and have same        
+               // count. Notice that this is valid optimization only 
+               // when the types are comparable. If you have weird   
+               // types that can be different despite occupying same 
+               // memory, you'll have to delete their comparison     
+               // operator.                                          
+               return Compared::Equal;
+            }
+
+            // Call compare operator for each element pair           
+            [[maybe_unused]] const auto t1_start = t1;
+            const auto size = LT.GetSize();
+            const auto t1end = t1 + lhs_count * size;
+            while (t1 < t1end) {
+               const Compared last_compare = comparer(t1, t2);
+               if (last_compare != Compared::Equal) {
+                  LglsVerbose(Info, Logger::Red,
+                     "Element #", (t1 - t1_start) / size, " differs (type-erased)");
+                  return last_compare;
+               }
+
+               t1 += size;
+               t2 += size;
+            }
+            return Compared::Equal;
+         }
+
+         LglsVerbose(Info, Logger::Red, "Type not comparable (type-erased): ", LT);
+         return Compared::Unordered;
+      }
+      #if not LANGULUS(FORCE_TYPE_ERASURE)
+      else {
+         //                                                          
+         // Both blocks are statically-typed - leverage it by using  
+         // static comparisons                                       
+         const auto lhs_count = lhs.GetCount();
+         const auto rhs_count = rhs.GetCount();
+         if (lhs_count != rhs_count) {
+            // Early failure if count differs, no point in        
+            // comparing anything at all                          
+            LglsVerbose(Info, Logger::Red, "Different count (typed): ",
+               lhs_count, " != ", rhs_count);
+            return Compared::Unordered;
+         }
+
+         if (not lhs_count) {
+            // Both empty                                         
+            return Compared::Equal;
+         }
+
+         using LT = TypeOf<LHS>;
+         using RT = TypeOf<RHS>;
+         if constexpr (not Same<LT, RT>) { //TODO but what if differently typed pointers to the same virtual objects?
+            // Types are different                                   
+            LglsVerbose(Info, Logger::Red, "Types differ (typed): ",
+               NameOf<LT>(), " != ", NameOf<RT>());
+            return Compared::Unordered;
+         }
+         else {
+            if constexpr (CT::Comparable<LT, LT>) {
+               auto t1 = lhs.GetRaw();
+               auto t2 = rhs.GetRaw();
+               if (t1 == t2) {
+                  // Both point to the same memory and have same     
+                  // count. Notice that this is valid only when      
+                  // the types are comparable. If you have weird     
+                  // types that can be different despite occupying   
+                  // same memory, you'll have to delete their        
+                  // comparison operator.                            
+                  return Compared::Equal;
+               }
+
+               // Use comparison operator between all elements       
+               const auto t1end = t1 + lhs_count;
+               auto last_compare = Compared::Unordered;
+               while (t1 < t1end and ((last_compare = FromOrdering(*t1 <=> *t2)) == Compared::Equal)) {
+                  ++t1;
+                  ++t2;
+               }
+
+               if (t1 != t1end) {
+                  LglsVerbose(Info, Logger::Red,
+                     "Element #", t1 - lhs.GetRaw(), " differs (typed)");
+               }
+               return last_compare;
+            }
+            else {
+               LglsVerbose(Info, Logger::Red,
+                  "Type not comparable (typed): ", NameOf<LT>());
+               return Compared::Unordered;
+            }
+         }
+      }
+      #endif
    }
 
    /// MARK: CompareOneEqual                                               

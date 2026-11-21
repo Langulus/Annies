@@ -96,7 +96,10 @@ namespace Langulus::Annies
                );
                this->Absorb(LglsFwd(a1));
             }
-            else this->EmplaceConstruct(LglsFwd(a1));
+            else {
+               this->ConstructDefault(); //TODO suboptimal but needed to initialize type. do it in EmplaceConstruct instead at some point
+               this->EmplaceConstruct(LglsFwd(a1));
+            }
          }
          else {
             this->ConstructDefault();
@@ -118,8 +121,10 @@ namespace Langulus::Annies
       /// Construction that emplaces all arguments inside                     
       template<class A1, class...AN>
       constexpr TMany(Inner::Piecewise, A1&& a1, AN&&...an) {
-         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>)
+         if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
+            this->ConstructDefault(); //TODO suboptimal but needed to initialize type. do it in EmplaceConstruct instead at some point
             this->EmplaceConstruct(LglsFwd(a1));
+         }
          else {
             this->ConstructDefault();
             this->Insert(LglsFwd(a1), LglsFwd(an)...);

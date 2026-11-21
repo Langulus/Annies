@@ -746,7 +746,7 @@ namespace Langulus::Annies::Component
          else {
             void* const dst = self.template GetRawVoid<SID>();
 
-            if constexpr (CT::TypeErased<C, IT>) {
+            /*if constexpr (CT::TypeErased<C, IT>) {
                //                                                       
                // This container is type-erased                         
                LglsAssumeDev((self.template IsSame<IT, SID>()), "Type mismatch");
@@ -768,7 +768,7 @@ namespace Langulus::Annies::Component
                else
                   static_assert(false, "Unrecognized intent");
             }
-            else {
+            else {*/
                //                                                       
                // This container is statically-typed                    
                if constexpr (CT::Typed<C>) {
@@ -781,7 +781,7 @@ namespace Langulus::Annies::Component
                else LglsAssumeDev((self.template IsSame<IT, SID>()), "Type mismatch");
 
                IntentNew(dst, LglsFwd(intent));
-            }
+            //}
 
             if_available(self.template EmplaceEntries<SID>(LglsFwd(intent)));
          }

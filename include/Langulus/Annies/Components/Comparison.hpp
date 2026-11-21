@@ -288,7 +288,7 @@ namespace Langulus::Annies::Component
       ///      compare all elements until short-circuited                     
       ///   @return the ordering result                                       
       template<CT::Container LHS, CT::Container RHS> requires CT::NoIntent<RHS>
-      constexpr auto Compare(this LHS const& lhs, RHS const& rhs) /*-> Ordering<LHS>*/ {
+      constexpr auto Compare(this LHS const& lhs, RHS const& rhs) -> Compared; /*-> Ordering<LHS>*/ /*{
          LglsVerboseScoped(Info, "Comparing ",
             Logger::White, lhs.GetCount(), "x of ", lhs.GetName(),
             Logger::Reset, " with ",
@@ -417,7 +417,7 @@ namespace Langulus::Annies::Component
             }
          }
          #endif
-      }
+      }*/
 
       /// MARK: CompareOneEqual                                               
       /// Equality-compare with the first contained element                   

@@ -115,6 +115,7 @@ namespace Langulus::Annies::Component
       }
 
       self.GetCountInner() = resrv;
+      if_available(self.SetHashInner(0));
       return self;
    }
 
@@ -137,6 +138,7 @@ namespace Langulus::Annies::Component
       }
 
       self.GetCountInner() = resrv;
+      if_available(self.SetHashInner(0));
       return self;
    }
 
@@ -170,6 +172,7 @@ namespace Langulus::Annies::Component
          // be handled there                                         
          ThisCom::ConvertInsertInner(offset, LglsFwd(a1));
         (ThisCom::ConvertInsertInner(offset, LglsFwd(an)), ...);
+         if_available(self.SetHashInner(0));
          return self.GetCountInner() - initial_count;
       }
       else {
@@ -211,6 +214,7 @@ namespace Langulus::Annies::Component
                                              DT {Langulus::Piecewise, LglsFwd(an)}...};*///TODO actually insert at the desired place
                                              
             new (&self) C {Langulus::Absorb, Abandon{deepened}};
+            if_available(self.SetHashInner(0));
             return 2 + sizeof...(an);
          }
          else LglsError("Can't deepen to incorporate differently typed arguments");
@@ -247,6 +251,7 @@ namespace Langulus::Annies::Component
             self.SetCountInner(rhs_count);
             if constexpr (CT::NullTerminated<C>)
                memset(to.GetRaw(), 0, 1);
+            if_available(self.SetHashInner(0));
             return rhs_count;  
          }
 
@@ -312,6 +317,7 @@ namespace Langulus::Annies::Component
          self.SetCountInner(all_count);
          if constexpr (CT::NullTerminated<C>)
             memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
+         if_available(self.SetHashInner(0));
          return rhs_count;
       }
    }
@@ -390,6 +396,7 @@ namespace Langulus::Annies::Component
          // be handled there                                         
          ThisCom::ConvertInsertInner(offset, LglsFwd(a1));
         (ThisCom::ConvertInsertInner(offset, LglsFwd(an)), ...);
+         if_available(self.SetHashInner(0));
          return offset - initial_count;
       }
       else {
@@ -433,6 +440,7 @@ namespace Langulus::Annies::Component
                                              DT {Langulus::Piecewise, LglsFwd(a1)},
                                              DT {Langulus::Piecewise, LglsFwd(an)}...};*/
             new (&self) C {Langulus::Absorb, Abandon{deepened}};
+            if_available(self.SetHashInner(0));
             return 2 + sizeof...(an);
          }
          else LglsError("Can't deepen to incorporate differently typed arguments");
@@ -460,6 +468,7 @@ namespace Langulus::Annies::Component
          self.SetCountInner(all_count);
          if constexpr (CT::NullTerminated<C>)
             memset(to.GetRaw(), 0, 1);
+         if_available(self.SetHashInner(0));
          return rhs_count;
       }
    }
@@ -538,6 +547,7 @@ namespace Langulus::Annies::Component
 
       // Complete success                                            
       self.SetCountInner(previousCount + count);
+      if_available(self.SetHashInner(0));
       return count;
    }
 
@@ -638,6 +648,9 @@ namespace Langulus::Annies::Component
          self.SetCountInner(rhs_count);
          if constexpr (CT::NullTerminated<C>)
             memset(dst.GetRaw(), 0, 1);
+
+         // Update hash                                                 
+         if_available(self.SetHashInner(0));
          return rhs_count;  
       }
 
@@ -699,6 +712,7 @@ namespace Langulus::Annies::Component
       self.SetCountInner(all_count);
       if constexpr (CT::NullTerminated<C>)
          memset((self.GetHandle() + all_count).GetRaw(), 0, 1);
+      if_available(self.SetHashInner(0));
       return rhs_count;
    }
 
@@ -748,6 +762,7 @@ namespace Langulus::Annies::Component
       self.SetCountInner(all_count);
       if constexpr (CT::NullTerminated<C>)
          memset(to.GetRaw(), 0, 1);
+      if_available(self.SetHashInner(0));
       return rhs_count;
    }
       

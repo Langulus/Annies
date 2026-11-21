@@ -65,6 +65,7 @@ namespace Langulus::Annies::Component
 
       if constexpr (CT::NullTerminated<C>)
          memset((self.GetHandle() + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
+      if_available(self.SetHashInner(0));
       return removed;
    }
 
@@ -116,6 +117,7 @@ namespace Langulus::Annies::Component
       A result = self.GetHandle();
       if constexpr (CT::NullTerminated<C>)
          memset((result + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
+      if_available(self.SetHashInner(0));
       return (result + offset) - 1;
    }
 
@@ -150,6 +152,7 @@ namespace Langulus::Annies::Component
          return 0;
 
       ThisCom::EraseFromTable(found.ForceMutable());
+      if_available(self.SetHashInner(0));
       return 1;
    }
 
@@ -168,6 +171,7 @@ namespace Langulus::Annies::Component
          "Handle doesn't belong to this container");
 
       ThisCom::EraseFromTable(key.ForceMutable());
+      if_available(self.SetHashInner(0));
       return key - 1;
    }
 
@@ -246,6 +250,7 @@ namespace Langulus::Annies::Component
 
       if constexpr (CT::NullTerminated<C>)
          memset((self.GetHandle() + self.GetCount()).GetRaw(), 0, 1);//TODO bit out there, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
+      if_available(self.SetHashInner(0));
       return count;
    }
    
@@ -271,6 +276,7 @@ namespace Langulus::Annies::Component
                if (desiredCount)
                   memset((self.GetHandle() + desiredCount).GetRaw(), 0, 1);
             }
+            if_available(self.SetHashInner(0));
             return;
          }
       }
@@ -282,6 +288,7 @@ namespace Langulus::Annies::Component
                if (desiredCount)
                   memset((self.GetHandle() + desiredCount).GetRaw(), 0, 1);
             }
+            if_available(self.SetHashInner(0));
             return;
          }
       }
@@ -304,6 +311,7 @@ namespace Langulus::Annies::Component
          if (desiredCount)
             memset((self.GetHandle() + desiredCount).GetRaw(), 0, 1);//TODO bit farfetched, but notice that these always occur after a SetCount/SetCountInner. Maybe just add null byte there? makes perfect sense when you think about it.
       }
+      if_available(self.SetHashInner(0));
    }
 
    /// Destroy all elements but don't deallocate memory unless we really   
@@ -323,6 +331,7 @@ namespace Langulus::Annies::Component
             self.ResetAllAllocations();
          }
          if_available(self.DisableDisowned());
+         if_available(self.SetHashInner(1));
          return;
       }
       
@@ -336,6 +345,7 @@ namespace Langulus::Annies::Component
          if_available(self.SetCoverageTableInner(nullptr));
          self.ResetCount();
          if_available(self.DisableDisowned());
+         if_available(self.SetHashInner(1));
          return;
       }
 
@@ -358,6 +368,7 @@ namespace Langulus::Annies::Component
       }
 
       if_available(self.DisableDisowned());
+      if_available(self.SetHashInner(1));
    }
 
    /// Destroy all elements. Specialized for stack-based containers.       
@@ -370,6 +381,7 @@ namespace Langulus::Annies::Component
          if constexpr (CT::Sparse<TypeOf<C, D>>)
             self.GetStackInner() = nullptr;
       });
+      if_available(self.SetHashInner(0));
    }
 
    /// Destroy all elements, deallocate memory and reset state and type.   
@@ -381,6 +393,7 @@ namespace Langulus::Annies::Component
       if_available(self.ResetAllAllocations());
       if_available(self.ResetState());
       if_available(self.ResetAllTypes());
+      if_available(self.SetHashInner(1));
    }
 
    /// Erases an element at a specific index from a hash table             

@@ -214,30 +214,32 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
 
       if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed referred container") {
-            if (not pack_referred1.IsSame(element->GetType())) {
-               auto misabsorb_refer = [&](T& a) {
-                  REQUIRE_THROWS(a.AssignAbsorb(*element));
-                  Many_CheckState_OwnedFull<E>(a);
-                  Many_CheckState_ContainsOne(a, Refer(originalElement));
-               };
+            if constexpr (CT::Typed<T>) {
+               if (not pack_referred1.IsSame(element->GetType())) {
+                  auto misabsorb_refer = [&](T& a) {
+                     REQUIRE_THROWS(a.AssignAbsorb(*element));
+                     Many_CheckState_OwnedFull<E>(a);
+                     Many_CheckState_ContainsOne(a, Refer(originalElement));
+                  };
 
-               misabsorb_refer(pack_referred1);
-               misabsorb_refer(pack_referred2);
-               misabsorb_refer(pack_copied);
-               misabsorb_refer(pack_cloned);
-               misabsorb_refer(pack_moved1);
-               misabsorb_refer(pack_moved2);
-               misabsorb_refer(pack_abandoned);
-               misabsorb_refer(pack_disowned);
-               return;
+                  misabsorb_refer(pack_referred1);
+                  misabsorb_refer(pack_referred2);
+                  misabsorb_refer(pack_copied);
+                  misabsorb_refer(pack_cloned);
+                  misabsorb_refer(pack_moved1);
+                  misabsorb_refer(pack_moved2);
+                  misabsorb_refer(pack_abandoned);
+                  misabsorb_refer(pack_disowned);
+                  return;
+               }
             }
 
-            auto absorb_refer = [&](T& a, [[maybe_unused]] const char* intent) {
+            auto absorb_refer = [&](T& a, [[maybe_unused]] const char* intent, int uses) {
                a.AssignAbsorb(*element);
 
                Many_Helper_TestSame(a, *element);
                REQUIRE(a.GetUses() == element->GetUses());
-               REQUIRE(a.GetUses() == 2);
+               REQUIRE(a.GetUses() == uses);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
                BenchmarkManyStd("Piecewise/" + intent + "/AssignAbsorb/Refer", 30, 100,
@@ -247,12 +249,12 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
                );
             };
 
-            absorb_refer(pack_referred1, "Refer");
-            absorb_refer(pack_copied,    "Copy");
-            absorb_refer(pack_cloned,    "Clone");
-            absorb_refer(pack_moved1,    "Move");
-            absorb_refer(pack_abandoned, "Abandon");
-            absorb_refer(pack_disowned,  "Disown");
+            absorb_refer(pack_referred1, "Refer",     2);
+            absorb_refer(pack_copied,    "Copy",      3);
+            absorb_refer(pack_cloned,    "Clone",     4);
+            absorb_refer(pack_moved1,    "Move",      5);
+            absorb_refer(pack_abandoned, "Abandon",   6);
+            absorb_refer(pack_disowned,  "Disown",    7);
          }
       }
       
@@ -281,31 +283,33 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
 
       if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed cloned container") {
-            if (not pack_referred1.IsSame(element->GetType())) {
-               auto misabsorb_clone = [&](T& a) {
-                  REQUIRE_THROWS(a.AssignAbsorb(Clone(*element)));
-                  Many_CheckState_OwnedFull<E>(a);
-                  Many_CheckState_ContainsOne(a, Clone(originalElement));
-               };
+            if constexpr (CT::Typed<T>) {
+               if (not pack_referred1.IsSame(element->GetType())) {
+                  auto misabsorb_clone = [&](T& a) {
+                     REQUIRE_THROWS(a.AssignAbsorb(Clone(*element)));
+                     Many_CheckState_OwnedFull<E>(a);
+                     Many_CheckState_ContainsOne(a, Clone(originalElement));
+                  };
 
-               misabsorb_clone(pack_referred1);
-               misabsorb_clone(pack_referred2);
-               misabsorb_clone(pack_copied);
-               misabsorb_clone(pack_cloned);
-               misabsorb_clone(pack_moved1);
-               misabsorb_clone(pack_moved2);
-               misabsorb_clone(pack_abandoned);
-               misabsorb_clone(pack_disowned);
-               return;
+                  misabsorb_clone(pack_referred1);
+                  misabsorb_clone(pack_referred2);
+                  misabsorb_clone(pack_copied);
+                  misabsorb_clone(pack_cloned);
+                  misabsorb_clone(pack_moved1);
+                  misabsorb_clone(pack_moved2);
+                  misabsorb_clone(pack_abandoned);
+                  misabsorb_clone(pack_disowned);
+                  return;
+               }
             }
 
             auto absorb_clone = [&](T& a, [[maybe_unused]] const char* intent) {
                a.AssignAbsorb(Clone(*element));
 
                Many_CheckState_OwnedFull<TypeOf<E>>(*element);
-               Many_Helper_TestSame(a, *element);
-               REQUIRE(a.GetUses() == 2);
-               REQUIRE(a.GetAllocation() == element->GetAllocation());
+               REQUIRE(a == *element);
+               REQUIRE(a.GetUses() == 1);
+               REQUIRE(a.GetAllocation() != element->GetAllocation());
 
                BenchmarkManyStd("Piecewise/" + intent + "/AssignAbsorb/Clone", 30, 100,
                   a.AssignAbsorb(Clone(*element)),             a.AssignAbsorb(Clone(*originalElement)),
@@ -348,31 +352,33 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
 
       if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed copied container") {
-            if (not pack_referred1.IsSame(element->GetType())) {
-               auto misabsorb_copy = [&](T& a) {
-                  REQUIRE_THROWS(a.AssignAbsorb(Copy(*element)));
-                  Many_CheckState_OwnedFull<E>(a);
-                  Many_CheckState_ContainsOne(a, Refer(originalElement));
-               };
+            if constexpr (CT::Typed<T>) {
+               if (not pack_referred1.IsSame(element->GetType())) {
+                  auto misabsorb_copy = [&](T& a) {
+                     REQUIRE_THROWS(a.AssignAbsorb(Copy(*element)));
+                     Many_CheckState_OwnedFull<E>(a);
+                     Many_CheckState_ContainsOne(a, Refer(originalElement));
+                  };
 
-               misabsorb_copy(pack_referred1);
-               misabsorb_copy(pack_referred2);
-               misabsorb_copy(pack_copied);
-               misabsorb_copy(pack_cloned);
-               misabsorb_copy(pack_moved1);
-               misabsorb_copy(pack_moved2);
-               misabsorb_copy(pack_abandoned);
-               misabsorb_copy(pack_disowned);
-               return;
+                  misabsorb_copy(pack_referred1);
+                  misabsorb_copy(pack_referred2);
+                  misabsorb_copy(pack_copied);
+                  misabsorb_copy(pack_cloned);
+                  misabsorb_copy(pack_moved1);
+                  misabsorb_copy(pack_moved2);
+                  misabsorb_copy(pack_abandoned);
+                  misabsorb_copy(pack_disowned);
+                  return;
+               }
             }
 
             auto absorb_copy = [&](T& a, [[maybe_unused]] const char* intent) {
                a.AssignAbsorb(Copy(*element));
 
                Many_CheckState_OwnedFull<TypeOf<E>>(*element);
-               Many_Helper_TestSame(a, *element);
-               REQUIRE(a.GetUses() == 2);
-               REQUIRE(a.GetAllocation() == element->GetAllocation());
+               REQUIRE(a == *element);
+               REQUIRE(a.GetUses() == 1);
+               REQUIRE(a.GetAllocation() != element->GetAllocation());
 
                BenchmarkManyStd("Piecewise/" + intent + "/AssignAbsorb/Copy", 30, 100,
                   a.AssignAbsorb(Copy(*element)),              a.AssignAbsorb(Copy(*originalElement)),
@@ -420,36 +426,38 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
 
       if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed moved container") {
-            if (not pack_referred1.IsSame(element->GetType())) {
-               auto misabsorb_move = [&](T& a) {
-                  auto movable = *element;
-                  REQUIRE_THROWS(a.AssignAbsorb(::std::move(movable)));
+            if constexpr (CT::Typed<T>) {
+               if (not pack_referred1.IsSame(element->GetType())) {
+                  auto misabsorb_move = [&](T& a) {
+                     auto movable = *element;
+                     REQUIRE_THROWS(a.AssignAbsorb(::std::move(movable)));
 
-                  Many_CheckState_OwnedFull<E>(a);
-                  Many_CheckState_ContainsOne(a, Refer(originalElement));
-                  Many_CheckState_OwnedFull<int>(movable);
-                  REQUIRE(movable.GetUses() == 2);
-                  REQUIRE(movable.template As<int>() == 555);
+                     Many_CheckState_OwnedFull<E>(a);
+                     Many_CheckState_ContainsOne(a, Refer(originalElement));
+                     Many_CheckState_OwnedFull<int>(movable);
+                     REQUIRE(movable.GetUses() == 2);
+                     REQUIRE(movable.template As<int>() == 555);
+                  };
+
+                  misabsorb_move(pack_referred1);
+                  misabsorb_move(pack_referred2);
+                  misabsorb_move(pack_copied);
+                  misabsorb_move(pack_cloned);
+                  misabsorb_move(pack_moved1);
+                  misabsorb_move(pack_moved2);
+                  misabsorb_move(pack_abandoned);
+                  misabsorb_move(pack_disowned);
+                  return;
                };
+            }
 
-               misabsorb_move(pack_referred1);
-               misabsorb_move(pack_referred2);
-               misabsorb_move(pack_copied);
-               misabsorb_move(pack_cloned);
-               misabsorb_move(pack_moved1);
-               misabsorb_move(pack_moved2);
-               misabsorb_move(pack_abandoned);
-               misabsorb_move(pack_disowned);
-               return;
-            };
-
-            auto absorb_move = [&](T& a, [[maybe_unused]] const char* intent) {
+            auto absorb_move = [&](T& a, [[maybe_unused]] const char* intent, int uses) {
                auto movable = *element;
                a.AssignAbsorb(::std::move(movable));
 
                Many_CheckState_Default<TypeOf<E>>(movable);
                Many_Helper_TestSame(a, *element);
-               REQUIRE(a.GetUses() == 2);
+               REQUIRE(a.GetUses() == uses);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
                BenchmarkManyStd("Piecewise/" + intent + "/AssignAbsorb/Move", 30, 100,
@@ -461,12 +469,12 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
                );
             };
 
-            absorb_move(pack_referred1, "Refer");
-            absorb_move(pack_copied,    "Copy");
-            absorb_move(pack_cloned,    "Clone");
-            absorb_move(pack_moved1,    "Move");
-            absorb_move(pack_abandoned, "Abandon");
-            absorb_move(pack_disowned,  "Disown");
+            absorb_move(pack_referred1, "Refer",   2);
+            absorb_move(pack_copied,    "Copy",    3);
+            absorb_move(pack_cloned,    "Clone",   4);
+            absorb_move(pack_moved1,    "Move",    5);
+            absorb_move(pack_abandoned, "Abandon", 6);
+            absorb_move(pack_disowned,  "Disown",  7);
          }
       }
 
@@ -493,35 +501,30 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
 
       if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed disowned container") {
-            if (not pack_referred1.IsSame(element->GetType())) {
-               auto misabsorb_disown = [&](T& a) {
-                  REQUIRE_THROWS(a.AssignAbsorb(Disown(*element)));
-                  Many_CheckState_OwnedFull<E>(a);
-                  Many_CheckState_ContainsOne(a, Disown(originalElement));
-               };
+            if constexpr (CT::Typed<T>) {
+               if (not pack_referred1.IsSame(element->GetType())) {
+                  auto misabsorb_disown = [&](T& a) {
+                     REQUIRE_THROWS(a.AssignAbsorb(Disown(*element)));
+                     Many_CheckState_OwnedFull<E>(a);
+                     Many_CheckState_ContainsOne(a, Disown(originalElement));
+                  };
 
-               misabsorb_disown(pack_referred1);
-               misabsorb_disown(pack_referred2);
-               misabsorb_disown(pack_copied);
-               misabsorb_disown(pack_cloned);
-               misabsorb_disown(pack_moved1);
-               misabsorb_disown(pack_moved2);
-               misabsorb_disown(pack_abandoned);
-               misabsorb_disown(pack_disowned);
-               return;
+                  misabsorb_disown(pack_referred1);
+                  misabsorb_disown(pack_referred2);
+                  misabsorb_disown(pack_copied);
+                  misabsorb_disown(pack_cloned);
+                  misabsorb_disown(pack_moved1);
+                  misabsorb_disown(pack_moved2);
+                  misabsorb_disown(pack_abandoned);
+                  misabsorb_disown(pack_disowned);
+                  return;
+               }
             }
 
             auto absorb_disown = [&](T& a, [[maybe_unused]] const char* intent) {
                a.AssignAbsorb(Disown(*element));
 
-               REQUIRE(a.GetRaw() == element->GetRaw());
-               REQUIRE(a.IsExact(element->GetType()));
-               REQUIRE(a == *element);
-               REQUIRE(a.IsDeep() == element->IsDeep());
-               REQUIRE(a.IsConstant() != element->IsConstant());
-               REQUIRE(a.GetUnconstrainedState() == element->GetUnconstrainedState());
-               REQUIRE(a.GetUses() == 0);
-               REQUIRE_FALSE(a.GetAllocation());
+               Many_Helper_TestSame(a, *element, false);
 
                BenchmarkManyStd("Piecewise/" + intent + "/AssignAbsorb/Disown", 30, 100,
                   a.AssignAbsorb(Disown(*element)),         a.AssignAbsorb(Disown(*originalElement)),
@@ -569,36 +572,38 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
 
       if constexpr (CT::DeepDense<E>) {
          WHEN("Assigned and absorbed abandoned container") {
-            if (not pack_referred1.IsSame(element->GetType())) {
-               auto misabsorb_abandon = [&](T& a) {
-                  auto movable = *element;
-                  REQUIRE_THROWS(a.AssignAbsorb(Abandon(movable)));
+            if constexpr (CT::Typed<T>) {
+               if (not pack_referred1.IsSame(element->GetType())) {
+                  auto misabsorb_abandon = [&](T& a) {
+                     auto movable = *element;
+                     REQUIRE_THROWS(a.AssignAbsorb(Abandon(movable)));
 
-                  Many_CheckState_OwnedFull<E>(a);
-                  Many_CheckState_ContainsOne(a, Refer(originalElement));
-                  Many_CheckState_OwnedFull<int>(movable);
-                  REQUIRE(movable.GetUses() == 2);
-                  REQUIRE(movable.template As<int>() == 555);
-               };
+                     Many_CheckState_OwnedFull<E>(a);
+                     Many_CheckState_ContainsOne(a, Refer(originalElement));
+                     Many_CheckState_OwnedFull<int>(movable);
+                     REQUIRE(movable.GetUses() == 2);
+                     REQUIRE(movable.template As<int>() == 555);
+                  };
 
-               misabsorb_abandon(pack_referred1);
-               misabsorb_abandon(pack_referred2);
-               misabsorb_abandon(pack_copied);
-               misabsorb_abandon(pack_cloned);
-               misabsorb_abandon(pack_moved1);
-               misabsorb_abandon(pack_moved2);
-               misabsorb_abandon(pack_abandoned);
-               misabsorb_abandon(pack_disowned);
-               return;
+                  misabsorb_abandon(pack_referred1);
+                  misabsorb_abandon(pack_referred2);
+                  misabsorb_abandon(pack_copied);
+                  misabsorb_abandon(pack_cloned);
+                  misabsorb_abandon(pack_moved1);
+                  misabsorb_abandon(pack_moved2);
+                  misabsorb_abandon(pack_abandoned);
+                  misabsorb_abandon(pack_disowned);
+                  return;
+               }
             }
 
-            auto absorb_abandon = [&](T& a, [[maybe_unused]] const char* intent) {
+            auto absorb_abandon = [&](T& a, [[maybe_unused]] const char* intent, int uses) {
                auto movable = *element;
                a.AssignAbsorb(Abandon(movable));
 
                Many_CheckState_Abandoned<TypeOf<E>>(movable);
                Many_Helper_TestSame(a, *element);
-               REQUIRE(a.GetUses() == 2);
+               REQUIRE(a.GetUses() == uses);
                REQUIRE(a.GetAllocation() == element->GetAllocation());
 
                BenchmarkManyStd("Piecewise/" + intent + "/AssignAbsorb/Abandon", 30, 100,
@@ -611,12 +616,12 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Many/TMany", TestType
                );
             };
 
-            absorb_abandon(pack_referred1, "Refer");
-            absorb_abandon(pack_copied,    "Copy");
-            absorb_abandon(pack_cloned,    "Clone");
-            absorb_abandon(pack_moved1,    "Move");
-            absorb_abandon(pack_abandoned, "Abandon");
-            absorb_abandon(pack_disowned,  "Disown");
+            absorb_abandon(pack_referred1, "Refer",   2);
+            absorb_abandon(pack_copied,    "Copy",    3);
+            absorb_abandon(pack_cloned,    "Clone",   4);
+            absorb_abandon(pack_moved1,    "Move",    5);
+            absorb_abandon(pack_abandoned, "Abandon", 6);
+            absorb_abandon(pack_disowned,  "Disown",  7);
          }
       }
 

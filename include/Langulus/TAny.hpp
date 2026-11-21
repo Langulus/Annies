@@ -72,7 +72,10 @@ namespace Langulus::Annies
             );
             this->Absorb(LglsFwd(arguments)...);
          }
-         else this->EmplaceConstruct(LglsFwd(arguments)...);
+         else {
+            this->ConstructDefault(); //TODO suboptimal but needed to initialize type. do it in EmplaceConstruct instead at some point
+            this->EmplaceConstruct(LglsFwd(arguments)...);
+         }
       }
       
       /// Construction that absorbs the provided container                    
@@ -84,6 +87,7 @@ namespace Langulus::Annies
       /// Emplaces T inside, using A... as constructor arguments              
       template<class...A>
       constexpr TAny(Inner::Piecewise, A&&...arguments) {
+         this->ConstructDefault(); //TODO suboptimal but needed to initialize type. do it in EmplaceConstruct instead at some point
          this->EmplaceConstruct(LglsFwd(arguments)...);
       }
 
