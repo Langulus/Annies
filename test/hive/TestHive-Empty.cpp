@@ -528,11 +528,11 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
          REQUIRE(pack.GetReserved() >= 1);
 
          if constexpr (CT::Typed<T>) {
-            REQUIRE(*pack == i666backup);
+            REQUIRE(pack[0] == i666backup);
             if constexpr (CT::Handle<decltype(instance)>)
-               REQUIRE(&*pack == &*instance);
+               REQUIRE(&pack[0] == &*instance);
             else
-               REQUIRE(&*pack == &instance);
+               REQUIRE(&pack[0] == &instance);
          }
 
          BenchmarkHive("Empty/Emplace", 30,
@@ -553,7 +553,7 @@ TEST_CASE_TEMPLATE("Test empty hive", TestType
       WHEN("Emplace (insert, describe)") {
          ScopedE i666{666};
          const auto i666backup = *i666;
-         Many descriptor {Piecewise, ::std::move(*i666)};
+         Neat descriptor {::std::move(*i666)};
          if constexpr (CT::DescribeConstructible<E> and not CT::Container<T>) {
             decltype(auto) instance = pack.template Emplace<E>(Describe{descriptor});
             Hive_CheckState_OwnedFull<E>(pack);

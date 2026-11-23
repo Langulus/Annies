@@ -151,7 +151,9 @@ namespace Langulus::Annies::Component
          if (not a)
             return;
 
-         LglsAssumeDev(a->GetUses() >= 1, "Bad memory dereferencing");
+         if constexpr (DEALLOCATE)
+            LglsAssumeDev(a->GetUses() >= 1, "Bad memory dereferencing");
+            
          if (a->GetUses() != 1) {
             // Memory is used elsewhere, just dereference once          
             if constexpr (DEALLOCATE)

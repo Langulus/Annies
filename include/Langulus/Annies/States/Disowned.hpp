@@ -73,8 +73,9 @@ namespace Langulus::Annies::Component::State
       ///      a container.                                                   
       template<class SELF, CT::Disowned I>
       requires (CT::Container<I> and Dynamic and SELF::HasStates)
-      constexpr void ConstructFrom(this SELF& self, I&&) noexcept {
-         ThisCom::EnableDisowned();
+      constexpr void ConstructFrom(this SELF& self, I&& intent) noexcept {
+         if (not intent->IsEmpty())
+            ThisCom::EnableDisowned();
       }
    };
 

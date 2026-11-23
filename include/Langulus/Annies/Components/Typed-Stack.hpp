@@ -414,7 +414,7 @@ namespace Langulus::Annies::Component
       }
 
       /// Dereference the first element inside the container                  
-      constexpr decltype(auto) operator * (this auto&& self) assumptious
+      /*constexpr decltype(auto) operator * (this auto&& self) assumptious
       requires (not TypeErased) {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
          return *self.GetRaw();
@@ -425,7 +425,7 @@ namespace Langulus::Annies::Component
       requires (not TypeErased and ::std::is_class_v<Decay<TYPE>>) {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
          return &DenseCast(self.GetRaw());
-      }
+      }*/
 
       /// Set the contained data type if possible.                            
       /// This is still used if statically typed - checks if types are        

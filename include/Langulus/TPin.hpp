@@ -24,59 +24,6 @@ namespace Langulus::Annies::Inner
 {
    template<CT::NotVoid T>
    using TPinBase = Tif<CT::Dense<T>, TOwn<T>, TRef<T>>;
-
-   /*//WORKAROUND
-   template<CT::NotVoid T> requires CT::NotReference<T>
-   using TOwnPinnedBase = Com::Container<
-      Com::State::Pinned<>,               // Added pin state            
-      Com::TypedStatic<DMeta, T>,         // Statically typed           
-      Com::Stack<T>,                      // Element on the stack       
-      Com::CountStatic<1u>,               // Statically sized           
-      Com::Deepening<Many>,               // Makes container deep       
-      Com::Emplacement<>,                 // Can be emplaced            
-      Com::Assignment<>,                  // Can be reassigned          
-      Com::Comparison<>                   // Can be compared            
-   >;
-
-   //WORKAROUND
-   template<class T> requires (not ::std::is_reference_v<T>)
-   using TRefPinnedBase = Com::Container<
-      Com::State::Pinned<>,               // Added pin state            
-      Com::TypedStatic<DMeta, T>,         // Statically typed           
-      Com::Stack<T>,
-      Com::CountStatic<1u>,               // Statically sized           
-      Com::ReserveEmergent<>,             // Reserve derived from alloc 
-      //Com::OwnershipStack<>,              // Allocation is referenced   
-      //Com::OwnershipDeepHeap<>,           // Individual references      //TODO what if we initialize heap using some arbitrary pointer and there is no entry data beside it?? OwnershipDeepStack instead? with a static array?
-      Com::OwnershipDeepEmergent<>,       // Individual references      //TODO temporary
-      Com::Deepening<Many>,               // Makes container deep       
-      Com::Emplacement<>,                 // Can be emplaced            
-      Com::Assignment<>,                  // Can be reassigned          
-      Com::Comparison<false, false>,      // Can be compared            
-      Com::Removal<>                      // Can be cleared/reset       
-   >;
-
-   //WORKAROUND
-   template<CT::NotVoid T>
-   using TPinBase = Tif<CT::Dense<T>, TOwnPinnedBase<T>, TRefPinnedBase<T>>;*/
-
-   /*template<CT::NotVoid T>
-   using TPinBase = Tif<CT::Dense<T>,
-      typename TOwnBase<T>::template Include<Com::State::Pinned<>>,
-      typename TRefBase<T>::template Include<Com::State::Pinned<>>
-   >;*///TODO this is excellent solution but adding states is currently ignored cuz Include doesn't discard the Com::StateStack<>
-
-   /*template<CT::NotVoid T>//TODO old thing - delete it eventually
-   using TPinBase = Com::Container<
-      Com::State::Pinned<>,               // Allows pinning             
-      Com::TypedStatic<DMeta, T>,         // Statically typed           
-      Com::Stack<T>,                      // Element on the stack       
-      Com::CountStatic<1u>,               // Statically sized           
-      Com::Deepening<Many>,               // Makes container deep       
-      Com::Emplacement<>,                 // Can be emplaced            
-      Com::Assignment<>,                  // Can be reassigned          
-      Com::Comparison<>                   // Can be compared            
-   >;*/
 }
 
 namespace Langulus::Annies
@@ -113,124 +60,14 @@ namespace Langulus::Annies
       }
 
       using Inner::TPinBase<T>::TPinBase;
-      using Inner::TPinBase<T>::operator ==;
-      using Inner::TPinBase<T>::operator <=>;
+      using Base::operator ==;
+      using Base::operator <=>;
 
       constexpr TPin& operator = (auto&& other) {
          if (pinned)
             return *this;
-         Inner::TPinBase<T>::operator = (LglsFwd(other));
+         Base::operator = (LglsFwd(other));
          return *this;
       }
-
-      /*constexpr  TPin() noexcept {
-         this->ConstructDefault();
-      }
-
-      constexpr  TPin(TPin const& other) {
-         this->Absorb(Refer(other));
-      }
-
-      constexpr  TPin(TPin&& other) noexcept {
-         this->Absorb(Move(other));
-      }
-
-      /// Construction that either absorbs the provided container, or         
-      /// emplaces T in the container, using A... as constructor arguments    
-      template<class...A>
-      constexpr TPin(A&&...arguments) {
-         if constexpr (sizeof...(A) == 1 and CT::ContainsOne<A...>) {
-            LglsAssumeUser((Same<Deint<A>, TPin> and ...),
-               "Ambiguous use of construction "
-               "- you should use tag-dispatch with first argument either Absorb "
-               "(if you want to overwrite the container itself) or Piecewise "
-               "(if you want to overwrite the first item) in order to clearly "
-               "state your intent. Absorb will be used by default!"
-            );
-            this->Absorb(LglsFwd(arguments)...);
-         }
-         else this->EmplaceConstruct(LglsFwd(arguments)...);
-      }
-      
-      /// Construction that absorbs the provided container                    
-      template<class A>
-      constexpr TPin(Inner::Absorb, A&& argument) {
-         this->Absorb(LglsFwd(argument));
-      }
-      
-      /// Emplaces T inside, using A... as constructor arguments              
-      template<class...A>
-      constexpr TPin(Inner::Piecewise, A&&...arguments) {
-         this->EmplaceConstruct(LglsFwd(arguments)...);
-      }
-
-      constexpr ~TPin() noexcept {
-         this->Destroy();
-      }
-
-      /// Assignment                                                          
-      constexpr TPin& operator = (TPin const& other) {
-         return this->AssignAbsorb(Refer(other));
-      }
-      constexpr TPin& operator = (TPin&& other) noexcept {
-         return this->AssignAbsorb(Move(other));
-      }
-
-      template<class A>
-      constexpr TPin& operator = (A&& argument) {
-         if constexpr (CT::ContainsOne<A>) {
-            LglsAssumeUser(Same<Deint<A>, TPin>,
-               "Ambiguous use of assignment "
-               "- you should use either AssignAbsorb (if you want to overwrite "
-               "the container itself) or Assign (if you want to overwrite the "
-               "first item) in order to clearly state your intent. "
-               "AssignAbsorb will be used by default!"
-            );
-            return this->AssignAbsorb(LglsFwd(argument));
-         }
-         else return this->Assign(LglsFwd(argument));
-      }*/
-
-      /// Three-way comparison                                                
-      /*constexpr auto operator <=> (const TPin& rhs) const noexcept {
-         return Base::GetStackInner() <=> rhs.GetStackInner();
-      }
-
-      friend constexpr auto operator <=> (const TPin& lhs, T const& rhs) noexcept {
-         return lhs.GetStackInner() <=> rhs;
-      }
-
-      friend constexpr auto operator <=> (T const& lhs, const TPin& rhs) noexcept {
-         return lhs <=> rhs.GetStackInner();
-      }
-
-      /// Equality comparison                                                 
-      constexpr bool operator == (const TPin& rhs) const noexcept {
-         return Base::GetStackInner() == rhs.GetStackInner();
-      }
-
-      friend constexpr bool operator == (const TPin& lhs, T const& rhs) noexcept {
-         return lhs.GetStackInner() == rhs;
-      }
-
-      friend constexpr bool operator == (T const& lhs, const TPin& rhs) noexcept {
-         return lhs == rhs.GetStackInner();
-      }
-
-      explicit constexpr operator bool() const {
-         return static_cast<bool>(Base::GetStackInner());
-      }
-
-      /// Access the first element inside the container                       
-      constexpr auto& operator -> (this auto&& self) assumptious
-      requires ::std::is_class_v<Decay<T>> {
-         return self.GetStackInner();
-      }
-
-      /// Forward New call to the contained type if available                 
-      constexpr decltype(auto) New(auto&&...args)
-      requires requires { Base::GetStackInner().New(LglsFwd(args)...); } {
-         return Base::GetStackInner().New(LglsFwd(args)...);
-      }*/
    };
 }

@@ -270,7 +270,7 @@ namespace Langulus::Annies::Component
       
       /// Returns a reference to the second dimension, a.k.a get the value    
       /// from a pair. Works only for pairs.                                  
-      template<class C> requires (not CT::TypeErased<C> and Id::Count == 2)
+      /*template<class C> requires (not CT::TypeErased<C> and Id::Count == 2)
       constexpr decltype(auto) operator * (this C&& self) assumptious {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
          return *self.template GetRaw<Id::Second>();
@@ -284,7 +284,7 @@ namespace Langulus::Annies::Component
       constexpr auto* operator -> (this C&& self) assumptious {
          LglsAssumeDev(not self.IsEmpty(), "Container is empty");
          return &DenseCast(self.template GetRaw<Id::Second>());
-      }
+      }*/
 
       /// Check if unqualified type is the same as another container's type   
       ///   @attention ignores only cv-qualifiers                             

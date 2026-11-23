@@ -88,6 +88,10 @@ namespace Langulus::Annies::Component
       void ConstructFrom(this C& self, I&& intent, size_t reserve = 0) {
          using IT = Decvq<Deref<Deint<I>>>;
          decltype(auto) from = LglsFwd(intent.what);
+         if (from.IsEmpty()) {
+            ThisCom::SetHeapInner(nullptr);
+            return;
+         }
 
          size_t count = from.GetCount();
          if constexpr (CT::Copied<I> or CT::Cloned<I> or not CT::HeapAllocated<I>) {
@@ -99,7 +103,7 @@ namespace Langulus::Annies::Component
                if constexpr (CT::TypeErased<IT>) {
                   auto type = from.template GetType<D>();
                   if constexpr (CT::Cloned<I>) {
-                     LglsAssert(type.GetCloneConstructor(),
+                     LglsAssertAndBreak(type.GetCloneConstructor(),
                         "Can't clone-construct elements"
                         " - no clone-constructor was reflected for type ",
                         type
@@ -109,7 +113,7 @@ namespace Langulus::Annies::Component
                      /// @attention this branch may not be reached by   
                      /// copy intent alone - stack->heap transfers end  
                      /// up here as well!                               
-                     LglsAssert(type.GetReferConstructor(),
+                     LglsAssertAndBreak(type.GetReferConstructor(),
                         "Can't refer-construct elements"
                         " - no refer-constructor was reflected for type ",
                         type
@@ -219,7 +223,7 @@ namespace Langulus::Annies::Component
          LglsAssumeDev(elements > self.GetCount(), "Bad element count");
          const auto al = DecvqAllCast(self.template GetAllocation<SID>());
 
-         if (not al) {
+         if (not al or self.IsDisowned()) {
             //                                                          
             // Allocate a fresh set of elements                         
             ThisCom::AllocateFresh(elements);
@@ -315,7 +319,7 @@ namespace Langulus::Annies::Component
             "This makes sense to be called only by containers that support many elements");
 
          const auto al = DecvqAllCast(self.template GetAllocation<SID>());
-         if (not al) {
+         if (not al or self.IsDisowned()) {
             //                                                          
             // We have to branch out                                    
             const C backup {Abandon{self}};

@@ -153,10 +153,13 @@ namespace Langulus::Annies::Component
       ///      something throws an exception while constructing.              
       template<class SELF, CT::Intent I> requires CT::Container<I>
       void ConstructFrom(this SELF& self, I&& intent) {
-         if constexpr (not CT::Copied<I> and not CT::Cloned<I> and CT::HeapAllocated<I>) {
-            //using IT = Decvq<Deref<Deint<I>>>;
-            decltype(auto) from = LglsFwd(intent.what);
+         decltype(auto) from = LglsFwd(intent.what);
+         if (from.IsEmpty()) {
+            ThisCom::SetAllocationInner(nullptr);
+            return;
+         }
 
+         if constexpr (not CT::Copied<I> and not CT::Cloned<I> and CT::HeapAllocated<I>) {
             if constexpr (CT::Disowned<I>) {
                // Disown                                                
                if constexpr (not SELF::CanBeDisowned and STYLE & OnCreateAndDestroy) {

@@ -605,7 +605,7 @@ TEST_CASE_TEMPLATE("Test empty Many/TMany", TestType
       WHEN("Emplace (insert, describe)") {
          ScopedE i666{666};
          const auto i666backup = *i666;
-         Many descriptor {Piecewise, ::std::move(*i666)};
+         Neat descriptor {::std::move(*i666)};
          if constexpr (CT::DescribeConstructible<E> and not CT::Container<T>) {
             decltype(auto) instance = pack.template Emplace<E>(Describe{descriptor});
             Many_CheckState_OwnedFull<E>(pack);

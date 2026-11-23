@@ -865,7 +865,7 @@ namespace Langulus::Annies::Component
          using I = IntentOf(intent);
          using IT = Decvq<Deref<Deint<I>>>;
 
-         if constexpr (not CT::Handle<SELF>) {
+         /*if constexpr (not CT::Handle<SELF>) {
             if (from.IsEmpty()) {
                // If source is empty, we copy only the type and the     
                // unconstrained state. Everything else is defaulted.    
@@ -878,12 +878,26 @@ namespace Langulus::Annies::Component
                });
                return;
             }
-         }
+         }*/
 
          ForEach(ComponentList{}, [&self,&intent]<class C>{
                  if_available_gcc(C::template ConstructFrom<SELF, I>)(FWDIntent(intent));
             else if_available_gcc(C::template ConstructDefault<SELF>)();
          });
+
+
+         if constexpr (CT::Abandoned<I>) {
+            // Make sure we disown an abandoned container at the end    //TODO combine branches
+            // If container is not disownable, it is every component's  
+            // responsibility to remain in a disowned state.            
+            if (not from.IsEmpty()) {
+               if_available(from.EnableDisowned());
+            }
+         }
+         else if constexpr (CT::Moved<I>) {
+            // Make sure we reset everything after movement concludes   
+            if_available(from.ResetState());
+         }
 
          // Count is responsible for deep ownership, it has to       
          // be reset on move to disable destruction in 'from'.       //TODO combine branches
@@ -900,21 +914,7 @@ namespace Langulus::Annies::Component
             }
          }
 
-         if constexpr (CT::Abandoned<I>) {
-            // Make sure we disown an abandoned container at the end    //TODO combine branches
-            // If container is not disownable, it is every component's  
-            // responsibility to remain in a disowned state.            
-            if_available(from.EnableDisowned());
-         }
-         else if constexpr (CT::Moved<I>) {
-            // Make sure we reset everything after movement concludes   
-            if_available(from.ResetState());
-         }
-
       
-         if constexpr (I::ResetsOnMove())//TODO combine branches
-            if_available(from.SetHashInner(1)); //TODO for all dimensions?
-
          if constexpr (CT::Moved<I> and CT::OwnedStrong<I>) {//TODO combine branches
             // We are moving 'from'. If it is owned on destruction,  
             // it needs to be fully reset.                           
@@ -943,13 +943,16 @@ namespace Langulus::Annies::Component
                from.SetHeapInner(nullptr);
             }
          }
-                  
+         if constexpr (I::ResetsOnMove())//TODO combine branches
+            if_available(from.SetHashInner(1)); //TODO for all dimensions?
+
+
          if constexpr (I::ResetsOnMove()) {
             if_available(from.SetCoverageTableInner(nullptr));//TODO for all dimensions?
             if_available(from.SetHashTableInner(nullptr));//TODO for all dimensions?
          }
 
-         if constexpr (CT::Moved<I> or (CT::Abandoned<I> and not IT::CanBeDisowned)) {
+         if constexpr (I::ResetsOnMove() or (CT::Abandoned<I> and not IT::CanBeDisowned)) {
             // Transfer ownership if we can, otherwise refer         
             if_available(from.SetAllocationInner(nullptr))//TODO for all dimensions?
 
@@ -973,20 +976,22 @@ namespace Langulus::Annies::Component
 
          }
 
-         if constexpr (I::ResetsOnMove())
+         if constexpr (I::ResetsOnMove()) {
             if_available(from.SetReservedInner(0));
-      
-         if constexpr (CT::Moved<I> and CT::TagErased<I>)
-            from.SetTagInner({}); //TODO for all dimensions?
+            if_available(from.SetChargeInner({}));
 
-         if constexpr (CT::Moved<I> and CT::TypeErased<I>) {
-            GetDimensions().ForEach([&from]<Cid ID> {
-               from.template SetTypeInner<ID>(DMeta{});
-            });
+            if constexpr (CT::TagErased<I>)
+               from.SetTagInner({}); //TODO for all dimensions?
+
+            if constexpr (CT::TypeErased<I>) {
+               GetDimensions().ForEach([&from]<Cid ID> {
+                  from.template SetTypeInner<ID>(DMeta{});
+               });
+            }
+
+            if constexpr (CT::VerbErased<I>)
+               from.SetVerbInner({}); //TODO for all dimensions?
          }
-
-         if constexpr (CT::Moved<I> and CT::VerbErased<I>)
-            from.SetVerbInner({}); //TODO for all dimensions?
       }
 
       /// MARK: SliceFrom                                                     

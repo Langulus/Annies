@@ -172,7 +172,7 @@ namespace Langulus::Annies
       constexpr Many(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             if constexpr (CT::DeepDense<A1> and not CT::Handle<A1>) {
-               LglsAssumeUserAndBreak(Same<Deint<A1>, Many>,
+               LglsAssumeUserAndBreak(Same<CT::ReflectedAs<Deint<A1>>, Many>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "
@@ -230,7 +230,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr Many& operator = (A&& argument) {
          if constexpr (CT::DeepDense<A> and not CT::Handle<A>) {
-            LglsAssumeUserAndBreak(Same<Deint<A>, Many>,
+            LglsAssumeUserAndBreak(Same<CT::ReflectedAs<Deint<A>>, Many>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

@@ -333,8 +333,10 @@ namespace Langulus::Annies::Component
             self.SetState(from.GetState());
 
             // Don't propagate disowned state unless explicitly required
-            if constexpr (CanBeDisowned and not CT::Disowned<I>)
-               self.DisableDisowned();
+            if constexpr (CanBeDisowned) {
+               if (from.IsEmpty() or not CT::Disowned<I>)
+                  self.DisableDisowned();
+            }
          }
          else self.SetStateInner(GetDefaultState());
       }

@@ -82,9 +82,13 @@ namespace Langulus::Annies::Component
       //TODO what happens if we transfer from not CT::NullTerminated to CT::NullTerminated - we must anticipate a resize and do shallow copy instead of absorb, or we lose last byte!
       template<class SELF, CT::Intent I> requires CT::Container<I>
       void ConstructFrom(this SELF& self, I&& intent) {
+         decltype(auto) from = LglsFwd(intent.what);
+         if (from.IsEmpty()) {
+            ThisCom::SetReservedInner(0);
+            return;
+         }
+
          if constexpr (not CT::Copied<I> and not CT::Cloned<I> and CT::HeapAllocated<I>) {
-            decltype(auto) from = LglsFwd(intent.what);
-         
             // Always propagate custom reserve if available             
                  if_available(ThisCom::SetReservedInner(from.GetReservedInner()))
             else if_available(ThisCom::SetReservedInner(from.GetReserved())) 

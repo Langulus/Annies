@@ -32,6 +32,20 @@ namespace Langulus::Annies::Component
 
       static constexpr int ComponentPrecedence = -2000;
       
+      /// Dereference the first element inside the container                  
+      constexpr decltype(auto) operator * (this auto&& self) assumptious {
+         return ThisCom::GetStackInner();
+      }
+
+      /// Access the first element inside the container                       
+      constexpr auto* operator -> (this auto&& self)
+      requires (not ::std::is_void_v<DeptrAll<StackRequest>>) {
+         ForEachIndirection(ThisCom::GetStackInner(), [](auto& i) {
+            LglsAssert(i != nullptr, "Dereferencing nullptr");
+         });
+         return &DenseCast(ThisCom::GetStackInner());
+      }
+
       /// Get a direct access to the stack memory                             
       template<Cid SID = ID>// requires (SID == ID)
       constexpr auto GetRaw(this auto&& self) noexcept {
@@ -225,18 +239,21 @@ namespace Langulus::Annies::Component
       }
 
       /// Get the heap pointer (inner)                                        
+      template<Cid SID = ID>// requires (SID == ID)
       constexpr auto& GetStackInner(this auto&& self) noexcept {
          return self.template AccessStack<Stack>();
       }
 
       /// Set the heap pointer (inner)                                        
+      template<Cid SID = ID>// requires (SID == ID)
       constexpr void SetStackInner(this auto& self, T&& data) noexcept {
          ThisCom::GetStackInner() = LglsFwd(data);
       }
 
       /// Default-initialize the variable                                     
       constexpr void ConstructDefault(this auto& self) noexcept requires CT::NotReference<T> {
-         ThisCom::SetStackInner({});
+         if constexpr (::std::is_trivially_default_constructible_v<T>)
+            ThisCom::SetStackInner({});
       }
 
       /// MARK: ConstructFrom                                                 
@@ -244,26 +261,24 @@ namespace Langulus::Annies::Component
       ///   @param intent the intent and container to transfer from.          
       ///   @attention stack transfers only work if containers are binary     
       ///      compatible                                                     
-      template<class C, CT::Intent I> requires Same<C, Deint<I>>
+      template<class C, CT::Intent I> /*requires Same<C, Deint<I>>*/
       void ConstructFrom(this C& self, I&& intent, size_t = 0) {
          auto src = intent->template GetRaw<ID>();
          auto dst = ThisCom::GetRaw();
-         static_assert(Same<decltype(dst), decltype(src)>,
-            "Type mismatch: " + NameOf<decltype(dst)>() +
-            " is not compatible with " + NameOf<decltype(src)>()
-         );
-         IntentNew(dst, NestIntentOf(intent, *src));
+         if constexpr(Same<decltype(dst), decltype(src)>) {
+            IntentNew(dst, NestIntentOf(intent, *src));
 
-         if constexpr (CT::Copied<I> or CT::Cloned<I>) {
-            // This is needed because ownership components generally    
-            // skip ConstructFrom with these intents.                   
-            if_available(self.template EmplaceEntries<ID>(NestIntentOf(intent, *src)));
-         }
-                  
-         decltype(auto) from = LglsFwd(intent.what);
-         if constexpr (requires { from.template GetHashInner<ID>(); }) {
-                 if_available(self.template SetHashInner<ID>(from.template GetHashInner<ID>()))
-            else if_available(self.template ResetHash<ID>())
+            if constexpr (CT::Copied<I> or CT::Cloned<I>) {
+               // This is needed because ownership components generally    
+               // skip ConstructFrom with these intents.                   
+               if_available(self.template EmplaceEntries<ID>(NestIntentOf(intent, *src)));
+            }
+                     
+            decltype(auto) from = LglsFwd(intent.what);
+            if constexpr (requires { from.template GetHashInner<ID>(); }) {
+                  if_available(self.template SetHashInner<ID>(from.template GetHashInner<ID>()))
+               else if_available(self.template ResetHash<ID>())
+            }
          }
       }
    };

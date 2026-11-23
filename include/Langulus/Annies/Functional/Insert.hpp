@@ -190,15 +190,15 @@ namespace Langulus::Annies::Component
 
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
          }
-         else if constexpr (Same<Deint<A1>, Deint<AN>...>) {
+         else if constexpr (Same<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>) {
             // Insertions have a common type                         
-            self.template SetType<Decvq<Deref<Deint<A1>>>>();
+            self.template SetType<Decvq<Deref<CT::ReflectedAs<Deint<A1>>>>>();
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
-         else if constexpr (requires { typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type; }) {
+         else if constexpr (requires { typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type; }) {
             // Insertions have a common type                         
-            self.template SetType<typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type>();
+            self.template SetType<typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type>();
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
@@ -416,15 +416,15 @@ namespace Langulus::Annies::Component
                
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
          }
-         else if constexpr (Same<Deint<A1>, Deint<AN>...>) {
+         else if constexpr (Same<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>) {
             // Insertions have a common type                         
-            self.template SetType<Decvq<Deref<Deint<A1>>>>();
+            self.template SetType<Decvq<Deref<CT::ReflectedAs<Deint<A1>>>>>();
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
-         else if constexpr (requires { typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type; }) {
+         else if constexpr (requires { typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type; }) {
             // Insertions have a common type                         
-            self.template SetType<typename ::std::common_type_t<Deint<A1>, Deint<AN>...>::type>();
+            self.template SetType<typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type>();
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
@@ -576,15 +576,23 @@ namespace Langulus::Annies::Component
          stateCompliant = ThisCom::CheckState(other);
          if (stateCompliant) {
             if (self.IsEmpty()) {
-               // We can directly absorb                             
+               // We can directly absorb. Just make sure we preserve 
+               // the state.                                         
+               const auto state_backup = self.GetStateInner().mState;
                self.AssignAbsorb(LglsFwd(value));
+               self.GetStateInner().mState |= state_backup;
                return 1;
             }
    
             if constexpr (CONCAT) {
                // We are allowed to attempt concatenatenation        
-               if (ThisCom::Concat(LglsFwd(value)))
-                  return 1;
+               try {
+                  if (ThisCom::Concat(LglsFwd(value)))
+                     return 1;
+               }
+               catch(...) {
+                  // Most likely type mismatch, ignore it.           
+               }
             }
          }
       }
@@ -1140,8 +1148,11 @@ namespace Langulus::Annies::Component
 
          if constexpr (FORCE) {
             // If this is reached, all else failed, but we are       
-            // allowed to deepen, so just do it                      
+            // allowed to deepen, so just do it. State will be       
+            // duplicated.                                           
+            const auto state_backup = self.GetStateInner().mState;
             self.Deepen();
+            self.GetStateInner().mState |= state_backup;
             return ThisCom::template InsertAt<false>(
                index, Deep<C> {LglsFwd(value)} //TODO are we allowed to absorb here? should we use Piecewise?
             );

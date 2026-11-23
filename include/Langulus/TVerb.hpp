@@ -98,6 +98,7 @@ namespace Langulus::Annies
 
    public:
       using CTTI_Members = Members<&TVerb::mContext, &TVerb::mOutput>;
+      using CTTI_Named   = Yes<"Verb">;
 
       constexpr TVerb() noexcept {
          this->ConstructDefault();
@@ -198,7 +199,7 @@ namespace Langulus::Annies
       
       /// Create a verb by manually specifying the verb ID and arguments      
       static TVerb From(VMeta verb, auto&&...arguments) {
-         TVerb result {Piecewise, LglsFwd(arguments)...};
+         TVerb result {LglsFwd(arguments)...};
          result.SetVerb(verb);
          return result;
       }
@@ -214,7 +215,7 @@ namespace Langulus::Annies
       /// Create a verb by extracting verb ID, charge and argument from verb. 
       /// Source and output remain empty.                                     
       static TVerb Like(CT::Executable auto const& source) {
-         return From(source, source.GetRHS());
+         return From(source, Absorb, source.GetRHS());
       }
 
       /// Partial copy, copies only charge and verb, provides new arguments.  
@@ -298,7 +299,7 @@ namespace Langulus::Annies
       /// Useful for instantiating constants, unary operations, etc.          
       /// Implemented in Langulus::Flow, as it requires some prime verbs      
       /// being defined, such as Verbs::Do.                                   
-      bool RunUnary();
+      //bool RunUnary();
 
       /// Execute the verb.                                                   
       /// Implemented in Langulus::Flow, as it requires some prime verbs      
@@ -327,7 +328,7 @@ namespace Langulus::Annies
          Text out;
          if (not v) {
             // An invalid verb is always written as token               
-            out += NameOf<Verb>();//TODO should we just use DefinitionVerb::InvalidName here?
+            out += RTTI::DefinitionVerb::InvalidName;
             tokenized = true;
             return out.Lowercase();
          }
@@ -641,12 +642,13 @@ namespace Langulus::Annies
 ///   @param N negative verb name (optional, same as positive if "")          
 ///   @param INFOSTRING information about the verb's purpose                  
 ///   @attention call this macro only in the global namespace!                
-#define LANGULUS_DEFINE_VERB(P, N, PRECEDENCE, INFOSTRING) \
+#define LANGULUS_DEFINE_VERB(P, N, PRECEDENCE, INFOSTRING, ...) \
    namespace Langulus::Verbs { struct P; } \
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
    namespace Langulus::Verbs { struct P : Annies::TVerb<P> { \
       using CTTI_Info = Yes<INFOSTRING>; \
       using Annies::TVerb<P>::TVerb; \
+      using ExtendTypes = Types<__VA_ARGS__>; \
    };}
 
 /// Define a verb with operators                                              
@@ -657,11 +659,12 @@ namespace Langulus::Annies
 ///   @param PRECEDENCE operator precedence                                   
 ///   @param INFOSTRING information about the verb's purpose                  
 ///   @attention call this macro only in the global namespace!                
-#define LANGULUS_DEFINE_OPERATOR(P, N, OP, ON, PRECEDENCE, INFOSTRING) \
+#define LANGULUS_DEFINE_OPERATOR(P, N, OP, ON, PRECEDENCE, INFOSTRING, ...) \
    namespace Langulus::Verbs { struct P; } \
    namespace Langulus::CTTI  { template<> struct DefineVerb<::Langulus::Verbs::P> : NamedVerb<#P,#N,PRECEDENCE> {}; } \
    namespace Langulus::CTTI  { template<> struct DefineVerbOp<::Langulus::Verbs::P> : NamedOperator<OP,ON> {}; } \
    namespace Langulus::Verbs { struct P : Annies::TVerb<P> { \
       using CTTI_Info = Yes<INFOSTRING>; \
       using Annies::TVerb<P>::TVerb; \
+      using ExtendTypes = Types<__VA_ARGS__>; \
    }; }

@@ -50,7 +50,7 @@ namespace Langulus::Annies
       constexpr TTag(A1&& a1, AN&&...an) {
          if constexpr (sizeof...(AN) == 0 and not CT::BoundedArray<A1>) {
             if constexpr ((CT::DeepDense<A1> and not CT::Handle<A1>) or CT::Tag<A1>) {
-               LglsAssumeUser(SameAsOneOf<Deint<A1>, TTag, Tag, TAG>,
+               LglsAssumeUser(::std::is_void_v<TAG> or SameAsOneOf<Deint<A1>, TTag, Tag, TAG>,
                   "Ambiguous use of construction "
                   "- you should use tag-dispatch with first argument either Absorb "
                   "(if you want to overwrite the container itself) or Piecewise "
@@ -134,7 +134,7 @@ namespace Langulus::Annies
       template<class A>
       constexpr TTag& operator = (A&& argument) {
          if constexpr ((CT::DeepDense<A> and not CT::Handle<A>) or CT::Tag<A>) {
-            LglsAssumeUser(SameAsOneOf<Deint<A>, TTag, Tag, TAG>,
+            LglsAssumeUser(::std::is_void_v<TAG> or SameAsOneOf<Deint<A>, TTag, Tag, TAG>,
                "Ambiguous use of assignment "
                "- you should use either AssignAbsorb (if you want to overwrite "
                "the container itself) or Assign (if you want to overwrite the "

@@ -8,6 +8,7 @@
 #pragma once
 #include "../Neat.hpp"
 #include "../Any.hpp"
+#include "../TVerb.hpp"
 
 
 namespace Langulus::Annies
@@ -221,7 +222,7 @@ namespace Langulus::Annies
          });
          return inserted;
       }
-      else if constexpr (CT::Deep<T>) {
+      else if constexpr (CT::Deep<T> and CT::ContainsMany<T>) {
          // Push anything deep here, flattening it, unless it has state 
          if (DeintCast(item).GetUnconstrainedState()) {
             // Item has state, so just push it as it is, to preserve it 
@@ -264,6 +265,51 @@ namespace Langulus::Annies
             }
 
             return inserted;
+         }
+      }
+      else if constexpr (CT::Deep<T> and CT::ContainsOne<T>) {
+         // Push anything deep here, flattening it, unless it has state 
+         if (DeintCast(item).GetUnconstrainedState()) {
+            // Item has state, so just push it as it is, to preserve it 
+            InsertInner(S::Nest(item));
+            return 1;
+         }
+         else if (DeintCast(item).IsDeep()) {
+            // Item is deep, flatten it                                 
+            return UnfoldInsert(S::Nest(DeintCast(item).template As<Many>()));
+         }
+         else {
+            // Item is not deep, filter based on type                   
+            if (DeintCast(item).template Is<Recipe>()) {
+               InsertInner(S::Nest(DeintCast(item).template As<Recipe>()));
+               return 1;
+            }
+            if (DeintCast(item).template Is<Neat>()) {
+               return UnfoldInsert(S::Nest(DeintCast(item).template As<Neat>()));
+            }
+            if (DeintCast(item).template Is<Tag>()) {
+               InsertInner(S::Nest(DeintCast(item).template As<Tag>()));
+               return 1;
+            }
+            if (DeintCast(item).template Is<Verb>()) {
+               InsertInner(S::Nest(DeintCast(item).template As<Verb>()));
+               return 1;
+            }
+            if (DeintCast(item).template Is<DMeta>()) {
+               InsertInner(DeintCast(item).template As<DMeta>());
+               return 1;
+            }
+            if (DeintCast(item).template Is<TMeta>()) {
+               InsertInner(DeintCast(item).template As<TMeta>());
+               return 1;
+            }
+            if (DeintCast(item).template Is<CMeta>()) {
+               InsertInner(DeintCast(item).template As<CMeta>());
+               return 1;
+            }
+            
+            InsertInner(Many {Langulus::Absorb, item});//TODO maybe absorb into Many isn't necessary?
+            return 1;
          }
       }
       else {

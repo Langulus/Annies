@@ -363,6 +363,19 @@ namespace Langulus::Annies
       KeyHandle GetKeyHandle() const noexcept { return {*this}; }
       ValHandle GetValHandle() const noexcept { return {Slice<1>, *this}; }
 
+      /// Returns a reference to the second value, just for convenience       
+      constexpr decltype(auto) operator * (this auto&& self) noexcept {
+         return self.GetVal();
+      }
+
+      /// Returns a innermost pointer to the second value                     
+      constexpr auto* operator -> (this auto&& self) {
+         ForEachIndirection(self.GetVal(), [](auto& i) {
+            LglsAssert(i != nullptr, "Dereferencing nullptr");
+         });
+         return &DenseCast(self.GetVal());
+      }
+
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
       auto& ForceMutable() const noexcept {
@@ -472,6 +485,19 @@ namespace Langulus::Annies
 
       KeyHandle GetKeyHandle() const noexcept { return {*this}; }
       ValHandle GetValHandle() const noexcept { return {Slice<1>, *this}; }
+
+      /// Returns a reference to the second value, just for convenience       
+      constexpr decltype(auto) operator * (this auto&& self) noexcept {
+         return self.GetVal();
+      }
+
+      /// Returns a innermost pointer to the second value                     
+      constexpr auto* operator -> (this auto&& self) {
+         ForEachIndirection(self.GetVal(), [](auto& i) {
+            LglsAssert(i != nullptr, "Dereferencing nullptr");
+         });
+         return &DenseCast(self.GetVal());
+      }
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        
@@ -587,6 +613,19 @@ namespace Langulus::Annies
 
       auto GetKeyHandle() const noexcept -> KeyHandle { return {*this}; }
       auto GetValHandle() const noexcept -> ValHandle { return {Slice<1>, *this}; }
+
+      /// Returns a reference to the second value, just for convenience       
+      constexpr decltype(auto) operator * (this auto&& self) noexcept {
+         return self.GetVal();
+      }
+
+      /// Returns a innermost pointer to the second value                     
+      constexpr auto* operator -> (this auto&& self) {
+         ForEachIndirection(self.GetVal(), [](auto& i) {
+            LglsAssert(i != nullptr, "Dereferencing nullptr");
+         });
+         return &DenseCast(self.GetVal());
+      }
 
       /// Force the handle to become mutable, so that we have methods like    
       /// emplacement in constructors.                                        

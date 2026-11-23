@@ -67,7 +67,7 @@ namespace Langulus::Annies::Component
       /// Hash is default-initialized to 1, because that's a universal value  
       /// for an empty container. Prevents rehash until something is pushed.  
       constexpr void ConstructDefault(this auto& self) noexcept {
-         ThisCom::SetHashInner(1);
+         ThisCom::SetHashInner(0);
       }
       
       /// Transfer from any kind of container, respecting intents             
@@ -76,10 +76,14 @@ namespace Langulus::Annies::Component
       ///      inserted. In those cases, hash is set by the heap components.  
       ///   @param intent the intent and container to transfer from           
       template<class SELF, CT::Intent I> requires CT::Container<I>
-      void ConstructFrom(this SELF& self, I&& intent) {
+      void ConstructFrom(this SELF& self, I&& intent)  {
+         decltype(auto) from = LglsFwd(intent.what);
+         if (from.IsEmpty()) {
+            ThisCom::SetHashInner(1);
+            return;
+         }
+
          if constexpr (not CT::Copied<I> and not CT::Cloned<I> and CT::HeapAllocated<I>) {
-            decltype(auto) from = LglsFwd(intent.what);
-            
             // Notice only the inner hash gets copied, to avoid         
             // precomputation if rhs doesn't cache it. It will be       
             // recomputed on demand on comparison either way.           

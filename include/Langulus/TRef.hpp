@@ -29,8 +29,6 @@ namespace Langulus::Annies::Inner
       Com::Stack<T>,
       Com::CountStatic<1u>,               // Statically sized           
       Com::ReserveEmergent<>,             // Reserve derived from alloc 
-      //Com::OwnershipStack<>,              // Allocation is referenced   
-      //Com::OwnershipDeepHeap<>,           // Individual references      //TODO what if we initialize heap using some arbitrary pointer and there is no entry data beside it?? OwnershipDeepStack instead? with a static array?
       Com::OwnershipDeepEmergent<>,       // Individual references      //TODO temporary
       Com::Deepening<Many>,               // Makes container deep       
       Com::Emplacement<>,                 // Can be emplaced            
@@ -92,14 +90,10 @@ namespace Langulus::Annies
             static_assert(IndirectsOf<A> == IndirectsOf<T>,
                "Number of indirections must match");
 
-            auto* p = DeintCast(pointer);
-            if (p) {
+            if (DeintCast(pointer))
                this->EmplaceConstruct(LglsFwd(pointer));
-               /*this->SetHeapInner(DeintCast(pointer));
-               if constexpr (not CT::Disowned<A>)
-                  this->FindAllocationInner();*/
-            }
-            else this->ConstructDefault();
+            else
+               this->ConstructDefault();
          }
       }
       
@@ -125,96 +119,14 @@ namespace Langulus::Annies
                "A must be a pointer (intent is optional)");
             static_assert(IndirectsOf<A> == IndirectsOf<T>,
                "Number of indirections must match");
-               
-            return this->Assign(LglsFwd(pointer));
+            
+            if (DeintCast(pointer))
+               this->Assign(LglsFwd(pointer));
+            else 
+               this->Clear();
+            return *this;
          }
-
-         /*if constexpr (CT::ContainsOne<A>) {
-            // It could be a handle to a sparse item                    
-            // TRef is an outlier in terms of type, because it is       
-            // a pointer only implicitly to avoid reallocation.         
-            if constexpr (Same<TypeOf<A>, T*>) {
-               // Handle mistypes here                                  
-               // Could probably be improved by copying entries         
-               return TRef::operator = (*pointer);
-            }
-            else return this->AssignAbsorb(FWDIntent(pointer));
-         }
-         else {
-            static_assert(CT::Sparse<A>,
-               "A must be a pointer (intent is optional)");
-
-            if (DeintCast(pointer) == this->GetHeapInner())
-               return *this;
-         
-            if (DeintCast(pointer)) {
-               this->Destroy();
-               this->SetHeapInner(DeintCast(pointer));
-               if constexpr (not CT::Disowned<A>)
-                  this->FindAllocationInner();
-            }
-         }
-         return *this;*/
       }
-
-      /// Access the pointer                                                  
-      //constexpr auto* operator * (this auto&& self) noexcept /*assumptious*/ {
-      //   //LglsAssumeDev(not self.IsEmpty(), "Container is empty"); //TODO what's the problem. it's just nullptr xD
-      //   return self.Get();
-      //}
-//
-      ///// Access the inner-most pointer                                       
-      //constexpr auto* operator -> (this auto&& self) assumptious {
-      //   LglsAssumeDev(not self.IsEmpty(), "Container is empty");
-      //   return &DenseCast(self.Get());
-      //}
-
-      /// Cast the pointer as something else                                  
-      /*template<class AS, class C>
-      constexpr auto* As(this C&& self) assumptious {
-         if constexpr (Akin<T, AS>) {
-            // Access directly                                          
-            if constexpr (CT::Dense<AS>)
-               return self.Get();
-            else {
-               // May wrap in custom pointer                            
-               return static_cast<LglsMutIf(C, AS)>(self.Get());
-            }
-         }
-         else if constexpr (CT::DerivedFrom<Decay<T>, Decay<AS>>) {
-            // Access by upcast                                         
-            if constexpr (CT::Dense<AS>) {
-               if constexpr (CT::Mutable<C, AS>)
-                  return DecvqAllCast(static_cast<AS const*>(self.Get()));
-               else
-                  return static_cast<AS const*>(self.Get());
-            }
-            else {
-               if constexpr (CT::Mutable<C, Deptr<AS>>)
-                  return DecvqAllCast(static_cast<ConstAll<AS >>(self.Get()));
-               else
-                  return static_cast<ConstAll<AS >>(self.Get());
-            }
-         }
-         else if constexpr (CT::DerivedFrom<Decay<AS>, Decay<T>>) {
-            // Access by downcast                                       
-            if constexpr (CT::Dense<AS>) {
-               if constexpr (CT::Mutable<C, AS>)
-                  return DecvqAllCast(dynamic_cast<ConstAll<AS*>>(self.Get()));
-               else
-                  return dynamic_cast<ConstAll<AS*>>(self.Get());
-            }
-            else {
-               if constexpr (CT::Mutable<C, Deptr<AS>>)
-                  return  DecvqAllCast(dynamic_cast<ConstAll<AS >>(self.Get()));
-               else 
-                  return  dynamic_cast<ConstAll<AS >>(self.Get());
-            }
-         }
-      }*/
-
-      //using Com::Comparison<false, false>::operator <=>;
-      //using Com::Comparison<false, false>::operator ==;
 
       /// Three-way comparison                                                
       constexpr auto operator <=> (const TRef& rhs) const noexcept {

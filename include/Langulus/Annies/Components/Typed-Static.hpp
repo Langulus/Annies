@@ -307,19 +307,6 @@ namespace Langulus::Annies::Component
          return sizeof(TYPE) * self.GetCount();
       }
 
-      /// Dereference the first element inside the container                  
-      constexpr decltype(auto) operator * (this auto&& self) assumptious {
-         LglsAssumeDev(not self.IsEmpty(), "Container is empty");
-         return *self.GetRaw();
-      }
-
-      /// Access the first element inside the container                       
-      constexpr auto* operator -> (this auto&& self) assumptious
-      requires ::std::is_class_v<Decay<TYPE>> {
-         LglsAssumeDev(not self.IsEmpty(), "Container is empty");
-         return &DenseCast(self.GetRaw());
-      }
-      
       /// This is still used if statically-typed - checks if types are        
       /// compatible in constructors and assigners                            
       ///   @tparam T the new type                                            

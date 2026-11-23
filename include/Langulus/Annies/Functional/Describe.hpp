@@ -6,8 +6,8 @@
 /// SPDX-License-Identifier: GPL-3.0-or-later                                 
 ///                                                                           
 #pragma once
-#include <Langulus/Many.hpp>
-#include <Langulus/Recipe.hpp>
+#include <Langulus/Neat.hpp>
+//#include <Langulus/Recipe.hpp>
 
 
 namespace Langulus
@@ -21,8 +21,7 @@ namespace Langulus
    ///   Provides services for setting and reading back properties. Often     
    /// used in Describe constructors to set member variables and stuff.       
    struct Describe {
-      using Many = Annies::Many;
-      Many const& what;
+      Annies::Neat const& what;
 
       using CTTI_ReflectAs     = void;
       using CTTI_Abstract      = Yup;
@@ -33,7 +32,7 @@ namespace Langulus
       constexpr Describe(const Describe&) noexcept = default;
       explicit constexpr Describe(Describe&&) noexcept = default;
 
-      explicit constexpr Describe(Many const& descriptor) noexcept
+      explicit constexpr Describe(Annies::Neat const& descriptor) noexcept
          : what {descriptor} {}
 
       auto& operator *  () const noexcept { return  what; }

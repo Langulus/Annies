@@ -866,7 +866,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Set/TSet", TestType
          auto emplace_overwrite_describe = [&](T& a, [[maybe_unused]] const char* intent) {
             ScopedE i666{666};
             const auto i666backup = *i666;
-            Many descriptor {Piecewise, ::std::move(*i666)};
+            Neat descriptor {::std::move(*i666)};
 
             if constexpr (CT::DescribeConstructible<E> and not CT::Container<T>) {
                decltype(auto) instance = a.Emplace(Describe{descriptor});

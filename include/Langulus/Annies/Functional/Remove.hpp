@@ -371,29 +371,43 @@ namespace Langulus::Annies::Component
       if_available(self.SetHashInner(1));
    }
 
-   /// Destroy all elements. Specialized for stack-based containers.       
+   /// Destroy all elements. Specialized for stack-based containers.          
    TEMPLATE template<CT::NotHeapAllocated C>
    void LGLSCOM::Clear(this C& self) {
       if_available(self.Free());
+      if_available(self.SetHashInner(1));
 
-      // Make sure we zero any stack-based pointers                  
-      Id::ForEach([&self]<Cid D> {
-         if constexpr (CT::Sparse<TypeOf<C, D>>)
-            self.GetStackInner() = nullptr;
-      });
-      if_available(self.SetHashInner(0));
+      if constexpr (not CT::HasVariableCount<C>) {
+         // Notice that stack pointers are zeroed only here.           
+         // Containers like TRef/TOwn that hold a sparse element are   
+         // an exception, as the pointer itself determines if they're  
+         // empty or not. Heaps are never reset on Clear.              
+         Id::ForEach([&self]<Cid D> {
+            if_available(self.template SetStackInner<D>(nullptr));
+         });
+      }
    }
 
-   /// Destroy all elements, deallocate memory and reset state and type.   
-   ///   @attention notice that heap pointer is not zeroed here, as it     
-   ///      is not a requirement. It is UB if you GetRaw while count is 0! 
-   TEMPLATE
-   void LGLSCOM::Reset(this auto& self) {
+   /// Destroy all elements, deallocate memory and reset state and type.      
+   TEMPLATE template<class C>
+   void LGLSCOM::Reset(this C& self) {
       if_available(self.Free());
       if_available(self.ResetAllAllocations());
       if_available(self.ResetState());
       if_available(self.ResetAllTypes());
       if_available(self.SetHashInner(1));
+
+      if constexpr (not CT::HasVariableCount<C>) {
+         // Notice that heap pointer is zeroed only here, as it         
+         // is not a requirement, generally speaking. It is UB if you   
+         // GetRaw while count is 0! Containers like TRef/TOwn that     
+         // hold a sparse element are an exception, as the pointer      
+         // itself determines if they're empty or not.                  
+         Id::ForEach([&self]<Cid D> {
+            if_available(self.template SetHeapInner<D>(nullptr));
+            if_available(self.template SetStackInner<D>(nullptr));
+         });
+      }
    }
 
    /// Erases an element at a specific index from a hash table             
@@ -411,7 +425,7 @@ namespace Langulus::Annies::Component
 
       // Destroy the key and info at the start                       
       //auto h = self.GetHandle() + index;
-      h.Free();
+      h.template Free<false>();
       ++h;
 
       *(psl++) = 0;
@@ -428,7 +442,7 @@ namespace Langulus::Annies::Component
             prev_h.template EmplaceWithIntent<D>(Abandon(h));
          });
 
-         h.Free();
+         h.template Free<false>();
          ++h;
 
          *(psl++) = 0;
@@ -448,7 +462,7 @@ namespace Langulus::Annies::Component
             last_h.template EmplaceWithIntent<D>(Abandon(h));
          });
 
-         h.Free();
+         h.template Free<false>();
          ++h;
 
          *(psl++) = 0;
@@ -473,7 +487,7 @@ namespace Langulus::Annies::Component
       LglsAssumeDev(self.GetUses() == 1,
          "Must branch-out before calling this method");
 
-      h.Free();
+      h.template Free<false>();
       self.DisableSlot(slot);
       --self.GetCountInner();
    }

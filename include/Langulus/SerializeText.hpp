@@ -116,30 +116,30 @@ namespace Langulus::CTTI
    };
    
    /// Rule for serializing Text to Text. Wraps it in "" symbols.             
-   template<>
-   struct SerializationRule<Annies::Text, Annies::Text> {
+   template<class T> requires Exact<Decay<T>, Annies::Text>
+   struct SerializationRule<Annies::Text, T> {
       using S = Serializer<Annies::Text>;
       using Context = typename S::Context;
 
-      static void Serialize(Annies::Text const&, Annies::Text&, Context*);
+      static void Serialize(ConstAll<T&>, Annies::Text&, Context*);
    };
    
    /// Rule for serializing Bytes to Text. Prefixes 0x.                       
-   template<>
-   struct SerializationRule<Annies::Text, Annies::Bytes> {
+   template<class T> requires Exact<Decay<T>, Annies::Bytes>
+   struct SerializationRule<Annies::Text, T> {
       using S = Serializer<Annies::Text>;
       using Context = typename S::Context;
 
-      static void Serialize(Annies::Bytes const&, Annies::Text&, Context*);
+      static void Serialize(ConstAll<T&>, Annies::Text&, Context*);
    };
    
    /// Rule for serializing Recipe to Text                                    
-   template<>
-   struct SerializationRule<Annies::Text, Annies::Recipe> {
+   template<class T> requires CT::Recipe<Decay<T>>
+   struct SerializationRule<Annies::Text, T> {
       using S = Serializer<Annies::Text>;
       using Context = typename S::Context;
 
-      static void Serialize(Annies::Recipe const&, Annies::Text&, Context*);
+      static void Serialize(ConstAll<T&>, Annies::Text&, Context*);
    };
    
    /// Rule for serializing characters to Text. Wraps them in ''.             
@@ -162,7 +162,7 @@ namespace Langulus::CTTI
    };
 
    /// Rule for serializing tags to Text.                                     
-   template<CT::Tag T>
+   template<class T> requires CT::Tag<Decay<T>>
    struct SerializationRule<Annies::Text, T> {
       using S = Serializer<Annies::Text>;
       using Context = typename S::Context;
@@ -183,19 +183,23 @@ namespace Langulus::CTTI
       using DC = Decay<C>;
       static_assert(CT::NotHandle<DC>);
       DC const& self = DenseCast(may_be_sparse);
-      S::BeginScope(self, out, context);
+      if (not self.IsEmpty()) {
+         // A container might potentially carry only a state            
+         S::BeginScope(self, out, context);
 
-      size_t counter = 0;
-      self.Apply([&](auto const& item) {
-         if (counter)
-            S::Separate(self, out, context);
+         size_t counter = 0;
+         self.Apply([&](auto const& item) {
+            if (counter)
+               S::Separate(self, out, context);
 
-         Langulus::Serialize(item, out, context);
-         ++counter;
-      });
+            Langulus::Serialize(item, out, context);
+            ++counter;
+         });
 
-      S::EndScope(self, out, context);
+         S::EndScope(self, out, context);
+      }
 
+      // Deposit the state after all elements                           
       if constexpr (requires { self.IsPast(); }) {
          if (self.IsPast())
             out += Serial::Past.Token;
@@ -228,11 +232,22 @@ namespace Langulus::CTTI
             // Serialize a type-erased container                        
             const auto T = self.template GetType<ID>();
             const auto text_meta = MetaDataOf<Annies::Text>();
-            const auto serializer = T.GetMorphism(text_meta).serialize;
+            const auto& morphism = T.GetMorphism(text_meta);
             try {
-               LglsAssert(serializer, "Missing serializer",
-                  " from ", T.GetName(), " to ", text_meta.GetName());
-               serializer(DecvqAllCast(self.template GetRaw<ID>()), &out, context);
+               LglsAssert(morphism.serialize or morphism.convert,
+                  "Missing serializer/converter ",
+                  "from ", T.GetName(), " to ", text_meta.GetName()
+               );
+
+               if (morphism.serialize)
+                  morphism.serialize(DecvqAllCast(self.template GetRaw<ID>()), &out, context);
+               else {
+                  alignas(Annies::Text) uint8_t local_memory[sizeof(Annies::Text)];
+                  auto local_memory_as_text = reinterpret_cast<Annies::Text*>(local_memory);
+                  morphism.convert(DecvqAllCast(self.template GetRaw<ID>()), local_memory_as_text);
+                  out += *local_memory_as_text;
+                  local_memory_as_text->~Text();
+               }
             }
             catch (...) {
                // Catch everything so that we can close any scopes      
@@ -278,11 +293,12 @@ namespace Langulus::CTTI
 
    /// MARK: Text                                                             
    /// Rule for serializing characters to Text. Wraps it in "".               
-   inline void SerializationRule<Annies::Text, Annies::Text>::Serialize(
-      Annies::Text const& item, Annies::Text& out, Context*
+   template<class T> requires Exact<Decay<T>, Annies::Text>
+   void SerializationRule<Annies::Text, T>::Serialize(
+      ConstAll<T&> may_be_sparse, Annies::Text& out, Context*
    ) {
       out += Serial::OpenString.Token;
-      out += item;
+      out += DenseCast(may_be_sparse);
       out += Serial::CloseString.Token;
    }
 
@@ -298,9 +314,12 @@ namespace Langulus::CTTI
 
    /// MARK: Bytes                                                            
    /// Rule for serializing bytes to Text. Prepends 0x.                       
-   inline void SerializationRule<Annies::Text, Annies::Bytes>::Serialize(
-      Annies::Bytes const& item, Annies::Text& out, Context*
+   template<class T> requires Exact<Decay<T>, Annies::Bytes>
+   void SerializationRule<Annies::Text, T>::Serialize(
+      ConstAll<T&> may_be_sparse, Annies::Text& out, Context*
    ) {
+      auto& item = DenseCast(may_be_sparse);
+
       out += Serial::OpenByte.Token;
       out.Reserve(item.GetCount()*2);
       ::std::array<char, sizeof(Byte) * 2> temp;
@@ -327,9 +346,12 @@ namespace Langulus::CTTI
 
    /// MARK: Recipes                                                          
    /// Rule for serializing recipes to Text.                                  
-   inline void SerializationRule<Annies::Text, Annies::Recipe>::Serialize(
-      Annies::Recipe const& recipe, Annies::Text& out, Context* context
+   template<class T> requires CT::Recipe<Decay<T>>
+   void SerializationRule<Annies::Text, T>::Serialize(
+      ConstAll<T&> may_be_sparse, Annies::Text& out, Context* context
    ) {
+      auto& recipe = DenseCast(may_be_sparse);
+
       // What is this a recipe for?                                     
       out += recipe.GetTarget().GetName();
       out += recipe.GetCharge();
@@ -343,10 +365,12 @@ namespace Langulus::CTTI
 
    /// MARK: Tags                                                             
    /// Rule for serializing recipes to Text.                                  
-   template<CT::Tag T>
+   template<class T> requires CT::Tag<Decay<T>>
    inline void SerializationRule<Annies::Text, T>::Serialize(
-      ConstAll<T&> tag, Annies::Text& out, Context* context
+      ConstAll<T&> may_be_sparse, Annies::Text& out, Context* context
    ) {
+      auto& tag = DenseCast(may_be_sparse);
+
       // Tag name                                                       
       out += tag.GetTag().GetName();
 

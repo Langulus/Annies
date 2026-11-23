@@ -44,16 +44,6 @@ namespace Langulus::Annies::Component
       void SetCharge(this auto& self, Langulus::Charge const& c) {
          ThisCom::GetChargeInner() = c;
       }
-      
-      /// Copy/move charge from another container                             
-      ///   @param other the container to copy charge from                    
-      template<Cid SID = ID, CT::Container I, class SELF> requires CT::NoIntent<I>
-      void AbsorbCharge(this SELF& self, I const& other) {
-         if constexpr (requires { other.template GetCharge<SID>(); })
-            ThisCom::SetCharge(other.template GetCharge<SID>());
-         else
-            ThisCom::SetCharge({});
-      }
 
       /// Reset the charge                                                    
       template<Cid SID = ID>
@@ -131,21 +121,19 @@ namespace Langulus::Annies::Component
       /// Transfer from any kind of container, respecting intents.            
       /// Do it for a particular dimension.                                   
       ///   @param intent The intent and container to transfer from.          
-      template<Cid D, class SELF, CT::Intent I> requires CT::Container<I>
-      void SliceFrom(this SELF& self, I&& intent) {
+      template<Cid D, class SELF, CT::Intent I> 
+      void SliceFrom(this SELF& self, I&& intent) 
+      requires (CT::Container<I> and requires { intent->template GetCharge<D>(); }) {
          static_assert(CT::Disowned<I>);
-         ThisCom::template AbsorbCharge<D>(DeintCast(intent));
+         ThisCom::SetCharge(intent->template GetCharge<D>());
       }
 
       /// Transfer from any kind of container, respecting intents             
       ///   @param intent the intent and container to transfer from           
-      template<class SELF, CT::Intent I> requires CT::Container<I>
-      void ConstructFrom(this SELF& self, I&& intent) {
-         ThisCom::AbsorbCharge(DeintCast(intent));
-         
-         if constexpr (CT::Moved<I>) {
-            if_available(intent->template SetChargeInner<ID>({}));
-         }
+      template<class SELF, CT::Intent I> 
+      void ConstructFrom(this SELF& self, I&& intent)
+      requires (CT::Container<I> and requires { intent->template GetCharge<ID>(); }) {
+         ThisCom::SetCharge(intent->template GetCharge<ID>());
       }
    };
 }

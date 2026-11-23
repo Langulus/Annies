@@ -739,7 +739,6 @@ namespace Langulus::Annies::Component
       
    public:
       /// Subscript operator for accessing value at a specific key in maps.   
-      /// Usable only when map is mutable. Use Find otherwise.                
       ///   @param key the key to search for                                  
       ///   @attention the value will be default-constructed if key didn't    
       ///      exist before calling this operator. Use Find if you don't want 
@@ -770,6 +769,28 @@ namespace Langulus::Annies::Component
 
             // Add the key                                              
             found = self.Merge(key);
+            return *found.GetValHandle();
+         }
+      }
+
+      /// Subscript operator for accessing value at a specific key in maps.   
+      ///   @param key the key to search for                                  
+      ///   @attention this is a constant access, so accessing nonexistent    
+      ///      key will throw an exception                                    
+      ///   @return a reference to the value                                  
+      template<CT::Multidimensional C, CT::NoIntent K> requires (not CT::TypeErased<C>)
+      auto& operator[] (this C const& self, K const& key) {
+         if constexpr (not Same<K, TypeOf<C>>) {
+            const auto key_converted = static_cast<TypeOf<C>>(key);
+            LglsAssert(not self.IsEmpty(), "Can't access empty map");
+
+            const auto found = self.TableSearch(key_converted);
+            LglsAssert(found, "No such key exists in map");
+            return *found.GetValHandle();
+         }
+         else {
+            const auto found = self.TableSearch(key);
+            LglsAssert(found, "No such key exists in map");
             return *found.GetValHandle();
          }
       }

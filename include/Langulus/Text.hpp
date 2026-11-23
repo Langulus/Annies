@@ -487,7 +487,7 @@ namespace Langulus::Annies
 
       /// Comparison                                                          
       constexpr auto operator <=> (CT::TextRange auto const& other) const noexcept -> ::std::partial_ordering {
-         return this->Compare(other);
+         return ToPartialOrdering(this->Compare(other));
       }
 
       constexpr auto operator <=> (Text const& other) const noexcept -> ::std::partial_ordering {
@@ -645,7 +645,7 @@ namespace Langulus
 /// Same-type conversions are always suppressed, but serializations are not.  
 /// This particular morphism adds quotes around the text.                     
 //LANGULUS_MORPHISM(Annies::Text, Annies::Text); //TODO and should also escape any quotes already in it
-LANGULUS_MORPHISM_CONCEPT(CT::Container, Annies::Text);
+LANGULUS_MORPHISM_CONCEPT(CT::ContainerOfAnySparseness, Annies::Text);
 
 /// Convert std::string -> Text                                               
 LANGULUS_MORPHISM(std::string, Annies::Text);

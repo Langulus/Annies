@@ -73,6 +73,25 @@ namespace Langulus::Annies::Component
       static constexpr auto CountMax = ::std::numeric_limits<Count<C>>::max();
 
    public:
+      /// Dereference the first element inside the container                  
+      template<CT::IndexedLinearly C>
+      constexpr decltype(auto) operator * (this C&& self)
+      requires (not ::std::is_void_v<Deptr<StackRequest>>) {
+         LglsAssert(not self.IsEmpty(), "Container is empty");
+         return *ThisCom::GetRaw();
+      }
+
+      /// Access the first element inside the container                       
+      template<CT::IndexedLinearly C>
+      constexpr auto* operator -> (this C&& self)
+      requires (not ::std::is_void_v<DeptrAll<StackRequest>>) {
+         LglsAssert(not self.IsEmpty(), "Container is empty");
+         ForEachIndirection(ThisCom::GetRaw(), [](auto& i) {
+            LglsAssert(i != nullptr, "Dereferencing nullptr");
+         });
+         return &DenseCast(ThisCom::GetRaw());
+      }
+      
       /// Get a direct access to the heap memory                              
       ///   @attention using raw pointer while self.IsEmpty() may lead to     
       ///      undefined behavior                                             
