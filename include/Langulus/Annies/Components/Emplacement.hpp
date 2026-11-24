@@ -333,7 +333,7 @@ namespace Langulus::Annies::Component
                   // If T is Text**, we allocate one intermediate ptr   
                   #if LANGULUS_FEATURE(MANAGED_MEMORY)
                      const auto cloned_ptrs = Allocator::Allocate(
-                        T,
+                        T.GetDecvqAll(),
                         pot_t(Roof2(T.GetSize() * (indirects - 1)))
                      );
                   #else
@@ -420,7 +420,7 @@ namespace Langulus::Annies::Component
                   // Multiple indirections                              
                   #if LANGULUS_FEATURE(MANAGED_MEMORY)
                      const auto cloned_ptrs = Allocator::Allocate(
-                        MetaDataOf<T>(),
+                        MetaDataOf<DecvqAll<T>>(),
                         pot_t(Roof2(sizeof(T) * (indirects - 1)))
                      );
                   #else
@@ -514,7 +514,7 @@ namespace Langulus::Annies::Component
                // Multiple indirections                                 
                #if LANGULUS_FEATURE(MANAGED_MEMORY)
                   const auto cloned_ptrs = Allocator::Allocate(
-                     MetaDataOf<T>(),
+                     MetaDataOf<DecvqAll<T>>(),
                      pot_t(Roof2(sizeof(T) * (indirects - 1)))
                   );
                #else

@@ -195,7 +195,7 @@ namespace Langulus::Annies::Component
          const auto request = ThisCom::RequestHeap(elements + size_t(CT::NullTerminated<C>));
 
          #if LANGULUS_FEATURE(MANAGED_MEMORY)
-            auto al = Allocator::Allocate(self.template GetType<SID>(), request.mTotalBytes);
+            auto al = Allocator::Allocate(self.template GetType<SID>().GetDecvqAll(), request.mTotalBytes);
          #else
             auto al = Allocator::Allocate(self.template GetAlignment<SID>(), request.mTotalBytes);
          #endif

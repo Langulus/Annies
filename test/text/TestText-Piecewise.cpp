@@ -837,7 +837,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Text", TestType
          auto compared_full = [&](T& a, [[maybe_unused]] const char* intent) {
             T same_pack {a};
 
-            if constexpr (Same<E, RT>) {
+            if constexpr (Same<Decay<E>, RT>) {
                // RT serializes to the same text regardless inner int   
                REQUIRE      (a == another_pack1);
                REQUIRE_FALSE(a != another_pack1);
@@ -895,16 +895,12 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Text", TestType
       /// MARK: Contains                                                      
       WHEN("Contains when full") {
          auto contains_full = [&](auto& a) {
-            if constexpr (CT::Sparse<E>) {
-               //TODO pointers are always different
-               REQUIRE_FALSE(a.Contains('?'));
-            }
-            else if constexpr (Same<E, Text>) {
+            if constexpr (Same<E, Text>) {
                REQUIRE      (a.Contains('5'));
                REQUIRE      (a.Contains('6'));
                REQUIRE_FALSE(a.Contains('?'));
             }
-            else if constexpr (Same<E, RT>) {
+            else if constexpr (Same<Decay<E>, RT>) {
                REQUIRE      (a.Contains('R'));
                REQUIRE      (a.Contains('T'));
                REQUIRE      (a.Contains('('));
@@ -913,6 +909,14 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Text", TestType
             }
             else if constexpr (Same<E, char>) {
                REQUIRE      (a.Contains(','));
+               REQUIRE_FALSE(a.Contains('?'));
+            }
+            else if constexpr (Same<E, char*>) {
+               REQUIRE      (a.Contains('\''));
+               REQUIRE      (a.Contains('5'));
+               REQUIRE_FALSE(a.Contains('6'));
+            }
+            else if constexpr (CT::Sparse<E>) {
                REQUIRE_FALSE(a.Contains('?'));
             }
             else {
@@ -940,10 +944,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Text", TestType
       /// MARK: Contains Range                                                
       WHEN("ContainsRange when full") {
          auto contains_full = [&](auto& a) {
-            if constexpr (CT::Sparse<E>) {
-               //TODO pointers are always different
-            }
-            else if constexpr (Same<E, RT>) {
+            if constexpr (Same<Decay<E>, RT>) {
                REQUIRE      (a.ContainsRange("RT("));
                REQUIRE_FALSE(a.ContainsRange("int"));
                REQUIRE_FALSE(a.ContainsRange(""));
@@ -952,6 +953,14 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Text", TestType
                REQUIRE      (a.ContainsRange(","));
                REQUIRE_FALSE(a.ContainsRange("?"));
                REQUIRE_FALSE(a.ContainsRange(""));
+            }
+            else if constexpr (Same<E, char*>) {
+               REQUIRE      (a.Contains('\''));
+               REQUIRE      (a.Contains('5'));
+               REQUIRE_FALSE(a.Contains('6'));
+            }
+            else if constexpr (CT::Sparse<E>) {
+               REQUIRE_FALSE(a.Contains('?'));
             }
             else {
                REQUIRE      (a.ContainsRange("55"));
@@ -1232,7 +1241,7 @@ TEST_CASE_TEMPLATE("Test piecewise-constructed Text", TestType
       }
    }
 
-   if constexpr (not Same<E, RT>) {
+   if constexpr (not Same<Decay<E>, RT>) {
       GIVEN("Two piecewise-constructed containers") {
          const ScopedE e1 {555};
          const ScopedE e2 {666};

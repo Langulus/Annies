@@ -206,7 +206,7 @@ void Text_Helper_CompareOne(const T& many, const E& e) {
 }
 
 /// Map all pointers as convertible to text, so that we can serialize them    
-LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
+/*LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
       if constexpr (CT::Complete<Deptr<T>>) {
          if constexpr (CT::Character<Deptr<T>>)
             return {from};
@@ -216,4 +216,4 @@ LANGULUS_MORPHISM_CONCEPT_CUSTOM(Langulus::CT::Sparse, {
       else return NameOf<T>() + "(" + Annies::Text::Hex<true>(from) + ")";
    },
    Langulus::Annies::Text
-);
+);*/

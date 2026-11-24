@@ -106,7 +106,7 @@ namespace Langulus::Annies::Component
          }
 
          // Time to allocate a new page                                 
-         auto new_allocation = Allocator::Allocate(MetaDataOf<C>(), pot_t(Roof2(sizeof(C))));
+         auto new_allocation = Allocator::Allocate(MetaDataOf<Decay<C>>(), pot_t(Roof2(sizeof(C))));
          last_page->next = new_allocation->GetBlockStart();
          new (last_page->next) C {};
          static_cast<C*>(last_page->next)->AllocateFresh(elements);

@@ -436,7 +436,7 @@ namespace Langulus::Annies::Component
          else {
             const auto size = static_cast<pot_t>(Roof2(S));
             #if LANGULUS_FEATURE(MANAGED_MEMORY)
-               auto temporary = Allocator::Allocate(T, size);
+               auto temporary = Allocator::Allocate(T.GetDecvqAll(), size);
             #else
                auto temporary = Allocator::Allocate(T.GetAlignment(), size);
             #endif

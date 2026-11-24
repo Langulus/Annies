@@ -1222,6 +1222,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Pair/TPair", TestType
          WHEN("Reset, and then immediately allocated again") {
             auto reset_and_reallocate = [&](T& a) {
                const auto memory = a.GetRaw();
+               REQUIRE(a.GetUses() == 1);
                a.Reset();
                a = TPair<E1 const&, E2 const&> {*element1, *element2};
                REQUIRE(a.GetRaw() == memory);

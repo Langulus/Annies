@@ -299,7 +299,7 @@ namespace Langulus::Annies
    #pragma pack(pop)
 }
 
-/// Convert POD -> Bytes (this includes pointers as well)                     
-LANGULUS_MORPHISM_CONCEPT(CT::POD, Annies::Bytes);
+/// Convert POD -> Bytes                                                      
+LANGULUS_MORPHISM_CONCEPT(CT::DensePOD, Annies::Bytes);
 
 #include "SerializeBytes.hpp"

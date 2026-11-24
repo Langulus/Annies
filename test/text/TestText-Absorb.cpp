@@ -10,6 +10,8 @@
 
 
 TEST_CASE_TEMPLATE("Test absorb-constructed Text", TestType
+   , Types<Text, ScopedElement<RT*>>
+
    // Elements are not allocated by the memory manager                  
    , Types<Text, ScopedElement<Text>>
    , Types<Text, ScopedElement<int>>
@@ -20,7 +22,6 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Text", TestType
    , Types<Text, ScopedElement<Text*>>
    , Types<Text, ScopedElement<int*>>
    , Types<Text, ScopedElement<Many*>>
-   , Types<Text, ScopedElement<RT*>>
    , Types<Text, ScopedElement<char*>>
 
    , Types<Text, ScopedElement<Text**>>
@@ -997,7 +998,7 @@ TEST_CASE_TEMPLATE("Test absorb-constructed Text", TestType
          auto compared_full = [&](T& a, [[maybe_unused]] const char* intent) {
             T same_pack {a};
 
-            if constexpr (Same<E, RT>) {
+            if constexpr (Same<Decay<E>, RT>) {
                // RT serializes to the same text regardless inner int   
                REQUIRE      (a == another_pack1);
                REQUIRE_FALSE(a != another_pack1);

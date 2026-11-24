@@ -50,12 +50,6 @@ LANGULUS_CTTI_CONCEPT_DECVQ(Slots);
 LANGULUS_CTTI_CONCEPT_DECVQ(Recipe);
 LANGULUS_CTTI_CONCEPT_DECVQ(Iterator);
 
-namespace Langulus::CT
-{
-   template<class T>
-   concept ContainerOfAnySparseness = CT::Container<Decay<T>>;
-}
-
 #define if_available(...) if constexpr (requires { __VA_ARGS__; }) { __VA_ARGS__; }
 
 //WORKAROUND G++ (up to version 16 when a last checked) has a notorious bug when       
