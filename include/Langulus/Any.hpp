@@ -134,6 +134,73 @@ namespace Langulus::Annies
       using Com::Comparison<>::operator <=>;
       using Com::Comparison<>::operator ==;
 
+      /// Create an empty container from a dynamic type and state             
+      ///   @param type type of the container                                 
+      ///   @param states optional states of the container                    
+      ///   @return the new container instance                                
+      static Any Typed(DMeta type, int states = 0) {
+         Any result;
+         result.SetType(type);
+         result.SetState(states);
+         return result;
+      }
+   
+      static Any Typed(CT::Container auto const& typed, int states = 0) {
+         Any result;
+         result.SetType(typed.GetType());
+         result.SetState(states);
+         return result;
+      }
+   
+      /// Create an empty container by copying another container's state      
+      ///   @attention only the unconstrained state is copied                 
+      ///   @param states states of the container                             
+      ///   @param additional additional states of the container              
+      ///   @return the new container instance                                
+      static Any CopyStates(CT::Container auto const& states, int additional = 0) {
+         Any result;
+         result.SetState(states.GetState() | additional);
+         return result;
+      }
+
+      #if LANGULUS_FEATURE(MANAGED_REFLECTION)
+         /// Make a container with a missing past state and optional filter   
+         /// at runtime, using reflected token                                
+         ///   @param tokens... reflected tokens (only last one is used)      
+         ///   @return a container marked as missing past with chosen filters 
+         template<CT::Text...T>
+         static Any Past(T&&...tokens) {
+            Any result;
+            result.EnablePast();
+            if constexpr (sizeof...(tokens)) {
+               auto push = [&result](RTTI::DefinitionData const* meta) {
+                  LglsAssert(meta, "Missing meta for past filter");
+                  result = DMeta {meta};
+               };
+               (push(RTTI::Registry::GetMetaDataByToken(tokens)), ...);
+            }
+            return result;
+         }
+
+         /// Make a container with a missing future state and optional filter 
+         /// at runtime, using reflected tokens                               
+         ///   @param tokens... reflected tokens (only last one is used)      
+         ///   @return container marked as missing future with chosen filters 
+         template<CT::Text...T>
+         static Any Future(T&&...tokens) {
+            Any result;
+            result.EnableFuture();
+            if constexpr (sizeof...(tokens)) {
+               auto push = [&result](RTTI::DefinitionData const* meta) {
+                  LglsAssert(meta, "Missing meta for future filter");
+                  result = DMeta {meta};
+               };
+               (push(RTTI::Registry::GetMetaDataByToken(tokens)), ...);
+            }
+            return result;
+         }
+      #endif
+
       /// Instantiate a reflected constant                                    
       static Any FromConstant(RTTI::CMeta c) {
          Any result;

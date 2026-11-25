@@ -323,21 +323,32 @@ namespace Langulus::CTTI
             const auto T = self.template GetType<ID>();
             const auto text_meta = MetaDataOf<Annies::Text>();
             const auto& morphism = T.GetMorphism(text_meta);
+            const auto& morphism_origin = T.GetOrigin().GetMorphism(text_meta);
             try {
-               LglsAssert(morphism.serialize or morphism.convert,
+               /*LglsAssert(morphism.serialize or morphism.convert,
                   "Missing serializer/converter ",
                   "from ", T.GetName(), " to ", text_meta.GetName()
-               );
+               );*/
 
                if (morphism.serialize)
                   morphism.serialize(DecvqAllCast(self.template GetRaw<ID>()), &out, context);
-               else {
+               else if (morphism_origin.serialize)
+                  morphism_origin.serialize(self.template GetDense<ID>().data, &out, context);
+               else if (morphism.convert) {
                   alignas(Annies::Text) uint8_t local_memory[sizeof(Annies::Text)];
                   auto local_memory_as_text = reinterpret_cast<Annies::Text*>(local_memory);
                   morphism.convert(DecvqAllCast(self.template GetRaw<ID>()), local_memory_as_text);
                   out += *local_memory_as_text;
                   local_memory_as_text->~Text();
                }
+               else if (morphism_origin.convert) {
+                  alignas(Annies::Text) uint8_t local_memory[sizeof(Annies::Text)];
+                  auto local_memory_as_text = reinterpret_cast<Annies::Text*>(local_memory);
+                  morphism_origin.convert(self.template GetDense<ID>().data, local_memory_as_text);
+                  out += *local_memory_as_text;
+                  local_memory_as_text->~Text();
+               }
+               else S::Error(T, ID, out, context);
             }
             catch (...) {
                // Catch everything so that we can close any scopes      

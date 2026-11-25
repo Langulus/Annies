@@ -687,6 +687,22 @@ namespace Langulus::Annies::Component
                ThisCom::template EmplaceByCloningStandardPointers<SID>(rhs);
             #endif
          }
+         else if constexpr (Same<I, Describe>) {
+            // Describe-construct an element                            
+            void* const dst = self.template GetRawVoid<SID>();
+
+            if constexpr (CT::TypeErased<C>) {
+               const auto T = self.template GetType<SID>();
+               const auto describe = T.GetDescribeConstructor();
+               LglsAssert(describe,
+                  "Contained type is not describe-constructible: ", T);
+               describe(dst, intent.what);
+            }
+            else {
+               using T = TypeOf<C, SID>;
+               new (dst) T (LglsFwd(intent));
+            }
+         }
          else if constexpr (CT::Handle<IT>) {
             // We're emplacing using a handle, which can be faster due  
             // to carrying allocation data with itself when sparse,     
@@ -746,42 +762,16 @@ namespace Langulus::Annies::Component
          else {
             void* const dst = self.template GetRawVoid<SID>();
 
-            /*if constexpr (CT::TypeErased<C, IT>) {
-               //                                                       
-               // This container is type-erased                         
-               LglsAssumeDev((self.template IsSame<IT, SID>()), "Type mismatch");
-               auto T = self.template GetType<SID>();
-               void* const src = const_cast<void*>(static_cast<const void*>(&rhs));
-               
-               if constexpr (CT::Moved<I>)
-                  T.GetMoveConstructor()(src, dst);
-               else if constexpr (CT::Abandoned<I>)
-                  T.GetAbandonConstructor()(src, dst);
-               else if constexpr (CT::Referred<I>)
-                  T.GetReferConstructor()(src, dst);
-               else if constexpr (CT::Disowned<I>)
-                  T.GetDisownConstructor()(src, dst);
-               else if constexpr (CT::Copied<I>)
-                  T.GetCopyConstructor()(src, dst);
-               else if constexpr (CT::Cloned<I>)
-                  T.GetCloneConstructor()(src, dst);
-               else
-                  static_assert(false, "Unrecognized intent");
+            if constexpr (CT::Typed<C>) {
+               using T = TypeOf<C, SID>;
+               static_assert(Same<T, IT> or ::std::is_constructible_v<T, IT>,
+                  "Type mismatch: " + NameOf<T>() +
+                  " is not compatible with " + NameOf<IT>()
+               );
             }
-            else {*/
-               //                                                       
-               // This container is statically-typed                    
-               if constexpr (CT::Typed<C>) {
-                  using T = TypeOf<C, SID>;
-                  static_assert(Same<T, IT> or ::std::is_constructible_v<T, IT>,
-                     "Type mismatch: " + NameOf<T>() +
-                     " is not compatible with " + NameOf<IT>()
-                  );
-               }
-               else LglsAssumeDev((self.template IsSame<IT, SID>()), "Type mismatch");
+            else LglsAssumeDev((self.template IsSame<IT, SID>()), "Type mismatch");
 
-               IntentNew(dst, LglsFwd(intent));
-            //}
+            IntentNew(dst, LglsFwd(intent));
 
             if_available(self.template EmplaceEntries<SID>(LglsFwd(intent)));
          }

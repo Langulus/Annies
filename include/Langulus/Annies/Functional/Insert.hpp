@@ -183,27 +183,38 @@ namespace Langulus::Annies::Component
 
          if constexpr (sizeof...(an) == 0) {
             // Insertions have a common type                         
-            if constexpr (CT::Handle<A1>)
-               self.AbsorbType(Copy(a1));
-            else
-               self.DeduceType(LglsFwd(a1));
+            if constexpr (not Same<A1, Describe>) {
+               if constexpr (CT::Handle<A1>)
+                  self.AbsorbType(Copy(a1));
+               else
+                  self.DeduceType(LglsFwd(a1));
+            }
 
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
          }
          else if constexpr (Same<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>) {
             // Insertions have a common type                         
-            self.template SetType<Decvq<Deref<CT::ReflectedAs<Deint<A1>>>>>();
+            if constexpr (not Same<A1, Describe>)
+               self.template SetType<Decvq<Deref<CT::ReflectedAs<Deint<A1>>>>>();
+
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
          else if constexpr (requires { typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type; }) {
             // Insertions have a common type                         
-            self.template SetType<typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type>();
+            if constexpr (not Same<A1, Describe>)
+               self.template SetType<typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type>();
+
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
          else if constexpr (requires { typename C::DeepType; }) {
             // Arguments of different types require deepening        
+            static_assert(not Same<A1, Describe> and ((not Same<AN, Describe>) and ...),
+               "Can't intermix different types with Describe intent. "
+               "Insert them separately."
+            );
+
             using DT = typename C::DeepType;
             C deepened;
             deepened.Insert(DT {Langulus::Absorb, Abandon {self}});
@@ -409,27 +420,38 @@ namespace Langulus::Annies::Component
 
          if constexpr (sizeof...(an) == 0) {
             // Insertions have a common type                         
-            if constexpr (CT::Handle<A1>)
-               self.AbsorbType(Copy(a1));
-            else
-               self.DeduceType(LglsFwd(a1));
+            if constexpr (not Same<A1, Describe>) {
+               if constexpr (CT::Handle<A1>)
+                  self.AbsorbType(Copy(a1));
+               else
+                  self.DeduceType(LglsFwd(a1));
+            }
                
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
          }
          else if constexpr (Same<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>) {
             // Insertions have a common type                         
-            self.template SetType<Decvq<Deref<CT::ReflectedAs<Deint<A1>>>>>();
+            if constexpr (not Same<A1, Describe>)
+               self.template SetType<Decvq<Deref<CT::ReflectedAs<Deint<A1>>>>>();
+
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
          else if constexpr (requires { typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type; }) {
             // Insertions have a common type                         
-            self.template SetType<typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type>();
+            if constexpr (not Same<A1, Describe>)
+               self.template SetType<typename ::std::common_type_t<CT::ReflectedAs<Deint<A1>>, CT::ReflectedAs<Deint<AN>>...>::type>();
+
             ThisCom::PrepareForInsertion(LglsFwd(a1), rhs_count, deepened);
            (ThisCom::PrepareForInsertion(LglsFwd(an), rhs_count, deepened), ...);
          }
          else if constexpr (requires { typename C::DeepType; }) {
             // Arguments of different types require deepening        
+            static_assert(not Same<A1, Describe> and ((not Same<AN, Describe>) and ...),
+               "Can't intermix different types with Describe intent. "
+               "Insert them separately."
+            );
+
             using DT = typename C::DeepType;
             C deepened;
             deepened.Insert(DT {Langulus::Absorb, Abandon {self}});
