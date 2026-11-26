@@ -653,6 +653,34 @@ namespace Langulus::Annies::Component
       }
    #endif
 
+      /// Emplace on top of the first element using describe-construction     
+      ///   @attention Assumes destination memory has been preallocated,      
+      ///      including all levels of indirection.                           
+      ///   @attention Does not modify any container state.                   
+      ///   @attention This overwrites previous handle without dereferencing  
+      ///      it and without destroying anything.                            
+      ///   @attention Works in one dimension at a time!                      
+      ///   @param intent the descriptor, wrapped in Describe intent          
+      template<Cid SID = ID, CT::Container C> requires Relevant<SID>
+      void EmplaceWithIntent(this C&& self, Describe&& intent) {
+         LglsAssumeDev(self.template GetRaw<SID>(), "Invalid heap");
+         LglsAssumeDev(self.template IsTyped<SID>(), "Invalid type");
+
+         // Describe-construct an element                               
+         void* const dst = self.template GetRawVoid<SID>();
+         if constexpr (CT::TypeErased<C>) {
+            const auto T = self.template GetType<SID>();
+            const auto describe = T.GetDescribeConstructor();
+            LglsAssert(describe,
+               "Contained type is not describe-constructible: ", T);
+            describe(dst, LglsFwd(intent));
+         }
+         else {
+            using T = TypeOf<C, SID>;
+            new (dst) T (LglsFwd(intent));
+         }
+      }
+
       /// Emplace on top of the first element using an intent                 
       ///   @attention Assumes destination memory has been preallocated,      
       ///      including all levels of indirection.                           
@@ -687,22 +715,6 @@ namespace Langulus::Annies::Component
                ThisCom::template EmplaceByCloningStandardPointers<SID>(rhs);
             #endif
          }
-         else if constexpr (Same<I, Describe>) {
-            // Describe-construct an element                            
-            void* const dst = self.template GetRawVoid<SID>();
-
-            if constexpr (CT::TypeErased<C>) {
-               const auto T = self.template GetType<SID>();
-               const auto describe = T.GetDescribeConstructor();
-               LglsAssert(describe,
-                  "Contained type is not describe-constructible: ", T);
-               describe(dst, intent.what);
-            }
-            else {
-               using T = TypeOf<C, SID>;
-               new (dst) T (LglsFwd(intent));
-            }
-         }
          else if constexpr (CT::Handle<IT>) {
             // We're emplacing using a handle, which can be faster due  
             // to carrying allocation data with itself when sparse,     
@@ -718,18 +730,10 @@ namespace Langulus::Annies::Component
                LglsAssumeDev(self.template IsSame<SID>(T), "Type mismatch");
                void* const src = rhs.template GetRawVoid<SID>();
 
-               if constexpr (CT::Moved<I>) {
-                  /*if (rhs.template IsConstant<SID>())
-                     T.GetReferConstructor()(src, dst);
-                  else*/
-                     T.GetMoveConstructor()(src, dst);
-               }
-               else if constexpr (CT::Abandoned<I>) {
-                  /*if (rhs.template IsConstant<SID>())
-                     T.GetReferConstructor()(src, dst);
-                  else*/
-                     T.GetAbandonConstructor()(src, dst);
-               }
+               if constexpr (CT::Moved<I>)
+                  T.GetMoveConstructor()(src, dst);
+               else if constexpr (CT::Abandoned<I>)
+                  T.GetAbandonConstructor()(src, dst);
                else if constexpr (CT::Referred<I>)
                   T.GetReferConstructor()(src, dst);
                else if constexpr (CT::Disowned<I>)
@@ -965,7 +969,7 @@ namespace Langulus::Annies::Component
                         self.template AllocateMore<SID>(1);
 
                      // Describe-construct the first element            
-                     constructor(self.template GetRaw<SID>(), LglsFwd(arguments.what)...);
+                     constructor(self.template GetRaw<SID>(), LglsFwd(arguments)...);
                   }
                }
                else {

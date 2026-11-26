@@ -1040,7 +1040,9 @@ namespace Langulus::Annies::Component
       if constexpr (CT::Array<T>) {
          for (size_t i = 0; i < ExtentOf<T>; ++i) {
             Id::ForEach([&]<Cid D>{
-               if constexpr (CT::Copied<I>)
+               if constexpr (Same<Deint<I>, Describe>)
+                  to.template EmplaceWithIntent<D>(a[i]);
+               else if constexpr (CT::Copied<I>)
                   to.template EmplaceWithIntent<D>(Refer(DeintCast(a)[i]));
                else
                   to.template EmplaceWithIntent<D>(I::Nest(DeintCast(a)[i]));
@@ -1051,7 +1053,9 @@ namespace Langulus::Annies::Component
       }
       else {
          Id::ForEach([&]<Cid D>{
-            if constexpr (CT::Copied<I>)
+            if constexpr (Same<Deint<I>, Describe>)
+               to.template EmplaceWithIntent<D>(LglsFwd(a));
+            else if constexpr (CT::Copied<I>)
                to.template EmplaceWithIntent<D>(Refer(LglsFwd(a)));
             else
                to.template EmplaceWithIntent<D>(FWDIntent(a));

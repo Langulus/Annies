@@ -234,7 +234,9 @@ namespace Langulus::Annies
    using DecidePick = typename decltype(Inner::DecidePickType<Deref<C>>())::First;
 
    template<class...T>
-   concept Disambiguate = ((not requires { typename Decay<T>::CTTI_Disambiguator; }) and ...);
+   concept Disambiguate = ((not Same<T, Describe>
+       and not requires { typename Decay<T>::CTTI_Disambiguator; }
+     ) and ...);
 }
 
 namespace Langulus

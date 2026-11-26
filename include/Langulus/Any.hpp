@@ -81,7 +81,7 @@ namespace Langulus::Annies
 
       /// Construction that either absorbs the provided container, or         
       /// emplaces A in the container                                         
-      template<class A>
+      template<Disambiguate A>
       constexpr Any(A&& argument) {
          if constexpr (CT::ContainsOne<A>) {
             LglsAssumeUser(Same<Deint<A>, Any>,

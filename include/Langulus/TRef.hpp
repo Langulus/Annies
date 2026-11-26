@@ -80,7 +80,7 @@ namespace Langulus::Annies
       }
 
       /// Initialize with a pointer. Respects intents.                        
-      template<class A>
+      template<Disambiguate A>
       constexpr TRef(A&& pointer) noexcept {
          if constexpr (CT::ContainsOne<A>)
             this->Absorb(FWDIntent(pointer));
