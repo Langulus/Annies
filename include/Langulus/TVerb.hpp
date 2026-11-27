@@ -445,7 +445,7 @@ namespace Langulus::Annies
       ///   @param rhs the verb to compare against                            
       ///   @return true if verbs match                                       
       ///   @attention charges are ignored                                    
-      constexpr bool operator == (const TVerb& rhs) const {
+      constexpr bool operator == (CT::Executable auto const& rhs) const {
          /*bool same_verb = this->GetVerb() == rhs.GetVerb();
          bool same_context = mContext == rhs.mContext;
          bool same_argument = ArgumentType::CompareEqual(rhs.GetRHS());
@@ -460,7 +460,7 @@ namespace Langulus::Annies
       /// Three-way comparison by precedence only                             
       ///   @param rhs the verb to compare against                            
       ///   @returns the ordering by precedence                               
-      constexpr auto operator <=> (const TVerb& rhs) const noexcept {
+      constexpr auto operator <=> (CT::Executable auto const& rhs) const noexcept {
          return this->GetPrecedence() <=> rhs.GetPrecedence();
       }
 

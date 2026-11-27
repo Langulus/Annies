@@ -944,6 +944,10 @@ namespace Langulus::Annies::Component
                else
                   return *self.template GetAt<RT, SID>(0) == rhs;
             }
+            else {
+               LglsVerbose(Verbose, Logger::Red, "Different types (CompareOneEqualInner): ",
+                  self.GetType(), " not similar to ", NameOf<RT>());
+            }
          
             if constexpr (CT::Text<RT>) {
                if (self.template IsSame<Text, SID>()) {
@@ -952,6 +956,10 @@ namespace Langulus::Annies::Component
                      return *self.template Get<Text, SID>() == Text {Disown(rhs)};
                   else
                      return *self.template GetAt<Text, SID>(0) == Text {Disown(rhs)};
+               }
+               else {
+                  LglsVerbose(Verbose, Logger::Red, "Different types (CompareOneEqualInner): ",
+                     self.GetType(), " not similar to ", NameOf<RT>());
                }
             }
          }

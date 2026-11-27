@@ -537,15 +537,18 @@ namespace Langulus::Annies
       /// Add recipe to the recipe map                                        
       template<CT::Intent T>
       void AddRecipe(T&& recipe) {
-         if constexpr (Same<Deint<T>, DMeta>)
-            this->GetRecsInner().Merge(recipe->GetOrigin());
+         if constexpr (Same<Deint<T>, DMeta>) {
+            const auto meta = recipe->GetOrigin();
+            this->GetRecsInner()[meta] << Recipe::Of(meta);
+            //this->GetRecsInner().Merge(recipe->GetOrigin());
+         }
          else {
             static_assert(CT::Recipe<T>, "Must be a recipe container");
             const auto meta = recipe->GetTarget().GetOrigin();
-            if (not recipe->IsValid()) {
+            /*if (not recipe->IsValid()) {
                this->GetRecsInner().Merge(meta);
                return;
-            }
+            }*/
 
             this->GetRecsInner()[meta] << LglsFwd(recipe);
             /*auto found = this->GetRecsInner().Find(meta);

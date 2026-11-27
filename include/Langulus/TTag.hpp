@@ -146,8 +146,29 @@ namespace Langulus::Annies
          else return this->Assign(LglsFwd(argument));
       }
 
-      using Com::Comparison<>::operator <=>;
-      using Com::Comparison<>::operator ==;
+      /// MARK: Compare                                                       
+      /// Compare tags for equality                                           
+      ///   @param rhs the tag to compare against                             
+      ///   @return true if tags match                                        
+      template<CT::NoIntent RHS>
+      constexpr bool operator == (RHS const& rhs) const {
+         if constexpr (CT::Tag<RHS>) {
+            return this->GetTag() == rhs.GetTag()
+               and GetData() == rhs.GetData();
+         }
+         else return GetData() == rhs;
+      }
+
+      /// Three-way comparison of tags                                        
+      ///   @param rhs the tag to compare against                             
+      ///   @returns the ordering                                             
+      template<CT::NoIntent RHS>
+      constexpr auto operator <=> (RHS const& rhs) const noexcept {
+         if constexpr (CT::Tag<RHS>)
+            return GetData() <=> rhs.GetData();
+         else
+            return GetData() <=> rhs;
+      }
 
       /// Get the data part of the tag                                        
       Many GetData() const {

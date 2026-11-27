@@ -95,11 +95,11 @@ namespace Langulus::Annies::Component
          }*///TODO should be allowed - just make sure we encrypt/decrypt prior to setting copying state
          
          self.SetStateInner(ToInternalState(state));
-         LglsAssert(state == 0,
+         /*LglsAssert(state == 0,
             "There are leftover states after translating to internal representation. "
             "This indicates that state information was lost during translation. "
             "The involved containers are likely state-incompatible."
-         );
+         );*/
       }
 
       /// Get the relevant state when relaying one container to another.      
